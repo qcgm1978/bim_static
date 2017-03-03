@@ -1,39 +1,35 @@
-"use strict";
+/**
+* @require /libsH5/js/libs/three.min.js
+*/
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20161230";
+CLOUD.Version = "20170222";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
     SceneScale: 2,
-    LengthUnitScale: 1000, // m vs mm 
+    LengthUnitScale : 1000,
     MinBoxSize: new THREE.Vector3(500, 500, 500),
 
-    UseArrayBuffer: true,
-    ShowSubSceneBox: false,
-    ShowCellBox: false,
-    DynamicRelease: true,
-    SubSceneVisibleDistance: 0.1,
-    CellVisibleLOD: 15,
-    RayTracingDeep: 10,
-    SubSceneVisibleLOD: 10,
-    ScreenCullLOD: 0.0002,
     LimitFrameTime: 250,
-    GarbageCollection: true,
-    ByTargetDistance: false,
-    MaxLoadSceneCount: 40,
+
+    TextureResRoot: 'images/',
 
     UseMpkWorker: true,
-    MpkWorkerUrl: "js/mpkWorker.min.js",
-    disableAntialias: false,
+    MpkWorkerUrl: "../libs/mpkWorker.min.js",
 
+    disableAntialias: false,
     EnableDemolishByDClick: true,
 
-    ZipResourcePostfix: "",
+    SelectionColor : { color: 0x003BBD, side: THREE.DoubleSide/*, opacity: 0.5, transparent: true*/ },
 
-    GPUMemoryBudget: 900 * 1048576, //  单位 : 字节
-
-    SelectionColor: { color: 0x0000BD, opacity: 1, side: THREE.DoubleSide, transparent: false }
+    maxObjectNumInPool: 100000,
+    ShowOctant: false,
+    OctantDepth : 8,
+    MaximumDepth:0,
+    TargetDistance:10000,
+    DisableOctant:false,
+    DEBUG: true
 };
 
 CLOUD.EnumObjectLevel = {
@@ -51,7 +47,7 @@ CLOUD.ObjectLevelLoD = {
     3: 4,
     4: 5,
     5: 5, // will remove
-    6: 6 //
+    6: 6  // 
 };
 
 CLOUD.EnumStandardView = {
@@ -126,9 +122,7 @@ CLOUD.EVENTS = {
     ON_LOAD_PROGRESS: 1,
     ON_LOAD_COMPLETE: 2,
     ON_LOAD_EMPTYSCENE: 3,
-
     ON_LOAD_SUBSCENE: 10,
-
     ON_SELECTION_CHANGED: 100,
     ON_UPDATE_SELECTION_UI: 101
 };
@@ -139,7 +133,7 @@ CLOUD.PrimitiveCount = {
 };
 
 CLOUD.Utils = {
-    box3FromArray: function box3FromArray(arr, optionalbox) {
+    box3FromArray : function (arr, optionalbox) {
         if (arr instanceof Array) {
             var bbox = optionalbox || new THREE.Box3();
             bbox.min.fromArray(arr, 0);
@@ -149,10 +143,10 @@ CLOUD.Utils = {
         return null;
     },
 
-    computeBBox: function computeBBox(points) {
+    computeBBox : function(points){
         var bbox = new THREE.Box3();
-
         var v1 = new THREE.Vector3();
+
         for (var ii = 0, len = points.length; ii < len; ++ii) {
             v1.fromArray(points[ii], 0);
             bbox.expandByPoint(v1);
@@ -162,7 +156,7 @@ CLOUD.Utils = {
     },
 
     // 合并box
-    mergeBBox: function mergeBBox(boxs) {
+    mergeBBox : function(boxs) {
 
         if (boxs.length < 1) return null;
 
@@ -172,7 +166,6 @@ CLOUD.Utils = {
         var box = new THREE.Box3();
 
         for (var i = 0, len = boxs.length; i < len; i++) {
-
             max.set(boxs[i].max.x, boxs[i].max.y, boxs[i].max.z);
             min.set(boxs[i].min.x, boxs[i].min.y, boxs[i].min.z);
             box.set(min, max);
@@ -182,9 +175,9 @@ CLOUD.Utils = {
         return bBox;
     },
 
-    parseTransform: function parseTransform(node, objJson, trf) {
-
+    parseTransform: function (node, objJson, trf) {
         var updateMatrix = false;
+
         if (objJson.rotation) {
             node.rotation.fromArray(objJson.rotation);
             updateMatrix = true;
@@ -199,6 +192,7 @@ CLOUD.Utils = {
             node.scale.fromArray(objJson.scale);
             updateMatrix = true;
         }
+
         if (objJson.quaternion) {
             node.quaternion.fromArray(objJson.quaternion);
             updateMatrix = true;
@@ -217,63 +211,11 @@ CLOUD.Utils = {
             localTrf.multiplyMatrices(trf, node.matrix);
             node.matrix = localTrf;
         }
+
         node.matrixAutoUpdate = false;
-        if (node.boundingBox !== undefined) node.boundingBox = CLOUD.Utils.box3FromArray(objJson.bbox);
-    },
 
-    parseRootNode: function parseRootNode(scene, data) {
-        if (!(scene instanceof CLOUD.Scene)) {
-            return scene;
-        }
-
-        var rootNode = scene.rootNode;
-
-        //bounding box
-        var boundingBox = CLOUD.Utils.box3FromArray(data.metadata.bbox);
-
-        if (rootNode.boundingBox === null) {
-            rootNode.boundingBox = boundingBox;
-
-            if (data.transform) {
-                var position = new THREE.Vector3();
-
-                var rotation = new THREE.Quaternion();
-                var scale = new THREE.Vector3(1, 1, 1);
-
-                if (data.transform.position) {
-                    position.fromArray(data.transform.position);
-                }
-
-                if (data.transform.rotation) {
-                    var euler = new THREE.Euler();
-                    euler.fromArray(data.transform.rotation);
-                    rotation.setFromEuler(euler, false);
-                }
-
-                if (data.transform.scale) {
-                    scale.fromArray(data.transform.scale);
-                    scale.multiplyScalar(CLOUD.GlobalData.SceneScale);
-                    //CLOUD.GlobalData.MinBoxSize.x = 0.05 / rootNode.scale.x;
-                    //CLOUD.GlobalData.MinBoxSize.y = 0.05 / rootNode.scale.y;
-                    //CLOUD.GlobalData.MinBoxSize.z = 0.05 / rootNode.scale.z;
-                    CLOUD.GlobalData.SubSceneVisibleDistance = CLOUD.GlobalData.LengthUnitScale * scale.x;
-                    console.log(CLOUD.GlobalData.SubSceneVisibleDistance);
-                }
-                rootNode.matrix.compose(position, rotation, scale);
-                rootNode.matrixAutoUpdate = false;
-                rootNode.updateMatrixWorld(true);
-            }
-        } else {
-            rootNode.boundingBox.expandByPoint(boundingBox.min);
-            rootNode.boundingBox.expandByPoint(boundingBox.max);
-        }
-
-        var localRoot = new CLOUD.Group();
-        localRoot.boundingBox = boundingBox;
-        rootNode.add(localRoot);
-        localRoot.updateMatrixWorld(true);
-        localRoot.matrixAutoUpdate = false;
-        return localRoot;
+        if(node.boundingBox !== undefined)
+            node.boundingBox = CLOUD.Utils.box3FromArray(objJson.bbox);
     }
 };
 
@@ -283,7 +225,7 @@ CLOUD.DomUtil = {
      * @param {String} str
      * @returns {Array} words
      */
-    splitStr: function splitStr(str) {
+    splitStr : function(str) {
         return str.trim().split(/\s+/g);
     },
 
@@ -292,13 +234,12 @@ CLOUD.DomUtil = {
      * @param {object} domElement
      * @returns {object}
      */
-    getContainerOffsetToClient: function getContainerOffsetToClient(domElement) {
+    getContainerOffsetToClient : function(domElement) {
         var offsetObj;
 
         // 获取相对于视口(客户区域)的偏移量
-        var getOffsetSum = function getOffsetSum(ele) {
-            var top = 0,
-                left = 0;
+        var getOffsetSum = function (ele) {
+            var top = 0, left = 0;
 
             // 遍历父元素,获取相对与document的偏移量
             while (ele) {
@@ -322,16 +263,15 @@ CLOUD.DomUtil = {
             return {
                 top: top,
                 left: left
-            };
+            }
         };
 
         // 获取相对于视口(客户区域)的偏移量(viewpoint), 不加页面的滚动量(scroll)
-        var getOffsetRect = function getOffsetRect(ele) {
+        var getOffsetRect = function (ele) {
             // getBoundingClientRect返回一个矩形对象，包含四个属性：left、top、right和bottom。分别表示元素各边与页面上边和左边的距离。
             //注意：IE、Firefox3+、Opera9.5、Chrome、Safari支持，在IE中，默认坐标从(2,2)开始计算，导致最终距离比其他浏览器多出两个像素，我们需要做个兼容。
             var box = ele.getBoundingClientRect();
-            var body = document.body,
-                docElem = document.documentElement;
+            var body = document.body, docElem = document.documentElement;
 
             //获取页面的scrollTop,scrollLeft(兼容性写法)
             //var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop,
@@ -345,11 +285,11 @@ CLOUD.DomUtil = {
                 //Math.round 兼容火狐浏览器bug
                 top: Math.round(top),
                 left: Math.round(left)
-            };
+            }
         };
 
         //获取元素相对于页面的偏移
-        var getOffset = function getOffset(ele) {
+        var getOffset = function (ele) {
             if (ele.getBoundingClientRect) {
                 return getOffsetRect(ele);
             } else {
@@ -366,19 +306,20 @@ CLOUD.DomUtil = {
             // domElement.offsetLeft（offsetTop）是相对父容器的偏移量，如果用相对坐标表示，直接传回0
             //offset	: [ domElement.offsetLeft,  domElement.offsetTop ]
             offsetObj = {
-                width: domElement.offsetWidth,
-                height: domElement.offsetHeight,
-                left: offsetV.left,
-                top: offsetV.top
-            };
+                width : domElement.offsetWidth,
+                height : domElement.offsetHeight,
+                left : offsetV.left,
+                top : offsetV.top
+            }
+
         } else {
 
             offsetObj = {
-                width: window.innerWidth,
-                height: window.innerHeight,
-                left: 0,
-                top: 0
-            };
+                width : window.innerWidth,
+                height : window.innerHeight,
+                left : 0,
+                top : 0
+            }
         }
 
         return offsetObj;
@@ -390,7 +331,7 @@ CLOUD.DomUtil = {
      * @param {String} cssName
      * @returns
      */
-    setClassName: function setClassName(id, cssName) {
+    setClassName : function(id, cssName) {
         var dom = document.getElementById(id);
         if (dom) {
             dom.className = cssName;
@@ -403,7 +344,7 @@ CLOUD.DomUtil = {
      * @param {String} cssName
      * @returns
      */
-    addClassName: function addClassName(id, cssName) {
+    addClassName : function(id, cssName) {
         var a, b, c;
         var i, j;
         var s = /\s+/;
@@ -440,7 +381,7 @@ CLOUD.DomUtil = {
      * @param {String} cssName
      * @returns
      */
-    removeClassName: function removeClassName(id, className) {
+    removeClassName : function(id, className) {
         var a, b, c;
         var i, j;
         var s = /\s+/;
@@ -458,7 +399,7 @@ CLOUD.DomUtil = {
                             b = b.replace(" " + a[i] + " ", " ");
                         }
                     }
-                    c.className = className ? String.trim(b) : "";
+                    c.className = className ? String.trim(b) : ""
                 }
             }
         }
@@ -470,7 +411,7 @@ CLOUD.DomUtil = {
      * @param {Boolean} isShow
      * @returns
      */
-    showOrHideElement: function showOrHideElement(id, isShow) {
+    showOrHideElement : function(id, isShow) {
         var dom = document.getElementById(id);
         if (dom) {
             if (isShow) {
@@ -480,7 +421,8 @@ CLOUD.DomUtil = {
             }
         }
     },
-    getStyleString: function getStyleString(style) {
+    getStyleString: function
+        (style) {
 
         var elements = [];
 
@@ -496,7 +438,7 @@ CLOUD.DomUtil = {
 
         return elements.join('');
     },
-    cloneStyle: function cloneStyle(style) {
+    cloneStyle: function (style) {
 
         var clone = {};
 
@@ -506,7 +448,7 @@ CLOUD.DomUtil = {
 
         return clone;
     },
-    removeStyleAttribute: function removeStyleAttribute(style, attrs) {
+    removeStyleAttribute: function (style, attrs) {
 
         if (!Array.isArray(attrs)) {
             attrs = [attrs];
@@ -518,7 +460,7 @@ CLOUD.DomUtil = {
             }
         });
     },
-    trimRight: function trimRight(text) {
+    trimRight: function (text) {
 
         if (text.length === 0) {
             return "";
@@ -535,7 +477,7 @@ CLOUD.DomUtil = {
 
         return text.substr(0, lastNonSpace + 1);
     },
-    trimLeft: function trimLeft(text) {
+    trimLeft: function (text) {
 
         if (text.length === 0) {
             return "";
@@ -552,7 +494,7 @@ CLOUD.DomUtil = {
 
         return text.substr(firstNonSpace);
     },
-    matchesSelector: function matchesSelector(domElem, selector) {
+    matchesSelector: function (domElem, selector) {
 
         if (domElem.matches) {
             return domElem.matches(selector);
@@ -583,18 +525,18 @@ CLOUD.DomUtil = {
             var matches = (domElem.document || domElem.ownerDocument).querySelectorAll(selector),
                 i = 0;
 
-            while (matches[i] && matches[i] !== element) {
-                i++;
-            }return matches[i] ? true : false;
+            while (matches[i] && matches[i] !== element) i++;
+
+            return matches[i] ? true : false;
         }
 
         return false;
     },
-    toTranslate3d: function toTranslate3d(x, y) {
+    toTranslate3d: function (x, y) {
 
         return 'translate3d(' + x + 'px,' + y + 'px,0)';
     },
-    setCursorStyle: function setCursorStyle(element, direction) {
+    setCursorStyle: function (element, direction) {
 
         var cursor;
 
@@ -620,461 +562,565 @@ CLOUD.DomUtil = {
         element.style.cursor = cursor;
     }
 };
-
 /**
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-THREE.CylinderBufferGeometry = function (radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength) {
+THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
-    THREE.BufferGeometry.call(this);
+	THREE.BufferGeometry.call( this );
 
-    this.type = 'CylinderBufferGeometry';
+	this.type = 'CylinderBufferGeometry';
 
-    this.parameters = {
-        radiusTop: radiusTop,
-        radiusBottom: radiusBottom,
-        height: height,
-        radialSegments: radialSegments,
-        heightSegments: heightSegments,
-        openEnded: openEnded,
-        thetaStart: thetaStart,
-        thetaLength: thetaLength
-    };
+	this.parameters = {
+		radiusTop: radiusTop,
+		radiusBottom: radiusBottom,
+		height: height,
+		radialSegments: radialSegments,
+		heightSegments: heightSegments,
+		openEnded: openEnded,
+		thetaStart: thetaStart,
+		thetaLength: thetaLength
+	};
 
-    radiusTop = radiusTop !== undefined ? radiusTop : 20;
-    radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
-    height = height !== undefined ? height : 100;
+	radiusTop = radiusTop !== undefined ? radiusTop : 20;
+	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
+	height = height !== undefined ? height : 100;
 
-    radialSegments = Math.floor(radialSegments) || 8;
-    heightSegments = Math.floor(heightSegments) || 1;
+	radialSegments = Math.floor( radialSegments )  || 8;
+	heightSegments = Math.floor( heightSegments ) || 1;
 
-    openEnded = openEnded !== undefined ? openEnded : false;
-    thetaStart = thetaStart !== undefined ? thetaStart : 0;
-    thetaLength = thetaLength !== undefined ? thetaLength : 2 * Math.PI;
+	openEnded = openEnded !== undefined ? openEnded : false;
+	thetaStart = thetaStart !== undefined ? thetaStart : 0;
+	thetaLength = thetaLength !== undefined ? thetaLength : 2 * Math.PI;
 
-    // used to calculate buffer length
+	// used to calculate buffer length
 
-    var vertexCount = calculateVertexCount();
-    var indexCount = calculateIndexCount();
+	var vertexCount = calculateVertexCount();
+	var indexCount = calculateIndexCount();
 
-    // buffers
+	// buffers
 
-    var indices = new THREE.BufferAttribute(new (indexCount > 65535 ? Uint32Array : Uint16Array)(indexCount), 1);
-    var vertices = new THREE.BufferAttribute(new Float32Array(vertexCount * 3), 3);
-    var normals = new THREE.BufferAttribute(new Float32Array(vertexCount * 3), 3);
-    var uvs = new THREE.BufferAttribute(new Float32Array(vertexCount * 2), 2);
+	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+	var vertices = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var normals = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
 
-    // helper variables
+	// helper variables
 
-    var index = 0,
-        indexOffset = 0,
-        indexArray = [],
-        halfHeight = height / 2;
+	var index = 0, indexOffset = 0, indexArray = [], halfHeight = height / 2;
 
-    // generate geometry
+	// generate geometry
 
-    generateTorso();
+	generateTorso();
 
-    if (openEnded === false) {
+	if( openEnded === false ) {
 
-        if (radiusTop > 0) {
+		if( radiusTop > 0 ) {
 
-            generateCap(true);
-        }
+			generateCap( true );
 
-        if (radiusBottom > 0) {
+		}
 
-            generateCap(false);
-        }
-    }
+		if( radiusBottom > 0 ) {
 
-    // build geometry
+			generateCap( false );
 
-    this.setIndex(indices);
-    this.addAttribute('position', vertices);
-    this.addAttribute('normal', normals);
-    this.addAttribute('uv', uvs);
+		}
 
-    // helper functions
+	}
 
-    function calculateVertexCount() {
+	// build geometry
 
-        var count = (radialSegments + 1) * (heightSegments + 1);
+	this.setIndex( indices );
+	this.addAttribute( 'position', vertices );
+	this.addAttribute( 'normal', normals );
+	this.addAttribute( 'uv', uvs );
 
-        if (openEnded === false) {
+	// helper functions
 
-            count += (radialSegments + 1) * 2 + radialSegments * 2;
-        }
+	function calculateVertexCount () {
 
-        return count;
-    }
+		var count = ( radialSegments + 1 ) * ( heightSegments + 1 );
 
-    function calculateIndexCount() {
+		if ( openEnded === false ) {
 
-        var count = radialSegments * heightSegments * 2 * 3;
+			count += ( ( radialSegments + 1 ) * 2 ) + ( radialSegments * 2 );
 
-        if (openEnded === false) {
+		}
 
-            count += radialSegments * 2 * 3;
-        }
+		return count;
 
-        return count;
-    }
+	}
 
-    function generateTorso() {
+	function calculateIndexCount () {
 
-        var x, y;
-        var normal = new THREE.Vector3();
-        var vertex = new THREE.Vector3();
+		var count = radialSegments * heightSegments * 2 * 3;
 
-        // this will be used to calculate the normal
-        var tanTheta = (radiusBottom - radiusTop) / height;
+		if ( openEnded === false ) {
 
-        // generate vertices, normals and uvs
+			count += radialSegments * 2 * 3;
 
-        for (y = 0; y <= heightSegments; y++) {
+		}
 
-            var indexRow = [];
+		return count;
 
-            var v = y / heightSegments;
+	}
 
-            // calculate the radius of the current row
-            var radius = v * (radiusBottom - radiusTop) + radiusTop;
+	function generateTorso () {
 
-            for (x = 0; x <= radialSegments; x++) {
+		var x, y;
+		var normal = new THREE.Vector3();
+		var vertex = new THREE.Vector3();
 
-                var u = x / radialSegments;
+		// this will be used to calculate the normal
+		var tanTheta = ( radiusBottom - radiusTop ) / height;
 
-                // vertex
-                vertex.x = radius * Math.sin(u * thetaLength + thetaStart);
-                vertex.y = -v * height + halfHeight;
-                vertex.z = radius * Math.cos(u * thetaLength + thetaStart);
-                vertices.setXYZ(index, vertex.x, vertex.y, vertex.z);
+		// generate vertices, normals and uvs
 
-                // normal
-                normal.copy(vertex);
+		for ( y = 0; y <= heightSegments; y ++ ) {
 
-                // handle special case if radiusTop/radiusBottom is zero
-                if (radiusTop === 0 && y === 0 || radiusBottom === 0 && y === heightSegments) {
+			var indexRow = [];
 
-                    normal.x = Math.sin(u * thetaLength + thetaStart);
-                    normal.z = Math.cos(u * thetaLength + thetaStart);
-                }
+			var v = y / heightSegments;
 
-                normal.setY(Math.sqrt(normal.x * normal.x + normal.z * normal.z) * tanTheta).normalize();
-                normals.setXYZ(index, normal.x, normal.y, normal.z);
+			// calculate the radius of the current row
+			var radius = v * ( radiusBottom - radiusTop ) + radiusTop;
 
-                // uv
-                uvs.setXY(index, u, 1 - v);
+			for ( x = 0; x <= radialSegments; x ++ ) {
 
-                // save index of vertex in respective row
-                indexRow.push(index);
+				var u = x / radialSegments;
 
-                // increase index
-                index++;
-            }
+				// vertex
+				vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
+				vertex.y = - v * height + halfHeight;
+				vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
+				vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
 
-            // now save vertices of the row in our index array
-            indexArray.push(indexRow);
-        }
+				// normal
+				normal.copy( vertex );
 
-        // generate indices
+				// handle special case if radiusTop/radiusBottom is zero
+				if( ( radiusTop === 0  && y === 0 ) || ( radiusBottom === 0  && y === heightSegments ) ) {
 
-        for (x = 0; x < radialSegments; x++) {
+					normal.x = Math.sin( u * thetaLength + thetaStart );
+					normal.z = Math.cos( u * thetaLength + thetaStart );
 
-            for (y = 0; y < heightSegments; y++) {
+				}
 
-                // we use the index array to access the correct indices
-                var i1 = indexArray[y][x];
-                var i2 = indexArray[y + 1][x];
-                var i3 = indexArray[y + 1][x + 1];
-                var i4 = indexArray[y][x + 1];
+				normal.setY( Math.sqrt( normal.x * normal.x + normal.z * normal.z ) * tanTheta ).normalize();
+				normals.setXYZ( index, normal.x, normal.y, normal.z );
 
-                // face one
-                indices.setX(indexOffset, i1);indexOffset++;
-                indices.setX(indexOffset, i2);indexOffset++;
-                indices.setX(indexOffset, i4);indexOffset++;
+				// uv
+				uvs.setXY( index, u, 1 - v );
 
-                // face two
-                indices.setX(indexOffset, i2);indexOffset++;
-                indices.setX(indexOffset, i3);indexOffset++;
-                indices.setX(indexOffset, i4);indexOffset++;
-            }
-        }
-    }
+				// save index of vertex in respective row
+				indexRow.push( index );
 
-    function generateCap(top) {
+				// increase index
+				index ++;
 
-        var x, centerIndexStart, centerIndexEnd;
-        var uv = new THREE.Vector2();
-        var vertex = new THREE.Vector3();
+			}
 
-        var radius = top === true ? radiusTop : radiusBottom;
-        var sign = top === true ? 1 : -1;
+			// now save vertices of the row in our index array
+			indexArray.push( indexRow );
 
-        // save the index of the first center vertex
-        centerIndexStart = index;
+		}
 
-        // first we generate the center vertex data of the cap.
-        // because the geometry needs one set of uvs per face,
-        // we must generate a center vertex per face/segment
+		// generate indices
 
-        for (x = 1; x <= radialSegments; x++) {
+		for ( x = 0; x < radialSegments; x ++ ) {
 
-            // vertex
-            vertices.setXYZ(index, 0, halfHeight * sign, 0);
+			for ( y = 0; y < heightSegments; y ++ ) {
 
-            // normal
-            normals.setXYZ(index, 0, sign, 0);
+				// we use the index array to access the correct indices
+				var i1 = indexArray[ y ][ x ];
+				var i2 = indexArray[ y + 1 ][ x ];
+				var i3 = indexArray[ y + 1 ][ x + 1 ];
+				var i4 = indexArray[ y ][ x + 1 ];
 
-            // uv
-            if (top === true) {
+				// face one
+				indices.setX( indexOffset, i1 ); indexOffset++;
+				indices.setX( indexOffset, i2 ); indexOffset++;
+				indices.setX( indexOffset, i4 ); indexOffset++;
 
-                uv.x = x / radialSegments;
-                uv.y = 0;
-            } else {
+				// face two
+				indices.setX( indexOffset, i2 ); indexOffset++;
+				indices.setX( indexOffset, i3 ); indexOffset++;
+				indices.setX( indexOffset, i4 ); indexOffset++;
 
-                uv.x = (x - 1) / radialSegments;
-                uv.y = 1;
-            }
+			}
 
-            uvs.setXY(index, uv.x, uv.y);
+		}
 
-            // increase index
-            index++;
-        }
+	}
 
-        // save the index of the last center vertex
-        centerIndexEnd = index;
+	function generateCap ( top ) {
 
-        // now we generate the surrounding vertices, normals and uvs
+		var x, centerIndexStart, centerIndexEnd;
+		var uv = new THREE.Vector2();
+		var vertex = new THREE.Vector3();
 
-        for (x = 0; x <= radialSegments; x++) {
+		var radius = ( top === true ) ? radiusTop : radiusBottom;
+		var sign = ( top === true ) ? 1 : - 1;
 
-            var u = x / radialSegments;
+		// save the index of the first center vertex
+		centerIndexStart = index;
 
-            // vertex
-            vertex.x = radius * Math.sin(u * thetaLength + thetaStart);
-            vertex.y = halfHeight * sign;
-            vertex.z = radius * Math.cos(u * thetaLength + thetaStart);
-            vertices.setXYZ(index, vertex.x, vertex.y, vertex.z);
+		// first we generate the center vertex data of the cap.
+		// because the geometry needs one set of uvs per face,
+		// we must generate a center vertex per face/segment
 
-            // normal
-            normals.setXYZ(index, 0, sign, 0);
+		for ( x = 1; x <= radialSegments; x ++ ) {
 
-            // uv
-            uvs.setXY(index, u, top === true ? 1 : 0);
+			// vertex
+			vertices.setXYZ( index, 0, halfHeight * sign, 0 );
 
-            // increase index
-            index++;
-        }
+			// normal
+			normals.setXYZ( index, 0, sign, 0 );
 
-        // generate indices
+			// uv
+			if( top === true ) {
 
-        for (x = 0; x < radialSegments; x++) {
+				uv.x = x / radialSegments;
+				uv.y = 0;
 
-            var c = centerIndexStart + x;
-            var i = centerIndexEnd + x;
+			} else {
 
-            if (top === true) {
+				uv.x = ( x - 1 ) / radialSegments;
+				uv.y = 1;
 
-                // face top
-                indices.setX(indexOffset, i);indexOffset++;
-                indices.setX(indexOffset, i + 1);indexOffset++;
-                indices.setX(indexOffset, c);indexOffset++;
-            } else {
+			}
 
-                // face bottom
-                indices.setX(indexOffset, i + 1);indexOffset++;
-                indices.setX(indexOffset, i);indexOffset++;
-                indices.setX(indexOffset, c);indexOffset++;
-            }
-        }
-    }
+			uvs.setXY( index, uv.x, uv.y );
+
+			// increase index
+			index++;
+
+		}
+
+		// save the index of the last center vertex
+		centerIndexEnd = index;
+
+		// now we generate the surrounding vertices, normals and uvs
+
+		for ( x = 0; x <= radialSegments; x ++ ) {
+
+			var u = x / radialSegments;
+
+			// vertex
+			vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
+			vertex.y = halfHeight * sign;
+			vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
+			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+			// normal
+			normals.setXYZ( index, 0, sign, 0 );
+
+			// uv
+			uvs.setXY( index, u, ( top === true ) ? 1 : 0 );
+
+			// increase index
+			index ++;
+
+		}
+
+		// generate indices
+
+		for ( x = 0; x < radialSegments; x ++ ) {
+
+			var c = centerIndexStart + x;
+			var i = centerIndexEnd + x;
+
+			if( top === true ) {
+
+				// face top
+				indices.setX( indexOffset, i ); indexOffset++;
+				indices.setX( indexOffset, i + 1 ); indexOffset++;
+				indices.setX( indexOffset, c ); indexOffset++;
+
+			} else {
+
+				// face bottom
+				indices.setX( indexOffset, i + 1); indexOffset++;
+				indices.setX( indexOffset, i ); indexOffset++;
+				indices.setX( indexOffset, c ); indexOffset++;
+
+			}
+
+		}
+
+	}
+
 };
 
-THREE.CylinderBufferGeometry.prototype = Object.create(THREE.BufferGeometry.prototype);
+THREE.CylinderBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.CylinderBufferGeometry.prototype.constructor = THREE.CylinderBufferGeometry;
 
 /**
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-THREE.BoxBufferGeometry = function (width, height, depth, widthSegments, heightSegments, depthSegments) {
+THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
-    THREE.BufferGeometry.call(this);
+	THREE.BufferGeometry.call( this );
 
-    this.type = 'BoxBufferGeometry';
+	this.type = 'BoxBufferGeometry';
 
-    this.parameters = {
-        width: width,
-        height: height,
-        depth: depth,
-        widthSegments: widthSegments,
-        heightSegments: heightSegments,
-        depthSegments: depthSegments
-    };
+	this.parameters = {
+		width: width,
+		height: height,
+		depth: depth,
+		widthSegments: widthSegments,
+		heightSegments: heightSegments,
+		depthSegments: depthSegments
+	};
 
-    var scope = this;
+	var scope = this;
 
-    // segments
-    widthSegments = Math.floor(widthSegments) || 1;
-    heightSegments = Math.floor(heightSegments) || 1;
-    depthSegments = Math.floor(depthSegments) || 1;
+	// segments
+	widthSegments = Math.floor( widthSegments ) || 1;
+	heightSegments = Math.floor( heightSegments ) || 1;
+	depthSegments = Math.floor( depthSegments ) || 1;
 
-    // these are used to calculate buffer length
-    var vertexCount = calculateVertexCount(widthSegments, heightSegments, depthSegments);
-    var indexCount = vertexCount / 4 * 6;
+	// these are used to calculate buffer length
+	var vertexCount = calculateVertexCount( widthSegments, heightSegments, depthSegments );
+	var indexCount = ( vertexCount / 4 ) * 6;
 
-    // buffers
-    var indices = new (indexCount > 65535 ? Uint32Array : Uint16Array)(indexCount);
-    var vertices = new Float32Array(vertexCount * 3);
-    var normals = new Float32Array(vertexCount * 3);
-    var uvs = new Float32Array(vertexCount * 2);
+	// buffers
+	var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
+	var vertices = new Float32Array( vertexCount * 3 );
+	var normals = new Float32Array( vertexCount * 3 );
+	var uvs = new Float32Array( vertexCount * 2 );
 
-    // offset variables
-    var vertexBufferOffset = 0;
-    var uvBufferOffset = 0;
-    var indexBufferOffset = 0;
-    var numberOfVertices = 0;
+	// offset variables
+	var vertexBufferOffset = 0;
+	var uvBufferOffset = 0;
+	var indexBufferOffset = 0;
+	var numberOfVertices = 0;
 
-    // group variables
-    var groupStart = 0;
+	// group variables
+	var groupStart = 0;
 
-    // build each side of the box geometry
-    buildPlane('z', 'y', 'x', -1, -1, depth, height, width, depthSegments, heightSegments, 0); // px
-    buildPlane('z', 'y', 'x', 1, -1, depth, height, -width, depthSegments, heightSegments, 1); // nx
-    buildPlane('x', 'z', 'y', 1, 1, width, depth, height, widthSegments, depthSegments, 2); // py
-    buildPlane('x', 'z', 'y', 1, -1, width, depth, -height, widthSegments, depthSegments, 3); // ny
-    buildPlane('x', 'y', 'z', 1, -1, width, height, depth, widthSegments, heightSegments, 4); // pz
-    buildPlane('x', 'y', 'z', -1, -1, width, height, -depth, widthSegments, heightSegments, 5); // nz
+	// build each side of the box geometry
+	buildPlane( 'z', 'y', 'x', - 1, - 1, depth, height,   width,  depthSegments, heightSegments, 0 ); // px
+	buildPlane( 'z', 'y', 'x',   1, - 1, depth, height, - width,  depthSegments, heightSegments, 1 ); // nx
+	buildPlane( 'x', 'z', 'y',   1,   1, width, depth,    height, widthSegments, depthSegments,  2 ); // py
+	buildPlane( 'x', 'z', 'y',   1, - 1, width, depth,  - height, widthSegments, depthSegments,  3 ); // ny
+	buildPlane( 'x', 'y', 'z',   1, - 1, width, height,   depth,  widthSegments, heightSegments, 4 ); // pz
+	buildPlane( 'x', 'y', 'z', - 1, - 1, width, height, - depth,  widthSegments, heightSegments, 5 ); // nz
 
-    // build geometry
-    this.setIndex(new THREE.BufferAttribute(indices, 1));
-    this.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-    this.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
-    this.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+	// build geometry
+	this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
-    // helper functions
+	// helper functions
 
-    function calculateVertexCount(w, h, d) {
+	function calculateVertexCount ( w, h, d ) {
 
-        var segments = 0;
+		var segments = 0;
 
-        // calculate the amount of segments for each side
-        segments += w * h * 2; // xy
-        segments += w * d * 2; // xz
-        segments += d * h * 2; // zy
+		// calculate the amount of segments for each side
+		segments += w * h * 2; // xy
+		segments += w * d * 2; // xz
+		segments += d * h * 2; // zy
 
-        return segments * 4; // four vertices per segments
-    }
+		return segments * 4; // four vertices per segments
 
-    function buildPlane(u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex) {
+	}
 
-        var segmentWidth = width / gridX;
-        var segmentHeight = height / gridY;
+	function buildPlane ( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
 
-        var widthHalf = width / 2;
-        var heightHalf = height / 2;
-        var depthHalf = depth / 2;
+		var segmentWidth	= width / gridX;
+		var segmentHeight = height / gridY;
 
-        var gridX1 = gridX + 1;
-        var gridY1 = gridY + 1;
+		var widthHalf = width / 2;
+		var heightHalf = height / 2;
+		var depthHalf = depth / 2;
 
-        var vertexCounter = 0;
-        var groupCount = 0;
+		var gridX1 = gridX + 1;
+		var gridY1 = gridY + 1;
 
-        var vector = new THREE.Vector3();
+		var vertexCounter = 0;
+		var groupCount = 0;
 
-        // generate vertices, normals and uvs
+		var vector = new THREE.Vector3();
 
-        for (var iy = 0; iy < gridY1; iy++) {
+		// generate vertices, normals and uvs
 
-            var y = iy * segmentHeight - heightHalf;
+		for ( var iy = 0; iy < gridY1; iy ++ ) {
 
-            for (var ix = 0; ix < gridX1; ix++) {
+			var y = iy * segmentHeight - heightHalf;
 
-                var x = ix * segmentWidth - widthHalf;
+			for ( var ix = 0; ix < gridX1; ix ++ ) {
 
-                // set values to correct vector component
-                vector[u] = x * udir;
-                vector[v] = y * vdir;
-                vector[w] = depthHalf;
+				var x = ix * segmentWidth - widthHalf;
 
-                // now apply vector to vertex buffer
-                vertices[vertexBufferOffset] = vector.x;
-                vertices[vertexBufferOffset + 1] = vector.y;
-                vertices[vertexBufferOffset + 2] = vector.z;
+				// set values to correct vector component
+				vector[ u ] = x * udir;
+				vector[ v ] = y * vdir;
+				vector[ w ] = depthHalf;
 
-                // set values to correct vector component
-                vector[u] = 0;
-                vector[v] = 0;
-                vector[w] = depth > 0 ? 1 : -1;
+				// now apply vector to vertex buffer
+				vertices[ vertexBufferOffset ] = vector.x;
+				vertices[ vertexBufferOffset + 1 ] = vector.y;
+				vertices[ vertexBufferOffset + 2 ] = vector.z;
 
-                // now apply vector to normal buffer
-                normals[vertexBufferOffset] = vector.x;
-                normals[vertexBufferOffset + 1] = vector.y;
-                normals[vertexBufferOffset + 2] = vector.z;
+				// set values to correct vector component
+				vector[ u ] = 0;
+				vector[ v ] = 0;
+				vector[ w ] = depth > 0 ? 1 : - 1;
 
-                // uvs
-                uvs[uvBufferOffset] = ix / gridX;
-                uvs[uvBufferOffset + 1] = 1 - iy / gridY;
+				// now apply vector to normal buffer
+				normals[ vertexBufferOffset ] = vector.x;
+				normals[ vertexBufferOffset + 1 ] = vector.y;
+				normals[ vertexBufferOffset + 2 ] = vector.z;
 
-                // update offsets and counters
-                vertexBufferOffset += 3;
-                uvBufferOffset += 2;
-                vertexCounter += 1;
-            }
-        }
+				// uvs
+				uvs[ uvBufferOffset ] = ix / gridX;
+				uvs[ uvBufferOffset + 1 ] = 1 - ( iy / gridY );
 
-        // 1. you need three indices to draw a single face
-        // 2. a single segment consists of two faces
-        // 3. so we need to generate six (2*3) indices per segment
+				// update offsets and counters
+				vertexBufferOffset += 3;
+				uvBufferOffset += 2;
+				vertexCounter += 1;
 
-        for (iy = 0; iy < gridY; iy++) {
+			}
 
-            for (ix = 0; ix < gridX; ix++) {
+		}
 
-                // indices
-                var a = numberOfVertices + ix + gridX1 * iy;
-                var b = numberOfVertices + ix + gridX1 * (iy + 1);
-                var c = numberOfVertices + (ix + 1) + gridX1 * (iy + 1);
-                var d = numberOfVertices + (ix + 1) + gridX1 * iy;
+		// 1. you need three indices to draw a single face
+		// 2. a single segment consists of two faces
+		// 3. so we need to generate six (2*3) indices per segment
 
-                // face one
-                indices[indexBufferOffset] = a;
-                indices[indexBufferOffset + 1] = b;
-                indices[indexBufferOffset + 2] = d;
+		for ( iy = 0; iy < gridY; iy ++ ) {
 
-                // face two
-                indices[indexBufferOffset + 3] = b;
-                indices[indexBufferOffset + 4] = c;
-                indices[indexBufferOffset + 5] = d;
+			for ( ix = 0; ix < gridX; ix ++ ) {
 
-                // update offsets and counters
-                indexBufferOffset += 6;
-                groupCount += 6;
-            }
-        }
+				// indices
+				var a = numberOfVertices + ix + gridX1 * iy;
+				var b = numberOfVertices + ix + gridX1 * ( iy + 1 );
+				var c = numberOfVertices + ( ix + 1 ) + gridX1 * ( iy + 1 );
+				var d = numberOfVertices + ( ix + 1 ) + gridX1 * iy;
 
-        // add a group to the geometry. this will ensure multi material support
-        scope.addGroup(groupStart, groupCount, materialIndex);
+				// face one
+				indices[ indexBufferOffset ] = a;
+				indices[ indexBufferOffset + 1 ] = b;
+				indices[ indexBufferOffset + 2 ] = d;
 
-        // calculate new start value for groups
-        groupStart += groupCount;
+				// face two
+				indices[ indexBufferOffset + 3 ] = b;
+				indices[ indexBufferOffset + 4 ] = c;
+				indices[ indexBufferOffset + 5 ] = d;
 
-        // update total number of vertices
-        numberOfVertices += vertexCounter;
-    }
+				// update offsets and counters
+				indexBufferOffset += 6;
+				groupCount += 6;
+
+			}
+
+		}
+
+		// add a group to the geometry. this will ensure multi material support
+		scope.addGroup( groupStart, groupCount, materialIndex );
+
+		// calculate new start value for groups
+		groupStart += groupCount;
+
+		// update total number of vertices
+		numberOfVertices += vertexCounter;
+
+	}
+
 };
 
-THREE.BoxBufferGeometry.prototype = Object.create(THREE.BufferGeometry.prototype);
+THREE.BoxBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.BoxBufferGeometry.prototype.constructor = THREE.BoxBufferGeometry;
+
+
+/**
+ * @author bhouston / http://clara.io
+ * @author WestLangley / http://github.com/WestLangley
+ *
+ * Ref: https://en.wikipedia.org/wiki/Spherical_coordinate_system
+ *
+ * The poles (phi) are at the positive and negative y axis.
+ * The equator starts at positive z.
+ */
+
+THREE.Spherical = function( radius, phi, theta ) {
+
+	this.radius = ( radius !== undefined ) ? radius : 1.0;
+	this.phi = ( phi !== undefined ) ? phi : 0; // up / down towards top and bottom pole
+	this.theta = ( theta !== undefined ) ? theta : 0; // around the equator of the sphere
+};
+
+THREE.Spherical.prototype = {
+
+	constructor: THREE.Spherical,
+
+	set: function ( radius, phi, theta ) {
+
+		this.radius = radius;
+		this.phi = phi;
+		this.theta = theta;
+
+		return this;
+
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
+
+	copy: function ( other ) {
+
+		this.radius = other.radius;
+		this.phi = other.phi;
+		this.theta = other.theta;
+
+		return this;
+
+	},
+
+	// restrict phi to be betwee EPS and PI-EPS
+	makeSafe: function() {
+
+		var EPS = 0.000001;
+		this.phi = Math.max( EPS, Math.min( Math.PI - EPS, this.phi ) );
+
+		return this;
+
+	},
+
+	setFromVector3: function( vec3 ) {
+
+		this.radius = vec3.length();
+
+		if ( this.radius === 0 ) {
+
+			this.theta = 0;
+			this.phi = 0;
+
+		} else {
+
+			this.theta = Math.atan2( vec3.x, vec3.z ); // equator angle around y-up axis
+			this.phi = Math.acos( THREE.Math.clamp( vec3.y / this.radius, - 1, 1 ) ); // polar angle
+
+		}
+
+		return this;
+
+	}
+};
 
 CLOUD.GeomUtil = {
 
-    createInstancedBufferGeometry: function createInstancedBufferGeometry(mesh, objJSON) {
+    createInstancedBufferGeometry: function (mesh, objJSON) {
         var instances = objJSON.count;
 
         // 转换buffer
@@ -1138,16 +1184,19 @@ CLOUD.GeomUtil = {
         return geometry;
     },
 
-    parseNodeProperties: function parseNodeProperties(object, objJSON, nodeId, trf) {
+    parseNodeProperties: function (object, objJSON, nodeId, trf) {
 
         //object.name = nodeId;
 
-        if (objJSON.userId) object.name = objJSON.userId;else object.name = nodeId;
+        if (objJSON.userId)
+            object.name = objJSON.userId;
+        else
+            object.name = nodeId;
 
         CLOUD.Utils.parseTransform(object, objJSON, trf);
     },
 
-    parseSceneNode: function parseSceneNode(object, objJSON, modelManager, level) {
+    parseSceneNode: function (object, objJSON, modelManager, level) {
 
         object.sceneId = objJSON.sceneId;
 
@@ -1161,7 +1210,7 @@ CLOUD.GeomUtil = {
 
         if (CLOUD.GlobalData.ShowSubSceneBox) {
             var clr = 0xff;
-            clr = clr << level * 5;
+            clr = clr << (level * 5);
 
             var boxNode = new CLOUD.BBoxNode(object.boundingBox, clr);
             CLOUD.Utils.parseTransform(boxNode, objJSON);
@@ -1172,38 +1221,39 @@ CLOUD.GeomUtil = {
     parseCylinderNode: function () {
 
         var reg = new RegExp("'", "g");
+        var startPt = new THREE.Vector3();
         var endPt = new THREE.Vector3();
         var dir = new THREE.Vector3();
         var unitY = new THREE.Vector3(0, 1, 0);
 
-        var position = new THREE.Vector3();
-        var quaternion = new THREE.Quaternion();
-        var scale = new THREE.Vector3(1, 1, 1);
-
         return function (geometryNode, params) {
-            if (params instanceof Object) {} else {
+            if (params instanceof Object) {
+
+            }
+            else {
                 params = params.replace(reg, '"');
                 params = JSON.parse(params);
             }
 
-            position.fromArray(params.startPt);
+
+            startPt.fromArray(params.startPt);
             endPt.fromArray(params.endPt);
 
-            dir.subVectors(endPt, position);
+            dir.subVectors(endPt, startPt);
 
             var len = dir.length();
             dir.normalize();
 
             var radius = params.radius;
-            if (radius <= 1) radius = 100;
-
-            scale.set(radius, len, radius);
-            quaternion.setFromUnitVectors(unitY, dir);
-            position.addScaledVector(dir, len * 0.5);
-
-            geometryNode.matrix.compose(position, quaternion, scale);
+            if (radius <= 1)
+                radius = 100;
+            geometryNode.scale.set(radius, len, radius);
+            geometryNode.quaternion.setFromUnitVectors(unitY, dir);
+            geometryNode.position.copy(startPt).addScaledVector(dir, len * 0.5);
+            geometryNode.updateMatrix();
             geometryNode.matrixAutoUpdate = false;
-        };
+        }
+
     }(),
 
     parseBoxNode: function () {
@@ -1214,7 +1264,7 @@ CLOUD.GeomUtil = {
         return function (object, objJSON) {
             CLOUD.Utils.parseTransform(object, objJSON);
 
-            CLOUD.Utils.box3FromArray(objJSON.bbox, _boundingBox);
+            CLOUD.Utils.box3FromArray(objJSON.bbox, _boundingBox)
             var boxSize = _boundingBox.size();
             var center = _boundingBox.center();
 
@@ -1225,49 +1275,68 @@ CLOUD.GeomUtil = {
             object.matrix.multiply(_trf);
             object.matrixAutoUpdate = false;
         };
+
+
     }(),
 
-    parseHermitePipe: function parseHermitePipe(objJSON) {
-
+    parseHermitePipe: function (objJSON) {
         var reg = new RegExp("'", "g");
         var params = objJSON.params;
         params = params.replace(reg, '"');
         params = JSON.parse(params);
         var points = [];
+
         for (var ii = 0, len = params.ctrlPts.length / 3; ii < len; ++ii) {
             var pt = new THREE.Vector3();
             pt.fromArray(params.ctrlPts, ii * 3);
             points.push(pt);
         }
+
         var extrudePath = new THREE.CatmullRomCurve3(points);
         var tube = new THREE.TubeGeometry(extrudePath, 5, params.radius, 6, false);
-
         var bufferObj = new THREE.BufferGeometry();
         bufferObj.fromGeometry(tube);
-        return bufferObj;
 
-        //return tube;
+        return bufferObj;
     },
 
-    parsePGeomNodeInstance: function parsePGeomNodeInstance(objJSON, matObj, trf, unloadable) {
+    parsePGeomNodeInstance: function (client, objJSON, matObj, trf, unloadable) {
 
-        var object;
+        var object = null;
 
         if (objJSON.geomType == "pipe" || objJSON.geomType == "tube") {
 
             var geometry = CLOUD.GeomUtil.UnitCylinderInstance;
-            object = new CLOUD.Mesh(geometry, matObj);
+            object = new THREE.Mesh(geometry, matObj);
+
+            if (!object) {
+                return null;
+            }
+
+
             CLOUD.GeomUtil.parseCylinderNode(object, objJSON.params);
-        } else if (objJSON.geomType == "box") {
+
+        }
+        else if (objJSON.geomType == "box") {
 
             var geometry = CLOUD.GeomUtil.UnitBoxInstance;
-            object = new CLOUD.Mesh(geometry, matObj);
+            object = new THREE.Mesh(geometry, matObj);
 
+            if (!object) {
+                return null;
+            }
             CLOUD.GeomUtil.parseBoxNode(object, objJSON);
-        } else if (objJSON.geomType == "hermitepipe") {
+
+        }
+        else if (objJSON.geomType == "hermitepipe") {
             var geometry = CLOUD.GeomUtil.parseHermitePipe(objJSON);
-            object = new CLOUD.Mesh(geometry, matObj);
-        } else {
+            object = new THREE.Mesh(geometry, matObj);
+
+            if (!object) {
+                return null;
+            }
+        }
+        else {
             console.log("unknonw geometry!");
             return object;
         }
@@ -1279,12 +1348,6 @@ CLOUD.GeomUtil = {
             object.matrixAutoUpdate = false;
         }
 
-        //if (unloadable) {
-        //    object.unload = function () {
-        //        this.geometry.dispose();
-        //    };
-        //}
-
         return object;
     },
 
@@ -1292,17 +1355,19 @@ CLOUD.GeomUtil = {
     UnitCylinderInstance: new THREE.CylinderBufferGeometry(1, 1, 1, 8, 1, false),
     UnitBoxInstance: new THREE.BoxBufferGeometry(1, 1, 1),
 
-    initializeUnitInstances: function initializeUnitInstances() {
-        if (!CLOUD.GeomUtil.UnitCylinderInstance.boundingBox) CLOUD.GeomUtil.UnitCylinderInstance.computeBoundingBox();
-        if (!CLOUD.GeomUtil.UnitBoxInstance.boundingBox) CLOUD.GeomUtil.UnitBoxInstance.computeBoundingBox();
+    initializeUnitInstances: function () {
+        if (!CLOUD.GeomUtil.UnitCylinderInstance.boundingBox)
+            CLOUD.GeomUtil.UnitCylinderInstance.computeBoundingBox();
+        if (!CLOUD.GeomUtil.UnitBoxInstance.boundingBox)
+            CLOUD.GeomUtil.UnitBoxInstance.computeBoundingBox();
     },
 
-    destroyUnitInstances: function destroyUnitInstances() {
+    destroyUnitInstances: function () {
         CLOUD.GeomUtil.UnitCylinderInstance.dispose();
         CLOUD.GeomUtil.UnitBoxInstance.dispose();
     },
 
-    toMeshWorldPosition: function toMeshWorldPosition(position, sceneMatrix) {
+    toMeshWorldPosition: function (position, sceneMatrix) {
 
         if (!sceneMatrix) {
             sceneMatrix = new THREE.Matrix4();
@@ -1319,26 +1384,23 @@ CLOUD.GeomUtil = {
     },
 
     // 遍历父节点获得当前mesh的世界矩阵
-    getMeshWorldMatrix: function getMeshWorldMatrix(mesh) {
-
+    getWorldMatrixOfMesh: function (mesh) {
         var matList = [];
         var parent = mesh.parent;
 
         while (parent) {
 
-            if (parent instanceof CLOUD.SubScene || parent instanceof CLOUD.Cell) {
-                break;
-            }
+            // if ((parent instanceof CLOUD.SubScene) || (parent instanceof CLOUD.Cell)) {
+            //     break;
+            // }
 
             matList.push(parent.matrix);
-
             parent = parent.parent;
         }
 
         var matTmp = new THREE.Matrix4();
 
         if (matList.length > 0) {
-
             matTmp = matList[matList.length - 1];
 
             for (var i = matList.length - 2; i >= 0; --i) {
@@ -1352,7 +1414,7 @@ CLOUD.GeomUtil = {
         return objMatrixWorld;
     },
 
-    getMeshWorldBoundingBox: function getMeshWorldBoundingBox(mesh, sceneMatrix) {
+    getBoundingBoxWorldOfMesh: function (mesh, sceneMatrix) {
 
         // 计算世界坐标下的包围盒
         var bBox = mesh.boundingBox;
@@ -1371,364 +1433,546 @@ CLOUD.GeomUtil = {
         boundingBox.applyMatrix4(inverseScaleMatrix);
 
         return boundingBox;
+    },
+
+    getMeshNodeAttr: function (cacheGeometries, sceneOrSymbolReader, item, mpkArray, itemParent) {
+        var matrix = sceneOrSymbolReader.getMatrix(item.matrixId).matrix;
+        var meshAttr = sceneOrSymbolReader.getMeshAttr(item.attrIndex);
+        var nodeId = itemParent ? itemParent.ItemId + "_" + item.ItemId : item.ItemId;
+        // var nodeId = matrixParent ? "symbol" + item.ItemId : item.ItemId;
+        var meshId = meshAttr.meshId;
+        var mpk = mpkArray[meshAttr.blockId];
+
+        if (!mpk) {
+            // console.log("empty mpk");
+            return null;
+        }
+
+        var meshData = mpk.getMeshData(meshAttr.meshId);
+
+        if (meshData == undefined) {
+            console.log("empty mesh data");
+            return null;
+        }
+
+        var geometry = cacheGeometries[meshId];
+
+        if (!geometry) {
+
+            var positions = mpk.getPtBuffer(meshAttr.meshId);
+            var index = mpk.getIdxBuffer(meshAttr.meshId);
+            var normal = mpk.getNormalBuffer(meshAttr.meshId);
+
+            if (positions == undefined || index == undefined || normal == undefined) {
+                console.log("empty mesh data");
+                return null;
+            }
+
+            geometry = new THREE.BufferGeometry();
+            geometry.setIndex(new THREE.BufferAttribute(index, 1));
+            geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.addAttribute('normal', new THREE.BufferAttribute(normal, 3));
+            // geometry.computeVertexNormals(); // 计算法线，影响光照
+            cacheGeometries[meshId] = geometry;
+        }
+
+        var matrixTmp = new THREE.Matrix4();
+        matrixTmp.setPosition(meshData.baseVector);
+        matrixTmp.scale(new THREE.Vector3(meshData.baseScale, meshData.baseScale, meshData.baseScale));
+
+        if (meshData.baseScale != 0.0) {
+            matrix.multiply(matrixTmp);
+        }
+
+        if (itemParent) {
+            matrix.multiplyMatrices(itemParent.matrix, matrix);
+        }
+
+        return {nodeId: nodeId, meshId: meshId, matrix: matrix.clone()};
+    },
+
+    getMeshNodeAttrOfCube: function (cacheGeometries, sceneOrSymbolReader, item, itemParent) {
+        var geomAttr = sceneOrSymbolReader.getGeomAttr(item.attrIndex);
+        var matrix = sceneOrSymbolReader.getMatrix(item.matrixId).matrix;
+        var nodeId = itemParent ? itemParent.ItemId + "_" + item.ItemId : item.ItemId;
+        // var nodeId = matrixParent ? "symbol" + item.ItemId : item.ItemId;
+        var meshId = "Cube";
+        var geometry = cacheGeometries[meshId];
+
+        if (!geometry) {
+            geometry = CLOUD.GeomUtil.UnitCylinderInstance;
+            cacheGeometries[meshId] = geometry;
+        }
+
+        var startPt = geomAttr.startPt;
+        var endPt = geomAttr.endPt;
+
+        var dir = new THREE.Vector3();
+        dir.subVectors(endPt, startPt);
+
+        var len = dir.length();
+        dir.normalize();
+
+        var radius = geomAttr.radius;
+        if (radius <= 1) {
+            radius = 100;
+        }
+
+        var unitY = new THREE.Vector3(0, 1, 0);
+        var scale = new THREE.Vector3(radius, len, radius);
+        var quaternion = new THREE.Quaternion().setFromUnitVectors(unitY, dir);
+        var position = startPt.clone().addScaledVector(dir, len * 0.5);
+
+        var matrixTmp = new THREE.Matrix4().compose(position, quaternion, scale);
+        matrix.multiply(matrixTmp);
+
+        if (itemParent) {
+            matrix.multiplyMatrices(itemParent.matrix, matrix);
+        }
+
+        return {nodeId: nodeId, meshId: meshId, matrix: matrix.clone()};
+    },
+
+    getMeshNodeAttrOfPipe: function (cacheGeometries, sceneOrSymbolReader, item, itemParent) {
+        var geomAttr = sceneOrSymbolReader.getGeomAttr(item.attrIndex);
+        var matrix = sceneOrSymbolReader.getMatrix(item.matrixId).matrix;
+        // var nodeId = matrixParent ? "symbol" + item.ItemId : item.ItemId;
+        var nodeId = itemParent ? itemParent.ItemId + "_" + item.ItemId : item.ItemId;
+        var meshId = "pipe";
+        var geometry = cacheGeometries[meshId];
+
+        if (!geometry) {
+            geometry = CLOUD.GeomUtil.UnitCylinderInstance;
+            cacheGeometries[meshId] = geometry;
+        }
+
+        var startPt = geomAttr.startPt;
+        var endPt = geomAttr.endPt;
+
+        var dir = new THREE.Vector3();
+        dir.subVectors(endPt, startPt);
+
+        var len = dir.length();
+        dir.normalize();
+
+        var radius = geomAttr.radius;
+        if (radius <= 1) {
+            radius = 100;
+        }
+
+        var unitY = new THREE.Vector3(0, 1, 0);
+        var scale = new THREE.Vector3(radius, len, radius);
+        var quaternion = new THREE.Quaternion().setFromUnitVectors(unitY, dir);
+        var position = startPt.clone().addScaledVector(dir, len * 0.5);
+
+        var matrixTmp = new THREE.Matrix4().compose(position, quaternion, scale);
+        matrix.multiply(matrixTmp);
+
+        if (itemParent) {
+            matrix.multiplyMatrices(itemParent.matrix, matrix);
+        }
+
+        return {
+            nodeId: nodeId,
+            meshId: meshId,
+            matrix: matrix.clone()
+        };
+    },
+
+    getMeshNodeAttrOfBox: function (cacheGeometries, sceneOrSymbolReader, item, itemParent) {
+        var matrix = sceneOrSymbolReader.getMatrix(item.matrixId).matrix;
+        var bBox = item.boundingBox;
+        var boxSize = bBox.size();
+        var boxCenter = bBox.center();
+        // var nodeId = matrixParent ? "symbol" + item.ItemId : item.ItemId;
+        var nodeId = itemParent ? itemParent.ItemId + "_" + item.ItemId : item.ItemId;
+        var meshId = "box";
+        var geometry = cacheGeometries[meshId];
+
+        if (!geometry) {
+            geometry = CLOUD.GeomUtil.UnitBoxInstance;
+            cacheGeometries[meshId] = geometry;
+        }
+
+        var matrixTmp = new THREE.Matrix4().scale(new THREE.Vector3(boxSize.x, boxSize.y, boxSize.z));
+        matrixTmp.setPosition(boxCenter);
+        matrix.multiply(matrixTmp);
+
+        if (itemParent) {
+            matrix.multiplyMatrices(itemParent.matrix, matrix);
+        }
+
+        return {
+            nodeId: nodeId,
+            meshId: meshId,
+            matrix: matrix.clone()
+        };
     }
 
 };
 
-THREE.CombinedCamera = function (width, height, fov, near, far, orthoNear, orthoFar) {
+CLOUD.MaterialUtil = {
 
-    THREE.Camera.call(this);
+    DefaultMaterial: new THREE.MeshPhongMaterial({color: 0x0000ff, side: THREE.DoubleSide}),
 
-    this.fov = fov;
+    createInstancePhongMaterial: function (matObj) {
+        // 复制一份，不影响其他模型的使用
+        // 不复制一份，有模型绘制不出
+        var material = matObj.clone();
+        material.type = "phong_instanced";
+        material.uniforms = CLOUD.ShaderMaterial.ShaderLib.phong_cust_clip.uniforms;
+        material.vertexShader = "#define USE_CUST_INSTANCED \n" + CLOUD.ShaderMaterial.ShaderLib.phong_cust_clip.vertexShader;
+        material.fragmentShader = "#define USE_CUST_INSTANCED \n" + CLOUD.ShaderMaterial.ShaderLib.phong_cust_clip.fragmentShader;
+        return material;
+    },
 
-    this.left = -width / 2;
-    this.right = width / 2;
-    this.top = height / 2;
-    this.bottom = -height / 2;
-    this.aspect = width / height;
+    updateBasicMaterial: function (material, instanced) {
 
-    // We could also handle the projectionMatrix internally, but just wanted to test nested camera objects
+        if (instanced) {
+            material.vertexShader = "#define USE_CUST_INSTANCED \n" + CLOUD.ShaderMaterial.ShaderLib.base_cust_clip.vertexShader;
+            material.fragmentShader = "#define USE_CUST_INSTANCED \n" + CLOUD.ShaderMaterial.ShaderLib.base_cust_clip.fragmentShader;
+        } else {
+            material.vertexShader = CLOUD.ShaderMaterial.ShaderLib.base_cust_clip.vertexShader;
+            material.fragmentShader = CLOUD.ShaderMaterial.ShaderLib.base_cust_clip.fragmentShader;
+        }
 
-    this.cameraO = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, orthoNear, orthoFar);
-    this.cameraP = new THREE.PerspectiveCamera(fov, width / height, near, far);
+        material.needsUpdate = true;
+    },
 
-    this.zoom = 1;
+    setMatrixUniform: function(transform) {
+        CLOUD.ShaderMaterial.ShaderLib.base_cust_clip.uniforms.transformMatrix.value = transform;
+    },
 
-    this.toPerspective();
-};
+    createPhongMaterial: function(obj){
+        var material = new THREE.MeshPhongMaterial(obj);
+        material.type = 'phong_cust_clip';
+        material.uniforms = CLOUD.ShaderMaterial.ShaderLib.phong_cust_clip.uniforms;
+        material.vertexShader = CLOUD.ShaderMaterial.ShaderLib.phong_cust_clip.vertexShader;
+        material.fragmentShader = CLOUD.ShaderMaterial.ShaderLib.phong_cust_clip.fragmentShader;
+        return material;
+    },
 
-THREE.CombinedCamera.prototype = Object.create(THREE.Camera.prototype);
-THREE.CombinedCamera.prototype.constructor = THREE.CombinedCamera;
+    createHighlightMaterial: function () {
+        return this.createPhongMaterial(CLOUD.GlobalData.SelectionColor);
+    },
 
-THREE.CombinedCamera.prototype.toPerspective = function () {
+    nextHighestPowerOfTwo: function (x) {
+        --x;
 
-    // Switches to the Perspective Camera
+        for (var i = 1; i < 32; i <<= 1) {
+            x = x | x >> i;
+        }
 
-    this.near = this.cameraP.near;
-    this.far = this.cameraP.far;
-    this.cameraP.fov = this.fov / this.zoom;
-    this.cameraP.updateProjectionMatrix();
-    this.projectionMatrix = this.cameraP.projectionMatrix;
-    this.inPerspectiveMode = true;
-    this.inOrthographicMode = false;
-};
+        return x + 1;
+    },
 
-THREE.CombinedCamera.prototype.toOrthographic = function () {
+    ensurePowerOfTwo: function (image) {
 
-    // Switches to the Orthographic camera estimating viewport from Perspective
+        if (!THREE.Math.isPowerOfTwo(image.width) || !THREE.Math.isPowerOfTwo(image.height)) {
+            var canvas = document.createElement("canvas");
+            canvas.width = CLOUD.MaterialUtil.nextHighestPowerOfTwo(image.width);
+            canvas.height = CLOUD.MaterialUtil.nextHighestPowerOfTwo(image.height);
 
-    var fov = this.fov;
-    var aspect = this.cameraP.aspect;
-    var near = this.cameraP.near;
-    var far = this.cameraP.far;
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height);
+            return canvas;
+        }
 
-    // The size that we set is the mid plane of the viewing frustum
-
-    var hyperfocus = (near + far) / 2;
-
-    var halfHeight = Math.tan(fov * Math.PI / 180 / 2) * hyperfocus;
-    var planeHeight = 2 * halfHeight;
-    var planeWidth = planeHeight * aspect;
-    var halfWidth = planeWidth / 2;
-
-    halfHeight /= this.zoom;
-    halfWidth /= this.zoom;
-
-    this.cameraO.left = -halfWidth;
-    this.cameraO.right = halfWidth;
-    this.cameraO.top = halfHeight;
-    this.cameraO.bottom = -halfHeight;
-
-    // this.cameraO.left = -farHalfWidth;
-    // this.cameraO.right = farHalfWidth;
-    // this.cameraO.top = farHalfHeight;
-    // this.cameraO.bottom = -farHalfHeight;
-
-    // this.cameraO.left = this.left / this.zoom;
-    // this.cameraO.right = this.right / this.zoom;
-    // this.cameraO.top = this.top / this.zoom;
-    // this.cameraO.bottom = this.bottom / this.zoom;
-
-    this.cameraO.updateProjectionMatrix();
-
-    this.near = this.cameraO.near;
-    this.far = this.cameraO.far;
-    this.projectionMatrix = this.cameraO.projectionMatrix;
-
-    this.inPerspectiveMode = false;
-    this.inOrthographicMode = true;
-};
-
-THREE.CombinedCamera.prototype.setSize = function (width, height) {
-
-    this.cameraP.aspect = width / height;
-    this.left = -width / 2;
-    this.right = width / 2;
-    this.top = height / 2;
-    this.bottom = -height / 2;
-    this.aspect = width / height;
-};
-
-THREE.CombinedCamera.prototype.setFov = function (fov) {
-
-    this.fov = fov;
-
-    if (this.inPerspectiveMode) {
-
-        this.toPerspective();
-    } else {
-
-        this.toOrthographic();
+        return image;
     }
 };
 
-THREE.CombinedCamera.prototype.setNearFar = function (near, far) {
-
-    if (this.inPerspectiveMode) {
-
-        this.cameraP.near = near;
-        this.cameraP.far = far;
-
-        this.toPerspective();
-    } else {
-
-        this.cameraO.near = near;
-        this.cameraO.far = far;
-
-        this.toOrthographic();
-    }
-};
-
-// For mantaining similar API with PerspectiveCamera
-
-THREE.CombinedCamera.prototype.updateProjectionMatrix = function () {
-
-    if (this.inPerspectiveMode) {
-
-        this.toPerspective();
-    } else {
-
-        //this.toPerspective();
-        this.toOrthographic();
-    }
-};
-
-/*
- * Uses Focal Length (in mm) to estimate and set FOV
- * 35mm (fullframe) camera is used if frame size is not specified;
- * Formula based on http://www.bobatkins.com/photography/technical/field_of_view.html
- */
-THREE.CombinedCamera.prototype.setLens = function (focalLength, frameHeight) {
-
-    if (frameHeight === undefined) frameHeight = 24;
-
-    var fov = 2 * THREE.Math.radToDeg(Math.atan(frameHeight / (focalLength * 2)));
-
-    this.setFov(fov);
-
-    return fov;
-};
-
-THREE.CombinedCamera.prototype.setZoom = function (zoom) {
-
-    this.zoom = zoom;
-
-    if (this.inPerspectiveMode) {
-
-        this.toPerspective();
-    } else {
-
-        this.toOrthographic();
-    }
-};
-
-CLOUD.BBoxNode = function (boundingBox, color) {
+CLOUD.CameraInfo = function (position, target, up) {
     "use strict";
-
-    var geometry = new THREE.BufferGeometry();
-    geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(72), 3));
-
-    THREE.LineSegments.call(this, geometry, new THREE.LineBasicMaterial({ color: color }));
-
-    if (boundingBox !== undefined) {
-        this.updateBBox(boundingBox);
-    }
+    this.position = position;
+    this.target = target;
+    this.up = up;
 };
 
-CLOUD.BBoxNode.prototype = Object.create(THREE.LineSegments.prototype);
-CLOUD.BBoxNode.prototype.constructor = CLOUD.BBoxNode;
+CLOUD.CameraUtil = {
 
-CLOUD.BBoxNode.prototype.unload = function () {};
+    // camera = {"camera_position":"26513.603437903, -14576.4810728955, 15107.6582255056","camera_direction":"-220.050259546712, 169.277369901229, -125.801809656091","camera_up":"0, 0, 304.8"}
+    transformCamera: function (camera, scene) {
+        var position = new THREE.Vector3();
 
-CLOUD.BBoxNode.prototype.updateBBox = function (boundingBox) {
-    var min = boundingBox.min;
-    var max = boundingBox.max;
+        var str2float = function (strarr) {
+            return [parseFloat(strarr[0]), parseFloat(strarr[1]), parseFloat(strarr[2])];
+        };
 
-    /*
-    5____4
-    1/___0/|
-    | 6__|_7
-    2/___3/
-    0: max.x, max.y, max.z
-    1: min.x, max.y, max.z
-    2: min.x, min.y, max.z
-    3: max.x, min.y, max.z
-    4: max.x, max.y, min.z
-    5: min.x, max.y, min.z
-    6: min.x, min.y, min.z
-    7: max.x, min.y, min.z
-    */
+        position.fromArray(str2float(camera.camera_position.split(",")));
+        var dir = new THREE.Vector3();
+        dir.fromArray(str2float(camera.camera_direction.split(",")));
+        var up = new THREE.Vector3();
+        up.fromArray(str2float(camera.camera_up.split(",")));
 
-    var vertices = this.geometry.attributes.position.array;
+        var target = new THREE.Vector3();
+        target.addVectors(position, dir);
 
-    vertices[0] = max.x;vertices[1] = max.y;vertices[2] = max.z;
-    vertices[3] = min.x;vertices[4] = max.y;vertices[5] = max.z;
+        position.applyMatrix4(scene.rootNode.matrix);
+        target.applyMatrix4(scene.rootNode.matrix);
 
-    vertices[6] = min.x;vertices[7] = max.y;vertices[8] = max.z;
-    vertices[9] = min.x;vertices[10] = min.y;vertices[11] = max.z;
+        var rotMat = new THREE.Matrix4();
+        rotMat.makeRotationFromEuler(scene.rootNode.rotation);
+        up.applyMatrix4(rotMat);
+        up.normalize();
 
-    vertices[12] = min.x;vertices[13] = min.y;vertices[14] = max.z;
-    vertices[15] = max.x;vertices[16] = min.y;vertices[17] = max.z;
+        return new CLOUD.CameraInfo(position, target, up);
+    },
 
-    vertices[18] = max.x;vertices[19] = min.y;vertices[20] = max.z;
-    vertices[21] = max.x;vertices[22] = max.y;vertices[23] = max.z;
+    parseCameraInfo: function (jsonStr) {
+        var jsonObj = JSON.parse(jsonStr);
 
-    //
+        var position = new THREE.Vector3();
+        position.x = jsonObj.position.x;
+        position.y = jsonObj.position.y;
+        position.z = jsonObj.position.z;
 
-    vertices[24] = max.x;vertices[25] = max.y;vertices[26] = min.z;
-    vertices[27] = min.x;vertices[28] = max.y;vertices[29] = min.z;
+        var target = new THREE.Vector3();
+        target.x = jsonObj.target.x;
+        target.y = jsonObj.target.y;
+        target.z = jsonObj.target.z;
 
-    vertices[30] = min.x;vertices[31] = max.y;vertices[32] = min.z;
-    vertices[33] = min.x;vertices[34] = min.y;vertices[35] = min.z;
+        var up = new THREE.Vector3();
+        up.x = jsonObj.up.x;
+        up.y = jsonObj.up.y;
+        up.z = jsonObj.up.z;
 
-    vertices[36] = min.x;vertices[37] = min.y;vertices[38] = min.z;
-    vertices[39] = max.x;vertices[40] = min.y;vertices[41] = min.z;
+        return new CLOUD.CameraInfo(position, target, up);
+    },
 
-    vertices[42] = max.x;vertices[43] = min.y;vertices[44] = min.z;
-    vertices[45] = max.x;vertices[46] = max.y;vertices[47] = min.z;
 
-    //
+    intersectBoxByRay: function (ray, box) {
 
-    vertices[48] = max.x;vertices[49] = max.y;vertices[50] = max.z;
-    vertices[51] = max.x;vertices[52] = max.y;vertices[53] = min.z;
+        var tmin, tmax, tymin, tymax, tzmin, tzmax;
 
-    vertices[54] = min.x;vertices[55] = max.y;vertices[56] = max.z;
-    vertices[57] = min.x;vertices[58] = max.y;vertices[59] = min.z;
+        var invdirx = 1 / ray.direction.x,
+			invdiry = 1 / ray.direction.y,
+			invdirz = 1 / ray.direction.z;
 
-    vertices[60] = min.x;vertices[61] = min.y;vertices[62] = max.z;
-    vertices[63] = min.x;vertices[64] = min.y;vertices[65] = min.z;
+        var origin = ray.origin;
 
-    vertices[66] = max.x;vertices[67] = min.y;vertices[68] = max.z;
-    vertices[69] = max.x;vertices[70] = min.y;vertices[71] = min.z;
+        if (invdirx >= 0) {
 
-    this.geometry.attributes.position.needsUpdate = true;
+            tmin = (box.min.x - origin.x) * invdirx;
+            tmax = (box.max.x - origin.x) * invdirx;
 
-    this.geometry.computeBoundingBox();
-    this.geometry.computeBoundingSphere();
-    this.matrixAutoUpdate = false;
+        } else {
+
+            tmin = (box.max.x - origin.x) * invdirx;
+            tmax = (box.min.x - origin.x) * invdirx;
+
+        }
+
+        if (invdiry >= 0) {
+
+            tymin = (box.min.y - origin.y) * invdiry;
+            tymax = (box.max.y - origin.y) * invdiry;
+
+        } else {
+
+            tymin = (box.max.y - origin.y) * invdiry;
+            tymax = (box.min.y - origin.y) * invdiry;
+
+        }
+
+        if ((tmin > tymax) || (tymin > tmax)) return null;
+
+        // These lines also handle the case where tmin or tmax is NaN
+        // (result of 0 * Infinity). x !== x returns true if x is NaN
+
+        if (tymin > tmin || tmin !== tmin) tmin = tymin;
+
+        if (tymax < tmax || tmax !== tmax) tmax = tymax;
+
+        if (invdirz >= 0) {
+
+            tzmin = (box.min.z - origin.z) * invdirz;
+            tzmax = (box.max.z - origin.z) * invdirz;
+
+        } else {
+
+            tzmin = (box.max.z - origin.z) * invdirz;
+            tzmax = (box.min.z - origin.z) * invdirz;
+
+        }
+
+        if ((tmin > tzmax) || (tzmin > tmax)) return null;
+
+        if (tzmin > tmin || tmin !== tmin) tmin = tzmin;
+
+        if (tzmax < tmax || tmax !== tmax) tmax = tzmax;
+
+        //return point closest to the ray (positive side)
+
+        if (tmax < 0) return null;
+
+        return tmin >= 0 ? tmin : tmax;
+
+    }
+};
+CLOUD.Logger = {
+
+    log: function () {
+
+        if (CLOUD.GlobalData.DEBUG) {
+            console.log.apply(console, arguments);
+        }
+    },
+
+    debug: function () {
+
+        if (CLOUD.GlobalData.DEBUG) {
+            console.debug.apply(console, arguments);
+        }
+    },
+
+    warn: function () {
+
+        if (CLOUD.GlobalData.DEBUG) {
+            console.warn.apply(console, arguments);
+        }
+    },
+
+    error: function () {
+
+        if (CLOUD.GlobalData.DEBUG) {
+            console.error.apply(console, arguments);
+        }
+    },
+
+    time:function () {
+
+        if (CLOUD.GlobalData.DEBUG) {
+            console.time.apply(console, arguments);
+        }
+    },
+
+    timeEnd:function () {
+
+        if (CLOUD.GlobalData.DEBUG) {
+            console.timeEnd.apply(console, arguments);
+        }
+    }
+
 };
 
 /**
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLGeometriesExt = function (gl, properties, info) {
+THREE.WebGLGeometriesExt = function ( gl, properties, info ) {
 
-    var geometries = {};
+	var geometries = {};
 
-    function get(object) {
+	function get( object ) {
 
-        var geometry = object.geometry;
+		var geometry = object.geometry;
 
-        if (geometries[geometry.id] !== undefined) {
+		if ( geometries[ geometry.id ] !== undefined ) {
 
-            return geometries[geometry.id];
-        }
+			return geometries[ geometry.id ];
 
-        geometry.addEventListener('dispose', onGeometryDispose);
+		}
 
-        var buffergeometry;
+		geometry.addEventListener( 'dispose', onGeometryDispose );
 
-        if (geometry instanceof THREE.BufferGeometry) {
+		var buffergeometry;
 
-            buffergeometry = geometry;
-        } else if (geometry instanceof THREE.Geometry) {
+		if ( geometry instanceof THREE.BufferGeometry ) {
 
-            if (geometry._bufferGeometry === undefined) {
+			buffergeometry = geometry;
 
-                geometry._bufferGeometry = new THREE.BufferGeometry().setFromObject(object);
-            }
+		} else if ( geometry instanceof THREE.Geometry ) {
 
-            buffergeometry = geometry._bufferGeometry;
-        }
+			if ( geometry._bufferGeometry === undefined ) {
 
-        geometries[geometry.id] = buffergeometry;
+				geometry._bufferGeometry = new THREE.BufferGeometry().setFromObject( object );
 
-        info.memory.geometries++;
+			}
 
-        return buffergeometry;
-    }
+			buffergeometry = geometry._bufferGeometry;
 
-    function onGeometryDispose(event) {
+		}
 
-        var geometry = event.target;
-        var buffergeometry = geometries[geometry.id];
+		geometries[ geometry.id ] = buffergeometry;
 
-        deleteAttributes(buffergeometry.attributes);
-        if (buffergeometry.index) {
-            deleteAttribute(buffergeometry.index);
-        }
-        geometry.removeEventListener('dispose', onGeometryDispose);
+		info.memory.geometries ++;
 
-        geometries[geometry.id] = undefined;
+		return buffergeometry;
 
-        var property = properties.get(geometry);
-        if (property.wireframe) deleteAttribute(property.wireframe);
+	}
 
-        info.memory.geometries--;
-    }
+	function onGeometryDispose( event ) {
 
-    function getAttributeBuffer(attribute) {
+		var geometry = event.target;
+		var buffergeometry = geometries[ geometry.id ];
 
-        if (attribute instanceof THREE.InterleavedBufferAttribute) {
+		deleteAttributes( buffergeometry.attributes );
+		if (buffergeometry.index) {
+		    deleteAttribute(buffergeometry.index);
+		}
+		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
-            return properties.get(attribute.data).__webglBuffer;
-        }
+		geometries[geometry.id] = undefined;
 
-        return properties.get(attribute).__webglBuffer;
-    }
+		var property = properties.get( geometry );
+		if ( property.wireframe ) deleteAttribute( property.wireframe );
 
-    function deleteAttribute(attribute) {
+		info.memory.geometries --;
 
-        var buffer = getAttributeBuffer(attribute);
+	}
 
-        if (buffer !== undefined) {
+	function getAttributeBuffer( attribute ) {
 
-            gl.deleteBuffer(buffer);
-            removeAttributeBuffer(attribute);
-        }
-    }
+		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
 
-    function deleteAttributes(attributes) {
+			return properties.get( attribute.data ).__webglBuffer;
 
-        for (var name in attributes) {
+		}
 
-            deleteAttribute(attributes[name]);
-        }
-    }
+		return properties.get( attribute ).__webglBuffer;
 
-    function removeAttributeBuffer(attribute) {
+	}
 
-        if (attribute instanceof THREE.InterleavedBufferAttribute) {
+	function deleteAttribute( attribute ) {
 
-            properties.delete(attribute.data);
-        } else {
+		var buffer = getAttributeBuffer( attribute );
 
-            properties.delete(attribute);
-        }
-    }
+		if ( buffer !== undefined ) {
 
-    this.get = get;
+			gl.deleteBuffer( buffer );
+			removeAttributeBuffer( attribute );
+
+		}
+
+	}
+
+	function deleteAttributes( attributes ) {
+
+		for ( var name in attributes ) {
+
+			deleteAttribute( attributes[ name ] );
+
+		}
+
+	}
+
+	function removeAttributeBuffer( attribute ) {
+
+		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+
+			properties.delete( attribute.data );
+
+		} else {
+
+			properties.delete( attribute );
+
+		}
+
+	}
+
+	this.get = get;
+
 };
 
 THREE.WebGLObjectsExt = function (gl, properties, info) {
@@ -1739,17 +1983,19 @@ THREE.WebGLObjectsExt = function (gl, properties, info) {
 
     function update(object) {
 
-        // TODO: Avoid updating twice (when using shadowMap). Maybe add frame counter.
+        // TODO: Avoid updating twice (when using shadowMap). Maybe add frame taskCounter.
 
         var geometry = geometries.get(object);
 
-        if (geometry.ticket === this.renderTicket) return geometry;
+        if (geometry.ticket === this.renderTicket)
+            return geometry;
 
         geometry.ticket = this.renderTicket;
 
         if (object.geometry instanceof THREE.Geometry) {
 
             geometry.updateFromObject(object);
+
         }
 
         var index = geometry.index;
@@ -1758,11 +2004,13 @@ THREE.WebGLObjectsExt = function (gl, properties, info) {
         if (index !== null) {
 
             updateAttribute(index, gl.ELEMENT_ARRAY_BUFFER);
+
         }
 
         for (var name in attributes) {
 
             updateAttribute(attributes[name], gl.ARRAY_BUFFER);
+
         }
 
         // morph targets
@@ -1776,25 +2024,31 @@ THREE.WebGLObjectsExt = function (gl, properties, info) {
             for (var i = 0, l = array.length; i < l; i++) {
 
                 updateAttribute(array[i], gl.ARRAY_BUFFER);
+
             }
+
         }
 
         return geometry;
+
     }
 
     function updateAttribute(attribute, bufferType) {
 
-        var data = attribute instanceof THREE.InterleavedBufferAttribute ? attribute.data : attribute;
+        var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
 
         var attributeProperties = properties.get(data);
 
         if (attributeProperties.__webglBuffer === undefined) {
 
             createBuffer(attributeProperties, data, bufferType);
+
         } else if (attributeProperties.version !== data.version) {
 
             updateBuffer(attributeProperties, data, bufferType);
+
         }
+
     }
 
     function createBuffer(attributeProperties, data, bufferType) {
@@ -1807,6 +2061,7 @@ THREE.WebGLObjectsExt = function (gl, properties, info) {
         gl.bufferData(bufferType, data.array, usage);
 
         attributeProperties.version = data.version;
+
     }
 
     function updateBuffer(attributeProperties, data, bufferType) {
@@ -1818,17 +2073,22 @@ THREE.WebGLObjectsExt = function (gl, properties, info) {
             // Not using update ranges
 
             gl.bufferSubData(bufferType, 0, data.array);
+
         } else if (data.updateRange.count === 0) {
 
             console.error('THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.');
+
         } else {
 
-            gl.bufferSubData(bufferType, data.updateRange.offset * data.array.BYTES_PER_ELEMENT, data.array.subarray(data.updateRange.offset, data.updateRange.offset + data.updateRange.count));
+            gl.bufferSubData(bufferType, data.updateRange.offset * data.array.BYTES_PER_ELEMENT,
+                data.array.subarray(data.updateRange.offset, data.updateRange.offset + data.updateRange.count));
 
             data.updateRange.count = 0; // reset range
+
         }
 
         attributeProperties.version = data.version;
+
     }
 
     function getAttributeBuffer(attribute) {
@@ -1836,9 +2096,11 @@ THREE.WebGLObjectsExt = function (gl, properties, info) {
         if (attribute instanceof THREE.InterleavedBufferAttribute) {
 
             return properties.get(attribute.data).__webglBuffer;
+
         }
 
         return properties.get(attribute).__webglBuffer;
+
     }
 
     function getWireframeAttribute(geometry) {
@@ -1848,6 +2110,7 @@ THREE.WebGLObjectsExt = function (gl, properties, info) {
         if (property.wireframe !== undefined) {
 
             return property.wireframe;
+
         }
 
         var indices = [];
@@ -1872,19 +2135,23 @@ THREE.WebGLObjectsExt = function (gl, properties, info) {
                 if (checkEdge(edges, a, b)) indices.push(a, b);
                 if (checkEdge(edges, b, c)) indices.push(b, c);
                 if (checkEdge(edges, c, a)) indices.push(c, a);
+
             }
+
         } else {
 
             var array = attributes.position.array;
 
-            for (var i = 0, l = array.length / 3 - 1; i < l; i += 3) {
+            for (var i = 0, l = ( array.length / 3 ) - 1; i < l; i += 3) {
 
                 var a = i + 0;
                 var b = i + 1;
                 var c = i + 2;
 
                 indices.push(a, b, b, c, c, a);
+
             }
+
         }
 
         // console.timeEnd( 'wireframe' );
@@ -1897,6 +2164,7 @@ THREE.WebGLObjectsExt = function (gl, properties, info) {
         property.wireframe = attribute;
 
         return attribute;
+
     }
 
     function checkEdge(edges, a, b) {
@@ -1906,6 +2174,7 @@ THREE.WebGLObjectsExt = function (gl, properties, info) {
             var tmp = a;
             a = b;
             b = tmp;
+
         }
 
         var list = edges[a];
@@ -1914,20 +2183,25 @@ THREE.WebGLObjectsExt = function (gl, properties, info) {
 
             edges[a] = [b];
             return true;
+
         } else if (list.indexOf(b) === -1) {
 
             list.push(b);
             return true;
+
         }
 
         return false;
+
     }
 
     this.getAttributeBuffer = getAttributeBuffer;
     this.getWireframeAttribute = getWireframeAttribute;
 
     this.update = update;
+
 };
+
 
 CLOUD.RenderGroup = function () {
 
@@ -1940,8 +2214,9 @@ CLOUD.RenderGroup = function () {
     var renderingIdx = 0;
     var opaqueFinished = false;
     var transparentFinished = false;
-    var startTime = 0;
-    var endTime, elapseTime;
+    var timeStart = 0;
+    var timeEnd = 0;
+    var timeElapse = 0;
 
     this.getOpaqueObjects = function () {
         return opaqueObjects;
@@ -1966,15 +2241,17 @@ CLOUD.RenderGroup = function () {
 
         if (a.z !== b.z) {
             return a.z - b.z;
-        } else if (a.material.id !== b.material.id) {
+        }
+        else if (a.material.id !== b.material.id) {
             return a.material.id - b.material.id;
-        } else {
+        }
+        else {
             return a.id - b.id;
         }
     }
 
     function reversePainterSortStable(a, b) {
-        if (a.z !== b.z) {
+        if(a.z !== b.z) {
             return b.z - a.z;
         } else {
             return a.id - b.id;
@@ -1998,11 +2275,11 @@ CLOUD.RenderGroup = function () {
         transparentObjectsLastIndex = -1;
     };
 
-    this.renderableCount = function () {
-        return opaqueObjectsLastIndex + transparentObjectsLastIndex;
+    this.renderableCount = function(){
+        return  opaqueObjectsLastIndex +   transparentObjectsLastIndex;
     };
 
-    function isFinished() {
+    function isFinished () {
         return opaqueFinished && transparentFinished;
     }
 
@@ -2012,6 +2289,7 @@ CLOUD.RenderGroup = function () {
         if (material.transparent) {
             array = transparentObjects;
             index = ++transparentObjectsLastIndex;
+
         } else {
             array = opaqueObjects;
             index = ++opaqueObjectsLastIndex;
@@ -2027,6 +2305,7 @@ CLOUD.RenderGroup = function () {
             renderItem.material = material;
             renderItem.z = z;
             renderItem.group = group;
+
         } else {
             renderItem = {
                 id: object.id,
@@ -2040,6 +2319,7 @@ CLOUD.RenderGroup = function () {
             //array.push( renderItem );
             array[index] = renderItem;
         }
+
     };
 
     this.sortRenderList = function (cullEnd) {
@@ -2059,45 +2339,45 @@ CLOUD.RenderGroup = function () {
 
     function renderObjects(renderer, renderList, camera, lights, fog, update) {
 
-        startTime = Date.now();
+        timeStart = Date.now();
 
-        var l = renderList.length;
-
+        var len = renderList.length;
         var i = renderingIdx;
-        for (; i < l; i++) {
+
+        for (; i < len; i++) {
 
             var renderItem = renderList[i];
-
             var object = renderItem.object;
             var material = renderItem.material;
             var group = renderItem.group;
+            var geometry = renderItem.geometry;
 
             object.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, object.matrixWorld);
             object.normalMatrix.getNormalMatrix(object.modelViewMatrix);
 
-            var geometry = renderItem.geometry;
-            if (geometry && geometry._listeners) {
-                if (geometry.refCount === 0) {
-                    geometry = null;
-                }
-            } else {
-                geometry = null;
-            }
+            // var geometry = renderItem.geometry;
+            // if (geometry && geometry._listeners) {
+            //     if (geometry.refCount === 0) {
+            //         geometry = null;
+            //     }
+            // }
+            // else {
+            //     geometry = null;
+            // }
 
-            if (object.loaded === 0) {
-                object.load();
-            }
-            // var geometry = objects.update(object);
-
+            // if (object.loaded === 0) {
+            //     object.load();
+            // }
+            // var geometry = objects.update(object);           
+           
             renderer.renderBufferDirect(camera, lights, fog, geometry, material, object, group);
 
-            if (i % 5000 === 4999) {
-                //endTime = window.performance.now();
-                endTime = Date.now();
+            if ( (i % 5000) === 4999) {
 
-                elapseTime = endTime - startTime;
+                timeEnd = Date.now();
+                timeElapse = timeEnd - timeStart;
 
-                if (elapseTime > CLOUD.GlobalData.LimitFrameTime) {
+                if (timeElapse > CLOUD.GlobalData.LimitFrameTime) {
 
                     renderingIdx = i + 1;
 
@@ -2133,16 +2413,15 @@ CLOUD.OrderedRenderer = function () {
 
     // increment culling
     var _cullTicket = 0;
-    var isIncrementalCullFinish = false,
-        isIncrementalRenderFinish = false;
-    var cullingObjectCount = 0;
-    var _screenCullOffCount = 0;
-    var startCullTime = 0;
-    var diff = 0;
-
+    var _isIncrementalCullFinish = false,
+        _isIncrementalRenderFinish = false;
+    var _countCullingObject = 0;
+    var _countScreenCullOff = 0;
+    var _timeStartCull = 0;
+    
     var _renderTicket = 0;
 
-    var renderGroups = [];
+    var _renderGroups = [];
 
     var _frustum = null;
     var _projScreenMatrix = null;
@@ -2151,7 +2430,7 @@ CLOUD.OrderedRenderer = function () {
         _vector3End = new THREE.Vector3();
 
     var _isUpdateObjectList = true;
-    var incrementListDirty = true;
+    var _dirtyIncrementList = true;
 
     var _filterObject = null;
 
@@ -2161,39 +2440,41 @@ CLOUD.OrderedRenderer = function () {
 
     this.destroy = function () {
 
-        for (var ii = 0, len = renderGroups.length; ii < len; ++ii) {
-            var group = renderGroups[ii];
+        for (var ii = 0, len = _renderGroups.length; ii < len; ++ii) {
+            var group = _renderGroups[ii];
             if (group !== undefined) {
                 group.destroy();
             }
         }
+
     };
 
-    this.restart = function () {
+    this.restart  = function() {
 
-        for (var ii = 0, len = renderGroups.length; ii < len; ++ii) {
-            var group = renderGroups[ii];
+        for (var ii = 0, len = _renderGroups.length; ii < len; ++ii) {
+            var group = _renderGroups[ii];
             if (group !== undefined) {
                 group.restart();
             }
         }
 
-        cullingObjectCount = 0;
-        _screenCullOffCount = 0;
-        incrementListDirty = true;
+        _countCullingObject = 0;
+        _countScreenCullOff = 0;
+        _dirtyIncrementList = true;
     };
 
-    this.setFilter = function (filter) {
+    this.setFilter = function(filter){
         _filterObject = filter;
     };
 
     function prepareNewFrame() {
 
         ++_cullTicket;
-        if (_cullTicket > 100000) _cullTicket = 0;
+        if (_cullTicket > 100000)
+            _cullTicket = 0;
 
-        for (var ii = 0, len = renderGroups.length; ii < len; ++ii) {
-            var group = renderGroups[ii];
+        for (var ii = 0, len = _renderGroups.length; ii < len; ++ii) {
+            var group = _renderGroups[ii];
             if (group !== undefined) {
                 group.prepare();
             }
@@ -2203,8 +2484,8 @@ CLOUD.OrderedRenderer = function () {
     function computeRenderableCount() {
 
         var totalCount = 0;
-        for (var ii = 0, len = renderGroups.length; ii < len; ++ii) {
-            var group = renderGroups[ii];
+        for (var ii = 0, len = _renderGroups.length; ii < len; ++ii) {
+            var group = _renderGroups[ii];
             if (group !== undefined) {
                 totalCount += group.renderableCount();
             }
@@ -2214,14 +2495,15 @@ CLOUD.OrderedRenderer = function () {
 
     function pushRenderItem(object, geometry, material, z) {
 
-        var renderGroup = renderGroups[object.renderOrder];
+        var renderGroup = _renderGroups[object.renderOrder];
         if (renderGroup === undefined) {
             renderGroup = new CLOUD.RenderGroup();
-            renderGroups[object.renderOrder] = renderGroup;
+            _renderGroups[object.renderOrder] = renderGroup;
         }
 
         renderGroup.pushRenderItem(object, geometry, material, z, null);
     }
+
 
     function computeObjectCenter(object) {
 
@@ -2236,97 +2518,109 @@ CLOUD.OrderedRenderer = function () {
             _vector3.applyMatrix4(object.matrixWorld);
 
             object.radius = object.modelCenter.distanceTo(_vector3);
-        } else {
+        }
+        else {
 
             object.modelCenter.setFromMatrixPosition(object.matrixWorld);
+
         }
     }
 
     function sortRenderList() {
 
-        for (var ii = 0, len = renderGroups.length; ii < len; ++ii) {
-            var group = renderGroups[ii];
+        for (var ii = 0, len = _renderGroups.length; ii < len; ++ii) {
+            var group = _renderGroups[ii];
             if (group !== undefined) {
-                group.sortRenderList(isIncrementalCullFinish);
+                group.sortRenderList(_isIncrementalCullFinish);
             }
+
         }
     }
 
     function projectObject(object, camera, inFrustum) {
 
-        if (object.visible === false) return true;
-
-        if (!inFrustum) inFrustum = object.inFrustum;
-
-        if (object.fileId && _filterObject.hasFileFilter(object.fileId)) {
+        if (object.visible === false)
             return true;
-        } else if (object._cullTicket != _cullTicket /*&& (object.channels.mask & camera.channels.mask) !== 0*/) {
 
-                ++cullingObjectCount;
-                if (cullingObjectCount % 5000 == 4999) {
+        // if (!inFrustum)
+        //     inFrustum = object.inFrustum;
 
-                    diff = Date.now() - startCullTime;
-                    if (diff > 30) return false;
-                }
+        if (object.fileId && _filterObject.hasFileFilter(object.fileId) ) {
+             return true;
+        }
+        else if (object._cullTicket != _cullTicket /*&& (object.channels.mask & camera.channels.mask) !== 0*/) {
 
-                object._cullTicket = _cullTicket;
-                if (object instanceof CLOUD.Mesh || object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points) {
+            ++_countCullingObject;
+            if (_countCullingObject % 5000 == 4999) {
 
-                    if (inFrustum || _frustum.intersectsObject(object) === true) {
+                var diff = Date.now() - _timeStartCull;
+                if (diff > 30)
+                    return false;
+            }
 
-                        if (!_filterObject.isVisible(object)) {
-                            return true;
-                        }
+            object._cullTicket = _cullTicket;
+            if (object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points) {
 
-                        if (object.renderOrder <= 5) {
+                if (inFrustum || _frustum.intersectsObject(object) === true) {
 
-                            if (!object.modelCenter) {
-                                computeObjectCenter(object);
-                            }
-
-                            if (object.radius !== undefined) {
-
-                                _vector3.copy(object.modelCenter);
-                                _vector3.applyProjection(_projScreenMatrix);
-                                _vector3End.copy(camera.realUp);
-                                _vector3End.multiplyScalar(object.radius).add(object.modelCenter);
-
-                                _vector3End.applyProjection(_projScreenMatrix);
-
-                                var sqrtDist = _vector3End.distanceTo(_vector3) * 10;
-                                if (sqrtDist < CLOUD.GlobalData.ScreenCullLOD) {
-                                    ++_screenCullOffCount;
-                                    return true;
-                                }
-                            } else {
-                                _vector3.copy(object.modelCenter);
-                                _vector3.applyProjection(_projScreenMatrix);
-                            }
-                        }
-
-                        // 材质过滤
-                        var material = _filterObject.getOverridedMaterial(object);
-                        if (material === undefined) return true;
-                        material = material || object.material;
-
-                        //var geometry = objects.update(object);
-                        var geometry = object.geometry;
-                        if (geometry instanceof THREE.Geometry) {
-                            geometry = geometry._bufferGeometry;
-                        }
-
-                        pushRenderItem(object, geometry, material, _vector3.z);
+                    if (!_filterObject.isVisible(object)) {
+                        return true;
                     }
+
+                    if (object.renderOrder <= 5) {
+
+                        if (!object.modelCenter) {
+                            computeObjectCenter(object);
+                        }
+
+                        if (object.radius !== undefined) {
+
+                            _vector3.copy(object.modelCenter);
+                            _vector3.applyProjection(_projScreenMatrix);
+                            _vector3End.copy(camera.realUp);
+                            _vector3End.multiplyScalar(object.radius).add(object.modelCenter);
+
+                            _vector3End.applyProjection(_projScreenMatrix);
+
+                            var sqrtDist = _vector3End.distanceTo(_vector3) * 10;
+                            if (sqrtDist < CLOUD.GlobalData.ScreenCullLOD) {
+                                ++_countScreenCullOff;
+                                return true;
+                            }
+
+                        }
+                        else {
+                            _vector3.copy(object.modelCenter);
+                            _vector3.applyProjection(_projScreenMatrix);
+                        }
+                    }
+
+                    // 材质过滤
+                    var material = _filterObject.getOverridedMaterial(object);
+                    material = material || object.material;
+
+                    //var geometry = objects.update(object);
+                    var geometry = object.geometry;
+                    if (geometry instanceof THREE.Geometry) {
+                        geometry = geometry._bufferGeometry;
+                    }
+
+                    pushRenderItem(object, geometry, material, _vector3.z);
+
                 }
             }
+        }
 
         var children = object.children;
         if (children) {
             for (var i = 0, l = children.length; i < l; i++) {
 
-                if (!projectObject(children[i], camera, inFrustum)) return false;
+                if (!projectObject(children[i], camera, inFrustum))
+                    return false;
+
             }
         }
+
 
         return true;
     }
@@ -2343,27 +2637,29 @@ CLOUD.OrderedRenderer = function () {
             if (object instanceof THREE.Light) {
 
                 lights.push(object);
+
             }
+
         }
     }
 
     function buildObjectList(scene, camera, lights) {
 
         if (!_isUpdateObjectList) {
-            isIncrementalCullFinish = true;
+            _isIncrementalCullFinish = true;
             return;
         }
 
-        if (isIncrementalCullFinish) {
+        if (_isIncrementalCullFinish) {
 
             prepareNewFrame();
             projectLights(scene, lights);
         }
 
-        startCullTime = Date.now();
+        _timeStartCull = Date.now();
 
         //console.time("projectObject");
-        isIncrementalCullFinish = projectObject(scene, camera);
+        _isIncrementalCullFinish = projectObject(scene, camera);
         //console.timeEnd("projectObject");
         //console.log("screen cull off: " + _screenCullOffCount);
         sortRenderList();
@@ -2376,27 +2672,30 @@ CLOUD.OrderedRenderer = function () {
 
     function updateRenderTicket() {
 
-        if (!_isUpdateObjectList || incrementListDirty) {
+        if (!_isUpdateObjectList || _dirtyIncrementList) {
             ++_renderTicket;
         }
         //else {
         //    console.log(_renderTicket);
         //}
-        if (_renderTicket > 10000) _renderTicket = 0;
+        if (_renderTicket > 10000)
+            _renderTicket = 0;
     }
 
     this.render = function (renderer, scene, camera, lights, renderTarget, forceClear, state) {
 
         updateRenderTicket();
 
-        if (incrementListDirty) {
+        if (_dirtyIncrementList) {
 
-            // console.log("  build");
+           // console.log("  build");
             buildObjectList(scene, camera, lights);
 
-            if (!isIncrementalCullFinish) return false;else {
+            if (!_isIncrementalCullFinish)
+                return false;
+            else {
                 forceClear = true;
-                incrementListDirty = false;
+                _dirtyIncrementList = false;
 
                 //var count = computeRenderableCount();
                 //console.log("renderable " + count);
@@ -2416,21 +2715,25 @@ CLOUD.OrderedRenderer = function () {
 
         state.setBlending(THREE.NoBlending);
 
-        for (var ii = renderGroups.length - 1; ii >= 0; --ii) {
-            var group = renderGroups[ii];
+        _isIncrementalRenderFinish = true; //
+
+        for (var ii = _renderGroups.length - 1; ii >= 0; --ii) {
+            var group = _renderGroups[ii];
             if (group !== undefined) {
-                isIncrementalRenderFinish = group.renderOpaqueObjects(renderer, camera, lights, fog, _isUpdateObjectList);
-                if (!isIncrementalRenderFinish) break;
+                _isIncrementalRenderFinish = group.renderOpaqueObjects(renderer, camera, lights, fog, _isUpdateObjectList);
+                if (!_isIncrementalRenderFinish)
+                    break;
             }
         }
 
-        if (isIncrementalRenderFinish) {
+        if (_isIncrementalRenderFinish) {
 
-            for (var ii = renderGroups.length - 1; ii >= 0; --ii) {
-                var group = renderGroups[ii];
+            for (var ii = _renderGroups.length - 1; ii >= 0; --ii) {
+                var group = _renderGroups[ii];
                 if (group !== undefined) {
-                    isIncrementalRenderFinish = group.renderTransparentObjects(renderer, camera, lights, fog);
-                    if (!isIncrementalRenderFinish) break;
+                    _isIncrementalRenderFinish = group.renderTransparentObjects(renderer, camera, lights, fog);
+                    if (!_isIncrementalRenderFinish)
+                        break;
                 }
             }
         }
@@ -2440,19 +2743,22 @@ CLOUD.OrderedRenderer = function () {
         state.setDepthWrite(true);
         state.setColorWrite(true);
 
-        return isIncrementalRenderFinish;
+        return _isIncrementalRenderFinish;
+
     };
 
     this.computeSelectionBBox = function () {
 
-        if (_filterObject === null) return null;
+        if (_filterObject === null)
+            return null;
 
-        if (_filterObject.isSelectionSetEmpty()) return null;
+        if (_filterObject.isSelectionSetEmpty())
+            return null;
 
         _filterObject.resetSelectionBox();
 
-        for (var ii = renderGroups.length - 1; ii >= 0; --ii) {
-            var group = renderGroups[ii];
+        for (var ii = _renderGroups.length - 1; ii >= 0; --ii) {
+            var group = _renderGroups[ii];
             if (group !== undefined) {
                 _filterObject.computeSelectionBox(group.getOpaqueObjects());
                 _filterObject.computeSelectionBox(group.getTransparentObjects());
@@ -2464,8 +2770,8 @@ CLOUD.OrderedRenderer = function () {
 
     this.computeRenderObjectsBox = function () {
         var box = new THREE.Box3();
-        for (var ii = renderGroups.length - 1; ii >= 0; --ii) {
-            var group = renderGroups[ii];
+        for (var ii = _renderGroups.length - 1; ii >= 0; --ii) {
+            var group = _renderGroups[ii];
             if (group !== undefined) {
                 var opaqueBox = _filterObject.computeRenderObjectsBox(group.getOpaqueObjects());
                 if (!opaqueBox.empty()) {
@@ -2484,7 +2790,6 @@ CLOUD.OrderedRenderer = function () {
         return box;
     };
 };
-
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author mrdoob / http://mrdoob.com/
@@ -2500,15 +2805,19 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
     var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement('canvas'),
         _context = parameters.context !== undefined ? parameters.context : null,
+
         _width = _canvas.width,
         _height = _canvas.height,
+
         pixelRatio = 1,
+
         _alpha = parameters.alpha !== undefined ? parameters.alpha : false,
         _depth = parameters.depth !== undefined ? parameters.depth : true,
         _stencil = parameters.stencil !== undefined ? parameters.stencil : true,
         _antialias = parameters.antialias !== undefined ? parameters.antialias : false,
         _premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
         _preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
+
         _clearColor = new THREE.Color(0x000000),
         _clearAlpha = 0;
 
@@ -2520,6 +2829,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
     var transparentObjectsLastIndex = -1;
 
     var morphInfluences = new Float32Array(8);
+
 
     var sprites = [];
     var lensFlares = [];
@@ -2542,7 +2852,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
     // physically based shading
 
-    this.gammaFactor = 2.0; // for backwards compatibility
+    this.gammaFactor = 2.0;	// for backwards compatibility
     this.gammaInput = false;
     this.gammaOutput = false;
 
@@ -2559,15 +2869,16 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
     var _this = this,
 
+        // internal state cache
 
-    // internal state cache
-
-    _currentProgram = null,
+        _currentProgram = null,
         _currentFramebuffer = null,
         _currentMaterialId = -1,
         _currentGeometryProgram = '',
         _currentCamera = null,
+
         _usedTextureUnits = 0,
+
         _viewportX = 0,
         _viewportY = 0,
         _viewportWidth = _canvas.width,
@@ -2575,49 +2886,58 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         _currentWidth = 0,
         _currentHeight = 0,
 
+        // frustum
 
-    // frustum
+        _frustum = new THREE.Frustum(),
 
-    _frustum = new THREE.Frustum(),
+        // camera matrices cache
 
+        _projScreenMatrix = new THREE.Matrix4(),
 
-    // camera matrices cache
-
-    _projScreenMatrix = new THREE.Matrix4(),
         _vector3 = new THREE.Vector3(),
 
+        // light arrays cache
 
-    // light arrays cache
+        _direction = new THREE.Vector3(),
 
-    _direction = new THREE.Vector3(),
         _lightsNeedUpdate = true,
+
         _lights = {
 
-        ambient: [0, 0, 0],
-        directional: { length: 0, colors: [], positions: [] },
-        point: { length: 0, colors: [], positions: [], distances: [], decays: [] },
-        spot: { length: 0, colors: [], positions: [], distances: [], directions: [], anglesCos: [], exponents: [], decays: [] },
-        hemi: { length: 0, skyColors: [], groundColors: [], positions: [] }
+            ambient: [0, 0, 0],
+            directional: {length: 0, colors: [], positions: []},
+            point: {length: 0, colors: [], positions: [], distances: [], decays: []},
+            spot: {
+                length: 0,
+                colors: [],
+                positions: [],
+                distances: [],
+                directions: [],
+                anglesCos: [],
+                exponents: [],
+                decays: []
+            },
+            hemi: {length: 0, skyColors: [], groundColors: [], positions: []}
 
-    },
+        },
 
+        // info
 
-    // info
+        _infoMemory = {
 
-    _infoMemory = {
+            geometries: 0,
+            textures: 0
 
-        geometries: 0,
-        textures: 0
+        },
 
-    },
         _infoRender = {
 
-        calls: 0,
-        vertices: 0,
-        faces: 0,
-        points: 0
+            calls: 0,
+            vertices: 0,
+            faces: 0,
+            points: 0
 
-    };
+        };
 
     this.info = {
 
@@ -2626,6 +2946,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         programs: null
 
     };
+
 
     // initialize
 
@@ -2649,16 +2970,21 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             if (_canvas.getContext('webgl') !== null) {
 
                 throw 'Error creating WebGL context with your selected attributes.';
+
             } else {
 
                 throw 'Error creating WebGL context.';
+
             }
+
         }
 
         _canvas.addEventListener('webglcontextlost', onContextLost, false);
+
     } catch (error) {
 
         console.error('THREE.WebGLRenderer: ' + error);
+
     }
 
     var extensions = new THREE.WebGLExtensions(_gl);
@@ -2673,6 +2999,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
     if (extensions.get('OES_element_index_uint')) {
 
         THREE.BufferGeometry.MaxIndex = 4294967296;
+
     }
 
     var capabilities = new THREE.WebGLCapabilities(_gl, extensions, parameters);
@@ -2693,10 +3020,14 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
         if (_premultipliedAlpha === true) {
 
-            r *= a;g *= a;b *= a;
+            r *= a;
+            g *= a;
+            b *= a;
+
         }
 
         _gl.clearColor(r, g, b, a);
+
     }
 
     function setDefaultGLState() {
@@ -2706,6 +3037,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         _gl.viewport(_viewportX, _viewportY, _viewportWidth, _viewportHeight);
 
         glClearColor(_clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha);
+
     }
 
     function resetGLState() {
@@ -2719,6 +3051,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         _lightsNeedUpdate = true;
 
         state.reset();
+
     }
 
     setDefaultGLState();
@@ -2736,6 +3069,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
     var shadowMap = new THREE.WebGLShadowMap(this, lights);
     this.shadowMap = shadowMap;
 
+
     // Plugins
 
     var spritePlugin = new THREE.SpritePlugin(this, sprites);
@@ -2746,19 +3080,22 @@ THREE.WebGLIncrementRenderer = function (parameters) {
     this.getContext = function () {
 
         return _gl;
+
     };
 
     this.getContextAttributes = function () {
 
         return _gl.getContextAttributes();
+
     };
 
     this.forceContextLoss = function () {
 
         extensions.get('WEBGL_lose_context').loseContext();
+
     };
 
-    this.getMaxAnisotropy = function () {
+    this.getMaxAnisotropy = (function () {
 
         var value;
 
@@ -2771,28 +3108,35 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             if (extension !== null) {
 
                 value = _gl.getParameter(extension.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+
             } else {
 
                 value = 0;
+
             }
 
             return value;
-        };
-    }();
+
+        }
+
+    })();
 
     this.getPrecision = function () {
 
         return capabilities.precision;
+
     };
 
     this.getPixelRatio = function () {
 
         return pixelRatio;
+
     };
 
     this.setPixelRatio = function (value) {
 
         if (value !== undefined) pixelRatio = value;
+
     };
 
     this.getSize = function () {
@@ -2801,6 +3145,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             width: _width,
             height: _height
         };
+
     };
 
     this.setSize = function (width, height, updateStyle) {
@@ -2815,9 +3160,11 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             _canvas.style.width = width + 'px';
             _canvas.style.height = height + 'px';
+
         }
 
         this.setViewport(0, 0, width, height);
+
     };
 
     this.setViewport = function (x, y, width, height) {
@@ -2829,6 +3176,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         _viewportHeight = height * pixelRatio;
 
         _gl.viewport(_viewportX, _viewportY, _viewportWidth, _viewportHeight);
+
     };
 
     this.getViewport = function (dimensions) {
@@ -2838,16 +3186,24 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
         dimensions.z = _viewportWidth / pixelRatio;
         dimensions.w = _viewportHeight / pixelRatio;
+
     };
 
     this.setScissor = function (x, y, width, height) {
 
-        _gl.scissor(x * pixelRatio, y * pixelRatio, width * pixelRatio, height * pixelRatio);
+        _gl.scissor(
+            x * pixelRatio,
+            y * pixelRatio,
+            width * pixelRatio,
+            height * pixelRatio
+        );
+
     };
 
     this.enableScissorTest = function (boolean) {
 
         state.setScissorTest(boolean);
+
     };
 
     // Clearing
@@ -2855,6 +3211,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
     this.getClearColor = function () {
 
         return _clearColor;
+
     };
 
     this.setClearColor = function (color, alpha) {
@@ -2864,11 +3221,13 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         _clearAlpha = alpha !== undefined ? alpha : 1;
 
         glClearColor(_clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha);
+
     };
 
     this.getClearAlpha = function () {
 
         return _clearAlpha;
+
     };
 
     this.setClearAlpha = function (alpha) {
@@ -2876,6 +3235,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         _clearAlpha = alpha;
 
         glClearColor(_clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha);
+
     };
 
     this.clear = function (color, depth, stencil) {
@@ -2887,27 +3247,32 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         if (stencil === undefined || stencil) bits |= _gl.STENCIL_BUFFER_BIT;
 
         _gl.clear(bits);
+
     };
 
     this.clearColor = function () {
 
         _gl.clear(_gl.COLOR_BUFFER_BIT);
+
     };
 
     this.clearDepth = function () {
 
         _gl.clear(_gl.DEPTH_BUFFER_BIT);
+
     };
 
     this.clearStencil = function () {
 
         _gl.clear(_gl.STENCIL_BUFFER_BIT);
+
     };
 
     this.clearTarget = function (renderTarget, color, depth, stencil) {
 
         this.setRenderTarget(renderTarget);
         this.clear(color, depth, stencil);
+
     };
 
     // Reset
@@ -2917,6 +3282,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
     this.dispose = function () {
 
         _canvas.removeEventListener('webglcontextlost', onContextLost, false);
+
     };
 
     // Events
@@ -2929,7 +3295,8 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         setDefaultGLState();
 
         properties.clear();
-    }
+
+    };
 
     function onTextureDispose(event) {
 
@@ -2940,6 +3307,8 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         deallocateTexture(texture);
 
         _infoMemory.textures--;
+
+
     }
 
     function onRenderTargetDispose(event) {
@@ -2951,6 +3320,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         deallocateRenderTarget(renderTarget);
 
         _infoMemory.textures--;
+
     }
 
     function onMaterialDispose(event) {
@@ -2960,6 +3330,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         material.removeEventListener('dispose', onMaterialDispose);
 
         deallocateMaterial(material);
+
     }
 
     // Buffer deallocation
@@ -2973,6 +3344,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             // cube texture
 
             _gl.deleteTexture(textureProperties.__image__webglTextureCube);
+
         } else {
 
             // 2D texture
@@ -2980,10 +3352,12 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             if (textureProperties.__webglInit === undefined) return;
 
             _gl.deleteTexture(textureProperties.__webglTexture);
+
         }
 
         // remove all webgl properties
         properties.delete(texture);
+
     }
 
     function deallocateRenderTarget(renderTarget) {
@@ -3001,15 +3375,19 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
                 _gl.deleteFramebuffer(renderTargetProperties.__webglFramebuffer[i]);
                 _gl.deleteRenderbuffer(renderTargetProperties.__webglRenderbuffer[i]);
+
             }
+
         } else {
 
             _gl.deleteFramebuffer(renderTargetProperties.__webglFramebuffer);
             _gl.deleteRenderbuffer(renderTargetProperties.__webglRenderbuffer);
+
         }
 
         properties.delete(renderTarget.texture);
         properties.delete(renderTarget);
+
     }
 
     function deallocateMaterial(material) {
@@ -3017,7 +3395,9 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         releaseMaterialProgramReference(material);
 
         properties.delete(material);
+
     }
+
 
     function releaseMaterialProgramReference(material) {
 
@@ -3028,7 +3408,9 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         if (programInfo !== undefined) {
 
             programCache.releaseProgram(programInfo);
+
         }
+
     }
 
     // Buffer rendering
@@ -3053,6 +3435,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             state.enableAttribute(attributes.position);
             _gl.vertexAttribPointer(attributes.position, 3, _gl.FLOAT, false, 0, 0);
+
         }
 
         if (object.hasNormals) {
@@ -3065,9 +3448,9 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
                     var array = object.normalArray;
 
-                    var nx = (array[i + 0] + array[i + 3] + array[i + 6]) / 3;
-                    var ny = (array[i + 1] + array[i + 4] + array[i + 7]) / 3;
-                    var nz = (array[i + 2] + array[i + 5] + array[i + 8]) / 3;
+                    var nx = ( array[i + 0] + array[i + 3] + array[i + 6] ) / 3;
+                    var ny = ( array[i + 1] + array[i + 4] + array[i + 7] ) / 3;
+                    var nz = ( array[i + 2] + array[i + 5] + array[i + 8] ) / 3;
 
                     array[i + 0] = nx;
                     array[i + 1] = ny;
@@ -3080,7 +3463,9 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                     array[i + 6] = nx;
                     array[i + 7] = ny;
                     array[i + 8] = nz;
+
                 }
+
             }
 
             _gl.bufferData(_gl.ARRAY_BUFFER, object.normalArray, _gl.DYNAMIC_DRAW);
@@ -3088,6 +3473,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             state.enableAttribute(attributes.normal);
 
             _gl.vertexAttribPointer(attributes.normal, 3, _gl.FLOAT, false, 0, 0);
+
         }
 
         if (object.hasUvs && material.map) {
@@ -3098,6 +3484,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             state.enableAttribute(attributes.uv);
 
             _gl.vertexAttribPointer(attributes.uv, 2, _gl.FLOAT, false, 0, 0);
+
         }
 
         if (object.hasColors && material.vertexColors !== THREE.NoColors) {
@@ -3108,6 +3495,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             state.enableAttribute(attributes.color);
 
             _gl.vertexAttribPointer(attributes.color, 3, _gl.FLOAT, false, 0, 0);
+
         }
 
         state.disableUnusedAttributes();
@@ -3115,11 +3503,15 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         _gl.drawArrays(_gl.TRIANGLES, 0, object.count);
 
         object.count = 0;
+
     };
 
     this.renderBufferDirect = function (camera, lights, fog, geometry, material, object, group) {
 
-        if (!geometry) geometry = objects.update(object);
+        // if (!geometry)
+        //     geometry = objects.update(object);
+
+        geometry = objects.update(object);
 
         setMaterial(material);
 
@@ -3132,6 +3524,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             _currentGeometryProgram = geometryProgram;
             updateBuffers = true;
+
         }
 
         //// morph targets
@@ -3209,9 +3602,11 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             renderer = indexedBufferRenderer;
             renderer.setIndex(index);
+
         } else {
 
             renderer = bufferRenderer;
+
         }
 
         if (updateBuffers) {
@@ -3221,7 +3616,9 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             if (index !== null) {
 
                 _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, objects.getAttributeBuffer(index));
+
             }
+
         }
 
         //
@@ -3231,10 +3628,12 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
         if (index !== null) {
 
-            dataCount = index.count;
+            dataCount = index.count
+
         } else if (position !== undefined) {
 
             dataCount = position.count;
+
         }
 
         //var rangeStart = geometry.drawRange.start;
@@ -3251,24 +3650,29 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         var drawStart = 0;
         var drawCount = dataCount;
 
-        if (object instanceof CLOUD.Mesh || object instanceof THREE.Mesh) {
+        if (object instanceof THREE.Mesh) {
 
             if (material.wireframe === true) {
 
                 state.setLineWidth(material.wireframeLinewidth * pixelRatio);
                 renderer.setMode(_gl.LINES);
+
             } else {
 
                 renderer.setMode(_gl.TRIANGLES);
+
             }
 
             if (geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0) {
 
                 renderer.renderInstances(geometry);
+
             } else {
 
                 renderer.render(drawStart, drawCount);
+
             }
+
         } else if (object instanceof THREE.Line) {
 
             var lineWidth = material.linewidth;
@@ -3280,17 +3684,22 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             if (object instanceof THREE.LineSegments) {
 
                 renderer.setMode(_gl.LINES);
+
             } else {
 
                 renderer.setMode(_gl.LINE_STRIP);
+
             }
 
             renderer.render(drawStart, drawCount);
+
         } else if (object instanceof THREE.Points) {
 
             renderer.setMode(_gl.POINTS);
             renderer.render(drawStart, drawCount);
+
         }
+
     };
 
     function setupVertexAttributes(material, program, geometry, startIndex) {
@@ -3332,6 +3741,44 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
                     var size = geometryAttribute.itemSize;
                     var buffer = objects.getAttributeBuffer(geometryAttribute);
+
+                    var type = _gl.FLOAT;
+                    var array = geometryAttribute.array;
+                    var normalized = geometryAttribute.normalized;
+
+                    if (array instanceof Float32Array) {
+
+                        type = _gl.FLOAT;
+
+                    } else if (array instanceof Float64Array) {
+
+                        console.warn("Unsupported data buffer format: Float64Array");
+
+                    } else if (array instanceof Uint16Array) {
+
+                        type = _gl.UNSIGNED_SHORT;
+
+                    } else if (array instanceof Int16Array) {
+
+                        type = _gl.SHORT;
+
+                    } else if (array instanceof Uint32Array) {
+
+                        type = _gl.UNSIGNED_INT;
+
+                    } else if (array instanceof Int32Array) {
+
+                        type = _gl.INT;
+
+                    } else if (array instanceof Int8Array) {
+
+                        type = _gl.BYTE;
+
+                    } else if (array instanceof Uint8Array) {
+
+                        type = _gl.UNSIGNED_BYTE;
+
+                    }
 
                     //if ( geometryAttribute instanceof THREE.InterleavedBufferAttribute ) {
 
@@ -3377,11 +3824,14 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                         {
 
                             state.enableAttribute(programAttribute);
+
                         }
 
                         _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
-                        _gl.vertexAttribPointer(programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4); // 4 bytes per Float32
+                        _gl.vertexAttribPointer(programAttribute, size, type, false, 0, startIndex * size * array.BYTES_PER_ELEMENT); // 4 bytes per Float32
+
                     }
+
                 } else if (materialDefaultAttributeValues !== undefined) {
 
                     var value = materialDefaultAttributeValues[name];
@@ -3406,12 +3856,17 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                                 _gl.vertexAttrib1fv(programAttribute, value);
 
                         }
+
                     }
+
                 }
+
             }
+
         }
 
         state.disableUnusedAttributes();
+
     }
 
     // Sorting
@@ -3419,6 +3874,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
     function numericalSort(a, b) {
 
         return b[0] - a[0];
+
     }
 
     function painterSortStable(a, b) {
@@ -3426,16 +3882,21 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         if (a.object.renderOrder !== b.object.renderOrder) {
 
             return a.object.renderOrder - b.object.renderOrder;
+
         } else if (a.material.id !== b.material.id) {
 
             return a.material.id - b.material.id;
+
         } else if (a.z !== b.z) {
 
             return a.z - b.z;
+
         } else {
 
             return a.id - b.id;
+
         }
+
     }
 
     function reversePainterSortStable(a, b) {
@@ -3443,13 +3904,18 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         if (a.object.renderOrder !== b.object.renderOrder) {
 
             return a.object.renderOrder - b.object.renderOrder;
-        }if (a.z !== b.z) {
+
+        }
+        if (a.z !== b.z) {
 
             return b.z - a.z;
+
         } else {
 
             return a.id - b.id;
+
         }
+
     }
 
     // Rendering
@@ -3460,6 +3926,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             console.error('THREE.WebGLRenderer.render: camera is not an instance of THREE.Camera.');
             return;
+
         }
 
         var fog = scene.fog;
@@ -3501,6 +3968,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             opaqueObjects.sort(painterSortStable);
             transparentObjects.sort(reversePainterSortStable);
+
         }
 
         //
@@ -3519,6 +3987,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         if (this.autoClear || forceClear) {
 
             this.clear(this.autoClearColor, this.autoClearDepth, this.autoClearStencil);
+
         }
 
         //
@@ -3529,6 +3998,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             renderObjects(opaqueObjects, camera, lights, fog, overrideMaterial);
             renderObjects(transparentObjects, camera, lights, fog, overrideMaterial);
+
         } else {
 
             // opaque pass (front-to-back order)
@@ -3539,6 +4009,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             // transparent pass (back-to-front order)
 
             renderObjects(transparentObjects, camera, lights, fog);
+
         }
 
         // custom render plugins (post pass)
@@ -3555,7 +4026,9 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             if (texture.generateMipmaps && isTargetPowerOfTwo && texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter) {
 
                 updateRenderTargetMipmap(renderTarget);
+
             }
+
         }
 
         // Ensure depth buffer writing is enabled so it can be cleared on next render
@@ -3565,6 +4038,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         state.setColorWrite(true);
 
         // _gl.finish();
+
     };
 
     function pushRenderItem(object, geometry, material, z, group) {
@@ -3577,10 +4051,12 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             array = transparentObjects;
             index = ++transparentObjectsLastIndex;
+
         } else {
 
             array = opaqueObjects;
             index = ++opaqueObjectsLastIndex;
+
         }
 
         // recycle existing render item or grow the array
@@ -3595,6 +4071,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             renderItem.material = material;
             renderItem.z = _vector3.z;
             renderItem.group = group;
+
         } else {
 
             renderItem = {
@@ -3610,37 +4087,44 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             //array.push( renderItem );
             array[index] = renderItem;
         }
+
     }
 
     function projectObject(object, camera) {
 
         if (object.visible === false) return;
 
-        if ((object.channels && object.channels.mask & camera.channels.mask) !== 0) {
+        if (( object.channels && object.channels.mask & camera.channels.mask ) !== 0) {
 
             if (object instanceof THREE.Light) {
 
                 lights.push(object);
+
             } else if (object instanceof THREE.Sprite) {
 
                 sprites.push(object);
+
             } else if (object instanceof THREE.LensFlare) {
 
                 lensFlares.push(object);
+
             } else if (object instanceof THREE.ImmediateRenderObject) {
 
                 if (_this.sortObjects === true) {
 
                     _vector3.setFromMatrixPosition(object.matrixWorld);
                     _vector3.applyProjection(_projScreenMatrix);
+
                 }
 
                 pushRenderItem(object, null, object.material, _vector3.z, null);
+
             } else if (object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points) {
 
                 if (object instanceof THREE.SkinnedMesh) {
 
                     object.skeleton.update();
+
                 }
 
                 if (object.frustumCulled === false || _frustum.intersectsObject(object) === true) {
@@ -3653,6 +4137,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
                             _vector3.setFromMatrixPosition(object.matrixWorld);
                             _vector3.applyProjection(_projScreenMatrix);
+
                         }
 
                         var geometry = objects.update(object);
@@ -3670,15 +4155,23 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                                 if (groupMaterial.visible === true) {
 
                                     pushRenderItem(object, geometry, groupMaterial, _vector3.z, group);
+
                                 }
+
                             }
+
                         } else {
 
                             pushRenderItem(object, geometry, material, _vector3.z, null);
+
                         }
+
                     }
+
                 }
+
             }
+
         }
 
         var children = object.children;
@@ -3692,6 +4185,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             for (var i = 0, l = children.length; i < l; i++) {
 
                 projectObject(children[i], camera);
+
             }
         }
 
@@ -3700,6 +4194,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         //projectObject( children[ i ], camera );
         //
         //}
+
     }
 
     function renderObjects(renderList, camera, lights, fog, overrideMaterial) {
@@ -3727,12 +4222,17 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                 object.render(function (object) {
 
                     _this.renderBufferImmediate(object, program, material);
+
                 });
+
             } else {
 
                 _this.renderBufferDirect(camera, lights, fog, geometry, material, object, group);
+
             }
+
         }
+
     }
 
     function initMaterial(material, lights, fog, object) {
@@ -3749,18 +4249,22 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             // new material
             material.addEventListener('dispose', onMaterialDispose);
+
         } else if (program.code !== code) {
 
             // changed glsl or parameters
             releaseMaterialProgramReference(material);
+
         } else if (parameters.shaderID !== undefined) {
 
             // same glsl and uniform list
             return;
+
         } else {
 
             // only rebuild uniform list
             programChange = false;
+
         }
 
         if (programChange) {
@@ -3775,6 +4279,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                     vertexShader: shader.vertexShader,
                     fragmentShader: shader.fragmentShader
                 };
+
             } else {
 
                 materialProperties.__webglShader = {
@@ -3783,6 +4288,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                     vertexShader: material.vertexShader,
                     fragmentShader: material.fragmentShader
                 };
+
             }
 
             material.__webglShader = materialProperties.__webglShader;
@@ -3791,6 +4297,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             materialProperties.program = program;
             material.program = program;
+
         }
 
         var attributes = program.getAttributes();
@@ -3804,8 +4311,11 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                 if (attributes['morphTarget' + i] >= 0) {
 
                     material.numSupportedMorphTargets++;
+
                 }
+
             }
+
         }
 
         if (material.morphNormals) {
@@ -3817,8 +4327,11 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                 if (attributes['morphNormal' + i] >= 0) {
 
                     material.numSupportedMorphNormals++;
+
                 }
+
             }
+
         }
 
         materialProperties.uniformsList = [];
@@ -3832,8 +4345,11 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             if (location) {
 
                 materialProperties.uniformsList.push([materialProperties.__webglShader.uniforms[u], location]);
+
             }
+
         }
+
     }
 
     function setMaterial(material) {
@@ -3843,9 +4359,11 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         if (material.transparent === true) {
 
             state.setBlending(material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha);
+
         } else {
 
             state.setBlending(THREE.NoBlending);
+
         }
 
         state.setDepthFunc(material.depthFunc);
@@ -3853,12 +4371,14 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         state.setDepthWrite(material.depthWrite);
         state.setColorWrite(material.colorWrite);
         state.setPolygonOffset(material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits);
+
     }
 
     function setMaterialFaces(material) {
 
         material.side !== THREE.DoubleSide ? state.enable(_gl.CULL_FACE) : state.disable(_gl.CULL_FACE);
         state.setFlipSided(material.side === THREE.BackSide);
+
     }
 
     function setProgram(camera, lights, fog, material, object) {
@@ -3871,6 +4391,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             initMaterial(material, lights, fog, object);
             material.needsUpdate = false;
+
         }
 
         var refreshProgram = false;
@@ -3889,6 +4410,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             refreshProgram = true;
             refreshMaterial = true;
             refreshLights = true;
+
         }
 
         if (material.id !== _currentMaterialId) {
@@ -3897,6 +4419,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             _currentMaterialId = material.id;
 
             refreshMaterial = true;
+
         }
 
         if (refreshProgram || camera !== _currentCamera) {
@@ -3905,30 +4428,43 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             if (capabilities.logarithmicDepthBuffer) {
 
-                _gl.uniform1f(p_uniforms.logDepthBufFC, 2.0 / (Math.log(camera.far + 1.0) / Math.LN2));
+                _gl.uniform1f(p_uniforms.logDepthBufFC, 2.0 / ( Math.log(camera.far + 1.0) / Math.LN2 ));
+
             }
+
 
             if (camera !== _currentCamera) _currentCamera = camera;
 
             // load material specific uniforms
             // (shader material also gets them for the sake of genericity)
 
-            if (material instanceof THREE.ShaderMaterial || material instanceof THREE.MeshPhongMaterial || material.envMap) {
+            if (material instanceof THREE.ShaderMaterial ||
+                material instanceof THREE.MeshPhongMaterial ||
+                material.envMap) {
 
                 if (p_uniforms.cameraPosition !== undefined) {
 
                     _vector3.setFromMatrixPosition(camera.matrixWorld);
                     _gl.uniform3f(p_uniforms.cameraPosition, _vector3.x, _vector3.y, _vector3.z);
+
                 }
+
             }
 
-            if (material instanceof THREE.MeshPhongMaterial || material instanceof THREE.MeshLambertMaterial || material instanceof THREE.MeshBasicMaterial || material instanceof THREE.ShaderMaterial || material.skinning) {
+            if (material instanceof THREE.MeshPhongMaterial ||
+                material instanceof THREE.MeshLambertMaterial ||
+                material instanceof THREE.MeshBasicMaterial ||
+                material instanceof THREE.ShaderMaterial ||
+                material.skinning) {
 
                 if (p_uniforms.viewMatrix !== undefined) {
 
                     _gl.uniformMatrix4fv(p_uniforms.viewMatrix, false, camera.matrixWorldInverse.elements);
+
                 }
+
             }
+
         }
 
         // skinning uniforms must be set even if material didn't change
@@ -3940,11 +4476,13 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             if (object.bindMatrix && p_uniforms.bindMatrix !== undefined) {
 
                 _gl.uniformMatrix4fv(p_uniforms.bindMatrix, false, object.bindMatrix.elements);
+
             }
 
             if (object.bindMatrixInverse && p_uniforms.bindMatrixInverse !== undefined) {
 
                 _gl.uniformMatrix4fv(p_uniforms.bindMatrixInverse, false, object.bindMatrixInverse.elements);
+
             }
 
             if (capabilities.floatVertexTextures && object.skeleton && object.skeleton.useVertexTexture) {
@@ -3955,24 +4493,31 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
                     _gl.uniform1i(p_uniforms.boneTexture, textureUnit);
                     _this.setTexture(object.skeleton.boneTexture, textureUnit);
+
                 }
 
                 if (p_uniforms.boneTextureWidth !== undefined) {
 
                     _gl.uniform1i(p_uniforms.boneTextureWidth, object.skeleton.boneTextureWidth);
+
                 }
 
                 if (p_uniforms.boneTextureHeight !== undefined) {
 
                     _gl.uniform1i(p_uniforms.boneTextureHeight, object.skeleton.boneTextureHeight);
+
                 }
+
             } else if (object.skeleton && object.skeleton.boneMatrices) {
 
                 if (p_uniforms.boneGlobalMatrices !== undefined) {
 
                     _gl.uniformMatrix4fv(p_uniforms.boneGlobalMatrices, false, object.skeleton.boneMatrices);
+
                 }
+
             }
+
         }
 
         if (refreshMaterial) {
@@ -3982,30 +4527,40 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             if (fog && material.fog) {
 
                 refreshUniformsFog(m_uniforms, fog);
+
             }
 
-            if (material instanceof THREE.MeshPhongMaterial || material instanceof THREE.MeshLambertMaterial || material.lights) {
+            if (material instanceof THREE.MeshPhongMaterial ||
+                material instanceof THREE.MeshLambertMaterial ||
+                material.lights) {
 
                 if (_lightsNeedUpdate) {
 
                     refreshLights = true;
                     setupLights(lights, camera);
                     _lightsNeedUpdate = false;
+
                 }
 
                 if (refreshLights) {
 
                     refreshUniformsLights(m_uniforms, _lights);
                     markUniformsLightsNeedsUpdate(m_uniforms, true);
+
                 } else {
 
                     markUniformsLightsNeedsUpdate(m_uniforms, false);
+
                 }
+
             }
 
-            if (material instanceof THREE.MeshBasicMaterial || material instanceof THREE.MeshLambertMaterial || material instanceof THREE.MeshPhongMaterial) {
+            if (material instanceof THREE.MeshBasicMaterial ||
+                material instanceof THREE.MeshLambertMaterial ||
+                material instanceof THREE.MeshPhongMaterial) {
 
                 refreshUniformsCommon(m_uniforms, material);
+
             }
 
             // refresh single material specific uniforms
@@ -4013,34 +4568,42 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             if (material instanceof THREE.LineBasicMaterial) {
 
                 refreshUniformsLine(m_uniforms, material);
+
             } else if (material instanceof THREE.LineDashedMaterial) {
 
                 refreshUniformsLine(m_uniforms, material);
                 refreshUniformsDash(m_uniforms, material);
+
             } else if (material instanceof THREE.PointsMaterial) {
 
                 refreshUniformsParticle(m_uniforms, material);
+
             } else if (material instanceof THREE.MeshPhongMaterial) {
 
                 refreshUniformsPhong(m_uniforms, material);
+
             } else if (material instanceof THREE.MeshDepthMaterial) {
 
                 m_uniforms.mNear.value = camera.near;
                 m_uniforms.mFar.value = camera.far;
                 m_uniforms.opacity.value = material.opacity;
+
             } else if (material instanceof THREE.MeshNormalMaterial) {
 
                 m_uniforms.opacity.value = material.opacity;
+
             }
 
             if (object.receiveShadow && !material._shadowPass) {
 
                 refreshUniformsShadow(m_uniforms, lights, camera);
+
             }
 
             // load common uniforms
 
             loadUniformsGeneric(materialProperties.uniformsList);
+
         }
 
         loadUniformsMatrices(p_uniforms, object);
@@ -4048,9 +4611,11 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         if (p_uniforms.modelMatrix !== undefined) {
 
             _gl.uniformMatrix4fv(p_uniforms.modelMatrix, false, object.matrixWorld.elements);
+
         }
 
         return program;
+
     }
 
     // Uniforms (refresh uniforms objects)
@@ -4064,6 +4629,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         if (material.emissive) {
 
             uniforms.emissive.value = material.emissive;
+
         }
 
         uniforms.map.value = material.map;
@@ -4074,6 +4640,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             uniforms.aoMap.value = material.aoMap;
             uniforms.aoMapIntensity.value = material.aoMapIntensity;
+
         }
 
         // uv repeat and offset setting priorities
@@ -4089,24 +4656,31 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         if (material.map) {
 
             uvScaleMap = material.map;
+
         } else if (material.specularMap) {
 
             uvScaleMap = material.specularMap;
+
         } else if (material.displacementMap) {
 
             uvScaleMap = material.displacementMap;
+
         } else if (material.normalMap) {
 
             uvScaleMap = material.normalMap;
+
         } else if (material.bumpMap) {
 
             uvScaleMap = material.bumpMap;
+
         } else if (material.alphaMap) {
 
             uvScaleMap = material.alphaMap;
+
         } else if (material.emissiveMap) {
 
             uvScaleMap = material.emissiveMap;
+
         }
 
         if (uvScaleMap !== undefined) {
@@ -4116,20 +4690,22 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             var repeat = uvScaleMap.repeat;
 
             uniforms.offsetRepeat.value.set(offset.x, offset.y, repeat.x, repeat.y);
-            uniforms.wangle.value = uvScaleMap.wangle;
+
         }
 
         uniforms.envMap.value = material.envMap;
-        uniforms.flipEnvMap.value = material.envMap instanceof THREE.WebGLRenderTargetCube ? 1 : -1;
+        uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : -1;
 
         uniforms.reflectivity.value = material.reflectivity;
         uniforms.refractionRatio.value = material.refractionRatio;
+
     }
 
     function refreshUniformsLine(uniforms, material) {
 
         uniforms.diffuse.value = material.color;
         uniforms.opacity.value = material.opacity;
+
     }
 
     function refreshUniformsDash(uniforms, material) {
@@ -4137,6 +4713,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         uniforms.dashSize.value = material.dashSize;
         uniforms.totalSize.value = material.dashSize + material.gapSize;
         uniforms.scale.value = material.scale;
+
     }
 
     function refreshUniformsParticle(uniforms, material) {
@@ -4154,7 +4731,9 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             var repeat = material.map.repeat;
 
             uniforms.offsetRepeat.value.set(offset.x, offset.y, repeat.x, repeat.y);
+
         }
+
     }
 
     function refreshUniformsFog(uniforms, fog) {
@@ -4165,10 +4744,13 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             uniforms.fogNear.value = fog.near;
             uniforms.fogFar.value = fog.far;
+
         } else if (fog instanceof THREE.FogExp2) {
 
             uniforms.fogDensity.value = fog.density;
+
         }
+
     }
 
     function refreshUniformsPhong(uniforms, material) {
@@ -4180,23 +4762,27 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             uniforms.lightMap.value = material.lightMap;
             uniforms.lightMapIntensity.value = material.lightMapIntensity;
+
         }
 
         if (material.emissiveMap) {
 
             uniforms.emissiveMap.value = material.emissiveMap;
+
         }
 
         if (material.bumpMap) {
 
             uniforms.bumpMap.value = material.bumpMap;
             uniforms.bumpScale.value = material.bumpScale;
+
         }
 
         if (material.normalMap) {
 
             uniforms.normalMap.value = material.normalMap;
             uniforms.normalScale.value.copy(material.normalScale);
+
         }
 
         if (material.displacementMap) {
@@ -4204,7 +4790,9 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             uniforms.displacementMap.value = material.displacementMap;
             uniforms.displacementScale.value = material.displacementScale;
             uniforms.displacementBias.value = material.displacementBias;
+
         }
+
     }
 
     function refreshUniformsLights(uniforms, lights) {
@@ -4230,6 +4818,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         uniforms.hemisphereLightSkyColor.value = lights.hemi.skyColors;
         uniforms.hemisphereLightGroundColor.value = lights.hemi.groundColors;
         uniforms.hemisphereLightDirection.value = lights.hemi.positions;
+
     }
 
     // If uniforms are marked as clean, they don't need to be loaded to the GPU.
@@ -4257,6 +4846,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         uniforms.hemisphereLightSkyColor.needsUpdate = value;
         uniforms.hemisphereLightGroundColor.needsUpdate = value;
         uniforms.hemisphereLightDirection.needsUpdate = value;
+
     }
 
     function refreshUniformsShadow(uniforms, lights, camera) {
@@ -4284,9 +4874,11 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
                             // for point lights we set the sign of the shadowDarkness uniform to be negative
                             uniforms.shadowDarkness.value[j] = -shadow.darkness;
+
                         } else {
 
                             uniforms.shadowDarkness.value[j] = shadow.darkness;
+
                         }
 
                         uniforms.shadowMatrix.value[j] = shadow.matrix;
@@ -4295,10 +4887,15 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                         uniforms.shadowBias.value[j] = shadow.bias;
 
                         j++;
+
                     }
+
                 }
+
             }
+
         }
+
     }
 
     // Uniforms (load to GPU)
@@ -4310,7 +4907,9 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         if (uniforms.normalMatrix) {
 
             _gl.uniformMatrix3fv(uniforms.normalMatrix, false, object.normalMatrix.elements);
+
         }
+
     }
 
     function getTextureUnit() {
@@ -4320,11 +4919,13 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         if (textureUnit >= capabilities.maxTextures) {
 
             console.warn('WebGLRenderer: trying to use ' + textureUnit + ' texture units while this GPU supports only ' + capabilities.maxTextures);
+
         }
 
         _usedTextureUnits += 1;
 
         return textureUnit;
+
     }
 
     function loadUniformsGeneric(uniforms) {
@@ -4475,12 +5076,14 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                     if (uniform._array === undefined) {
 
                         uniform._array = new Float32Array(2 * value.length);
+
                     }
 
                     for (var i = 0, i2 = 0, il = value.length; i < il; i++, i2 += 2) {
 
                         uniform._array[i2 + 0] = value[i].x;
                         uniform._array[i2 + 1] = value[i].y;
+
                     }
 
                     _gl.uniform2fv(location, uniform._array);
@@ -4494,6 +5097,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                     if (uniform._array === undefined) {
 
                         uniform._array = new Float32Array(3 * value.length);
+
                     }
 
                     for (var i = 0, i3 = 0, il = value.length; i < il; i++, i3 += 3) {
@@ -4501,6 +5105,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                         uniform._array[i3 + 0] = value[i].x;
                         uniform._array[i3 + 1] = value[i].y;
                         uniform._array[i3 + 2] = value[i].z;
+
                     }
 
                     _gl.uniform3fv(location, uniform._array);
@@ -4514,6 +5119,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                     if (uniform._array === undefined) {
 
                         uniform._array = new Float32Array(4 * value.length);
+
                     }
 
                     for (var i = 0, i4 = 0, il = value.length; i < il; i++, i4 += 4) {
@@ -4522,6 +5128,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                         uniform._array[i4 + 1] = value[i].y;
                         uniform._array[i4 + 2] = value[i].z;
                         uniform._array[i4 + 3] = value[i].w;
+
                     }
 
                     _gl.uniform4fv(location, uniform._array);
@@ -4542,11 +5149,13 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                     if (uniform._array === undefined) {
 
                         uniform._array = new Float32Array(9 * value.length);
+
                     }
 
                     for (var i = 0, il = value.length; i < il; i++) {
 
                         value[i].flattenToArrayOffset(uniform._array, i * 9);
+
                     }
 
                     _gl.uniformMatrix3fv(location, false, uniform._array);
@@ -4567,11 +5176,13 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                     if (uniform._array === undefined) {
 
                         uniform._array = new Float32Array(16 * value.length);
+
                     }
 
                     for (var i = 0, il = value.length; i < il; i++) {
 
                         value[i].flattenToArrayOffset(uniform._array, i * 16);
+
                     }
 
                     _gl.uniformMatrix4fv(location, false, uniform._array);
@@ -4589,20 +5200,25 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
                     if (!texture) continue;
 
-                    if (texture instanceof THREE.CubeTexture || Array.isArray(texture.image) && texture.image.length === 6) {
+                    if (texture instanceof THREE.CubeTexture ||
+                        ( Array.isArray(texture.image) && texture.image.length === 6 )) {
 
                         // CompressedTexture can have Array in image :/
 
                         setCubeTexture(texture, textureUnit);
+
                     } else if (texture instanceof THREE.WebGLRenderTargetCube) {
 
                         setCubeTextureDynamic(texture.texture, textureUnit);
+
                     } else if (texture instanceof THREE.WebGLRenderTarget) {
 
                         _this.setTexture(texture.texture, textureUnit);
+
                     } else {
 
                         _this.setTexture(texture, textureUnit);
+
                     }
 
                     break;
@@ -4614,11 +5230,13 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                     if (uniform._array === undefined) {
 
                         uniform._array = [];
+
                     }
 
                     for (var i = 0, il = uniform.value.length; i < il; i++) {
 
                         uniform._array[i] = getTextureUnit();
+
                     }
 
                     _gl.uniform1iv(location, uniform._array);
@@ -4630,21 +5248,27 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
                         if (!texture) continue;
 
-                        if (texture instanceof THREE.CubeTexture || texture.image instanceof Array && texture.image.length === 6) {
+                        if (texture instanceof THREE.CubeTexture ||
+                            ( texture.image instanceof Array && texture.image.length === 6 )) {
 
                             // CompressedTexture can have Array in image :/
 
                             setCubeTexture(texture, textureUnit);
+
                         } else if (texture instanceof THREE.WebGLRenderTarget) {
 
                             _this.setTexture(texture.texture, textureUnit);
+
                         } else if (texture instanceof THREE.WebGLRenderTargetCube) {
 
                             setCubeTextureDynamic(texture.texture, textureUnit);
+
                         } else {
 
                             _this.setTexture(texture, textureUnit);
+
                         }
+
                     }
 
                     break;
@@ -4654,7 +5278,9 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                     console.warn('THREE.WebGLRenderer: Unknown uniform type: ' + type);
 
             }
+
         }
+
     }
 
     function setColorLinear(array, offset, color, intensity) {
@@ -4662,29 +5288,29 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         array[offset + 0] = color.r * intensity;
         array[offset + 1] = color.g * intensity;
         array[offset + 2] = color.b * intensity;
+
     }
 
     function setupLights(lights, camera) {
 
-        var l,
-            ll,
-            light,
-            r = 0,
-            g = 0,
-            b = 0,
-            color,
-            skyColor,
-            groundColor,
+        var l, ll, light,
+            r = 0, g = 0, b = 0,
+            color, skyColor, groundColor,
             intensity,
             distance,
+
             zlights = _lights,
+
             viewMatrix = camera.matrixWorldInverse,
+
             dirColors = zlights.directional.colors,
             dirPositions = zlights.directional.positions,
+
             pointColors = zlights.point.colors,
             pointPositions = zlights.point.positions,
             pointDistances = zlights.point.distances,
             pointDecays = zlights.point.decays,
+
             spotColors = zlights.spot.colors,
             spotPositions = zlights.spot.positions,
             spotDistances = zlights.spot.distances,
@@ -4692,17 +5318,21 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             spotAnglesCos = zlights.spot.anglesCos,
             spotExponents = zlights.spot.exponents,
             spotDecays = zlights.spot.decays,
+
             hemiSkyColors = zlights.hemi.skyColors,
             hemiGroundColors = zlights.hemi.groundColors,
             hemiPositions = zlights.hemi.positions,
+
             dirLength = 0,
             pointLength = 0,
             spotLength = 0,
             hemiLength = 0,
+
             dirCount = 0,
             pointCount = 0,
             spotCount = 0,
             hemiCount = 0,
+
             dirOffset = 0,
             pointOffset = 0,
             spotOffset = 0,
@@ -4723,6 +5353,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                 r += color.r;
                 g += color.g;
                 b += color.b;
+
             } else if (light instanceof THREE.DirectionalLight) {
 
                 dirCount += 1;
@@ -4743,6 +5374,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                 setColorLinear(dirColors, dirOffset, color, intensity);
 
                 dirLength += 1;
+
             } else if (light instanceof THREE.PointLight) {
 
                 pointCount += 1;
@@ -4762,9 +5394,10 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
                 // distance is 0 if decay is 0, because there is no attenuation at all.
                 pointDistances[pointLength] = distance;
-                pointDecays[pointLength] = light.distance === 0 ? 0.0 : light.decay;
+                pointDecays[pointLength] = ( light.distance === 0 ) ? 0.0 : light.decay;
 
                 pointLength += 1;
+
             } else if (light instanceof THREE.SpotLight) {
 
                 spotCount += 1;
@@ -4794,9 +5427,10 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
                 spotAnglesCos[spotLength] = Math.cos(light.angle);
                 spotExponents[spotLength] = light.exponent;
-                spotDecays[spotLength] = light.distance === 0 ? 0.0 : light.decay;
+                spotDecays[spotLength] = ( light.distance === 0 ) ? 0.0 : light.decay;
 
                 spotLength += 1;
+
             } else if (light instanceof THREE.HemisphereLight) {
 
                 hemiCount += 1;
@@ -4819,23 +5453,21 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                 setColorLinear(hemiGroundColors, hemiOffset, groundColor, intensity);
 
                 hemiLength += 1;
+
             }
+
         }
 
         // null eventual remains from removed lights
         // (this is to avoid if in shader)
 
-        for (l = dirLength * 3, ll = Math.max(dirColors.length, dirCount * 3); l < ll; l++) {
-            dirColors[l] = 0.0;
-        }for (l = pointLength * 3, ll = Math.max(pointColors.length, pointCount * 3); l < ll; l++) {
-            pointColors[l] = 0.0;
-        }for (l = spotLength * 3, ll = Math.max(spotColors.length, spotCount * 3); l < ll; l++) {
-            spotColors[l] = 0.0;
-        }for (l = hemiLength * 3, ll = Math.max(hemiSkyColors.length, hemiCount * 3); l < ll; l++) {
-            hemiSkyColors[l] = 0.0;
-        }for (l = hemiLength * 3, ll = Math.max(hemiGroundColors.length, hemiCount * 3); l < ll; l++) {
-            hemiGroundColors[l] = 0.0;
-        }zlights.directional.length = dirLength;
+        for (l = dirLength * 3, ll = Math.max(dirColors.length, dirCount * 3); l < ll; l++) dirColors[l] = 0.0;
+        for (l = pointLength * 3, ll = Math.max(pointColors.length, pointCount * 3); l < ll; l++) pointColors[l] = 0.0;
+        for (l = spotLength * 3, ll = Math.max(spotColors.length, spotCount * 3); l < ll; l++) spotColors[l] = 0.0;
+        for (l = hemiLength * 3, ll = Math.max(hemiSkyColors.length, hemiCount * 3); l < ll; l++) hemiSkyColors[l] = 0.0;
+        for (l = hemiLength * 3, ll = Math.max(hemiGroundColors.length, hemiCount * 3); l < ll; l++) hemiGroundColors[l] = 0.0;
+
+        zlights.directional.length = dirLength;
         zlights.point.length = pointLength;
         zlights.spot.length = spotLength;
         zlights.hemi.length = hemiLength;
@@ -4843,6 +5475,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         zlights.ambient[0] = r;
         zlights.ambient[1] = g;
         zlights.ambient[2] = b;
+
     }
 
     // GL state setting
@@ -4852,29 +5485,37 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         if (cullFace === THREE.CullFaceNone) {
 
             state.disable(_gl.CULL_FACE);
+
         } else {
 
             if (frontFaceDirection === THREE.FrontFaceDirectionCW) {
 
                 _gl.frontFace(_gl.CW);
+
             } else {
 
                 _gl.frontFace(_gl.CCW);
+
             }
 
             if (cullFace === THREE.CullFaceBack) {
 
                 _gl.cullFace(_gl.BACK);
+
             } else if (cullFace === THREE.CullFaceFront) {
 
                 _gl.cullFace(_gl.FRONT);
+
             } else {
 
                 _gl.cullFace(_gl.FRONT_AND_BACK);
+
             }
 
             state.enable(_gl.CULL_FACE);
+
         }
+
     };
 
     // Textures
@@ -4890,6 +5531,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             _gl.texParameteri(textureType, _gl.TEXTURE_MAG_FILTER, paramThreeToGL(texture.magFilter));
             _gl.texParameteri(textureType, _gl.TEXTURE_MIN_FILTER, paramThreeToGL(texture.minFilter));
+
         } else {
 
             _gl.texParameteri(textureType, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE);
@@ -4898,6 +5540,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             if (texture.wrapS !== THREE.ClampToEdgeWrapping || texture.wrapT !== THREE.ClampToEdgeWrapping) {
 
                 console.warn('THREE.WebGLRenderer: Texture is not power of two. Texture.wrapS and Texture.wrapT should be set to THREE.ClampToEdgeWrapping.', texture);
+
             }
 
             _gl.texParameteri(textureType, _gl.TEXTURE_MAG_FILTER, filterFallback(texture.magFilter));
@@ -4906,7 +5549,9 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             if (texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter) {
 
                 console.warn('THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter should be set to THREE.NearestFilter or THREE.LinearFilter.', texture);
+
             }
+
         }
 
         extension = extensions.get('EXT_texture_filter_anisotropic');
@@ -4920,8 +5565,11 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
                 _gl.texParameterf(textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(texture.anisotropy, _this.getMaxAnisotropy()));
                 properties.get(texture).__currentAnisotropy = texture.anisotropy;
+
             }
+
         }
+
     }
 
     function uploadTexture(textureProperties, texture, slot) {
@@ -4935,6 +5583,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             textureProperties.__webglTexture = _gl.createTexture();
 
             _infoMemory.textures++;
+
         }
 
         state.activeTexture(_gl.TEXTURE0 + slot);
@@ -4949,6 +5598,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         if (textureNeedsPowerOfTwo(texture) && isPowerOfTwo(texture.image) === false) {
 
             texture.image = makePowerOfTwo(texture.image);
+
         }
 
         var image = texture.image,
@@ -4958,8 +5608,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
         setTextureParameters(_gl.TEXTURE_2D, texture, isImagePowerOfTwo);
 
-        var mipmap,
-            mipmaps = texture.mipmaps;
+        var mipmap, mipmaps = texture.mipmaps;
 
         if (texture instanceof THREE.DataTexture) {
 
@@ -4973,13 +5622,17 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
                     mipmap = mipmaps[i];
                     state.texImage2D(_gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data);
+
                 }
 
                 texture.generateMipmaps = false;
+
             } else {
 
                 state.texImage2D(_gl.TEXTURE_2D, 0, glFormat, image.width, image.height, 0, glFormat, glType, image.data);
+
             }
+
         } else if (texture instanceof THREE.CompressedTexture) {
 
             for (var i = 0, il = mipmaps.length; i < il; i++) {
@@ -4991,15 +5644,21 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                     if (state.getCompressedTextureFormats().indexOf(glFormat) > -1) {
 
                         state.compressedTexImage2D(_gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, mipmap.data);
+
                     } else {
 
                         console.warn("THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()");
+
                     }
+
                 } else {
 
                     state.texImage2D(_gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data);
+
                 }
+
             }
+
         } else {
 
             // regular Texture (image, video, canvas)
@@ -5014,13 +5673,17 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
                     mipmap = mipmaps[i];
                     state.texImage2D(_gl.TEXTURE_2D, i, glFormat, glFormat, glType, mipmap);
+
                 }
 
                 texture.generateMipmaps = false;
+
             } else {
 
                 state.texImage2D(_gl.TEXTURE_2D, 0, glFormat, glFormat, glType, texture.image);
+
             }
+
         }
 
         if (texture.generateMipmaps && isImagePowerOfTwo) _gl.generateMipmap(_gl.TEXTURE_2D);
@@ -5028,6 +5691,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         textureProperties.__version = texture.version;
 
         if (texture.onUpdate) texture.onUpdate(texture);
+
     }
 
     this.setTexture = function (texture, slot) {
@@ -5042,21 +5706,25 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
                 console.warn('THREE.WebGLRenderer: Texture marked for update but image is undefined', texture);
                 return;
+
             }
 
             if (image.complete === false) {
 
                 console.warn('THREE.WebGLRenderer: Texture marked for update but image is incomplete', texture);
                 return;
+
             }
 
             uploadTexture(textureProperties, texture, slot);
 
             return;
+
         }
 
         state.activeTexture(_gl.TEXTURE0 + slot);
         state.bindTexture(_gl.TEXTURE_2D, textureProperties.__webglTexture);
+
     };
 
     function clampToMaxSize(image, maxSize) {
@@ -5078,14 +5746,17 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             console.warn('THREE.WebGLRenderer: image is too big (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image);
 
             return canvas;
+
         }
 
         return image;
+
     }
 
     function isPowerOfTwo(image) {
 
         return THREE.Math.isPowerOfTwo(image.width) && THREE.Math.isPowerOfTwo(image.height);
+
     }
 
     function textureNeedsPowerOfTwo(texture) {
@@ -5094,6 +5765,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         if (texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter) return true;
 
         return false;
+
     }
 
     function makePowerOfTwo(image) {
@@ -5110,9 +5782,11 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             console.warn('THREE.WebGLRenderer: image is not power of two (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image);
 
             return canvas;
+
         }
 
         return image;
+
     }
 
     function setCubeTexture(texture, slot) {
@@ -5130,6 +5804,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                     textureProperties.__image__webglTextureCube = _gl.createTexture();
 
                     _infoMemory.textures++;
+
                 }
 
                 state.activeTexture(_gl.TEXTURE0 + slot);
@@ -5147,10 +5822,13 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                     if (_this.autoScaleCubemaps && !isCompressed && !isDataTexture) {
 
                         cubeImage[i] = clampToMaxSize(texture.image[i], capabilities.maxCubemapSize);
+
                     } else {
 
                         cubeImage[i] = isDataTexture ? texture.image[i].image : texture.image[i];
+
                     }
+
                 }
 
                 var image = cubeImage[0],
@@ -5167,14 +5845,16 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                         if (isDataTexture) {
 
                             state.texImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, cubeImage[i].width, cubeImage[i].height, 0, glFormat, glType, cubeImage[i].data);
+
                         } else {
 
                             state.texImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, glFormat, glType, cubeImage[i]);
+
                         }
+
                     } else {
 
-                        var mipmap,
-                            mipmaps = cubeImage[i].mipmaps;
+                        var mipmap, mipmaps = cubeImage[i].mipmaps;
 
                         for (var j = 0, jl = mipmaps.length; j < jl; j++) {
 
@@ -5185,38 +5865,51 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                                 if (state.getCompressedTextureFormats().indexOf(glFormat) > -1) {
 
                                     state.compressedTexImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, mipmap.data);
+
                                 } else {
 
                                     console.warn("THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setCubeTexture()");
+
                                 }
+
                             } else {
 
                                 state.texImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data);
+
                             }
+
                         }
+
                     }
+
                 }
 
                 if (texture.generateMipmaps && isImagePowerOfTwo) {
 
                     _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
+
                 }
 
                 textureProperties.__version = texture.version;
 
                 if (texture.onUpdate) texture.onUpdate(texture);
+
             } else {
 
                 state.activeTexture(_gl.TEXTURE0 + slot);
                 state.bindTexture(_gl.TEXTURE_CUBE_MAP, textureProperties.__image__webglTextureCube);
+
             }
+
         }
+
     }
 
     function setCubeTextureDynamic(texture, slot) {
 
         state.activeTexture(_gl.TEXTURE0 + slot);
         state.bindTexture(_gl.TEXTURE_CUBE_MAP, properties.get(texture).__webglTexture);
+
     }
 
     // Render targets
@@ -5225,6 +5918,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
         _gl.bindFramebuffer(_gl.FRAMEBUFFER, framebuffer);
         _gl.framebufferTexture2D(_gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, textureTarget, properties.get(renderTarget.texture).__webglTexture, 0);
+
     }
 
     function setupRenderBuffer(renderbuffer, renderTarget) {
@@ -5238,22 +5932,27 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             /* For some reason this is not working. Defaulting to RGBA4.
              } else if ( ! renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
-               _gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.STENCIL_INDEX8, renderTarget.width, renderTarget.height );
+
+             _gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.STENCIL_INDEX8, renderTarget.width, renderTarget.height );
              _gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
              */
+
         } else if (renderTarget.depthBuffer && renderTarget.stencilBuffer) {
 
             _gl.renderbufferStorage(_gl.RENDERBUFFER, _gl.DEPTH_STENCIL, renderTarget.width, renderTarget.height);
             _gl.framebufferRenderbuffer(_gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer);
+
         } else {
 
             _gl.renderbufferStorage(_gl.RENDERBUFFER, _gl.RGBA4, renderTarget.width, renderTarget.height);
+
         }
+
     }
 
     this.setRenderTarget = function (renderTarget) {
 
-        var isCube = renderTarget instanceof THREE.WebGLRenderTargetCube;
+        var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
 
         if (renderTarget && properties.get(renderTarget).__webglFramebuffer === undefined) {
 
@@ -5292,9 +5991,11 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
                     setupFrameBuffer(renderTargetProperties.__webglFramebuffer[i], renderTarget, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i);
                     setupRenderBuffer(renderTargetProperties.__webglRenderbuffer[i], renderTarget);
+
                 }
 
                 if (renderTarget.texture.generateMipmaps && isTargetPowerOfTwo) _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
+
             } else {
 
                 renderTargetProperties.__webglFramebuffer = _gl.createFramebuffer();
@@ -5302,9 +6003,11 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                 if (renderTarget.shareDepthFrom) {
 
                     renderTargetProperties.__webglRenderbuffer = renderTarget.shareDepthFrom.__webglRenderbuffer;
+
                 } else {
 
                     renderTargetProperties.__webglRenderbuffer = _gl.createRenderbuffer();
+
                 }
 
                 state.bindTexture(_gl.TEXTURE_2D, textureProperties.__webglTexture);
@@ -5319,16 +6022,21 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                     if (renderTarget.depthBuffer && !renderTarget.stencilBuffer) {
 
                         _gl.framebufferRenderbuffer(_gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderTargetProperties.__webglRenderbuffer);
+
                     } else if (renderTarget.depthBuffer && renderTarget.stencilBuffer) {
 
                         _gl.framebufferRenderbuffer(_gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderTargetProperties.__webglRenderbuffer);
+
                     }
+
                 } else {
 
                     setupRenderBuffer(renderTargetProperties.__webglRenderbuffer, renderTarget);
+
                 }
 
                 if (renderTarget.texture.generateMipmaps && isTargetPowerOfTwo) _gl.generateMipmap(_gl.TEXTURE_2D);
+
             }
 
             // Release everything
@@ -5336,13 +6044,16 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             if (isCube) {
 
                 state.bindTexture(_gl.TEXTURE_CUBE_MAP, null);
+
             } else {
 
                 state.bindTexture(_gl.TEXTURE_2D, null);
+
             }
 
             _gl.bindRenderbuffer(_gl.RENDERBUFFER, null);
             _gl.bindFramebuffer(_gl.FRAMEBUFFER, null);
+
         }
 
         var framebuffer, width, height, vx, vy;
@@ -5354,9 +6065,11 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             if (isCube) {
 
                 framebuffer = renderTargetProperties.__webglFramebuffer[renderTarget.activeCubeFace];
+
             } else {
 
                 framebuffer = renderTargetProperties.__webglFramebuffer;
+
             }
 
             width = renderTarget.width;
@@ -5364,6 +6077,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             vx = 0;
             vy = 0;
+
         } else {
 
             framebuffer = null;
@@ -5373,6 +6087,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             vx = _viewportX;
             vy = _viewportY;
+
         }
 
         if (framebuffer !== _currentFramebuffer) {
@@ -5381,16 +6096,19 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             _gl.viewport(vx, vy, width, height);
 
             _currentFramebuffer = framebuffer;
+
         }
 
         if (isCube) {
 
             var textureProperties = properties.get(renderTarget.texture);
             _gl.framebufferTexture2D(_gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + renderTarget.activeCubeFace, textureProperties.__webglTexture, 0);
+
         }
 
         _currentWidth = width;
         _currentHeight = height;
+
     };
 
     this.readRenderTargetPixels = function (renderTarget, x, y, width, height, buffer) {
@@ -5399,6 +6117,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             console.error('THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.');
             return;
+
         }
 
         var framebuffer = properties.get(renderTarget).__webglFramebuffer;
@@ -5412,39 +6131,53 @@ THREE.WebGLIncrementRenderer = function (parameters) {
                 _gl.bindFramebuffer(_gl.FRAMEBUFFER, framebuffer);
 
                 restore = true;
+
             }
 
             try {
 
                 var texture = renderTarget.texture;
 
-                if (texture.format !== THREE.RGBAFormat && paramThreeToGL(texture.format) !== _gl.getParameter(_gl.IMPLEMENTATION_COLOR_READ_FORMAT)) {
+                if (texture.format !== THREE.RGBAFormat
+                    && paramThreeToGL(texture.format) !== _gl.getParameter(_gl.IMPLEMENTATION_COLOR_READ_FORMAT)) {
 
                     console.error('THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.');
                     return;
+
                 }
 
-                if (texture.type !== THREE.UnsignedByteType && paramThreeToGL(texture.type) !== _gl.getParameter(_gl.IMPLEMENTATION_COLOR_READ_TYPE) && !(texture.type === THREE.FloatType && extensions.get('WEBGL_color_buffer_float')) && !(texture.type === THREE.HalfFloatType && extensions.get('EXT_color_buffer_half_float'))) {
+                if (texture.type !== THREE.UnsignedByteType
+                    && paramThreeToGL(texture.type) !== _gl.getParameter(_gl.IMPLEMENTATION_COLOR_READ_TYPE)
+                    && !( texture.type === THREE.FloatType && extensions.get('WEBGL_color_buffer_float') )
+                    && !( texture.type === THREE.HalfFloatType && extensions.get('EXT_color_buffer_half_float') )) {
 
                     console.error('THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.');
                     return;
+
                 }
 
                 if (_gl.checkFramebufferStatus(_gl.FRAMEBUFFER) === _gl.FRAMEBUFFER_COMPLETE) {
 
                     _gl.readPixels(x, y, width, height, paramThreeToGL(texture.format), paramThreeToGL(texture.type), buffer);
+
                 } else {
 
                     console.error('THREE.WebGLRenderer.readRenderTargetPixels: readPixels from renderTarget failed. Framebuffer not complete.');
+
                 }
+
             } finally {
 
                 if (restore) {
 
                     _gl.bindFramebuffer(_gl.FRAMEBUFFER, _currentFramebuffer);
+
                 }
+
             }
+
         }
+
     };
 
     function updateRenderTargetMipmap(renderTarget) {
@@ -5455,6 +6188,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         state.bindTexture(target, texture);
         _gl.generateMipmap(target);
         state.bindTexture(target, null);
+
     }
 
     // Fallback filters for non-power-of-2 textures
@@ -5464,9 +6198,11 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         if (f === THREE.NearestFilter || f === THREE.NearestMipMapNearestFilter || f === THREE.NearestMipMapLinearFilter) {
 
             return _gl.NEAREST;
+
         }
 
         return _gl.LINEAR;
+
     }
 
     // Map three.js constants to WebGL constants
@@ -5504,6 +6240,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         if (extension !== null) {
 
             if (p === THREE.HalfFloatType) return extension.HALF_FLOAT_OES;
+
         }
 
         if (p === THREE.AlphaFormat) return _gl.ALPHA;
@@ -5537,6 +6274,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             if (p === THREE.RGBA_S3TC_DXT1_Format) return extension.COMPRESSED_RGBA_S3TC_DXT1_EXT;
             if (p === THREE.RGBA_S3TC_DXT3_Format) return extension.COMPRESSED_RGBA_S3TC_DXT3_EXT;
             if (p === THREE.RGBA_S3TC_DXT5_Format) return extension.COMPRESSED_RGBA_S3TC_DXT5_EXT;
+
         }
 
         extension = extensions.get('WEBGL_compressed_texture_pvrtc');
@@ -5547,6 +6285,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
             if (p === THREE.RGB_PVRTC_2BPPV1_Format) return extension.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
             if (p === THREE.RGBA_PVRTC_4BPPV1_Format) return extension.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
             if (p === THREE.RGBA_PVRTC_2BPPV1_Format) return extension.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+
         }
 
         extension = extensions.get('EXT_blend_minmax');
@@ -5555,9 +6294,11 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
             if (p === THREE.MinEquation) return extension.MIN_EXT;
             if (p === THREE.MaxEquation) return extension.MAX_EXT;
+
         }
 
         return 0;
+
     }
 
     // DEPRECATED
@@ -5566,47 +6307,55 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
         console.warn('THREE.WebGLRenderer: .supportsFloatTextures() is now .extensions.get( \'OES_texture_float\' ).');
         return extensions.get('OES_texture_float');
+
     };
 
     this.supportsHalfFloatTextures = function () {
 
         console.warn('THREE.WebGLRenderer: .supportsHalfFloatTextures() is now .extensions.get( \'OES_texture_half_float\' ).');
         return extensions.get('OES_texture_half_float');
+
     };
 
     this.supportsStandardDerivatives = function () {
 
         console.warn('THREE.WebGLRenderer: .supportsStandardDerivatives() is now .extensions.get( \'OES_standard_derivatives\' ).');
         return extensions.get('OES_standard_derivatives');
+
     };
 
     this.supportsCompressedTextureS3TC = function () {
 
         console.warn('THREE.WebGLRenderer: .supportsCompressedTextureS3TC() is now .extensions.get( \'WEBGL_compressed_texture_s3tc\' ).');
         return extensions.get('WEBGL_compressed_texture_s3tc');
+
     };
 
     this.supportsCompressedTexturePVRTC = function () {
 
         console.warn('THREE.WebGLRenderer: .supportsCompressedTexturePVRTC() is now .extensions.get( \'WEBGL_compressed_texture_pvrtc\' ).');
         return extensions.get('WEBGL_compressed_texture_pvrtc');
+
     };
 
     this.supportsBlendMinMax = function () {
 
         console.warn('THREE.WebGLRenderer: .supportsBlendMinMax() is now .extensions.get( \'EXT_blend_minmax\' ).');
         return extensions.get('EXT_blend_minmax');
+
     };
 
     this.supportsVertexTextures = function () {
 
         return capabilities.vertexTextures;
+
     };
 
     this.supportsInstancedArrays = function () {
 
         console.warn('THREE.WebGLRenderer: .supportsInstancedArrays() is now .extensions.get( \'ANGLE_instanced_arrays\' ).');
         return extensions.get('ANGLE_instanced_arrays');
+
     };
 
     //
@@ -5614,69 +6363,82 @@ THREE.WebGLIncrementRenderer = function (parameters) {
     this.initMaterial = function () {
 
         console.warn('THREE.WebGLRenderer: .initMaterial() has been removed.');
+
     };
 
     this.addPrePlugin = function () {
 
         console.warn('THREE.WebGLRenderer: .addPrePlugin() has been removed.');
+
     };
 
     this.addPostPlugin = function () {
 
         console.warn('THREE.WebGLRenderer: .addPostPlugin() has been removed.');
+
     };
 
     this.updateShadowMap = function () {
 
         console.warn('THREE.WebGLRenderer: .updateShadowMap() has been removed.');
+
     };
 
     Object.defineProperties(this, {
         shadowMapEnabled: {
-            get: function get() {
+            get: function () {
 
                 return shadowMap.enabled;
+
             },
-            set: function set(value) {
+            set: function (value) {
 
                 console.warn('THREE.WebGLRenderer: .shadowMapEnabled is now .shadowMap.enabled.');
                 shadowMap.enabled = value;
+
             }
         },
         shadowMapType: {
-            get: function get() {
+            get: function () {
 
                 return shadowMap.type;
+
             },
-            set: function set(value) {
+            set: function (value) {
 
                 console.warn('THREE.WebGLRenderer: .shadowMapType is now .shadowMap.type.');
                 shadowMap.type = value;
+
             }
         },
         shadowMapCullFace: {
-            get: function get() {
+            get: function () {
 
                 return shadowMap.cullFace;
+
             },
-            set: function set(value) {
+            set: function (value) {
 
                 console.warn('THREE.WebGLRenderer: .shadowMapCullFace is now .shadowMap.cullFace.');
                 shadowMap.cullFace = value;
+
             }
         },
         shadowMapDebug: {
-            get: function get() {
+            get: function () {
 
                 return shadowMap.debug;
+
             },
-            set: function set(value) {
+            set: function (value) {
 
                 console.warn('THREE.WebGLRenderer: .shadowMapDebug is now .shadowMap.debug.');
                 shadowMap.debug = value;
+
             }
         }
     });
+
 
     // ------------------------------------------------------------------
     // 增加增量绘制支持
@@ -5735,12 +6497,14 @@ THREE.WebGLIncrementRenderer = function (parameters) {
     // 重置增量绘制状态
     this.resetIncrementRender = function () {
         _orderedRenderer.restart();
+
     };
 
     // 设置过滤对象
     this.setFilterObject = function (filterObject) {
 
         _orderedRenderer.setFilter(filterObject);
+
     };
 
     // 设置是否更新对象列表
@@ -5762,260 +6526,599 @@ THREE.WebGLIncrementRenderer = function (parameters) {
     };
 };
 
-var CloudTouch = CloudTouch || {};
 
-(function () {
-    var INPUT_START = 1;
-    var INPUT_MOVE = 2;
-    var INPUT_END = 4;
-    var INPUT_CANCEL = 8;
+CLOUD.BBoxNode = function (boundingBox, color) {
+    "use strict";
+    var geometry = new THREE.BufferGeometry();
+    geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(72), 3));
 
-    var TOUCH_INPUT_MAP = {
-        touchstart: INPUT_START,
-        touchmove: INPUT_MOVE,
-        touchend: INPUT_END,
-        touchcancel: INPUT_CANCEL
-    };
+    THREE.LineSegments.call(this, geometry, new THREE.LineBasicMaterial({ color: color }));
 
-    var INPUT_TYPE_TOUCH = 'touch';
+    if (boundingBox !== undefined) {
+        this.updateBBox(boundingBox);
+    }
+};
 
-    var DIRECTION_NONE = 1;
-    var DIRECTION_LEFT = 2;
-    var DIRECTION_RIGHT = 4;
-    var DIRECTION_UP = 8;
-    var DIRECTION_DOWN = 16;
+CLOUD.BBoxNode.prototype = Object.create(THREE.LineSegments.prototype);
+CLOUD.BBoxNode.prototype.constructor = CLOUD.BBoxNode;
 
-    var DIRECTION_HORIZONTAL = DIRECTION_LEFT | DIRECTION_RIGHT;
-    var DIRECTION_VERTICAL = DIRECTION_UP | DIRECTION_DOWN;
-    var DIRECTION_ALL = DIRECTION_HORIZONTAL | DIRECTION_VERTICAL;
+CLOUD.BBoxNode.prototype.unload = function () {
 
-    var PROPS_XY = ['x', 'y'];
-    var PROPS_CLIENT_XY = ['clientX', 'clientY'];
+}
 
-    // 处理touch事件
-    var touchsHandler = function touchsHandler(manage, event) {
-        var manage_scope = manage;
-        var input = {
-            pointers: event.touches,
-            changedPointers: event.changedTouches,
-            pointerType: INPUT_TYPE_TOUCH,
-            srcEvent: event
-        };
+CLOUD.BBoxNode.prototype.updateBBox = function (boundingBox) {
+    var min = boundingBox.min;
+    var max = boundingBox.max;
 
-        var pointersLen = event.touches.length;
-        var changedPointersLen = event.changedTouches.length;
-        var eventType = TOUCH_INPUT_MAP[event.type];
-        var isFirst = eventType & INPUT_START && pointersLen - changedPointersLen === 0;
-        var isFinal = eventType & (INPUT_END | INPUT_CANCEL) && pointersLen - changedPointersLen === 0;
+    /*
+	  5____4
+	1/___0/|
+	| 6__|_7
+	2/___3/
+	0: max.x, max.y, max.z
+	1: min.x, max.y, max.z
+	2: min.x, min.y, max.z
+	3: max.x, min.y, max.z
+	4: max.x, max.y, min.z
+	5: min.x, max.y, min.z
+	6: min.x, min.y, min.z
+	7: max.x, min.y, min.z
+	*/
 
-        input.isFirst = !!isFirst;
-        input.isFinal = !!isFinal;
+    var vertices = this.geometry.attributes.position.array;
 
-        if (isFirst) {
-            manage_scope.session = {};
+    vertices[0] = max.x; vertices[1] = max.y; vertices[2] = max.z;
+    vertices[3] = min.x; vertices[4] = max.y; vertices[5] = max.z;
+
+    vertices[6] = min.x; vertices[7] = max.y; vertices[8] = max.z;
+    vertices[9] = min.x; vertices[10] = min.y; vertices[11] = max.z;
+
+    vertices[12] = min.x; vertices[13] = min.y; vertices[14] = max.z;
+    vertices[15] = max.x; vertices[16] = min.y; vertices[17] = max.z;
+
+    vertices[18] = max.x; vertices[19] = min.y; vertices[20] = max.z;
+    vertices[21] = max.x; vertices[22] = max.y; vertices[23] = max.z;
+
+    //
+
+    vertices[24] = max.x; vertices[25] = max.y; vertices[26] = min.z;
+    vertices[27] = min.x; vertices[28] = max.y; vertices[29] = min.z;
+
+    vertices[30] = min.x; vertices[31] = max.y; vertices[32] = min.z;
+    vertices[33] = min.x; vertices[34] = min.y; vertices[35] = min.z;
+
+    vertices[36] = min.x; vertices[37] = min.y; vertices[38] = min.z;
+    vertices[39] = max.x; vertices[40] = min.y; vertices[41] = min.z;
+
+    vertices[42] = max.x; vertices[43] = min.y; vertices[44] = min.z;
+    vertices[45] = max.x; vertices[46] = max.y; vertices[47] = min.z;
+
+    //
+
+    vertices[48] = max.x; vertices[49] = max.y; vertices[50] = max.z;
+    vertices[51] = max.x; vertices[52] = max.y; vertices[53] = min.z;
+
+    vertices[54] = min.x; vertices[55] = max.y; vertices[56] = max.z;
+    vertices[57] = min.x; vertices[58] = max.y; vertices[59] = min.z;
+
+    vertices[60] = min.x; vertices[61] = min.y; vertices[62] = max.z;
+    vertices[63] = min.x; vertices[64] = min.y; vertices[65] = min.z;
+
+    vertices[66] = max.x; vertices[67] = min.y; vertices[68] = max.z;
+    vertices[69] = max.x; vertices[70] = min.y; vertices[71] = min.z;
+
+    this.geometry.attributes.position.needsUpdate = true;
+
+    this.geometry.computeBoundingBox();
+    this.geometry.computeBoundingSphere();
+    this.matrixAutoUpdate = false;
+};
+THREE.CombinedCamera = function (width, height, fov, near, far) {
+
+    THREE.Camera.call(this);
+
+    this.aspect = width / height;
+    this.fov = fov;
+    this.near = near;
+    this.far = far;
+
+    this.left = -width / 2;
+    this.right = width / 2;
+    this.top = height / 2;
+    this.bottom = -height / 2;
+
+    this.cameraOrtho = new THREE.OrthographicCamera(this.left, this.right, this.top, this.bottom, this.near, this.far);
+    this.cameraPerspective = new THREE.PerspectiveCamera(this.fov, this.aspect, this.near, this.far);
+
+    this.zoom = 1;
+
+    this.toPerspective();
+
+};
+
+THREE.CombinedCamera.prototype = Object.create(THREE.Camera.prototype);
+THREE.CombinedCamera.prototype.constructor = THREE.CombinedCamera;
+
+THREE.CombinedCamera.prototype.toPerspective = function () {
+
+    this.near = this.cameraPerspective.near;
+    this.far = this.cameraPerspective.far;
+    this.cameraPerspective.fov = this.fov / this.zoom;
+    this.cameraPerspective.updateProjectionMatrix();
+    this.projectionMatrix = this.cameraPerspective.projectionMatrix;
+    this.isPerspective = true;
+};
+
+THREE.CombinedCamera.prototype.toOrthographic = function () {
+
+    // Switches to the Orthographic camera estimating viewport from Perspective
+
+    var fov = this.fov;
+    var aspect = this.cameraPerspective.aspect;
+    var near = this.cameraPerspective.near;
+    var far = this.cameraPerspective.far;
+
+    // The size that we set is the mid plane of the viewing frustum
+
+    var hyperfocus = ( near + far ) / 2;
+
+    var halfHeight = Math.tan(fov * Math.PI / 180 / 2) * hyperfocus;
+    var planeHeight = 2 * halfHeight;
+    var planeWidth = planeHeight * aspect;
+    var halfWidth = planeWidth / 2;
+
+    halfHeight /= this.zoom;
+    halfWidth /= this.zoom;
+
+    this.cameraOrtho.left = -halfWidth;
+    this.cameraOrtho.right = halfWidth;
+    this.cameraOrtho.top = halfHeight;
+    this.cameraOrtho.bottom = -halfHeight;
+    this.cameraOrtho.updateProjectionMatrix();
+
+    this.near = this.cameraOrtho.near;
+    this.far = this.cameraOrtho.far;
+    this.projectionMatrix = this.cameraOrtho.projectionMatrix;
+
+    this.isPerspective = false;
+};
+
+
+THREE.CombinedCamera.prototype.setSize = function (width, height) {
+
+    this.cameraPerspective.aspect = width / height;
+    this.left = -width / 2;
+    this.right = width / 2;
+    this.top = height / 2;
+    this.bottom = -height / 2;
+    this.aspect = width / height;
+};
+
+THREE.CombinedCamera.prototype.setFov = function (fov) {
+
+    this.fov = fov;
+
+    if (this.isPerspective) {
+
+        this.toPerspective();
+
+    } else {
+
+        this.toOrthographic();
+
+    }
+
+};
+
+THREE.CombinedCamera.prototype.setNearFar = function (near, far) {
+
+    if (this.isPerspective) {
+
+        this.cameraPerspective.near = near;
+        this.cameraPerspective.far = far;
+
+        this.toPerspective();
+
+    } else {
+
+        this.cameraOrtho.near = near;
+        this.cameraOrtho.far = far;
+
+        this.toOrthographic();
+
+    }
+
+};
+
+// For mantaining similar API with PerspectiveCamera
+
+THREE.CombinedCamera.prototype.updateProjectionMatrix = function () {
+
+    if (this.isPerspective) {
+
+        this.toPerspective();
+
+    } else {
+
+        //this.toPerspective();
+        this.toOrthographic();
+
+    }
+
+};
+
+/*
+ * Uses Focal Length (in mm) to estimate and set FOV
+ * 35mm (fullframe) camera is used if frame size is not specified;
+ * Formula based on http://www.bobatkins.com/photography/technical/field_of_view.html
+ */
+THREE.CombinedCamera.prototype.setLens = function (focalLength, frameHeight) {
+
+    if (frameHeight === undefined) frameHeight = 24;
+
+    var fov = 2 * THREE.Math.radToDeg(Math.atan(frameHeight / ( focalLength * 2 )));
+
+    this.setFov(fov);
+
+    return fov;
+};
+
+
+THREE.CombinedCamera.prototype.setZoom = function (zoom) {
+
+    this.zoom = zoom;
+
+    if (this.isPerspective) {
+
+        this.toPerspective();
+
+    } else {
+
+        this.toOrthographic();
+
+    }
+
+};
+/*
+ For three.js r73
+ */
+CLOUD.ShaderMaterial = CLOUD.ShaderMaterial || {};
+
+CLOUD.ShaderMaterial.ShaderChunk = {
+    cust_clip_pars_vertex: "#ifdef USE_CUSTOMCLIP\n\n    uniform vec4 vClipPlane[6]; \n\n    uniform int iClipPlane; \n\n    varying float fClipDistance[6];\n\n#endif\n",
+    cust_clip_pars_fragment: "#ifdef USE_CUSTOMCLIP\n\n    uniform int iClipPlane; \n\n    varying float fClipDistance[6];\n\n#endif\n",
+
+    cust_clip_vertex: "#ifdef USE_CUSTOMCLIP\n\n" +
+    " for(int i = 0; i < 6; i++) {\n" +
+    "     if (i < iClipPlane)\n" +
+    "         fClipDistance[i] = dot(worldPosition.xyz, vClipPlane[i].xyz) + vClipPlane[i].w;\n" +
+    "  }\n" +
+    "#endif\n",
+
+    cust_clip_fragment: "#ifdef USE_CUSTOMCLIP\n\n" +
+    "for(int i = 0; i < 6; i++) {\n\n" +
+    "    if (i < iClipPlane)\n" +
+    "       if (fClipDistance[i] > 0.0) discard;\n\n" +
+    "}\n\n" +
+    "#endif\n",
+
+    cust_Instanced_pars_vertex: "#ifdef USE_CUST_INSTANCED\n\n    attribute vec4 componentV1;\nattribute vec4 componentV2;\nattribute vec4 componentV3;\nattribute vec4 componentV4;\n#endif\n",
+    cust_Instanced_normal_vertex: "#ifdef USE_CUST_INSTANCED\n\n\tmat4 modelTransMatrix = mat4(componentV1, componentV2, componentV3,componentV4);\n\t objectNormal = inverseTransformDirection(objectNormal, modelTransMatrix);\n#endif\n",
+    cust_Instanced_vertex: "#ifdef USE_CUST_INSTANCED\n\n\tvec4 newposition = mat4(componentV1, componentV2, componentV3,componentV4) * vec4( transformed, 1.0 );\n\t transformed = newposition.xyz;\n#endif\n",
+
+    cust_Instanced_pars_vertex2: "#ifdef USE_CUST_INSTANCED\n\n  uniform mat4 transformMatrix; \n#endif\n",
+    cust_Instanced_vertex2: "#ifdef USE_CUST_INSTANCED\n\n\tvec4 newposition = transformMatrix * vec4( transformed, 1.0 );\n\t transformed = newposition.xyz;\n#endif\n"
+
+};
+
+CLOUD.ShaderMaterial.UniformsLib = {
+    cust_clip: {
+        iClipPlane: {type: "i", value: 0},
+        vClipPlane: {
+            type: "v4v",
+            value: new Array(new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4())
         }
+    },
+    cus_Instanced: {
+        transformMatrix: {type: "m4", value: new THREE.Matrix4()}
+    }
+};
 
-        input.eventType = eventType;
+CLOUD.ShaderMaterial.ShaderLibs = {
+    r73: {
+        phong_cust_clip: {
+            uniforms: THREE.UniformsUtils.merge([
 
-        computeTouchData(manage_scope, input);
+                THREE.UniformsLib["common"],
+                THREE.UniformsLib["aomap"],
+                THREE.UniformsLib["lightmap"],
+                THREE.UniformsLib["emissivemap"],
+                THREE.UniformsLib["bumpmap"],
+                THREE.UniformsLib["normalmap"],
+                THREE.UniformsLib["displacementmap"],
+                THREE.UniformsLib["fog"],
+                THREE.UniformsLib["lights"],
+                THREE.UniformsLib["shadowmap"],
 
-        manage_scope.session.prevInput = input;
-    };
+                CLOUD.ShaderMaterial.UniformsLib["cust_clip"],
 
-    // 复制touch数据
-    var simpleCloneTouchData = function simpleCloneTouchData(input) {
-        var pointers = [];
-        var i = 0;
-        while (i < input.pointers.length) {
-            pointers[i] = {
-                clientX: Math.round(input.pointers[i].clientX),
-                clientY: Math.round(input.pointers[i].clientY)
-            };
-            i++;
+                {
+                    "emissive": {type: "c", value: new THREE.Color(0x000000)},
+                    "specular": {type: "c", value: new THREE.Color(0x111111)},
+                    "shininess": {type: "f", value: 30}
+                }
+
+            ]),
+
+            vertexShader: [
+
+                "#define USE_CUSTOMCLIP",
+
+                "#define PHONG",
+
+                "varying vec3 vViewPosition;",
+
+                "#ifndef FLAT_SHADED",
+
+                "    varying vec3 vNormal;",
+
+                "#endif",
+
+                THREE.ShaderChunk["common"],
+                THREE.ShaderChunk["uv_pars_vertex"],
+                THREE.ShaderChunk["uv2_pars_vertex"],
+                THREE.ShaderChunk["displacementmap_pars_vertex"],
+                THREE.ShaderChunk["envmap_pars_vertex"],
+                THREE.ShaderChunk["lights_phong_pars_vertex"],
+                THREE.ShaderChunk["color_pars_vertex"],
+                THREE.ShaderChunk["morphtarget_pars_vertex"],
+                THREE.ShaderChunk["skinning_pars_vertex"],
+                THREE.ShaderChunk["shadowmap_pars_vertex"],
+                THREE.ShaderChunk["logdepthbuf_pars_vertex"],
+
+                CLOUD.ShaderMaterial.ShaderChunk["cust_clip_pars_vertex"],
+                CLOUD.ShaderMaterial.ShaderChunk["cust_Instanced_pars_vertex"],
+
+                "void main() {",
+
+                THREE.ShaderChunk["uv_vertex"],
+                THREE.ShaderChunk["uv2_vertex"],
+                THREE.ShaderChunk["color_vertex"],
+
+                THREE.ShaderChunk["beginnormal_vertex"],
+                CLOUD.ShaderMaterial.ShaderChunk["cust_Instanced_normal_vertex"],
+                THREE.ShaderChunk["morphnormal_vertex"],
+                THREE.ShaderChunk["skinbase_vertex"],
+                THREE.ShaderChunk["skinnormal_vertex"],
+                THREE.ShaderChunk["defaultnormal_vertex"],
+
+                "#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
+
+                "    vNormal = normalize( transformedNormal );",
+
+                "#endif",
+
+                THREE.ShaderChunk["begin_vertex"],
+                CLOUD.ShaderMaterial.ShaderChunk["cust_Instanced_vertex"],
+                THREE.ShaderChunk["displacementmap_vertex"],
+                THREE.ShaderChunk["morphtarget_vertex"],
+                THREE.ShaderChunk["skinning_vertex"],
+                THREE.ShaderChunk["project_vertex"],
+                THREE.ShaderChunk["logdepthbuf_vertex"],
+
+                "    vViewPosition = - mvPosition.xyz;",
+
+                THREE.ShaderChunk["worldpos_vertex"],
+
+                CLOUD.ShaderMaterial.ShaderChunk["cust_clip_vertex"],
+                THREE.ShaderChunk["envmap_vertex"],
+                THREE.ShaderChunk["lights_phong_vertex"],
+                THREE.ShaderChunk["shadowmap_vertex"],
+
+                "}"
+
+            ].join("\n"),
+
+            fragmentShader: [
+                "#define USE_CUSTOMCLIP",
+                CLOUD.ShaderMaterial.ShaderChunk["cust_clip_pars_fragment"],
+
+                "#define PHONG",
+
+                "uniform vec3 diffuse;",
+                "uniform vec3 emissive;",
+                "uniform vec3 specular;",
+                "uniform float shininess;",
+                "uniform float opacity;",
+
+                THREE.ShaderChunk["common"],
+                THREE.ShaderChunk["color_pars_fragment"],
+                THREE.ShaderChunk["uv_pars_fragment"],
+                THREE.ShaderChunk["uv2_pars_fragment"],
+                THREE.ShaderChunk["map_pars_fragment"],
+                THREE.ShaderChunk["alphamap_pars_fragment"],
+                THREE.ShaderChunk["aomap_pars_fragment"],
+                THREE.ShaderChunk["lightmap_pars_fragment"],
+                THREE.ShaderChunk["emissivemap_pars_fragment"],
+                THREE.ShaderChunk["envmap_pars_fragment"],
+                THREE.ShaderChunk["fog_pars_fragment"],
+                THREE.ShaderChunk["lights_phong_pars_fragment"],
+                THREE.ShaderChunk["shadowmap_pars_fragment"],
+                THREE.ShaderChunk["bumpmap_pars_fragment"],
+                THREE.ShaderChunk["normalmap_pars_fragment"],
+                THREE.ShaderChunk["specularmap_pars_fragment"],
+                THREE.ShaderChunk["logdepthbuf_pars_fragment"],
+
+                "void main() {",
+                CLOUD.ShaderMaterial.ShaderChunk["cust_clip_fragment"],
+
+                "    vec3 outgoingLight = vec3( 0.0 );",
+                "    vec4 diffuseColor = vec4( diffuse, opacity );",
+                "    vec3 totalAmbientLight = ambientLightColor;",
+                "    vec3 totalEmissiveLight = emissive;",
+                "    vec3 shadowMask = vec3( 1.0 );",
+
+                THREE.ShaderChunk["logdepthbuf_fragment"],
+                THREE.ShaderChunk["map_fragment"],
+                THREE.ShaderChunk["color_fragment"],
+                THREE.ShaderChunk["alphamap_fragment"],
+                THREE.ShaderChunk["alphatest_fragment"],
+                THREE.ShaderChunk["specularmap_fragment"],
+                THREE.ShaderChunk["normal_phong_fragment"],
+                THREE.ShaderChunk["lightmap_fragment"],
+                THREE.ShaderChunk["hemilight_fragment"],
+                THREE.ShaderChunk["aomap_fragment"],
+                THREE.ShaderChunk["emissivemap_fragment"],
+
+                THREE.ShaderChunk["lights_phong_fragment"],
+                THREE.ShaderChunk["shadowmap_fragment"],
+
+                "totalDiffuseLight *= shadowMask;",
+                "totalSpecularLight *= shadowMask;",
+
+                "#ifdef METAL",
+
+                "    outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) * specular + totalSpecularLight + totalEmissiveLight;",
+
+                "#else",
+
+                "    outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) + totalSpecularLight + totalEmissiveLight;",
+
+                "#endif",
+
+                THREE.ShaderChunk["envmap_fragment"],
+
+                THREE.ShaderChunk["linear_to_gamma_fragment"],
+
+                THREE.ShaderChunk["fog_fragment"],
+
+                "    gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
+
+                "}"
+
+            ].join("\n")
+        },
+        base_cust_clip: {
+            uniforms: THREE.UniformsUtils.merge([
+
+                THREE.UniformsLib["common"],
+                THREE.UniformsLib["aomap"],
+                THREE.UniformsLib["fog"],
+                THREE.UniformsLib["shadowmap"],
+                // CLIP
+                CLOUD.ShaderMaterial.UniformsLib["cust_clip"],
+                CLOUD.ShaderMaterial.UniformsLib["cus_Instanced"]
+            ]),
+
+            vertexShader: [
+
+                THREE.ShaderChunk["common"],
+                THREE.ShaderChunk["uv_pars_vertex"],
+                THREE.ShaderChunk["uv2_pars_vertex"],
+                THREE.ShaderChunk["envmap_pars_vertex"],
+                THREE.ShaderChunk["color_pars_vertex"],
+                THREE.ShaderChunk["morphtarget_pars_vertex"],
+                THREE.ShaderChunk["skinning_pars_vertex"],
+                THREE.ShaderChunk["shadowmap_pars_vertex"],
+                THREE.ShaderChunk["logdepthbuf_pars_vertex"],
+
+                "#define USE_CUSTOMCLIP",
+                CLOUD.ShaderMaterial.ShaderChunk["cust_clip_pars_vertex"],
+                CLOUD.ShaderMaterial.ShaderChunk["cust_Instanced_pars_vertex2"],
+                //CLOUD.ShaderMaterial.ShaderChunk["cust_Instanced_pars_vertex"],
+
+                "void main() {",
+
+                THREE.ShaderChunk["uv_vertex"],
+                THREE.ShaderChunk["uv2_vertex"],
+                THREE.ShaderChunk["color_vertex"],
+                THREE.ShaderChunk["skinbase_vertex"],
+
+                "    #ifdef USE_ENVMAP",
+
+                THREE.ShaderChunk["beginnormal_vertex"],
+                CLOUD.ShaderMaterial.ShaderChunk["cust_Instanced_normal_vertex"],
+                THREE.ShaderChunk["morphnormal_vertex"],
+                THREE.ShaderChunk["skinnormal_vertex"],
+                THREE.ShaderChunk["defaultnormal_vertex"],
+
+                "    #endif",
+
+
+                THREE.ShaderChunk["begin_vertex"],
+                CLOUD.ShaderMaterial.ShaderChunk["cust_Instanced_vertex2"],
+                //CLOUD.ShaderMaterial.ShaderChunk["cust_Instanced_vertex"],
+                THREE.ShaderChunk["morphtarget_vertex"],
+                THREE.ShaderChunk["skinning_vertex"],
+                THREE.ShaderChunk["project_vertex"],
+                THREE.ShaderChunk["logdepthbuf_vertex"],
+
+                THREE.ShaderChunk["worldpos_vertex"],
+                "vec4 worldPosition = modelMatrix * vec4( transformed, 1.0 );",
+                CLOUD.ShaderMaterial.ShaderChunk["cust_clip_vertex"],
+                THREE.ShaderChunk["envmap_vertex"],
+                THREE.ShaderChunk["shadowmap_vertex"],
+
+                "}"
+
+            ].join("\n"),
+
+            fragmentShader: [
+
+                "#define USE_CUSTOMCLIP",
+
+                "uniform vec3 diffuse;",
+                "uniform float opacity;",
+
+                THREE.ShaderChunk["color_pars_fragment"],
+                THREE.ShaderChunk["map_pars_fragment"],
+                THREE.ShaderChunk["alphamap_pars_fragment"],
+                THREE.ShaderChunk["lightmap_pars_fragment"],
+                THREE.ShaderChunk["envmap_pars_fragment"],
+                THREE.ShaderChunk["fog_pars_fragment"],
+                THREE.ShaderChunk["shadowmap_pars_fragment"],
+                THREE.ShaderChunk["specularmap_pars_fragment"],
+                THREE.ShaderChunk["logdepthbuf_pars_fragment"],
+                CLOUD.ShaderMaterial.ShaderChunk["cust_clip_pars_fragment"],
+
+                "void main() {",
+                CLOUD.ShaderMaterial.ShaderChunk["cust_clip_fragment"],
+
+                "    vec3 outgoingLight = vec3( 0.0 );",
+                "    vec4 diffuseColor = vec4( diffuse, opacity );",
+                "    vec3 totalAmbientLight = vec3( 1.0 );", // hardwired
+                "    vec3 shadowMask = vec3( 1.0 );",
+
+                THREE.ShaderChunk["logdepthbuf_fragment"],
+                THREE.ShaderChunk["map_fragment"],
+                THREE.ShaderChunk["color_fragment"],
+                THREE.ShaderChunk["alphamap_fragment"],
+                THREE.ShaderChunk["alphatest_fragment"],
+                THREE.ShaderChunk["specularmap_fragment"],
+                THREE.ShaderChunk["aomap_fragment"],
+                THREE.ShaderChunk["shadowmap_fragment"],
+
+                "    outgoingLight = diffuseColor.rgb * totalAmbientLight * shadowMask;",
+
+                THREE.ShaderChunk["envmap_fragment"],
+
+                //THREE.ShaderChunk["linear_to_gamma_fragment"],
+
+                THREE.ShaderChunk["fog_fragment"],
+
+                "    gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
+
+                "}"
+
+            ].join("\n")
         }
+    }
+};
 
-        return {
-            timeStamp: Date.now(),
-            pointers: pointers,
-            center: getCenter(pointers),
-            deltaX: input.deltaX || 0,
-            deltaY: input.deltaY || 0
-        };
-    };
-
-    // 得到所有点的中心点
-    var getCenter = function getCenter(pointers) {
-        var pointersLength = pointers.length;
-
-        // no need to loop when only one touch
-        if (pointersLength === 1) {
-            return {
-                x: Math.round(pointers[0].clientX),
-                y: Math.round(pointers[0].clientY)
-            };
-        }
-
-        var x = 0,
-            y = 0,
-            i = 0;
-        while (i < pointersLength) {
-            x += pointers[i].clientX;
-            y += pointers[i].clientY;
-            i++;
-        }
-
-        return {
-            x: Math.round(x / pointersLength),
-            y: Math.round(y / pointersLength)
-        };
-    };
-
-    // 计算并缓存touch数据
-    var computeTouchData = function computeTouchData(manager, input) {
-        var session = manager.session;
-        var pointers = input.pointers;
-        var pointersLength = pointers.length;
-
-        // store the first input to calculate the distance and direction
-        if (!session.firstInput) {
-            session.firstInput = simpleCloneTouchData(input);
-        }
-
-        // to compute scale and rotation we need to store the multiple touches
-        if (pointersLength > 1 && !session.firstMultiple) {
-            session.firstMultiple = simpleCloneTouchData(input);
-        } else if (pointersLength === 1) {
-            session.firstMultiple = false;
-        }
-
-        var firstInput = session.firstInput;
-        var firstMultiple = session.firstMultiple;
-        var offsetCenter = firstMultiple ? firstMultiple.center : firstInput.center;
-
-        var center = input.center = getCenter(pointers);
-        input.timeStamp = Date.now();
-        input.deltaTime = input.timeStamp - firstInput.timeStamp;
-
-        input.angle = getAngle(offsetCenter, center);
-        input.distance = getDistance(offsetCenter, center);
-
-        input.scale = firstMultiple ? getScale(firstMultiple.pointers, pointers) : 1;
-        input.rotation = firstMultiple ? getRotation(firstMultiple.pointers, pointers) : 0;
-
-        // 计算偏移量
-        computeDeltaXY(session, input);
-        input.offsetDirection = getDirection(input.deltaX, input.deltaY);
-
-        input.maxPointers = !session.prevInput ? input.pointers.length : input.pointers.length > session.prevInput.maxPointers ? input.pointers.length : session.prevInput.maxPointers;
-    };
-
-    // 计算输入数据的偏移量
-    var computeDeltaXY = function computeDeltaXY(session, input) {
-        var center = input.center;
-        var offset = session.offsetDelta || {};
-        var prevDelta = session.prevDelta || {};
-        var prevInput = session.prevInput || {};
-
-        if (input.eventType === INPUT_START || prevInput.eventType === INPUT_END) {
-            prevDelta = session.prevDelta = {
-                x: prevInput.deltaX || 0,
-                y: prevInput.deltaY || 0
-            };
-
-            offset = session.offsetDelta = {
-                x: center.x,
-                y: center.y
-            };
-        }
-
-        // 相对第一个点的偏移量
-        input.deltaX = prevDelta.x + (center.x - offset.x);
-        input.deltaY = prevDelta.y + (center.y - offset.y);
-
-        if (input.eventType === INPUT_START) {
-            // 相对前一个点的偏移量
-            input.relativeDeltaX = 0;
-            input.relativeDeltaY = 0;
-            // 相对前一个点的旋转量
-            input.relativeRotation = 0;
-            // 相对前一个点的缩放量
-            input.relativeScale = 1;
-            // 相对前一个点的角度变化量
-            input.deltaAngle = 0;
-        } else {
-            // 相对前一个点的偏移量
-            input.relativeDeltaX = center.x - prevInput.center.x;
-            input.relativeDeltaY = center.y - prevInput.center.y;
-            // 相对前一个点的旋转量
-            input.relativeRotation = input.rotation - prevInput.rotation;
-            // 相对前一个点的缩放量
-            input.relativeScale = input.scale / prevInput.scale;
-            // 相对前一个点的角度变化量
-            input.deltaAngle = input.angle - prevInput.angle;
-        }
-    };
-
-    // 获得点的方向
-    var getDirection = function getDirection(x, y) {
-        if (x === y) {
-            return DIRECTION_NONE;
-        }
-
-        if (Math.abs(x) >= Math.abs(y)) {
-            return x < 0 ? DIRECTION_LEFT : DIRECTION_RIGHT;
-        }
-
-        return y < 0 ? DIRECTION_UP : DIRECTION_DOWN;
-    };
-
-    // 计算两个点的距离
-    var getDistance = function getDistance(p1, p2, props) {
-        if (!props) {
-            props = PROPS_XY;
-        }
-        var x = p2[props[0]] - p1[props[0]],
-            y = p2[props[1]] - p1[props[1]];
-
-        return Math.sqrt(x * x + y * y);
-    };
-
-    // 计算两个点的角度
-    var getAngle = function getAngle(p1, p2, props) {
-        if (!props) {
-            props = PROPS_XY;
-        }
-        var x = p2[props[0]] - p1[props[0]],
-            y = p2[props[1]] - p1[props[1]];
-        return Math.atan2(y, x);
-    };
-
-    // 计算两个点集的旋转角度
-    var getRotation = function getRotation(start, end) {
-        return getAngle(end[1], end[0], PROPS_CLIENT_XY) + getAngle(start[1], start[0], PROPS_CLIENT_XY);
-    };
-
-    // 计算两个点集的缩放系数
-    var getScale = function getScale(start, end) {
-        return getDistance(end[0], end[1], PROPS_CLIENT_XY) / getDistance(start[0], start[1], PROPS_CLIENT_XY);
-    };
-
-    // export it
-    CloudTouch.proxy = {
-        INPUT_START: INPUT_START,
-        INPUT_MOVE: INPUT_MOVE,
-        INPUT_END: INPUT_END,
-        INPUT_CANCEL: INPUT_CANCEL,
-        DIRECTION_NONE: DIRECTION_NONE,
-        DIRECTION_LEFT: DIRECTION_LEFT,
-        DIRECTION_RIGHT: DIRECTION_RIGHT,
-        DIRECTION_UP: DIRECTION_UP,
-        DIRECTION_DOWN: DIRECTION_DOWN,
-        DIRECTION_HORIZONTAL: DIRECTION_HORIZONTAL,
-        DIRECTION_VERTICAL: DIRECTION_VERTICAL,
-        DIRECTION_ALL: DIRECTION_ALL,
-        touchsHandler: touchsHandler
-    };
-})();
+CLOUD.ShaderMaterial.ShaderLib = CLOUD.ShaderMaterial.ShaderLibs['r' + THREE.REVISION];
+if (CLOUD.ShaderMaterial.ShaderLib === undefined) {
+    console.log('custom clip not implemented for three.js r' + THREE.REVISION + ' yet!');
+}
 
 CLOUD.Animation = function () {
 
@@ -6035,7 +7138,7 @@ CLOUD.Animation = function () {
     var _onUpdateCallback = null;
     var _onCompleteCallback = null;
 
-    this.from = function (properties) {
+    this.from = function(properties){
 
         _object = properties;
 
@@ -6047,7 +7150,7 @@ CLOUD.Animation = function () {
         return this;
     };
 
-    this.to = function (properties, duration) {
+    this.to = function(properties, duration) {
 
         if (duration !== undefined) {
             _duration = duration;
@@ -6075,7 +7178,7 @@ CLOUD.Animation = function () {
         return this;
     };
 
-    this.start = function (frameTime) {
+    this.start = function( frameTime ) {
 
         _onStartCallbackFired = false;
 
@@ -6090,7 +7193,7 @@ CLOUD.Animation = function () {
 
         _interpolationFunction = this.interpolate;
 
-        var animate = function animate() {
+        var animate = function() {
 
             var elapsed;
             var start = _valuesStart;
@@ -6126,14 +7229,14 @@ CLOUD.Animation = function () {
                     _onUpdateCallback.call(_object, elapsed);
                 }
             }
-        };
+        }
 
         // 启动计时器
         _timerId = setInterval(animate, frameTime);
     };
 
     //判断两向量角度是否大于180°，大于180°返回真，否则返回假
-    this.isAngleGreaterThanPi = function (start, end, up) {
+    this.isAngleGreaterThanPi = function(start, end, up){
 
         // 根据混合积来判断角度
         var dir = new THREE.Vector3();
@@ -6150,7 +7253,7 @@ CLOUD.Animation = function () {
     };
 
     // 锥形底面圆弧插值
-    this.conicInterpolate = function (start, end, interp, percentage, islargeangle) {
+    this.conicInterpolate = function(start, end, interp, percentage, islargeangle) {
 
         // 场景旋转和相机旋转方向是反的
         var angle = -Math.PI * percentage;
@@ -6173,17 +7276,17 @@ CLOUD.Animation = function () {
     };
 
     // 球形插值
-    this.slerpInterpolate = function (start, end, up, interp, percentage, tolerance, isconic, islargeangle) {
-        var unitX = new THREE.Vector3(1, 0, 0);
-        var unitZ = new THREE.Vector3(0, 0, 1);
+    this.slerpInterpolate = function(start, end, up, interp, percentage, tolerance, isconic, islargeangle) {
+        var unitX = new THREE.Vector3( 1, 0 , 0 );
+        var unitZ = new THREE.Vector3( 0, 0 , 1);
         var middle = new THREE.Vector3(); // 中间量
         var step = 0;
         var cosTheta = start.dot(end);
         // 构造四元数
         var startQuaternion = new THREE.Quaternion(start.x, start.y, start.z, 1).normalize();
         var endQuaternion = new THREE.Quaternion(end.x, end.y, end.z, 1).normalize();
-        var midQuaternion = new THREE.Quaternion(0, 0, 0, 1);
-        var slerpQuaternion = new THREE.Quaternion(0, 0, 0, 1);
+        var midQuaternion = new THREE.Quaternion(0, 0, 0 ,1);
+        var slerpQuaternion = new THREE.Quaternion(0, 0, 0 ,1);
 
         if (isconic === undefined) {
             isconic = false;
@@ -6194,10 +7297,9 @@ CLOUD.Animation = function () {
         }
 
         // start == end (0度)
-        if (tolerance < cosTheta) {
+        if (tolerance < cosTheta){
             interp.copy(end);
-        } else if (tolerance < Math.abs(cosTheta)) {
-            // start == -end (180度)
+        } else  if (tolerance < Math.abs(cosTheta)) {// start == -end (180度)
 
             //if ( tolerance > Math.abs( start.dot( unitZ )) ) {
             //    //console.log("unitZ");
@@ -6207,7 +7309,7 @@ CLOUD.Animation = function () {
             //    middle.crossVectors(start , unitX).normalize();
             //}
 
-            middle.crossVectors(start, up).normalize();
+            middle.crossVectors(start , up).normalize();
 
             // 中间量四元数
             midQuaternion.set(middle.x, middle.y, middle.z, 1).normalize();
@@ -6221,10 +7323,10 @@ CLOUD.Animation = function () {
                 THREE.Quaternion.slerp(midQuaternion, endQuaternion, slerpQuaternion, step);
                 interp.set(slerpQuaternion.x, slerpQuaternion.y, slerpQuaternion.z);
             }
-        } else {
-            // start != abs(end)
 
-            if (isconic) {
+        } else { // start != abs(end)
+
+            if (isconic ){
                 //console.log("[slerpInterpolate][isconic]");
                 this.conicInterpolate(start, end, interp, percentage, islargeangle);
             } else {
@@ -6237,20 +7339,19 @@ CLOUD.Animation = function () {
     };
 
     // 线性插值
-    this.linearInterpolate = function (start, end, interp, percentage, tolerance) {
-        var unitX = new THREE.Vector3(1, 0, 0);
-        var unitZ = new THREE.Vector3(0, 0, 1);
+    this.linearInterpolate = function(start, end, interp, percentage, tolerance) {
+        var unitX = new THREE.Vector3( 1, 0 , 0 );
+        var unitZ = new THREE.Vector3( 0, 0 , 1);
         var middle = new THREE.Vector3(); // 中间量
         var step = 0;
         var cosTheta = start.dot(end);
 
         // start == end (0度)
-        if (tolerance < cosTheta) {
+        if (tolerance < cosTheta){
             interp.copy(end);
-        } else if (tolerance < -cosTheta) {
-            // start == -end (180度)
+        } else if (tolerance < -cosTheta) {// start == -end (180度)
 
-            if (tolerance > Math.abs(start.dot(unitZ))) {
+            if ( tolerance > Math.abs( start.dot( unitZ )) ) {
                 middle.crossVectors(start, unitZ).normalize();
             } else {
                 middle.crossVectors(start, unitX).normalize();
@@ -6264,8 +7365,8 @@ CLOUD.Animation = function () {
                 step = (percentage - 0.5) * 2;
                 interp.lerpVectors(middle, end, step);
             }
-        } else {
-            // start != abs(end)
+
+        }else { // start != abs(end)
             interp.lerpVectors(start, end, percentage);
         }
 
@@ -6309,254 +7410,127 @@ CLOUD.Animation = function () {
             animUp: interpUp
         };
     };
-};
 
-/*
-For three.js r73
- */
-var CloudUniformsLib = {
-    cust_clip: {
-        iClipPlane: { type: "i", value: 0 },
-        vClipPlane: { type: "v4v", value: new Array(new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()) }
-    },
-    cus_Instanced: {
-        transformMatrix: { type: "m4", value: new THREE.Matrix4() }
-    }
-};
-var CloudShaderChunk = {
-    cust_clip_pars_vertex: "#ifdef USE_CUSTOMCLIP\n\n    uniform vec4 vClipPlane[6]; \n\n    uniform int iClipPlane; \n\n    varying float fClipDistance[6];\n\n#endif\n",
-    cust_clip_pars_fragment: "#ifdef USE_CUSTOMCLIP\n\n    uniform int iClipPlane; \n\n    varying float fClipDistance[6];\n\n#endif\n",
-
-    cust_clip_vertex: "#ifdef USE_CUSTOMCLIP\n\n" + " for(int i = 0; i < 6; i++) {\n" + "     if (i < iClipPlane)\n" + "         fClipDistance[i] = dot(worldPosition.xyz, vClipPlane[i].xyz) + vClipPlane[i].w;\n" + "  }\n" + "#endif\n",
-
-    cust_clip_fragment: "#ifdef USE_CUSTOMCLIP\n\n" + "for(int i = 0; i < 6; i++) {\n\n" + "    if (i < iClipPlane)\n" + "       if (fClipDistance[i] > 0.0) discard;\n\n" + "}\n\n" + "#endif\n",
-
-    cust_Instanced_pars_vertex: "#ifdef USE_CUST_INSTANCED\n\n    attribute vec4 componentV1;\nattribute vec4 componentV2;\nattribute vec4 componentV3;\nattribute vec4 componentV4;\n#endif\n",
-    cust_Instanced_normal_vertex: "#ifdef USE_CUST_INSTANCED\n\n\tmat4 modelTransMatrix = mat4(componentV1, componentV2, componentV3,componentV4);\n\t objectNormal = inverseTransformDirection(objectNormal, modelTransMatrix);\n#endif\n",
-    cust_Instanced_vertex: "#ifdef USE_CUST_INSTANCED\n\n\tvec4 newposition = mat4(componentV1, componentV2, componentV3,componentV4) * vec4( transformed, 1.0 );\n\t transformed = newposition.xyz;\n#endif\n",
-
-    cust_Instanced_pars_vertex2: "#ifdef USE_CUST_INSTANCED\n\n  uniform mat4 transformMatrix; \n#endif\n",
-    cust_Instanced_vertex2: "#ifdef USE_CUST_INSTANCED\n\n\tvec4 newposition = transformMatrix * vec4( transformed, 1.0 );\n\t transformed = newposition.xyz;\n#endif\n"
-
-};
-var CloudShaderLibs = {};
-
-CloudShaderLibs.r73 = {
-    phong_cust_clip: {
-        uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib["common"], THREE.UniformsLib["aomap"], THREE.UniformsLib["lightmap"], THREE.UniformsLib["emissivemap"], THREE.UniformsLib["bumpmap"], THREE.UniformsLib["normalmap"], THREE.UniformsLib["displacementmap"], THREE.UniformsLib["fog"], THREE.UniformsLib["lights"], THREE.UniformsLib["shadowmap"], CloudUniformsLib["cust_clip"], {
-            "emissive": { type: "c", value: new THREE.Color(0x000000) },
-            "specular": { type: "c", value: new THREE.Color(0x111111) },
-            "shininess": { type: "f", value: 30 }
-        }]),
-
-        vertexShader: ["#define USE_CUSTOMCLIP", "#define PHONG", "varying vec3 vViewPosition;", "#ifndef FLAT_SHADED", "    varying vec3 vNormal;", "#endif", THREE.ShaderChunk["common"], THREE.ShaderChunk["uv_pars_vertex"], THREE.ShaderChunk["uv2_pars_vertex"], THREE.ShaderChunk["displacementmap_pars_vertex"], THREE.ShaderChunk["envmap_pars_vertex"], THREE.ShaderChunk["lights_phong_pars_vertex"], THREE.ShaderChunk["color_pars_vertex"], THREE.ShaderChunk["morphtarget_pars_vertex"], THREE.ShaderChunk["skinning_pars_vertex"], THREE.ShaderChunk["shadowmap_pars_vertex"], THREE.ShaderChunk["logdepthbuf_pars_vertex"], CloudShaderChunk["cust_clip_pars_vertex"], CloudShaderChunk["cust_Instanced_pars_vertex"], "void main() {", THREE.ShaderChunk["uv_vertex"], THREE.ShaderChunk["uv2_vertex"], THREE.ShaderChunk["color_vertex"], THREE.ShaderChunk["beginnormal_vertex"], CloudShaderChunk["cust_Instanced_normal_vertex"], THREE.ShaderChunk["morphnormal_vertex"], THREE.ShaderChunk["skinbase_vertex"], THREE.ShaderChunk["skinnormal_vertex"], THREE.ShaderChunk["defaultnormal_vertex"], "#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
-
-        "    vNormal = normalize( transformedNormal );", "#endif", THREE.ShaderChunk["begin_vertex"], CloudShaderChunk["cust_Instanced_vertex"], THREE.ShaderChunk["displacementmap_vertex"], THREE.ShaderChunk["morphtarget_vertex"], THREE.ShaderChunk["skinning_vertex"], THREE.ShaderChunk["project_vertex"], THREE.ShaderChunk["logdepthbuf_vertex"], "    vViewPosition = - mvPosition.xyz;", THREE.ShaderChunk["worldpos_vertex"], CloudShaderChunk["cust_clip_vertex"], THREE.ShaderChunk["envmap_vertex"], THREE.ShaderChunk["lights_phong_vertex"], THREE.ShaderChunk["shadowmap_vertex"], "}"].join("\n"),
-
-        fragmentShader: ["#define USE_CUSTOMCLIP", CloudShaderChunk["cust_clip_pars_fragment"], "#define PHONG", "uniform vec3 diffuse;", "uniform vec3 emissive;", "uniform vec3 specular;", "uniform float shininess;", "uniform float opacity;", THREE.ShaderChunk["common"], THREE.ShaderChunk["color_pars_fragment"], THREE.ShaderChunk["uv_pars_fragment"], THREE.ShaderChunk["uv2_pars_fragment"], THREE.ShaderChunk["map_pars_fragment"], THREE.ShaderChunk["alphamap_pars_fragment"], THREE.ShaderChunk["aomap_pars_fragment"], THREE.ShaderChunk["lightmap_pars_fragment"], THREE.ShaderChunk["emissivemap_pars_fragment"], THREE.ShaderChunk["envmap_pars_fragment"], THREE.ShaderChunk["fog_pars_fragment"], THREE.ShaderChunk["lights_phong_pars_fragment"], THREE.ShaderChunk["shadowmap_pars_fragment"], THREE.ShaderChunk["bumpmap_pars_fragment"], THREE.ShaderChunk["normalmap_pars_fragment"], THREE.ShaderChunk["specularmap_pars_fragment"], THREE.ShaderChunk["logdepthbuf_pars_fragment"], "void main() {", CloudShaderChunk["cust_clip_fragment"], "    vec3 outgoingLight = vec3( 0.0 );", "    vec4 diffuseColor = vec4( diffuse, opacity );", "    vec3 totalAmbientLight = ambientLightColor;", "    vec3 totalEmissiveLight = emissive;", "    vec3 shadowMask = vec3( 1.0 );", THREE.ShaderChunk["logdepthbuf_fragment"], THREE.ShaderChunk["map_fragment"], THREE.ShaderChunk["color_fragment"], THREE.ShaderChunk["alphamap_fragment"], THREE.ShaderChunk["alphatest_fragment"], THREE.ShaderChunk["specularmap_fragment"], THREE.ShaderChunk["normal_phong_fragment"], THREE.ShaderChunk["lightmap_fragment"], THREE.ShaderChunk["hemilight_fragment"], THREE.ShaderChunk["aomap_fragment"], THREE.ShaderChunk["emissivemap_fragment"], THREE.ShaderChunk["lights_phong_fragment"], THREE.ShaderChunk["shadowmap_fragment"], "totalDiffuseLight *= shadowMask;", "totalSpecularLight *= shadowMask;", "#ifdef METAL", "    outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) * specular + totalSpecularLight + totalEmissiveLight;", "#else", "    outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) + totalSpecularLight + totalEmissiveLight;", "#endif", THREE.ShaderChunk["envmap_fragment"], THREE.ShaderChunk["linear_to_gamma_fragment"], THREE.ShaderChunk["fog_fragment"], "    gl_FragColor = vec4( outgoingLight, diffuseColor.a );", "}"].join("\n")
-    },
-    base_cust_clip: {
-        uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib["common"], THREE.UniformsLib["aomap"], THREE.UniformsLib["fog"], THREE.UniformsLib["shadowmap"],
-        // CLIP
-        CloudUniformsLib["cust_clip"], CloudUniformsLib["cus_Instanced"]]),
-
-        vertexShader: [THREE.ShaderChunk["common"], THREE.ShaderChunk["uv_pars_vertex"], THREE.ShaderChunk["uv2_pars_vertex"], THREE.ShaderChunk["envmap_pars_vertex"], THREE.ShaderChunk["color_pars_vertex"], THREE.ShaderChunk["morphtarget_pars_vertex"], THREE.ShaderChunk["skinning_pars_vertex"], THREE.ShaderChunk["shadowmap_pars_vertex"], THREE.ShaderChunk["logdepthbuf_pars_vertex"], "#define USE_CUSTOMCLIP", CloudShaderChunk["cust_clip_pars_vertex"], CloudShaderChunk["cust_Instanced_pars_vertex2"],
-        //CloudShaderChunk["cust_Instanced_pars_vertex"],
-
-        "void main() {", THREE.ShaderChunk["uv_vertex"], THREE.ShaderChunk["uv2_vertex"], THREE.ShaderChunk["color_vertex"], THREE.ShaderChunk["skinbase_vertex"], "    #ifdef USE_ENVMAP", THREE.ShaderChunk["beginnormal_vertex"], CloudShaderChunk["cust_Instanced_normal_vertex"], THREE.ShaderChunk["morphnormal_vertex"], THREE.ShaderChunk["skinnormal_vertex"], THREE.ShaderChunk["defaultnormal_vertex"], "    #endif", THREE.ShaderChunk["begin_vertex"], CloudShaderChunk["cust_Instanced_vertex2"],
-        //CloudShaderChunk["cust_Instanced_vertex"],
-        THREE.ShaderChunk["morphtarget_vertex"], THREE.ShaderChunk["skinning_vertex"], THREE.ShaderChunk["project_vertex"], THREE.ShaderChunk["logdepthbuf_vertex"], THREE.ShaderChunk["worldpos_vertex"], "vec4 worldPosition = modelMatrix * vec4( transformed, 1.0 );", CloudShaderChunk["cust_clip_vertex"], THREE.ShaderChunk["envmap_vertex"], THREE.ShaderChunk["shadowmap_vertex"], "}"].join("\n"),
-
-        fragmentShader: ["#define USE_CUSTOMCLIP", "uniform vec3 diffuse;", "uniform float opacity;", THREE.ShaderChunk["color_pars_fragment"], THREE.ShaderChunk["map_pars_fragment"], THREE.ShaderChunk["alphamap_pars_fragment"], THREE.ShaderChunk["lightmap_pars_fragment"], THREE.ShaderChunk["envmap_pars_fragment"], THREE.ShaderChunk["fog_pars_fragment"], THREE.ShaderChunk["shadowmap_pars_fragment"], THREE.ShaderChunk["specularmap_pars_fragment"], THREE.ShaderChunk["logdepthbuf_pars_fragment"], CloudShaderChunk["cust_clip_pars_fragment"], "void main() {", CloudShaderChunk["cust_clip_fragment"], "    vec3 outgoingLight = vec3( 0.0 );", "    vec4 diffuseColor = vec4( diffuse, opacity );", "    vec3 totalAmbientLight = vec3( 1.0 );", // hardwired
-        "    vec3 shadowMask = vec3( 1.0 );", THREE.ShaderChunk["logdepthbuf_fragment"], THREE.ShaderChunk["map_fragment"], THREE.ShaderChunk["color_fragment"], THREE.ShaderChunk["alphamap_fragment"], THREE.ShaderChunk["alphatest_fragment"], THREE.ShaderChunk["specularmap_fragment"], THREE.ShaderChunk["aomap_fragment"], THREE.ShaderChunk["shadowmap_fragment"], "    outgoingLight = diffuseColor.rgb * totalAmbientLight * shadowMask;", THREE.ShaderChunk["envmap_fragment"],
-
-        //THREE.ShaderChunk["linear_to_gamma_fragment"],
-
-        THREE.ShaderChunk["fog_fragment"], "    gl_FragColor = vec4( outgoingLight, diffuseColor.a );", "}"].join("\n")
-    }
-};
-
-var CloudShaderLib = CloudShaderLibs['r' + THREE.REVISION];
-if (CloudShaderLib === undefined) {
-    console.log('custom clip not implemented for three.js r' + THREE.REVISION + ' yet!');
 }
+CLOUD.CameraAnimator = function () {
 
-CLOUD.MaterialUtil = {
+    var _duration = 500;// 500毫秒
+    var _frameTime = 13; // 周期性执行或调用函数之间的时间间隔，以毫秒计
+    var _isPlaying = false;
+    var _animation = new CLOUD.Animation();
 
-    createInstancePhongMaterial: function createInstancePhongMaterial(matObj) {
-        // 复制一份，不影响其他模型的使用
-        // 不复制一份，有模型绘制不出
-        var material = matObj.clone();
-        material.type = "phong_instanced";
-        material.uniforms = CloudShaderLib.phong_cust_clip.uniforms;
-        material.vertexShader = "#define USE_CUST_INSTANCED \n" + CloudShaderLib.phong_cust_clip.vertexShader;
-        material.fragmentShader = "#define USE_CUST_INSTANCED \n" + CloudShaderLib.phong_cust_clip.fragmentShader;
-        return material;
-    },
+    this.setDuration = function (duration) {
+        _duration = duration;
+    };
 
-    updateBasicMaterial: function updateBasicMaterial(material, instanced) {
-        if (instanced) {
-            material.vertexShader = "#define USE_CUST_INSTANCED \n" + CloudShaderLib.base_cust_clip.vertexShader;
-            material.fragmentShader = "#define USE_CUST_INSTANCED \n" + CloudShaderLib.base_cust_clip.fragmentShader;
-        } else {
-            material.vertexShader = CloudShaderLib.base_cust_clip.vertexShader;
-            material.fragmentShader = CloudShaderLib.base_cust_clip.fragmentShader;
-        }
+    this.setFrameTime = function (frameTime) {
+        _frameTime = frameTime;
+    };
 
-        material.needsUpdate = true;
-    },
+    this.setStandardView = function (stdView, viewer, margin, callback) {
 
-    setMatrixUniform: function setMatrixUniform(transform) {
-        CloudShaderLib.base_cust_clip.uniforms.transformMatrix.value = transform;
-    },
+        _isPlaying = false; // 无动画，将状态置成 false
 
-    createPhongMaterial: function createPhongMaterial(obj) {
-        var material = new THREE.MeshPhongMaterial(obj);
-        material.type = 'phong_cust_clip';
-        material.uniforms = CloudShaderLib.phong_cust_clip.uniforms;
-        material.vertexShader = CloudShaderLib.phong_cust_clip.vertexShader;
-        material.fragmentShader = CloudShaderLib.phong_cust_clip.fragmentShader;
-        return material;
-    },
+        var redoRender = function (viewer, box) {
 
-    createHilightMaterial: function createHilightMaterial() {
+            // fit all
+            var target = viewer.camera.zoomToBBox(box, margin);
+            viewer.cameraEditor.updateCamera(target);
+            viewer.render();
 
-        return this.createPhongMaterial(CLOUD.GlobalData.SelectionColor);
-    }
-};
-
-CLOUD.CameraInfo = function (position, target, up) {
-    "use strict";
-
-    this.position = position;
-    this.target = target;
-    this.up = up;
-};
-
-CLOUD.CameraUtil = {
-
-    // camera = {"camera_position":"26513.603437903, -14576.4810728955, 15107.6582255056","camera_direction":"-220.050259546712, 169.277369901229, -125.801809656091","camera_up":"0, 0, 304.8"}
-    transformCamera: function transformCamera(camera, scene) {
-        var position = new THREE.Vector3();
-
-        var str2float = function str2float(strarr) {
-            return [parseFloat(strarr[0]), parseFloat(strarr[1]), parseFloat(strarr[2])];
+            // 增加回调
+            callback && callback();
         };
 
-        position.fromArray(str2float(camera.camera_position.split(",")));
-        var dir = new THREE.Vector3();
-        dir.fromArray(str2float(camera.camera_direction.split(",")));
-        var up = new THREE.Vector3();
-        up.fromArray(str2float(camera.camera_up.split(",")));
+        var camera = viewer.camera;
+        var focal = CLOUD.GlobalData.SceneSize / 2;
+        var threshold = 0.9995;
 
-        var target = new THREE.Vector3();
-        target.addVectors(position, dir);
+        // 1. 记录动画开始参数
+        var startDir = camera.getWorldDirection().clone();
+        startDir.normalize();
 
-        position.applyMatrix4(scene.rootNode.matrix);
-        target.applyMatrix4(scene.rootNode.matrix);
+        var startUp = new THREE.Vector3();
+        startUp.copy(camera.realUp || camera.up);
+        startUp.normalize();
 
-        var rotMat = new THREE.Matrix4();
-        rotMat.makeRotationFromEuler(scene.rootNode.rotation);
-        up.applyMatrix4(rotMat);
-        up.normalize();
+        // 2. 设置视图模式
+        var box = viewer.getScene().worldBoundingBox();
+        var target = camera.setStandardView(stdView, box);
 
-        return new CLOUD.CameraInfo(position, target, up);
-    },
+        // 3. 记录动画结束参数
+        var endDir = camera.getWorldDirection().clone();
+        endDir.normalize();
 
-    parseCameraInfo: function parseCameraInfo(jsonStr) {
-        var jsonObj = JSON.parse(jsonStr);
+        var endUp = new THREE.Vector3();
+        endUp.copy(camera.realUp || camera.up);
+        endUp.normalize();
 
-        var position = new THREE.Vector3();
-        position.x = jsonObj.position.x;
-        position.y = jsonObj.position.y;
-        position.z = jsonObj.position.z;
+        // 开始结束点之间角度
+        var cosThetaDir = startDir.dot(endDir);
+        var cosThetaUp = startUp.dot(endUp);
 
-        var target = new THREE.Vector3();
-        target.x = jsonObj.target.x;
-        target.y = jsonObj.target.y;
-        target.z = jsonObj.target.z;
+        // dir和up都一样, 无动画
+        if (threshold < cosThetaDir && threshold < cosThetaUp) {
 
-        var up = new THREE.Vector3();
-        up.x = jsonObj.up.x;
-        up.y = jsonObj.up.y;
-        up.z = jsonObj.up.z;
+            // 绘制
+            redoRender(viewer, box);
 
-        return new CLOUD.CameraInfo(position, target, up);
-    },
+            camera.up.copy(THREE.Object3D.DefaultUp);
 
-    intersectBoxByRay: function intersectBoxByRay(ray, box) {
-
-        var tmin, tmax, tymin, tymax, tzmin, tzmax;
-
-        var invdirx = 1 / ray.direction.x,
-            invdiry = 1 / ray.direction.y,
-            invdirz = 1 / ray.direction.z;
-
-        var origin = ray.origin;
-
-        if (invdirx >= 0) {
-
-            tmin = (box.min.x - origin.x) * invdirx;
-            tmax = (box.max.x - origin.x) * invdirx;
         } else {
 
-            tmin = (box.max.x - origin.x) * invdirx;
-            tmax = (box.min.x - origin.x) * invdirx;
+            _isPlaying = true; // 动画中
+
+            // 启动定时器
+            _animation.from({animDir: startDir, animUp: startUp}).to({
+                animDir: endDir,
+                animUp: endUp
+            }, _duration).onUpdate(function () {
+                if (viewer.viewHouse) {
+                    viewer.viewHouse.isAnimationFinish = false;
+                }
+
+                // 传入更新值,这里的this是 CLOUD.Animation._object
+                var interpDir = this.animDir;
+                var interpUp = this.animUp;
+
+                viewer.camera.LookAt(target, interpDir, interpUp, focal);
+
+                redoRender(viewer, box);
+            }).onComplete(function () {
+
+                if (viewer.viewHouse) {
+                    // 处理最后一帧
+                    viewer.viewHouse.isAnimationFinish = true; // 标记ViewHouse动画结束
+                }
+
+                viewer.camera.LookAt(target, endDir, endUp, focal);
+
+                // 绘制
+                redoRender(viewer, box);
+
+                _isPlaying = false; //动画结束
+                viewer.camera.up.copy(THREE.Object3D.DefaultUp);// 渲染完成后才可以恢复相机up方向
+            }).start(_frameTime);
         }
+    };
 
-        if (invdiry >= 0) {
+    this.isPlaying = function () {
+        return _isPlaying;
+    };
+}
 
-            tymin = (box.min.y - origin.y) * invdiry;
-            tymax = (box.max.y - origin.y) * invdiry;
-        } else {
-
-            tymin = (box.max.y - origin.y) * invdiry;
-            tymax = (box.min.y - origin.y) * invdiry;
-        }
-
-        if (tmin > tymax || tymin > tmax) return null;
-
-        // These lines also handle the case where tmin or tmax is NaN
-        // (result of 0 * Infinity). x !== x returns true if x is NaN
-
-        if (tymin > tmin || tmin !== tmin) tmin = tymin;
-
-        if (tymax < tmax || tmax !== tmax) tmax = tymax;
-
-        if (invdirz >= 0) {
-
-            tzmin = (box.min.z - origin.z) * invdirz;
-            tzmax = (box.max.z - origin.z) * invdirz;
-        } else {
-
-            tzmin = (box.max.z - origin.z) * invdirz;
-            tzmax = (box.min.z - origin.z) * invdirz;
-        }
-
-        if (tmin > tzmax || tzmin > tmax) return null;
-
-        if (tzmin > tmin || tmin !== tmin) tmin = tzmin;
-
-        if (tzmax < tmax || tmax !== tmax) tmax = tzmax;
-
-        //return point closest to the ray (positive side)
-
-        if (tmax < 0) return null;
-
-        return tmin >= 0 ? tmin : tmax;
-    }
-};
 
 /**
  * 材质状态：
  *  构件 ： 选择、高亮、半透明、隔离
  */
-
 CLOUD.Filter = function () {
 
     // 内置材质库
     var _overridedMaterials = {};
-    _overridedMaterials.selection = CLOUD.MaterialUtil.createHilightMaterial();
+    _overridedMaterials.selection = CLOUD.MaterialUtil.createHighlightMaterial();
     _overridedMaterials.scene = CLOUD.MaterialUtil.createPhongMaterial({
         color: 0x888888,
         opacity: 0.1,
@@ -6611,24 +7585,18 @@ CLOUD.Filter = function () {
     var _filter = {}; // 可见过滤器
     var _fileFilter = {}; // 文件过滤器。在这里面的fileId将不可见。
 
-
-    var EnumIsolateState = {
-        SOS_Disabled: 0,
-        SOS_Transparent: 1,
-        SOS_Hidden: 2
-    };
-
-    var _overriderByScene = EnumIsolateState.SOS_Disabled; // 隔离
+    var _overriderByScene = false; // 场景半透明
     var _frozenSet = null; // 现在用于临时半透明构件的集合
 
-    var _isolateSet = null; // 隔离：半透明未在该集合的构件
-    var _isolateCondition = null; //组合条件的隔离
+    var _isolateSet = null; // 隔离：将不在该集合中的构件半透明（反向选择）
+    var _isolateCondition = null;//组合条件的隔离
 
     var _overriderByIds = {}; // 材质过滤器
     var _overriderByData = {}; // 自定义材质覆盖
-    var _overriderCondition = null; //组合条件的材质覆盖
+    var _overriderCondition = null;//组合条件的材质覆盖
 
     var _selectionSet = null; // 选中的构件集合
+    var _selectionBoundingBox = new THREE.Box3(); // 选中构件的包围盒
 
     // SERIALIZATION END
 
@@ -6638,12 +7606,15 @@ CLOUD.Filter = function () {
         obj.filter = _filter;
         obj.fileFilter = _fileFilter;
         obj.overriderByScene = _overriderByScene;
+
         if (_frozenSet) {
             obj.frozenSet = _frozenSet;
         }
+
         if (_isolateSet) {
             obj.isolateSet = _isolateSet;
         }
+
         if (_isolateCondition) {
             obj.isolateCondition = _isolateCondition;
         }
@@ -6667,97 +7638,37 @@ CLOUD.Filter = function () {
         _filter = obj.filter;
         _fileFilter = obj.fileFilter;
         _overriderByScene = obj.overriderByScene;
-        if (obj.frozenSet != undefined) _frozenSet = obj.frozenSet;
-        if (obj.isolateSet != undefined) _isolateSet = obj.isolateSet;
-        if (obj.isolateCondition != undefined) _isolateCondition = obj.isolateCondition;
 
-        _overrideByIds = obj.overriderByIds;
+        if (obj.frozenSet != undefined) {
+            _frozenSet = obj.frozenSet;
+        }
+
+        if (obj.isolateSet != undefined) {
+            _isolateSet = obj.isolateSet;
+        }
+
+        if (obj.isolateCondition != undefined) {
+            _isolateCondition = obj.isolateCondition;
+        }
+
+        _overriderByIds = obj.overriderByIds;
         _overriderByData = obj.overriderByData;
 
         if (obj.overriderCondition) {
             _overriderCondition = obj.overriderCondition;
         }
 
-        if (obj.selectionSet != undefined) _selectionSet = obj.selectionSet;
+        if (obj.selectionSet != undefined) {
+            _selectionSet = obj.selectionSet;
+        }
+
     };
 
-    var _selectionBoundingBox = new THREE.Box3(); // 选中构件的包围盒
-
-    // 将选中构件ID集合加入到【隐藏未选中】集合中  - 显示选中的
-    function pushToHideUnselectionSet() {
-
-        if (_selectionSet) {
-            _filter.visibleIds = {};
-            var ids = _filter.visibleIds;
-            for (var id in _selectionSet) {
-                ids[id] = _selectionSet[id];
-            }
-        } else {
-            //_filter.visibleIds = null;
-        }
-    }
-
-    // 将选中构件ID集合加入到【隐藏选中】集合中
-    // 存在需要连续对其他构件隐藏的需求，加入清理状态, 默认不清除之前的数据
-    function pushToHideSelectionSet(clear) {
-
-        if (_selectionSet) {
-            //_filter.invisibleIds = {};
-
-            if (clear) {
-                _filter.invisibleIds = {};
-            } else {
-                _filter.invisibleIds = _filter.invisibleIds || {}; // 连续对其他构件隐藏
-            }
-
-            var ids = _filter.invisibleIds;
-            for (var id in _selectionSet) {
-                ids[id] = _selectionSet[id];
-            }
-        } else {
-            _filter.invisibleIds = null;
-        }
-    }
-
-    // 将选中构件ID集合加入到【半透明未选中】集合中
-    function pushToTranslucentUnselectionSet() {
-
-        if (_selectionSet) {
-            _isolateSet = {};
-
-            for (var id in _selectionSet) {
-                _isolateSet[id] = _selectionSet[id];
-            }
-        } else {
-            //_isolateSet  = null;
-        }
-    }
-
-    // 将选中构件ID集合加入到【半透明选中】集合中
-    // 存在连续对其他构件半透明的需求，加入清理状态, 默认不清除之前的数据
-    function pushToTranslucentSelectionSet(clear) {
-
-        if (_selectionSet) {
-            //_frozenSet = {};
-
-            if (clear) {
-                _frozenSet = {};
-            } else {
-                _frozenSet = _frozenSet || {}; // 连续对其他构件半透明
-            }
-
-            for (var id in _selectionSet) {
-                _frozenSet[id] = _selectionSet[id];
-            }
-        } else {
-            _frozenSet = null;
-        }
-    }
 
     this.clear = function () {
         _filter = {};
         _fileFilter = {};
-        _overriderByScene = EnumIsolateState.SOS_Disabled;
+        _overriderByScene = false;
         _overriderByIds = {};
         _overriderByData = {};
         _selectionSet = null;
@@ -6802,35 +7713,39 @@ CLOUD.Filter = function () {
     // Visbililty Filter API
     // conditions: {{'levelId':'F01'},{'categoryId':'21'}}
     this.setVisibleConditions = function (conditions) {
-
         _filter.conditions = conditions;
     };
 
-    // only show the nodes with the specified ids.
+    // only show the nodes with the specified ids. 
     this.showByUserIds = function (ids) {
 
-        console.warn("obsolete: use setIsolateByUserIds instead!");
         if (ids) {
+
             _filter.visibleIds = {};
             var visibleIds = _filter.visibleIds;
+
             for (var ii = 0, len = ids.length; ii < len; ++ii) {
                 visibleIds[ids[ii]] = true;
             }
+
         } else {
             delete _filter.visibleIds;
         }
+
     };
+
     // to remove
     this.setFilterByUserIds = function (ids) {
-        console.warn("obsolete: use setIsolateByUserIds instead!");
         this.showByUserIds(ids);
     };
 
     this.removeShownUserIds = function (ids) {
-        console.warn("obsolete: use setIsolateByUserIds instead!");
-        if (!_filter.visibleIds) return;
+
+        if (!_filter.visibleIds)
+            return;
 
         var visibleIds = _filter.visibleIds;
+
         for (var ii = 0, len = ids.length; ii < len; ++ii) {
             delete visibleIds[ids[ii]];
         }
@@ -6841,27 +7756,35 @@ CLOUD.Filter = function () {
         }
 
         delete _filter.visibleIds;
+
     };
 
     // hide by the ids.
     this.hideByUserIds = function (ids) {
 
         if (ids) {
-            if (!_filter.invisibleIds) _filter.invisibleIds = {};
+
+            if (!_filter.invisibleIds)
+                _filter.invisibleIds = {};
 
             var invisibleIds = _filter.invisibleIds;
+
             for (var ii = 0, len = ids.length; ii < len; ++ii) {
                 invisibleIds[ids[ii]] = true;
             }
         } else {
             delete _filter.invisibleIds;
         }
+
     };
 
     this.removeHiddenUserIds = function (ids) {
-        if (!_filter.invisibleIds) return;
+
+        if (!_filter.invisibleIds)
+            return;
 
         var invisibleIds = _filter.invisibleIds;
+
         for (var ii = 0, len = ids.length; ii < len; ++ii) {
             delete invisibleIds[ids[ii]];
         }
@@ -6872,16 +7795,20 @@ CLOUD.Filter = function () {
         }
 
         delete _filter.invisibleIds;
+
     };
 
     // 将ID集合加入到可见过滤器中
     this.addFilterByUserIds = function (ids) {
-        console.warn("obsolete: use setIsolateByUserIds instead!");
-        if (!ids) return;
 
-        if (!_filter.visibleIds) _filter.visibleIds = {};
+        if (!ids)
+            return;
+
+        if (!_filter.visibleIds)
+            _filter.visibleIds = {};
 
         var visibleIds = _filter.visibleIds;
+
         for (var ii = 0, len = ids.length; ii < len; ++ii) {
             visibleIds[ids[ii]] = true;
         }
@@ -6891,6 +7818,7 @@ CLOUD.Filter = function () {
     this.addUserFilter = function (name, value) {
 
         var filters = _filter.filters;
+
         if (filters === undefined) {
             _filter.filters = {};
             filters = _filter.filters;
@@ -6905,7 +7833,11 @@ CLOUD.Filter = function () {
 
     // 获得名字为name的可见对象集
     this.getUserFilter = function (name) {
-        if (_filter.filters) return _filter.filters[name];
+
+        if (_filter.filters) {
+            return _filter.filters[name];
+        }
+
         return undefined;
     };
 
@@ -6913,9 +7845,11 @@ CLOUD.Filter = function () {
     this.removeUserFilter = function (name, value) {
 
         var filters = _filter.filters;
-        if (!filters) return;
+        if (!filters)
+            return;
 
-        if (!filters[name]) return;
+        if (!filters[name])
+            return;
 
         if (value === undefined) {
             delete filters[name];
@@ -6928,6 +7862,7 @@ CLOUD.Filter = function () {
             if (Object.getOwnPropertyNames(filters[name]).length == 0) {
                 delete filters[name];
             }
+
         }
     };
 
@@ -6943,12 +7878,15 @@ CLOUD.Filter = function () {
 
     // 从文件过滤器中移除文件id
     this.removeFileFilter = function (fileId) {
+
         if (fileId === undefined) {
             _fileFilter = {};
         } else {
+
             if (_fileFilter[fileId] !== undefined) {
                 delete _fileFilter[fileId];
             }
+
         }
     };
 
@@ -6962,27 +7900,26 @@ CLOUD.Filter = function () {
 
     // 是否启用场景材质，用于场景半透明
     this.enableSceneOverrider = function (enable) {
-        if (enable == EnumIsolateState.SOS_Hidden) _overriderByScene = EnumIsolateState.SOS_Hidden;else _overriderByScene = enable ? EnumIsolateState.SOS_Transparent : EnumIsolateState.SOS_Disabled;
+        _overriderByScene = enable;
     };
 
     // 场景材质启用状态 -- true: 启用， false: 禁用
     this.isSceneOverriderEnabled = function () {
-        return _overriderByScene != EnumIsolateState.SOS_Disabled;
-    };
-
-    this.getSceneOverriderState = function () {
         return _overriderByScene;
     };
+
     // 设置材质
     // 如果存在名为materialName的材质，则修改材质颜色；
     // 如果不存在名为materialName的材质，则创建一个新材质
     this.setOverriderMaterial = function (materialName, color) {
+
         var material = _overridedMaterials[materialName];
+
         if (material) {
             material.color = color;
             return material;
         } else {
-            material = CLOUD.MaterialUtil.createHilightMaterial({ color: color });
+            material = CLOUD.MaterialUtil.createHighlightMaterial({color: color});
             _overridedMaterials[materialName] = material;
             return material;
         }
@@ -7003,22 +7940,25 @@ CLOUD.Filter = function () {
             if (_overriderByIds[name]) {
                 delete _overriderByIds[name];
             }
+
         } else {
 
             var overrider = {};
             overrider.material = materialName;
-
             overrider.ids = {};
+
             for (var ii = 0, len = ids.length; ii < len; ++ii) {
                 overrider.ids[ids[ii]] = true;
             }
 
             _overriderByIds[name] = overrider;
         }
+
     };
 
     // 设置自定义材质过滤器数据
     this.setUserOverrider = function (name, value, materialName) {
+
         if (name === undefined) {
             _overriderByData = {};
             return;
@@ -7029,9 +7969,12 @@ CLOUD.Filter = function () {
             if (_overriderByData[name]) {
                 delete _overriderByData[name];
             }
-        } else {
 
-            if (!_overriderByData[name]) _overriderByData[name] = {};
+        }
+        else {
+
+            if (!_overriderByData[name])
+                _overriderByData[name] = {};
 
             _overriderByData[name][value] = materialName;
         }
@@ -7045,13 +7988,15 @@ CLOUD.Filter = function () {
             return;
         }
 
-        if (!_overriderByData[name]) return;
+        if (!_overriderByData[name])
+            return;
 
         if (value === undefined) {
             delete _overriderByData[name];
         } else {
             delete _overriderByData[name][value];
         }
+
     };
 
     // conditions: the condition array
@@ -7059,6 +8004,7 @@ CLOUD.Filter = function () {
     this.setConditionOverrider = function (conditions) {
         _overriderCondition = conditions;
     };
+
 
     ////////////////////////////////////////////////////////////////
 
@@ -7106,6 +8052,7 @@ CLOUD.Filter = function () {
         for (var ii = 0, len = ids.length; ii < len; ++ii) {
             _selectionSet[ids[ii]] = true;
         }
+
     };
 
     // 移除某个选中构件
@@ -7115,7 +8062,9 @@ CLOUD.Filter = function () {
 
             delete _selectionSet[id];
 
-            if (this.isNullSelectionSet()) _selectionSet = null;
+            if (this.isNullSelectionSet())
+                _selectionSet = null;
+
 
             return true;
         }
@@ -7126,6 +8075,7 @@ CLOUD.Filter = function () {
     this.clearSelectionSet = function () {
 
         _selectionSet = null;
+
     };
 
     // 增加或移除某个选中构件
@@ -7166,7 +8116,8 @@ CLOUD.Filter = function () {
             for (var ii = 0, len = ids.length; ii < len; ++ii) {
                 _frozenSet[ids[ii]] = true;
             }
-        } else {
+        }
+        else {
             _frozenSet = null;
         }
     };
@@ -7174,15 +8125,18 @@ CLOUD.Filter = function () {
     // 增加ID集合
     this.addDemolishIds = function (ids) {
 
-        if (!ids) return;
+        if (!ids)
+            return;
 
         if (!_frozenSet) {
             _frozenSet = {};
         }
 
+
         for (var ii = 0, len = ids.length; ii < len; ++ii) {
             _frozenSet[ids[ii]] = true;
         }
+
     };
 
     // 增加单个ID
@@ -7197,7 +8151,8 @@ CLOUD.Filter = function () {
 
                 delete _frozenSet[id];
 
-                if (this.isNullDemolishSet()) _frozenSet = null;
+                if (this.isNullDemolishSet())
+                    _frozenSet = null;
 
                 return false;
             }
@@ -7221,10 +8176,10 @@ CLOUD.Filter = function () {
     this.clearDemolishSet = function () {
 
         _frozenSet = null;
+
     };
 
-    // condition: {{'levelName':'F01'},{'categoryId':'21'}}
-    // conditions: [condition1, condition2]
+    // conditions: {{'levelName':'F01'},{'categoryId':'21'}}
     this.setIsolateCondition = function (conditions) {
         _isolateCondition = conditions;
     };
@@ -7238,7 +8193,8 @@ CLOUD.Filter = function () {
             for (var ii = 0, len = ids.length; ii < len; ++ii) {
                 _isolateSet[ids[ii]] = true;
             }
-        } else {
+        }
+        else {
             _isolateSet = null;
         }
     };
@@ -7292,7 +8248,8 @@ CLOUD.Filter = function () {
         }
 
         var userData = node.userData;
-        if (!userData) return true;
+        if (!userData)
+            return true;
 
         var filters = _filter.filters;
         if (filters) {
@@ -7307,18 +8264,21 @@ CLOUD.Filter = function () {
 
         var conditions = _filter.conditions;
         if (conditions) {
-            var matchCondition = function matchCondition(condition) {
+
+            var len = conditions.length;
+            if (len == 0)  // hide if visible array is empty
+                return false;
+
+            function matchCondition(condition) {
 
                 for (var item in condition) {
-                    if (condition[item] != userData[item]) return false;
+                    if (condition[item] != userData[item])
+                        return false;
                 }
 
                 return true;
-            };
+            }
 
-            var len = conditions.length;
-            if (len == 0) // hide if visible array is empty
-                return false;
 
             for (var idx = 0; idx < len; ++idx) {
                 if (matchCondition(conditions[idx])) {
@@ -7333,10 +8293,73 @@ CLOUD.Filter = function () {
         return true;
     };
 
+    // 对象是否可以被pick -- true: 对象可以被pick，false: 对象不可以pick
+    this.isSelectable = function (object) {
+
+        var id = object.name;
+
+        // 半透明的构件，不能pick
+        if (_frozenSet && _frozenSet[id]) {
+            return false;
+        }
+
+        // 不在集合中的构件属于半透明的构件，不能pick
+        if (_isolateSet && !_isolateSet[id]) {
+            return false;
+        }
+
+        //
+        for (var item in _overriderByIds) {
+            var overrider = _overriderByIds[item];
+            if (overrider.ids[id])
+                return true;
+        }
+
+        var userData = object.userData;
+        if (!userData)
+            return true;
+
+        // 隔离
+        if (_isolateCondition) {
+
+            function matchIsoCondition(condition) {
+
+                for (var item in condition) {
+                    if (condition[item] != userData[item])
+                        return false;
+                }
+
+                return true;
+            }
+
+            for (var ii = 0, len = _isolateCondition.length; ii < len; ++ii) {
+                var item = _isolateCondition[ii];
+                if (matchIsoCondition(item)) {
+                    return true;
+                }
+            }
+        }
+
+        // OTHER
+        for (var item in _overriderByData) {
+            var overrider = _overriderByData[item];
+            var material = overrider[userData[item]];
+            if (material !== undefined)
+                return true;
+        }
+
+        // 场景半透明不能pick
+        if (_overriderByScene)
+            return false;
+
+        return true;
+    };
+
     // 计算选中对象的包围盒
     this.computeSelectionBox = function (renderList) {
 
-        if (_selectionSet == null) return false;
+        if (_selectionSet == null)
+            return false;
 
         for (var ii = 0; ii < renderList.length; ++ii) {
 
@@ -7364,6 +8387,7 @@ CLOUD.Filter = function () {
                     _selectionBoundingBox.expandByPoint(box2.max);
                 }
             }
+
         }
 
         return true;
@@ -7403,62 +8427,6 @@ CLOUD.Filter = function () {
         return boundingBox;
     };
 
-    // 对象是否可以被pick -- true: 对象可以被pick，false: 对象不可以pick
-    this.isSelectable = function (object) {
-
-        var id = object.name;
-
-        //双击半透明不能pick
-        if (_frozenSet && _frozenSet[id]) {
-            return false;
-        }
-
-        // 如果ID被隔离，仍能被选择
-        if (_isolateSet && _isolateSet[id]) {
-            return true;
-        }
-
-        //
-        for (var item in _overriderByIds) {
-            var overrider = _overriderByIds[item];
-            if (overrider.ids[id]) return true;
-        }
-
-        var userData = object.userData;
-        if (!userData) return true;
-
-        // 条件隔离
-        if (_isolateCondition) {
-            var matchIsoCondition = function matchIsoCondition(condition) {
-
-                for (var item in condition) {
-                    if (condition[item] != userData[item]) return false;
-                }
-
-                return true;
-            };
-
-            for (var ii = 0, len = _isolateCondition.length; ii < len; ++ii) {
-                var item = _isolateCondition[ii];
-                if (matchIsoCondition(item)) {
-                    return true;
-                }
-            }
-        }
-
-        // OTHER
-        for (var item in _overriderByData) {
-            var overrider = _overriderByData[item];
-            var material = overrider[userData[item]];
-            if (material !== undefined) return true;
-        }
-
-        // 场景半透明不能pick
-        if (_overriderByScene) return false;
-
-        return true;
-    };
-
     // 切换材质
     this.getOverridedMaterial = function (object) {
 
@@ -7473,6 +8441,11 @@ CLOUD.Filter = function () {
             return _overridedMaterials.scene;
         }
 
+        //隔离
+        if (_isolateSet && !_isolateSet[id]) {
+            return _overridedMaterials.scene;
+        }
+
         // 选中
         if (_selectionSet && _selectionSet[id] !== undefined) {
             return _overridedMaterials.selection;
@@ -7481,29 +8454,34 @@ CLOUD.Filter = function () {
         // 是否在ID集合材质过滤器中
         for (var item in _overriderByIds) {
             var overrider = _overriderByIds[item];
-            if (overrider.ids[id]) return _overridedMaterials[overrider.material];
+            if (overrider.ids[id])
+                return _overridedMaterials[overrider.material];
         }
 
         var userData = object.userData;
-        if (!userData) return null;
+        if (!userData)
+            return null;
 
         // 自定义材质过滤器
         for (var item in _overriderByData) {
             var overrider = _overriderByData[item];
             var materialName = overrider[userData[item]];
             var material = _overridedMaterials[materialName];
-            if (material !== undefined) return material;
+            if (material !== undefined)
+                return material;
         }
 
         if (_overriderCondition) {
-            var matchCondition = function matchCondition(condition) {
+
+            function matchCondition(condition) {
 
                 for (var item in condition) {
-                    if (condition[item] != userData[item]) return false;
+                    if (condition[item] != userData[item])
+                        return false;
                 }
 
                 return true;
-            };
+            }
 
             for (var ii = 0, len = _overriderCondition.length; ii < len; ++ii) {
                 var item = _overriderCondition[ii];
@@ -7511,34 +8489,32 @@ CLOUD.Filter = function () {
                     return _overridedMaterials[item.material];
                 }
             }
+
         }
 
-        //隔离
-        if (_overriderByScene != EnumIsolateState.SOS_Disabled) {
+        if (_isolateCondition) {
 
-            if (_isolateCondition) {
-                var matchIsoCondition = function matchIsoCondition(condition) {
+            function matchIsoCondition(condition) {
 
-                    for (var item in condition) {
-                        if (condition[item] != userData[item]) return false;
-                    }
+                for (var item in condition) {
+                    if (condition[item] != userData[item])
+                        return false;
+                }
 
-                    return true;
-                };
+                return true;
+            }
 
-                for (var ii = 0, len = _isolateCondition.length; ii < len; ++ii) {
-                    var item = _isolateCondition[ii];
-                    if (matchIsoCondition(item)) {
-                        return null;
-                    }
+            for (var ii = 0, len = _isolateCondition.length; ii < len; ++ii) {
+                var item = _isolateCondition[ii];
+                if (matchIsoCondition(item)) {
+                    return null;
                 }
             }
+        }
 
-            if (_isolateSet && _isolateSet[id]) {
-                return null;
-            }
-
-            return _overriderByScene == EnumIsolateState.SOS_Transparent ? _overridedMaterials.scene : undefined;
+        // 场景材质
+        if (_overriderByScene) {
+            return _overridedMaterials.scene;
         }
 
         return null;
@@ -7561,14 +8537,99 @@ CLOUD.Filter = function () {
 
     // ------------------- 隔离功能（隐藏／半透明）S ------------------- //
 
+    // 将选中构件ID集合加入到【隐藏 - 未选中构件】集合中  - 显示选中的构件
+    function pushToHideUnselectionSet() {
+
+        if (_selectionSet) {
+            _filter.visibleIds = {};
+            var ids = _filter.visibleIds;
+            for (var id in _selectionSet) {
+                ids[id] = _selectionSet[id];
+            }
+
+        }
+        else {
+            //_filter.visibleIds = null;
+        }
+
+
+    }
+
+    // 将选中构件ID集合加入到【隐藏 - 选中构件】集合中
+    // 存在需要连续对其他构件隐藏的需求，加入清理状态, 默认不清除之前的数据
+    function pushToHideSelectionSet(clear) {
+
+        if (_selectionSet) {
+            //_filter.invisibleIds = {};
+
+            if (clear) {
+                _filter.invisibleIds = {};
+            } else {
+                _filter.invisibleIds = _filter.invisibleIds || {}; // 连续对其他构件隐藏
+            }
+
+            var ids = _filter.invisibleIds;
+            for (var id in _selectionSet) {
+                ids[id] = _selectionSet[id];
+            }
+
+        }
+        else {
+            _filter.invisibleIds = null;
+        }
+
+    }
+
+
+    // 将选中构件ID集合加入到【半透明 - 未选中构件】集合中
+    function pushToTranslucentUnselectionSet() {
+
+        if (_selectionSet) {
+            _isolateSet = {};
+
+            for (var id in _selectionSet) {
+                _isolateSet [id] = _selectionSet[id];
+            }
+
+        }
+        else {
+            //_isolateSet  = null;
+        }
+
+    }
+
+    // 将选中构件ID集合加入到【半透明 - 选中构件】集合中
+    // 存在连续对其他构件半透明的需求，加入清理状态, 默认不清除之前的数据
+    function pushToTranslucentSelectionSet(clear) {
+
+        if (_selectionSet) {
+            //_frozenSet = {};
+
+            if (clear) {
+                _frozenSet = {};
+            } else {
+                _frozenSet = _frozenSet || {}; // 连续对其他构件半透明
+            }
+
+            for (var id in _selectionSet) {
+                _frozenSet[id] = _selectionSet[id];
+            }
+
+        }
+        else {
+            _frozenSet = null;
+        }
+
+    }
+
     // 未选中的构件隐藏设置
     this.setHideUnselected = function (enabled) {
 
-        console.warn("obsolete: use setIsolateByUserIds instead!");
         // 如果上一次隐藏了选中构造
         if (enabled) {
             pushToHideUnselectionSet();
         }
+
     };
 
     // 是否隐藏未选中的构件
@@ -7578,7 +8639,7 @@ CLOUD.Filter = function () {
 
     // 选中构件隐藏设置
     this.setHideSelected = function (enabled, clear) {
-        console.warn("obsolete: use hideByUserIds instead!");
+
         if (enabled) {
 
             pushToHideSelectionSet(clear);
@@ -7588,28 +8649,28 @@ CLOUD.Filter = function () {
     // 已选构件半透明状态设置
     this.setTranslucentSelected = function (enabled, clear) {
 
-        console.warn("obsolete: use addDemolishIds instead!");
         if (enabled) {
 
             pushToTranslucentSelectionSet(clear);
         }
+
     };
 
     // 未选构件半透明状态设置
     this.setTranslucentUnselected = function (enabled) {
-        console.warn("obsolete: use setIsolateByUserIds instead!");
+
         if (enabled) {
 
             pushToTranslucentUnselectionSet();
         }
+
     };
 
     // 取消所有半透明
     this.cancelTranslucentAll = function () {
 
-        console.warn("obsolete: use setIsolateByUserIds instead!");
         // 全场景半透明
-        _overriderByScene = EnumIsolateState.SOS_Disabled;
+        _overriderByScene = false;
 
         _frozenSet = null;
 
@@ -7625,7 +8686,7 @@ CLOUD.Filter = function () {
         _filter = {};
 
         _isolateSet = null;
-        _overriderByScene = EnumIsolateState.SOS_Disabled;
+        _overriderByScene = false;
     };
 
     // 是否处于隔离状态
@@ -7637,23 +8698,708 @@ CLOUD.Filter = function () {
 
     // ------------------- 隔离功能（隐藏／半透明）E ------------------- //
 };
+/**
+* The object to be held within the Object Pool.
+*/
+CLOUD.MeshEx = function () {
 
-CLOUD.Camera = function (width, height, fov, near, far, orthoNear, orthoFar) {
+    THREE.Mesh.call(this);
 
-    THREE.CombinedCamera.call(this, width, height, fov, near, far, orthoNear, orthoFar);
+    this.type = 'MeshEx';
+    this.matrixAutoUpdate = false; // disable auto update
+    this.visible = false; // 使用这个状态标志，对于过滤是否有影响？
+
+    this.geometry = CLOUD.GeomUtil.EmptyGeometry;
+    this.material = CLOUD.MaterialUtil.DefaultMaterial;
+
+};
+
+CLOUD.MeshEx.prototype = Object.create(THREE.Mesh.prototype);
+CLOUD.MeshEx.prototype.constructor = CLOUD.MeshEx;
+
+/**
+ * Sets an object not in use to default values
+ */
+CLOUD.MeshEx.prototype.init = function (parameters) {
+
+    if (parameters && parameters.parent) {
+
+        parameters.parent.add(this);
+
+    }
+
+};
+
+/**
+ * Spawn an object
+ */
+CLOUD.MeshEx.prototype.spawn = function (parameters) {
+
+    // if (parameters.meshId !== undefined) {
+    //     this.name = parameters.meshId;
+    // }
+
+    if (parameters.userId !== undefined) {
+        this.name = parameters.userId;
+    } else if (parameters.nodeId !== undefined) {
+        this.name = parameters.nodeId;
+    }
+
+    if (parameters.geometry) {
+        this.geometry = parameters.geometry;
+    }
+
+    if (parameters.material) {
+        this.material = parameters.material;
+    }
+
+    if (parameters.matrix) {
+        this.matrix.copy(parameters.matrix);
+        this.updateMatrixWorld(true);//  this.matrixAutoUpdate = false;需要强制更新
+    }
+
+    this.visible = true;
+
+    // 适配Three.js
+    this.frustumCulled = false;
+    this.material.visible = true;
+};
+
+/**
+ * Resets the object values to default
+ */
+CLOUD.MeshEx.prototype.clear = function () {
+
+    this.geometry = CLOUD.GeomUtil.EmptyGeometry;
+    this.material = CLOUD.MaterialUtil.DefaultMaterial;
+    this.visible = false;
+
+    // 适配Three.js
+    this.frustumCulled = true;
+    this.material.visible = false;
+};
+
+
+/**
+ * Custom Pool object. Holds objects to be managed to prevent
+ * garbage collection.
+ */
+CLOUD.ObjectPool = function (classType, size) {
+
+    this.cls = classType;
+    this.size = size || 1000;// Max objects allowed in the pool
+    this._pool = [];
+    this.counter = 0;
+};
+
+/**
+ * Populates the pool array with objects
+ */
+CLOUD.ObjectPool.prototype.init = function (parameters) {
+
+    for (var i = 0; i < this.size; i++) {
+
+        // Initialize the objects
+        var obj = new this.cls();
+        obj.init(parameters);
+        this._pool[i] = obj;
+
+    }
+};
+
+CLOUD.ObjectPool.prototype.resize = function (size, parameters) {
+
+    this.size = size || 1000;
+    this.collect();
+    this.init(parameters);
+};
+
+/**
+ * Grabs the last item in the list and initializes it and
+ * pushes it to the front of the array.
+ */
+CLOUD.ObjectPool.prototype.get = function (parameters) {
+
+    if (this.counter >= this.size) {
+
+        // console.log("the pool is full");
+
+    } else {
+
+        this._pool[this.counter].spawn(parameters);
+
+        return this._pool[this.counter++];
+    }
+
+    return null;
+};
+
+CLOUD.ObjectPool.prototype.clear = function () {
+
+    for (var i = 0; i < this.size; i++) {
+
+        this._pool[i].clear();
+    }
+
+    this.counter = 0;
+
+};
+
+/**
+ * Allow collection of all objects in the pool
+ */
+CLOUD.ObjectPool.prototype.collect = function() {
+
+    // just forget the list and let the garbage collector reap them
+    this._pool = []; // fresh and new
+    this.counter = 0;
+
+};
+
+
+
+var CloudTouch	= CloudTouch || {};
+
+(function() {
+    var INPUT_START = 1;
+    var INPUT_MOVE = 2;
+    var INPUT_END = 4;
+    var INPUT_CANCEL = 8;
+
+    var TOUCH_INPUT_MAP = {
+        touchstart: INPUT_START,
+        touchmove: INPUT_MOVE,
+        touchend: INPUT_END,
+        touchcancel: INPUT_CANCEL
+    };
+
+    var INPUT_TYPE_TOUCH = 'touch';
+
+    var DIRECTION_NONE = 1;
+    var DIRECTION_LEFT = 2;
+    var DIRECTION_RIGHT = 4;
+    var DIRECTION_UP = 8;
+    var DIRECTION_DOWN = 16;
+
+    var DIRECTION_HORIZONTAL = DIRECTION_LEFT | DIRECTION_RIGHT;
+    var DIRECTION_VERTICAL = DIRECTION_UP | DIRECTION_DOWN;
+    var DIRECTION_ALL = DIRECTION_HORIZONTAL | DIRECTION_VERTICAL;
+
+    var PROPS_XY = ['x', 'y'];
+    var PROPS_CLIENT_XY = ['clientX', 'clientY'];
+
+    // 处理touch事件
+    var touchsHandler = function(manage, event) {
+        var manage_scope = manage;
+        var input = {
+            pointers: event.touches,
+            changedPointers: event.changedTouches,
+            pointerType: INPUT_TYPE_TOUCH,
+            srcEvent: event
+        };
+
+        var pointersLen = event.touches.length;
+        var changedPointersLen = event.changedTouches.length;
+        var eventType = TOUCH_INPUT_MAP[event.type];
+        var isFirst = (eventType & INPUT_START && (pointersLen - changedPointersLen === 0));
+        var isFinal = (eventType & (INPUT_END | INPUT_CANCEL) && (pointersLen - changedPointersLen === 0));
+
+        input.isFirst = !!isFirst;
+        input.isFinal = !!isFinal;
+
+        if (isFirst) {
+            manage_scope.session = {};
+        }
+
+        input.eventType = eventType;
+
+        computeTouchData(manage_scope, input);
+
+        manage_scope.session.prevInput = input;
+    };
+
+    // 复制touch数据
+    var simpleCloneTouchData = function(input) {
+        var pointers = [];
+        var i = 0;
+        while (i < input.pointers.length) {
+            pointers[i] = {
+                clientX: Math.round(input.pointers[i].clientX),
+                clientY: Math.round(input.pointers[i].clientY)
+            };
+            i++;
+        }
+
+        return {
+            timeStamp: Date.now(),
+            pointers: pointers,
+            center: getCenter(pointers),
+            deltaX: input.deltaX || 0,
+            deltaY: input.deltaY || 0
+        };
+    }
+
+    // 得到所有点的中心点
+    var getCenter = function(pointers) {
+        var pointersLength = pointers.length;
+
+        // no need to loop when only one touch
+        if (pointersLength === 1) {
+            return {
+                x: Math.round(pointers[0].clientX),
+                y: Math.round(pointers[0].clientY)
+            };
+        }
+
+        var x = 0, y = 0, i = 0;
+        while (i < pointersLength) {
+            x += pointers[i].clientX;
+            y += pointers[i].clientY;
+            i++;
+        }
+
+        return {
+            x: Math.round(x / pointersLength),
+            y: Math.round(y / pointersLength)
+        };
+    }
+
+    // 计算并缓存touch数据
+    var computeTouchData = function(manager, input) {
+        var session = manager.session;
+        var pointers = input.pointers;
+        var pointersLength = pointers.length;
+
+        // store the first input to calculate the distance and direction
+        if (!session.firstInput) {
+            session.firstInput = simpleCloneTouchData(input);
+        }
+
+        // to compute scale and rotation we need to store the multiple touches
+        if (pointersLength > 1 && !session.firstMultiple) {
+            session.firstMultiple = simpleCloneTouchData(input);
+        } else if (pointersLength === 1) {
+            session.firstMultiple = false;
+        }
+
+        var firstInput = session.firstInput;
+        var firstMultiple = session.firstMultiple;
+        var offsetCenter = firstMultiple ? firstMultiple.center : firstInput.center;
+
+        var center = input.center = getCenter(pointers);
+        input.timeStamp = Date.now();
+        input.deltaTime = input.timeStamp - firstInput.timeStamp;
+
+        input.angle = getAngle(offsetCenter, center);
+        input.distance = getDistance(offsetCenter, center);
+
+        input.scale = firstMultiple ? getScale(firstMultiple.pointers, pointers) : 1;
+        input.rotation = firstMultiple ? getRotation(firstMultiple.pointers, pointers) : 0;
+
+        // 计算偏移量
+        computeDeltaXY(session, input);
+        input.offsetDirection = getDirection(input.deltaX, input.deltaY);
+
+        input.maxPointers = !session.prevInput ? input.pointers.length : ((input.pointers.length > session.prevInput.maxPointers) ? input.pointers.length : session.prevInput.maxPointers);
+    }
+
+    // 计算输入数据的偏移量
+    var computeDeltaXY = function(session, input) {
+        var center = input.center;
+        var offset = session.offsetDelta || {};
+        var prevDelta = session.prevDelta || {};
+        var prevInput = session.prevInput || {};
+
+        if (input.eventType === INPUT_START || prevInput.eventType === INPUT_END) {
+            prevDelta = session.prevDelta = {
+                x: prevInput.deltaX || 0,
+                y: prevInput.deltaY || 0
+            };
+
+            offset = session.offsetDelta = {
+                x: center.x,
+                y: center.y
+            };
+        }
+
+        // 相对第一个点的偏移量
+        input.deltaX = prevDelta.x + (center.x - offset.x);
+        input.deltaY = prevDelta.y + (center.y - offset.y);
+
+        if (input.eventType === INPUT_START) {
+            // 相对前一个点的偏移量
+            input.relativeDeltaX = 0;
+            input.relativeDeltaY = 0;
+            // 相对前一个点的旋转量
+            input.relativeRotation = 0;
+            // 相对前一个点的缩放量
+            input.relativeScale = 1;
+            // 相对前一个点的角度变化量
+            input.deltaAngle = 0;
+        } else {
+            // 相对前一个点的偏移量
+            input.relativeDeltaX = center.x - prevInput.center.x
+            input.relativeDeltaY = center.y - prevInput.center.y;
+            // 相对前一个点的旋转量
+            input.relativeRotation = input.rotation - prevInput.rotation;
+            // 相对前一个点的缩放量
+            input.relativeScale = input.scale / prevInput.scale;
+            // 相对前一个点的角度变化量
+            input.deltaAngle = input.angle - prevInput.angle;
+        }
+
+    }
+
+    // 获得点的方向
+    var getDirection = function(x, y) {
+        if (x === y) {
+            return DIRECTION_NONE;
+        }
+
+        if (Math.abs(x) >= Math.abs(y)) {
+            return x < 0 ? DIRECTION_LEFT : DIRECTION_RIGHT;
+        }
+
+        return y < 0 ? DIRECTION_UP : DIRECTION_DOWN;
+    }
+
+    // 计算两个点的距离
+    var getDistance = function(p1, p2, props) {
+        if (!props) {
+            props = PROPS_XY;
+        }
+        var x = p2[props[0]] - p1[props[0]],
+            y = p2[props[1]] - p1[props[1]];
+
+        return Math.sqrt((x * x) + (y * y));
+    }
+
+    // 计算两个点的角度
+    var getAngle = function(p1, p2, props) {
+        if (!props) {
+            props = PROPS_XY;
+        }
+        var x = p2[props[0]] - p1[props[0]],
+            y = p2[props[1]] - p1[props[1]];
+        return Math.atan2(y, x);
+    }
+
+    // 计算两个点集的旋转角度
+    var getRotation = function(start, end) {
+        return getAngle(end[1], end[0], PROPS_CLIENT_XY) + getAngle(start[1], start[0], PROPS_CLIENT_XY);
+    }
+
+    // 计算两个点集的缩放系数
+    var getScale =function(start, end) {
+        return getDistance(end[0], end[1], PROPS_CLIENT_XY) / getDistance(start[0], start[1], PROPS_CLIENT_XY);
+    }
+
+    // export it
+    CloudTouch.proxy = {
+        INPUT_START: INPUT_START,
+        INPUT_MOVE: INPUT_MOVE,
+        INPUT_END: INPUT_END,
+        INPUT_CANCEL: INPUT_CANCEL,
+        DIRECTION_NONE: DIRECTION_NONE,
+        DIRECTION_LEFT: DIRECTION_LEFT,
+        DIRECTION_RIGHT: DIRECTION_RIGHT,
+        DIRECTION_UP: DIRECTION_UP,
+        DIRECTION_DOWN: DIRECTION_DOWN,
+        DIRECTION_HORIZONTAL: DIRECTION_HORIZONTAL,
+        DIRECTION_VERTICAL: DIRECTION_VERTICAL,
+        DIRECTION_ALL: DIRECTION_ALL,
+        touchsHandler	: touchsHandler
+    };
+})();
+CLOUD.Object3D = function () {
+
+    Object.defineProperty(this, 'id', {value: THREE.Object3DIdCount++});
+
+    this.name = '';
+    this.type = 'Object3D';
+
+    this.parent = null;
+
+    this.channels = new THREE.Channels();
+    this.children = [];
+
+    var position = new THREE.Vector3();
+    var rotation = new THREE.Euler();
+    var quaternion = new THREE.Quaternion();
+    var scale = new THREE.Vector3(1, 1, 1);
+
+    function onRotationChange() {
+        quaternion.setFromEuler(rotation, false);
+    }
+
+    function onQuaternionChange() {
+        rotation.setFromQuaternion(quaternion, undefined, false);
+    }
+
+    rotation.onChange(onRotationChange);
+    quaternion.onChange(onQuaternionChange);
+
+    Object.defineProperties(this, {
+        position: {
+            enumerable: true,
+            value: position
+        },
+        rotation: {
+            enumerable: true,
+            value: rotation
+        },
+        quaternion: {
+            enumerable: true,
+            value: quaternion
+        },
+        scale: {
+            enumerable: true,
+            value: scale
+        },
+        modelViewMatrix: {
+            value: new THREE.Matrix4()
+        },
+        normalMatrix: {
+            value: new THREE.Matrix3()
+        }
+    });
+
+    this.matrix = new THREE.Matrix4();
+    this.matrixWorld = new THREE.Matrix4();
+    this.matrixWorldNeedsUpdate = true;
+
+    this.visible = true;
+
+    this.renderOrder = 0;
+};
+
+
+CLOUD.Object3D.prototype = {
+
+    constructor: CLOUD.Object3D,
+
+    applyMatrix: function (matrix) {
+        this.matrix.multiplyMatrices(matrix, this.matrix);
+    },
+
+    localToWorld: function (vector) {
+        return vector.applyMatrix4(this.matrixWorld);
+    },
+
+    worldToLocal: function () {
+        var m1 = new THREE.Matrix4();
+
+        return function (vector) {
+            return vector.applyMatrix4(m1.getInverse(this.matrixWorld));
+        };
+
+    }(),
+
+    getWorldPosition: function (optionalTarget) {
+        var result = optionalTarget || new THREE.Vector3();
+        return result.setFromMatrixPosition(this.matrixWorld);
+    },
+
+    raycast: function () {
+    },
+
+    traverse: function (callback) {
+        callback(this);
+    },
+
+    traverseVisible: function (callback) {
+
+        if (this.visible === false) return;
+
+        callback(this);
+
+    },
+
+    traverseAncestors: function (callback) {
+        var parent = this.parent;
+
+        if (parent !== null) {
+            callback(parent);
+            parent.traverseAncestors(callback);
+        }
+
+    },
+
+    updateMatrix: function () {
+        this.matrix.compose(this.position, this.quaternion, this.scale);
+        this.matrixWorldNeedsUpdate = true;
+    },
+
+    updateMatrixWorld: function (force) {
+
+        if (this.matrixWorldNeedsUpdate === true || force) {
+
+            if (this.parent === null) {
+                this.matrixWorld.copy(this.matrix);
+            } else {
+                this.matrixWorld.multiplyMatrices(this.parent.matrixWorld, this.matrix);
+            }
+
+            this.matrixWorldNeedsUpdate = false;
+            force = true;
+        }
+
+        // update children
+        if (this.children) {
+
+            for (var i = 0, len = this.children.length; i < len; i++) {
+                this.children[i].updateMatrixWorld(force);
+            }
+        }
+
+    }
+};
+
+THREE.EventDispatcher.prototype.apply(CLOUD.Object3D.prototype);
+
+
+CLOUD.Group = function () {
+    "use strict";
+
+    CLOUD.Object3D.call(this);
+
+    this.type = 'Group';
+
+    this.children = [];
+
+    this.boundingBox = null;
+
+};
+
+CLOUD.Group.prototype = Object.create(CLOUD.Object3D.prototype);
+CLOUD.Group.prototype.constructor = CLOUD.Group;
+
+CLOUD.Group.prototype.raycast = (function () {
+
+    var inverseMatrix = new THREE.Matrix4();
+    var ray = new THREE.Ray();
+
+    return function (raycaster, intersects) {
+
+        var boundingBox = this.boundingBox;
+
+        // Check boundingBox before continuing
+        inverseMatrix.getInverse(this.matrixWorld);
+        ray.copy(raycaster.ray).applyMatrix4(inverseMatrix);
+
+        if (boundingBox !== null) {
+            if (ray.isIntersectionBox(boundingBox) === false) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+}());
+
+
+CLOUD.Group.prototype.add = function (object) {
+
+    if (arguments.length > 1) {
+
+        for (var i = 0; i < arguments.length; i++) {
+            this.add(arguments[i]);
+        }
+
+        return this;
+
+    }
+
+    if (object === this) {
+        console.error("CLOUD.Object3D.add: object can't be added as a child of itself.", object);
+        return this;
+
+    }
+
+    if (object instanceof CLOUD.Object3D || object instanceof THREE.Object3D) {
+
+        if (object.parent !== null) {
+            object.parent.remove(object);
+        }
+
+        object.parent = this;
+        object.dispatchEvent({ type: 'added' });
+
+        this.children.push(object);
+
+    } else {
+        console.error("CLOUD.Object3D.add: object not an instance of Object3D.", object);
+    }
+
+    return this;
+
+};
+
+CLOUD.Group.prototype.remove = function (object) {
+
+    if (arguments.length > 1) {
+
+        for (var i = 0; i < arguments.length; i++) {
+            this.remove(arguments[i]);
+        }
+
+    }
+
+    var index = this.children.indexOf(object);
+
+    if (index !== -1) {
+        object.parent = null;
+        object.dispatchEvent({ type: 'removed' });
+        this.children.splice(index, 1);
+    }
+
+};
+
+
+CLOUD.Group.prototype.traverseVisible = function (callback) {
+
+    if (this.visible === false) return;
+
+    callback(this);
+
+    var children = this.children;
+
+    for (var i = 0, l = children.length; i < l; i++) {
+        children[i].traverseVisible(callback);
+    }
+};
+
+CLOUD.Group.prototype.traverse = function (callback) {
+
+    callback(this);
+
+    var children = this.children;
+
+    for (var i = 0, l = children.length; i < l; i++) {
+        children[i].traverse(callback);
+    }
+
+};
+
+CLOUD.Camera = function (width, height, fov, near, far) {
+
+    THREE.CombinedCamera.call(this, width, height, fov, near, far);
 
     this.realUp = this.up.clone(); //
+    this.target = new THREE.Vector3();
 
     this.positionPlane = new THREE.Plane();
     this.projScreenMatrix = new THREE.Matrix4();
     this.viewProjInverse = new THREE.Matrix4();
+
 };
 
 CLOUD.Camera.prototype = Object.create(THREE.CombinedCamera.prototype);
 CLOUD.Camera.prototype.constructor = CLOUD.Camera;
 
 CLOUD.Camera.prototype.updateMVP = function () {
-    if (this.parent === null) this.updateMatrixWorld();
+    if (this.parent === null)
+        this.updateMatrixWorld();
 
     this.matrixWorldInverse.getInverse(this.matrixWorld);
     this.updatePositionPlane();
@@ -7665,7 +9411,8 @@ CLOUD.Camera.prototype.updateMVP = function () {
 CLOUD.Camera.prototype.LookAt = function (target, dir, up, focal) {
     var offset = new THREE.Vector3();
     offset.copy(dir);
-    if (focal !== undefined) offset.setLength(focal);
+    if (focal !== undefined)
+        offset.setLength(focal);
     this.position.subVectors(target, offset);
     this.up = up;
     this.lookAt(target);
@@ -7673,9 +9420,10 @@ CLOUD.Camera.prototype.LookAt = function (target, dir, up, focal) {
     this.target = target.clone();
 };
 
-CLOUD.Camera.prototype.updatePositionPlane = function () {
+CLOUD.Camera.prototype.updatePositionPlane = function(){
 
     this.positionPlane.setFromNormalAndCoplanarPoint(this.getWorldDirection(), this.position);
+
 };
 // 用THREE.Camera.getWorldDirection替换
 //CLOUD.Camera.prototype.LookDir = function () {
@@ -7702,7 +9450,7 @@ CLOUD.Camera.prototype.setStandardView = function (stdView, bbox) {
             var position = new THREE.Vector3(-CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
             //target = new THREE.Vector3();
             var dir = new THREE.Vector3();
-            dir.subVectors(target, position);
+            dir.subVectors(target, position);           
             this.LookAt(target, dir, THREE.Object3D.DefaultUp);
             break;
         case CLOUD.EnumStandardView.Top:
@@ -7897,7 +9645,7 @@ CLOUD.Camera.prototype.zoomToBBox = function (bound, margin, ratio, direction) {
 
     var bbox = new THREE.Box3();
     bbox.copy(bound);
-
+    
     bbox.expandByScalar(bound.size().length() * margin);
 
     var dir = direction ? direction : this.getWorldDirection();
@@ -7937,7 +9685,16 @@ CLOUD.Camera.prototype.zoomToBBox = function (bound, margin, ratio, direction) {
     var maxWidth = 0;
     var maxDistForWidth = 0;
 
-    var corners = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
+    var corners = [
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3()
+    ];
 
     corners[0].set(bbox.min.x, bbox.min.y, bbox.min.z); // 000
     corners[1].set(bbox.min.x, bbox.min.y, bbox.max.z); // 001
@@ -7946,7 +9703,7 @@ CLOUD.Camera.prototype.zoomToBBox = function (bound, margin, ratio, direction) {
     corners[4].set(bbox.max.x, bbox.min.y, bbox.min.z); // 100
     corners[5].set(bbox.max.x, bbox.min.y, bbox.max.z); // 101
     corners[6].set(bbox.max.x, bbox.max.y, bbox.min.z); // 110
-    corners[7].set(bbox.max.x, bbox.max.y, bbox.max.z); // 111
+    corners[7].set(bbox.max.x, bbox.max.y, bbox.max.z);  // 111
 
     for (var i = 0; i < 8; i++) {
         var v = new THREE.Vector3();
@@ -7980,6 +9737,7 @@ CLOUD.Camera.prototype.zoomToBBox = function (bound, margin, ratio, direction) {
     offset.copy(dir).normalize().setLength(cameraDist);
     position.subVectors(center, offset);
 
+
     // ---------- 计算新位置 E ----------------- //
 
     this.position.copy(position);
@@ -7995,7 +9753,8 @@ CLOUD.Camera.prototype.computeRay = function (cx, cy, domElement) {
     if (domElement === undefined) {
         viewportDim.x = window.innerWidth;
         viewportDim.y = window.innerHeight;
-    } else {
+    }
+    else {
         var element = domElement === document ? domElement.body : domElement;
 
         // clientWidth: 是对象可见的宽度，不包含滚动条等边线，会随窗口的显示大小改变。
@@ -8011,14 +9770,15 @@ CLOUD.Camera.prototype.computeRay = function (cx, cy, domElement) {
     var viewPos = new THREE.Vector2();
 
     // 注意这里传入的cx, cy是相对视口的值（即已做过偏移）
-    viewPos.x = cx / viewportDim.x * 2 - 1;
+    viewPos.x = (cx / viewportDim.x) * 2 - 1;
     viewPos.y = -(cy / viewportDim.y) * 2 + 1;
 
     var ray = new THREE.Ray();
-    if (this.inPerspectiveMode) {
+    if (this.isPerspective) {
         ray.origin.copy(this.position);
         ray.direction.set(viewPos.x, viewPos.y, 0.5).unproject(this).sub(this.position).normalize();
-    } else {
+    }
+    else {
         ray.origin.set(viewPos.x, viewPos.y, -1).unproject(this);
         ray.direction.set(0, 0, -1).transformDirection(this.matrixWorld);
     }
@@ -8027,444 +9787,53 @@ CLOUD.Camera.prototype.computeRay = function (cx, cy, domElement) {
 };
 
 CLOUD.Camera.prototype.screenToWorld = function (cx, cy, domElement, target) {
-    var ray = this.computeRay(cx, cy, domElement);
 
+    var ray = this.computeRay(cx, cy, domElement);
     // plane on target
     var dir = this.getWorldDirection().normalize();
+
     var plane = new THREE.Plane(dir);
     plane.setFromNormalAndCoplanarPoint(dir, target);
 
     return ray.intersectPlane(plane, target);
 };
 
-CLOUD.Client = function (modelManager, serverUrl, databagId) {
-    "use strict";
-    //this.serverUrl = "http://172.16.244.67:9980/project/";
+CLOUD.Camera.prototype.clone = function () {
 
-    this.serverUrl = serverUrl;
-    this.databagId = databagId;
+    var camera = new CLOUD.Camera(this.right * 2.0, this.top * 2.0, this.fov, this.near, this.far);
 
-    this.cache = {
-        geometries: {},
-        face_materials: {},
-        materials: {},
-        textures: {},
-        instancedMaterials: {}
-    };
+    camera.position.copy(this.position);
+    camera.up.copy(this.up);
 
-    this.index = null;
+    if (this.realUp)
+        camera.realUp.copy(this.realUp);
 
-    this.meshIds = {}; // dict for meshId -> mkpId
+    if( this.target )
+        camera.target.copy(this.target);
 
-    this.mkpIndex = null; // mpk index from file: mpk/index
+    camera.aspect = this.aspect;
+    camera.fov = this.fov;
+    camera.near = this.near;
+    camera.far = this.far;
 
-    this.symbolIndex = null; // symbol index from file: symbol/index
+    camera.left = this.left;
+    camera.right = this.right;
+    camera.top = this.top;
+    camera.bottom = this.bottom;
 
-    var defaultMaterial = new THREE.MeshPhongMaterial();
-    defaultMaterial.side = THREE.DoubleSide;
-    this.defaultMaterial = defaultMaterial;
+    camera.zoom = this.zoom;
+    camera.isPerspective = this.isPerspective;
 
-    this.geomCacheVer = 0;
+    this.updateProjectionMatrix();
 
-    this.modelManager = modelManager;
-    this.taskManager = new CLOUD.TaskManager(modelManager);
+    return camera;
 };
-
-CLOUD.Client.prototype = {
-    constructor: CLOUD.Client,
-
-    destroy: function destroy() {
-
-        this.cache = {
-            geometries: {},
-            face_materials: {},
-            materials: {},
-            textures: {},
-            instancedMaterials: {}
-        };
-
-        this.meshIds = {};
-        this.mkpIndex = null;
-        this.symbolIndex = null;
-    },
-
-    projectUrl: function projectUrl() {
-        return this.serverUrl + this.databagId + "/index.json";
-    },
-
-    sceneUrl: function sceneUrl(sceneId) {
-        return this.serverUrl + this.databagId + "/scene/" + sceneId + CLOUD.GlobalData.ZipResourcePostfix;
-    },
-
-    mpkIndexUrl: function mpkIndexUrl() {
-        return this.serverUrl + this.databagId + "/mpk/index" + CLOUD.GlobalData.ZipResourcePostfix;
-    },
-
-    symbolIndexUrl: function symbolIndexUrl() {
-        return this.serverUrl + this.databagId + "/symbol/index" + CLOUD.GlobalData.ZipResourcePostfix;
-    },
-
-    mpkUrl: function mpkUrl(mpkId) {
-        return this.serverUrl + this.databagId + "/mpk/" + mpkId + CLOUD.GlobalData.ZipResourcePostfix;
-    },
-
-    submeshUrl: function submeshUrl(geometryId) {
-        return this.serverUrl + this.databagId + "/midx/" + geometryId + CLOUD.GlobalData.ZipResourcePostfix;
-    },
-
-    materialUrl: function materialUrl(materialId) {
-        return this.serverUrl + this.databagId + "/material/" + materialId + CLOUD.GlobalData.ZipResourcePostfix;
-    },
-
-    textureUrl: function textureUrl(textureId) {
-        return this.serverUrl + this.databagId + "/texture/" + textureId;
-    },
-
-    purgeUnusedResource: function purgeUnusedResource() {
-        //if (this.geomCacheVer < 1)
-        //    return;
-        //this.geomCacheVer = 0;
-
-        //var geometries = this.cache.geometries;
-        //for (var meshId in geometries) {
-        //    var geometry = geometries[meshId];
-        //    if (geometry && geometry.refCount === 0) {
-
-        //        geometry.dispose();
-
-        //        //var mpkId = this.meshIds[meshId];
-        //        //var mpkIdx = this.mkpIndex.items[mpkId]
-        //        //mpkIdx.status = CLOUD.MPKSTATUS.UNKONW;
-        //        //geometries[meshId] = null;
-
-        //       // console.log("Release geometry: " + meshId);
-        //    }
-        //}
-    },
-
-    findMaterial: function findMaterial(materialId, isInstanced) {
-
-        var resource = this.cache;
-        var matObj = resource.materials[materialId];
-        if (!matObj) {
-            matObj = resource.defaultMaterial;
-            console.log("not found!" + materialId);
-        }
-
-        if (isInstanced) {
-
-            // 在InstancedMaterials中直接使用“复制源 Material" 的materialId值(存放在name属性中)
-            var material = resource.instancedMaterials[matObj.name];
-            if (material === undefined) {
-                material = CLOUD.MaterialUtil.createInstancePhongMaterial(matObj);
-            }
-            matObj = material;
-        }
-
-        return matObj;
-    },
-
-    findSymbol: function findSymbol(symbolId) {
-
-        return this.symbolIndex.items[symbolId];
-    },
-
-    loadSubScene: function loadSubScene(subSceneNode) {
-        var scope = this;
-
-        if (subSceneNode.children.length == 0) {
-
-            scope.taskManager.addSceneTask(subSceneNode);
-        } else {
-            scope.modelManager.subSceneLoader.update(subSceneNode);
-            subSceneNode.visible = true;
-        }
-    },
-
-    addDelayLoadMesh: function addDelayLoadMesh(mpkId, item) {
-
-        this.taskManager.addMpkTask(mpkId, item);
-    },
-
-    processMpkTasks: function processMpkTasks(onFinished) {
-        this.taskManager.processMpkTasks(this, onFinished);
-    },
-
-    processSceneTasks: function processSceneTasks(renderId, load) {
-        this.taskManager.processSceneTasks(this, renderId, load);
-    },
-
-    needGroupBySceneId: function needGroupBySceneId() {
-        var fileCount = this.index.statics.files;
-        if (fileCount === undefined) return false;
-
-        return fileCount > 1;
-    },
-
-    setTaskFinishedCallback: function setTaskFinishedCallback(callback) {
-        this.taskManager.onTaskFinished = callback;
-    }
-};
-
-CLOUD.Object3D = function () {
-
-    Object.defineProperty(this, 'id', { value: THREE.Object3DIdCount++ });
-
-    this.name = '';
-    this.type = 'Object3D';
-
-    this.parent = null;
-
-    Object.defineProperties(this, {
-
-        modelViewMatrix: {
-            value: new THREE.Matrix4()
-        },
-        normalMatrix: {
-            value: new THREE.Matrix3()
-        }
-    });
-
-    this.matrix = new THREE.Matrix4();
-    this.matrixWorld = new THREE.Matrix4();
-    this.matrixWorldNeedsUpdate = true;
-
-    this.visible = true;
-
-    this.renderOrder = 0;
-
-    //this.userData = null;
-};
-
-CLOUD.Object3D.prototype = {
-
-    constructor: CLOUD.Object3D,
-
-    applyMatrix: function applyMatrix(matrix) {
-
-        this.matrix.multiplyMatrices(matrix, this.matrix);
-    },
-
-    localToWorld: function localToWorld(vector) {
-
-        return vector.applyMatrix4(this.matrixWorld);
-    },
-
-    worldToLocal: function () {
-
-        var m1 = new THREE.Matrix4();
-
-        return function (vector) {
-
-            return vector.applyMatrix4(m1.getInverse(this.matrixWorld));
-        };
-    }(),
-
-    getWorldPosition: function getWorldPosition(optionalTarget) {
-
-        var result = optionalTarget || new THREE.Vector3();
-
-        return result.setFromMatrixPosition(this.matrixWorld);
-    },
-
-    raycast: function raycast() {},
-
-    traverse: function traverse(callback) {
-
-        callback(this);
-    },
-
-    traverseVisible: function traverseVisible(callback) {
-
-        if (this.visible === false) return;
-
-        callback(this);
-    },
-
-    traverseAncestors: function traverseAncestors(callback) {
-
-        var parent = this.parent;
-
-        if (parent !== null) {
-
-            callback(parent);
-
-            parent.traverseAncestors(callback);
-        }
-    },
-
-    updateMatrixWorld: function updateMatrixWorld(force) {
-
-        if (this.matrixWorldNeedsUpdate === true || force) {
-            if (this.parent === null) {
-
-                this.matrixWorld.copy(this.matrix);
-            } else {
-
-                this.matrixWorld.multiplyMatrices(this.parent.matrixWorld, this.matrix);
-            }
-            this.matrixWorldNeedsUpdate = false;
-            force = true;
-        }
-
-        // update children
-        if (this.children) {
-
-            for (var i = 0, l = this.children.length; i < l; i++) {
-
-                this.children[i].updateMatrixWorld(force);
-            }
-        }
-    }
-
-};
-
-THREE.EventDispatcher.prototype.apply(CLOUD.Object3D.prototype);
-
-CLOUD.Group = function () {
-    "use strict";
-
-    CLOUD.Object3D.call(this);
-
-    this.type = 'Group';
-
-    this.children = [];
-
-    this.boundingBox = null;
-};
-
-CLOUD.Group.prototype = Object.create(CLOUD.Object3D.prototype);
-CLOUD.Group.prototype.constructor = CLOUD.Group;
-
-CLOUD.Group.prototype.unload = function () {
-
-    var children = this.children;
-    for (var i = 0, l = children.length; i < l; i++) {
-        var child = children[i];
-        if (child.unload) child.unload();
-    }
-};
-
-//CLOUD.Group.prototype.load = function () {
-
-//    var children = this.children;
-//    for (var i = 0, l = children.length; i < l; i++) {
-//        var child = children[i];
-//        child.load();
-//    }
-//}
-
-
-CLOUD.Group.prototype.raycast = function () {
-    var inverseMatrix = new THREE.Matrix4();
-    var ray = new THREE.Ray();
-
-    return function (raycaster, intersects) {
-        var boundingBox = this.boundingBox;
-
-        // Check boundingBox before continuing
-        inverseMatrix.getInverse(this.matrixWorld);
-        ray.copy(raycaster.ray).applyMatrix4(inverseMatrix);
-
-        if (boundingBox !== null) {
-            if (ray.isIntersectionBox(boundingBox) === false) {
-                return false;
-            }
-        }
-
-        return true;
-    };
-}();
-
-CLOUD.Group.prototype.add = function (object) {
-
-    if (arguments.length > 1) {
-
-        for (var i = 0; i < arguments.length; i++) {
-
-            this.add(arguments[i]);
-        }
-
-        return this;
-    }
-
-    if (object === this) {
-
-        console.error("CLOUD.Object3D.add: object can't be added as a child of itself.", object);
-        return this;
-    }
-
-    if (object instanceof CLOUD.Object3D || object instanceof THREE.Object3D) {
-
-        if (object.parent !== null) {
-
-            object.parent.remove(object);
-        }
-
-        object.parent = this;
-        object.dispatchEvent({ type: 'added' });
-
-        this.children.push(object);
-    } else {
-
-        console.error("CLOUD.Object3D.add: object not an instance of Object3D.", object);
-    }
-
-    return this;
-};
-
-CLOUD.Group.prototype.remove = function (object) {
-
-    if (arguments.length > 1) {
-
-        for (var i = 0; i < arguments.length; i++) {
-
-            this.remove(arguments[i]);
-        }
-    }
-
-    var index = this.children.indexOf(object);
-
-    if (index !== -1) {
-
-        object.parent = null;
-
-        object.dispatchEvent({ type: 'removed' });
-
-        this.children.splice(index, 1);
-    }
-};
-
-CLOUD.Group.prototype.traverseVisible = function (callback) {
-
-    if (this.visible === false) return;
-
-    callback(this);
-
-    var children = this.children;
-
-    for (var i = 0, l = children.length; i < l; i++) {
-
-        children[i].traverseVisible(callback);
-    }
-};
-
-CLOUD.Group.prototype.traverse = function (callback) {
-
-    callback(this);
-
-    var children = this.children;
-
-    for (var i = 0, l = children.length; i < l; i++) {
-
-        children[i].traverse(callback);
-    }
-};
-
 CLOUD.Scene = function () {
+
     CLOUD.Group.call(this);
 
     this.type = 'Scene';
+    this.autoUpdate = false; // 不自动更新
 
     this.filter = new CLOUD.Filter();
     this.raycaster = new CLOUD.Raycaster();
@@ -8472,28 +9841,40 @@ CLOUD.Scene = function () {
 
     this.rootNode = new CLOUD.Group();
     this.rootNode.sceneRoot = true;
-
     this.add(this.rootNode);
 
     this.clipWidget = null;
-
     this.clipPlanes = null;
 
-    var len = CLOUD.GlobalData.SceneSize * 0.5;
     this.innerBoundingBox = new THREE.Box3();
 
-    this.autoUpdate = false;
+    // console.time("ObjectPool");
+    this.meshPool = new CLOUD.ObjectPool(CLOUD.MeshEx, CLOUD.GlobalData.maxObjectNumInPool);
+    this.meshPool.init({parent: this.rootNode});
+    // console.timeEnd("ObjectPool");
 
-    this.garbageCount = 0;
+    this.lightOffset = new THREE.Vector3(-1, -1, -1);
+    this.lightOffset.normalize();
+    this.lampHead = new THREE.DirectionalLight(0xB7B7CE, 0.8);
+    this.lampAssist = new THREE.DirectionalLight(0x333333, 0.8);
+    this.add(new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6));
+    this.add(this.lampHead);
+    this.add(this.lampAssist);
+
+    this.groupOctreeBox = new THREE.Group();
+    this.add(this.groupOctreeBox);
 };
 
 CLOUD.Scene.prototype = Object.create(CLOUD.Group.prototype);
 CLOUD.Scene.prototype.constructor = CLOUD.Scene;
 
 CLOUD.Scene.prototype.destroy = function () {
-
     this.clearAll();
-    this.innerBoundingBox = new THREE.Box3();
+};
+
+CLOUD.Scene.prototype.resizePool = function () {
+    this.rootNode.children = [];
+    this.meshPool.resize(CLOUD.GlobalData.maxObjectNumInPool, {parent: this.rootNode});
 };
 
 CLOUD.Scene.prototype.clearAll = function () {
@@ -8506,26 +9887,27 @@ CLOUD.Scene.prototype.clearAll = function () {
 
 CLOUD.Scene.prototype.worldBoundingBox = function () {
     var box = new THREE.Box3();
+
     return function () {
         box.copy(this.rootNode.boundingBox);
         box.applyMatrix4(this.rootNode.matrix);
         return box;
     };
+
 }();
 
 // 获得场景 root node 变换矩阵
-CLOUD.Scene.prototype.getRootNodeMatrix = function () {
+CLOUD.Scene.prototype.getMatrixOfRootNode = function () {
+    return this.rootNode.matrix;
+};
 
-    if (this.rootNode.matrix) {
-
-        return this.rootNode.matrix.clone();
-    }
-
-    return new THREE.Matrix4();
+// 获得场景 root node 变换矩阵
+CLOUD.Scene.prototype.getMatrixWorldOfRootNode = function () {
+    return this.rootNode.matrixWorld;
 };
 
 // 获得场景 root node 旋转角度(Euler)
-CLOUD.Scene.prototype.getRootNodeRotation = function () {
+CLOUD.Scene.prototype.getRotationOfRootNode = function () {
 
     if (this.rootNode.matrix) {
 
@@ -8533,7 +9915,7 @@ CLOUD.Scene.prototype.getRootNodeRotation = function () {
         rotMat.extractRotation(this.rootNode.matrix);
 
         var rotation = new THREE.Euler();
-        rotation.setFromRotationMatrix(rotMat);
+        rotation.setFromRotationMatrix( rotMat );
 
         return rotation;
     }
@@ -8542,7 +9924,7 @@ CLOUD.Scene.prototype.getRootNodeRotation = function () {
 };
 
 // 获得场景 root node 包围盒
-CLOUD.Scene.prototype.getRootNodeBoundingBox = function () {
+CLOUD.Scene.prototype.getBoundingBoxOfRootNode = function () {
 
     if (this.rootNode.boundingBox) {
         return this.rootNode.boundingBox;
@@ -8551,746 +9933,12 @@ CLOUD.Scene.prototype.getRootNodeBoundingBox = function () {
     return null;
 };
 
-CLOUD.Scene.prototype.hitTestClipPlane = function (ray, intersects) {
-    if (this.clipWidget && this.clipWidget.isEnabled()) {
-        var isBigEnough = function isBigEnough(element, index, array) {
-            return element.distance >= hit.distance;
-        };
-
-        var isSmallEnough = function isSmallEnough(element, index, array) {
-            return element.distance <= hit.distance;
-        };
-
-        var hit = this.clipWidget.hitTest(ray);
-        if (hit.distance == null) return intersects;
-
-        return intersects.filter(hit.sign ? isBigEnough : isSmallEnough);
-    }
-
-    return intersects;
-};
-
-CLOUD.Scene.prototype.hitTestClipPlanes = function (ray, intersects) {
-    if (this.clipPlanes && this.clipPlanes.isEnabled()) {
-        var isBigEnough = function isBigEnough(element, index, array) {
-            return element.distance >= hit.distance;
-        };
-
-        var isSmallEnough = function isSmallEnough(element, index, array) {
-            return element.distance <= hit.distance;
-        };
-
-        var hit = this.clipPlanes.hitTest(ray);
-        if (hit.distance == null) return intersects;
-
-        return intersects.filter(hit.sign ? isBigEnough : isSmallEnough);
-    }
-
-    return intersects;
-};
-
-// callback(point:Vector3)
-// point == null if hit nothing.
-CLOUD.Scene.prototype.hitTestPosition = function (mouse, camera, callback) {
-
-    //console.time("hitTest");
-    var raycaster = this.raycaster;
-    raycaster.setFromCamera(mouse, camera);
-
-    var intersects = this.hitTestClipPlane(raycaster.ray, raycaster.intersectObjects(this.children, true));
-    intersects = this.hitTestClipPlanes(raycaster, intersects);
-
-    if (intersects.length < 1) {
-
-        // modified 2016-5-3  begin
-        // 如果没有选中构件，绕场景中心旋转
-        if (this.rootNode.boundingBox) {
-            var bBox = this.worldBoundingBox();
-            var pivot = bBox.center();
-
-            // 如果没有选中构件，绕场景中心旋转
-            callback(pivot);
-        } else {
-            callback(null);
-        }
-
-        //callback(null);
-        // modified 2016-5-3  end
-        //console.timeEnd("hitTest");
-        return;
-    }
-
-    intersects.sort(function (a, b) {
-        return a.distance - b.distance;
-    });
-    callback(intersects[0].point);
-    //console.timeEnd("hitTest");
-};
-
-CLOUD.Scene.prototype.pickByReck = function () {
-
-    var sphere = new THREE.Sphere();
-    var box = new THREE.Box3();
-
-    var INTERSECTION_STATE = {
-        IS_Leave: 0,
-        IS_Intersection: 1,
-        IS_Contains: 2
-    };
-
-    function intersectObjectBySphere(frustum, object) {
-
-        var geometry = object.geometry;
-        if (geometry.boundingSphere === null) geometry.computeBoundingSphere();
-
-        sphere.copy(geometry.boundingSphere);
-        sphere.applyMatrix4(object.matrixWorld);
-
-        var planes = frustum.planes;
-        var center = sphere.center;
-        var negRadius = -sphere.radius;
-
-        var nCount = 0;
-        for (var i = 0; i < 6; i++) {
-
-            var distance = planes[i].distanceToPoint(center);
-
-            if (distance < negRadius) {
-
-                return INTERSECTION_STATE.IS_Leave;
-            } else if (distance >= sphere.radius) {
-                ++nCount;
-            }
-        }
-
-        return nCount == 6 ? INTERSECTION_STATE.IS_Contains : INTERSECTION_STATE.IS_Intersection;
-    }
-
-    var p1 = new THREE.Vector3(),
-        p2 = new THREE.Vector3();
-
-    function intersectBox(frustum, box) {
-
-        var nCount = 0;
-        var planes = frustum.planes;
-
-        for (var i = 0; i < 6; i++) {
-
-            var plane = planes[i];
-
-            p1.x = plane.normal.x > 0 ? box.min.x : box.max.x;
-            p2.x = plane.normal.x > 0 ? box.max.x : box.min.x;
-            p1.y = plane.normal.y > 0 ? box.min.y : box.max.y;
-            p2.y = plane.normal.y > 0 ? box.max.y : box.min.y;
-            p1.z = plane.normal.z > 0 ? box.min.z : box.max.z;
-            p2.z = plane.normal.z > 0 ? box.max.z : box.min.z;
-
-            var d1 = plane.distanceToPoint(p1);
-            var d2 = plane.distanceToPoint(p2);
-
-            // if both outside plane, no intersection
-
-            if (d1 < 0 && d2 < 0) {
-
-                return INTERSECTION_STATE.IS_Leave;
-            } else if (d1 * d2 >= 0) {
-                ++nCount;
-            }
-        }
-
-        return nCount == 6 ? INTERSECTION_STATE.IS_Contains : INTERSECTION_STATE.IS_Intersection;
-    }
-
-    function intersectObjectByBox(frustum, object) {
-
-        if (object.boundingBox && !(object instanceof THREE.Mesh)) {
-            box.copy(object.boundingBox);
-        } else {
-            var geometry = object.geometry;
-
-            if (geometry.boundingBox === null) geometry.computeBoundingBox();
-
-            box.copy(geometry.boundingBox);
-        }
-
-        box.applyMatrix4(object.matrixWorld);
-
-        return intersectBox(frustum, box);
-    }
-
-    return function (frustum, selectState, callback) {
-        var scope = this;
-
-        if (selectState === CLOUD.OPSELECTIONTYPE.Clear) scope.filter.setSelectedIds();
-
-        var count = 0;
-
-        function frustumTest(node) {
-
-            if (node instanceof CLOUD.Group) {
-                if (node.fileId && scope.filter.hasFileFilter(node.fileId)) return;
-            }
-
-            if (node.worldBoundingBox) {
-
-                if (intersectBox(frustum, node.worldBoundingBox) === INTERSECTION_STATE.IS_Leave) {
-                    return;
-                }
-            }
-
-            if (node.userData) {
-                var state = intersectObjectByBox(frustum, node);
-                if (state === INTERSECTION_STATE.IS_Contains) {
-
-                    if (scope.filter.isVisible(node) && scope.filter.isSelectable(node)) {
-
-                        if (selectState === CLOUD.OPSELECTIONTYPE.Remove) {
-                            scope.filter.removeSelectedId(node.name);
-                        } else {
-                            scope.filter.addSelectedId(node.name, node.userData);
-                        }
-                        ++count;
-                    }
-                } else {
-                    return;
-                }
-            }
-
-            var children = node.children;
-            if (!children) return;
-
-            for (var i = 0, l = children.length; i < l; i++) {
-                var child = children[i];
-                if (child.visible) {
-                    frustumTest(child);
-                }
-            }
-        }
-
-        var children = this.rootNode.children;
-        for (var i = 0, l = children.length; i < l; i++) {
-            var child = children[i];
-            if (child.visible) {
-                frustumTest(child);
-            }
-        }
-
-        callback();
-    };
-}();
-
-CLOUD.Scene.prototype.pick = function (mouse, camera, callback) {
-    var raycaster = this.raycaster;
-    raycaster.setFromCamera(mouse, camera);
-
-    var scope = this;
-
-    var intersects = this.hitTestClipPlane(raycaster.ray, raycaster.intersectObjects(scope.children, true));
-    intersects = this.hitTestClipPlanes(raycaster, intersects);
-
-    var length = intersects.length;
-
-    if (length > 0) {
-
-        intersects.sort(function (a, b) {
-            return a.distance - b.distance;
-        });
-
-        for (var ii = 0; ii < length; ++ii) {
-
-            var intersect = intersects[ii];
-
-            if (intersect.distance <= camera.near) continue;
-
-            var meshNode = intersect.object;
-
-            if (scope.filter.isVisible(meshNode) && scope.filter.isSelectable(meshNode)) {
-
-                if (meshNode.geometry) {
-
-                    intersect.userId = meshNode.name;
-                    callback(intersect);
-
-                    return;
-                }
-            }
-        }
-    }
-
-    callback(null);
-};
-
-CLOUD.Scene.prototype.hitTest = function (mouse, camera) {
-
-    var ray = this.raycaster;
-    ray.setFromCamera(mouse, camera);
-
-    var intersects = this.hitTestClipPlane(ray.ray, ray.intersectObjects(this.children, true));
-    intersects = this.hitTestClipPlanes(ray, intersects);
-
-    if (intersects.length < 1) {
-
-        return null;
-    }
-
-    intersects.sort(function (a, b) {
-        return a.distance - b.distance;
-    });
-
-    return intersects[0].point;
-};
-
-CLOUD.Scene.prototype.getClipWidget = function () {
-
-    if (this.clipWidget == null) {
-        var bbox = new THREE.Box3();
-        bbox.copy(this.rootNode.boundingBox);
-        bbox.applyMatrix4(this.rootNode.matrix);
-
-        this.clipWidget = new CLOUD.ClipWidget(new THREE.Vector4(0, 0, 1, 0), bbox.center());
-        this.add(this.clipWidget);
-    }
-
-    return this.clipWidget;
-};
-
-CLOUD.Scene.prototype.getClipPlanes = function () {
-
-    if (this.clipPlanes == null) {
-        var bbox = new THREE.Box3();
-        bbox.copy(this.rootNode.boundingBox);
-        bbox.applyMatrix4(this.rootNode.matrix);
-
-        this.clipPlanes = new CLOUD.ClipPlanes(bbox.size(), bbox.center());
-        this.add(this.clipPlanes);
-    }
-
-    return this.clipPlanes;
-};
-
-CLOUD.Scene.prototype.traverseIf = function (callback) {
-
-    function traverseChild(node, callback) {
-
-        var children = node.children;
-        for (var i = 0, l = children.length; i < l; i++) {
-            var child = children[i];
-            if (!callback(child, node)) {
-                break;
-            }
-
-            if (child.visible) traverseChild(child, callback);
-        }
-    }
-
-    var children = this.rootNode.children;
-    for (var i = 0, l = children.length; i < l; i++) {
-        var child = children[i];
-        traverseChild(child, callback);
-    }
-};
-
-CLOUD.Scene.prototype.findSceneNode = function (sceneId) {
-
-    var children = this.rootNode.children;
-    for (var i = 0, l = children.length; i < l; i++) {
-        var child = children[i];
-        if (sceneId == child.sceneId) {
-            return child;
-        }
-    }
-
-    return null;
-};
-
-CLOUD.Scene.prototype.showSceneNodes = function (client, bVisible) {
-
-    var children = this.rootNode.children;
-    for (var i = 0, l = children.length; i < l; i++) {
-        var child = children[i];
-        if (child.client.databagId === client.databagId) {
-            child.visible = bVisible;
-        }
-    }
-};
-
-CLOUD.Scene.prototype.containsBoxInFrustum = function () {
-    var p1 = new THREE.Vector3(),
-        p2 = new THREE.Vector3();
-
-    return function (frustum, box) {
-
-        var planes = frustum.planes;
-
-        for (var i = 0; i < 6; i++) {
-
-            var plane = planes[i];
-
-            p1.x = plane.normal.x > 0 ? box.min.x : box.max.x;
-            p2.x = plane.normal.x > 0 ? box.max.x : box.min.x;
-            p1.y = plane.normal.y > 0 ? box.min.y : box.max.y;
-            p2.y = plane.normal.y > 0 ? box.max.y : box.min.y;
-            p1.z = plane.normal.z > 0 ? box.min.z : box.max.z;
-            p2.z = plane.normal.z > 0 ? box.max.z : box.min.z;
-
-            var d1 = plane.distanceToPoint(p1);
-            var d2 = plane.distanceToPoint(p2);
-
-            // if one outside plane, is not contained.
-
-            if (d1 < 0 || d2 < 0) {
-
-                return false;
-            }
-        }
-
-        return true;
-    };
-}();
-
-CLOUD.Scene.prototype.prepareSceneBox = function () {
-    var _frustum = new THREE.Frustum();
-
-    return function (camera) {
-
-        camera.updateMVP();
-
-        _frustum.setFromMatrix(camera.projScreenMatrix);
-
-        var scope = this;
-
-        var boxList = [];
-
-        function visibleInFrustum(object) {
-
-            if (_frustum.intersectsBox(object.worldBoundingBox)) {
-
-                if (scope.containsBoxInFrustum(_frustum, object.worldBoundingBox)) {
-                    object.inFrustum = true;
-                } else {
-                    if (object.inFrustum) object.inFrustum = undefined;
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
-        console.time("cull");
-        this.traverseIf(function (object, parent) {
-
-            if (object instanceof CLOUD.BBoxNode) {
-
-                var bVisible = object.visible;
-                object.visible = true;
-
-                if (parent.inFrustum || visibleInFrustum(object)) {
-
-                    boxList.push(object);
-                } else {
-                    object.visible = false;
-                }
-
-                return true;
-            }
-
-            return true;
-        });
-        console.timeEnd("cull");
-
-        console.time("raytrace");
-
-        var traceResult = {};
-
-        var ray = new THREE.Ray();
-
-        var dir = new THREE.Vector3();
-        //
-        for (var ii = 0, len = boxList.length; ii < len; ++ii) {
-
-            var box = boxList[ii];
-            box.worldBoundingBox.center(ray.origin);
-            ray.direction.copy(camera.position).sub(ray.origin).normalize();
-
-            traceResult[ii] = 0;
-
-            for (var jj = 0; jj < len; ++jj) {
-                if (ii == jj) continue;
-
-                var otherBox = boxList[jj];
-                otherBox.worldBoundingBox.center(dir);
-
-                dir.sub(ray.origin).normalize();
-                if (dir.dot(ray.direction) > 0) {
-
-                    var hit = CLOUD.CameraUtil.intersectBoxByRay(ray, otherBox.worldBoundingBox);
-                    if (hit !== null) {
-                        ++traceResult[ii];
-                    }
-                }
-            }
-        }
-
-        var cullCount = 0;
-        for (var name in traceResult) {
-            var idx = traceResult[name];
-            if (idx < CLOUD.GlobalData.RayTracingDeep) boxList[name].visible = true;else {
-                boxList[name].visible = false;
-                ++cullCount;
-            }
-        }
-        console.log("rt " + boxList.length + "/" + cullCount);
-        console.timeEnd("raytrace");
-    };
-}();
-
-CLOUD.Scene.prototype.prepareScene2 = function () {
-
-    var _frustum = new THREE.Frustum();
-
-    var ray = new THREE.Ray();
-
-    return function (camera) {
-
-        console.time("rt");
-
-        camera.updateMVP();
-
-        _frustum.setFromMatrix(camera.projScreenMatrix);
-
-        camera.inside = this.innerBoundingBox.containsPoint(camera.position);
-
-        var scope = this;
-        scope.garbageCount = 0;
-
-        function visibleInFrustum(object) {
-
-            if (_frustum.intersectsBox(object.worldBoundingBox)) {
-
-                if (scope.containsBoxInFrustum(_frustum, object.worldBoundingBox)) {
-                    object.inFrustum = true;
-                } else {
-                    if (object.inFrustum) delete object.inFrustum;
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
-        var cullList = [];
-
-        function cullByFrustum(object, parent) {
-
-            if (object instanceof CLOUD.Cell) {
-                if (parent.inFrustum || visibleInFrustum(object)) {
-
-                    if (object.leaf) {
-                        cullList.push(object);
-                    }
-                    //object.update(camera);
-                    //if (!object.visible) {
-                    //    object.cullee = true;
-                    //}
-                    //else {
-                    //    object.cullee = false;
-                    //}
-                } else {
-
-                    if (object.visible) {
-                        object.visible = false;
-                        //++scope.garbageCount;
-                        //object.isGarbage = true;
-                    }
-                }
-            }
-
-            if (object.leaf === undefined) {
-
-                var children = object.children;
-                for (var i = 0, l = children.length; i < l; i++) {
-                    var child = children[i];
-                    cullByFrustum(child, object);
-                }
-            }
-        }
-
-        var children = scope.rootNode.children;
-        for (var i = 0, l = children.length; i < l; i++) {
-            var child = children[i];
-            cullByFrustum(child, scope.rootNode);
-        }
-
-        var traceResult = {};
-
-        //
-        for (var ii = 0, len = cullList.length; ii < len; ++ii) {
-
-            var object = cullList[ii];
-            //if (!object.cullee)
-            //    continue;
-
-            object.worldBoundingBox.center(ray.origin);
-            ray.direction.copy(camera.position).sub(ray.origin).normalize();
-            var maxDistance = ray.origin.distanceTo(camera.position);
-
-            var nHitCount = 0;
-            for (var jj = 0; jj < len; ++jj) {
-                if (ii == jj) continue;
-
-                var otherBox = cullList[jj];
-                var hit = CLOUD.CameraUtil.intersectBoxByRay(ray, otherBox.worldBoundingBox);
-                if (hit !== null && hit < maxDistance) {
-                    //console.log(hit);
-                    ++nHitCount;
-                }
-            }
-            traceResult[ii] = nHitCount;
-        }
-
-        var cullCount = 0;
-        for (var name in traceResult) {
-
-            var object = cullList[name];
-            var visible = object.visible;
-
-            if (traceResult[name] < CLOUD.GlobalData.RayTracingDeep) {
-
-                if (object.leaf === 2) {
-                    object.visible = true;
-                    var children = object.children;
-                    for (var i = 0, l = children.length; i < l; i++) {
-                        var child = children[i];
-                        child.update2(camera);
-                    }
-                } else {
-                    object.update2(camera);
-                }
-            } else {
-                object.visible = false;
-            }
-
-            if (!object.visible) {
-                ++cullCount;
-
-                if (visible) {
-                    //object.isGarbage = true;
-                    //++scope.garbageCount;
-                }
-            }
-        }
-
-        console.timeEnd("rt");
-        console.log("rt " + cullList.length + "/" + cullCount);
-    };
-}();
-
-CLOUD.Scene.prototype.prepareScene = function () {
-
-    var _frustum = new THREE.Frustum();
-
-    return function (camera) {
-        camera.updateMVP();
-
-        _frustum.setFromMatrix(camera.projScreenMatrix);
-
-        camera.inside = this.innerBoundingBox.containsPoint(camera.position);
-
-        var scope = this;
-
-        scope.garbageCount = 0;
-
-        //console.time("cull");
-        // Cell Cull and LoD
-        this.traverseIf(function (object, parent) {
-
-            if (object instanceof CLOUD.Cell) {
-
-                var bVisible = object.visible;
-                if (parent.inFrustum) {
-                    object.update(camera);
-                } else if (_frustum.intersectsBox(object.worldBoundingBox)) {
-
-                    if (scope.containsBoxInFrustum(_frustum, object.worldBoundingBox)) {
-                        object.inFrustum = true;
-                    } else {
-                        object.inFrustum = false;
-                    }
-
-                    object.update(camera);
-                } else {
-                    object.visible = false;
-                }
-
-                if ( /*bVisible &&*/!object.visible) {
-                    object.isGarbage = true;
-                    ++scope.garbageCount;
-                    object.unload();
-                } else {
-                    object.isGarbage = false;
-                }
-
-                return true;
-            }
-
-            return false;
-        });
-
-        //console.timeEnd("cull");
-    };
-}();
-
-CLOUD.Scene.prototype.prepareOutside = function (camera) {
-
-    var v2 = new THREE.Vector3();
-
-    this.traverseIf(function (object, parent) {
-
-        if (object instanceof CLOUD.Cell) {
-
-            if (object.out) {
-                object.worldBoundingBox.center(v2);
-                object.distance = camera.target.distanceToSquared(v2) * 0.0001;
-                object.load();
-            }
-
-            return true;
-        }
-
-        return false;
-    });
-};
-
-CLOUD.Scene.prototype.collectionGarbage = function () {
-
-    if (this.garbageCount < 10) return;
-
-    this.traverseIf(function (object, parent) {
-
-        if (object.isGarbage !== undefined) {
-
-            if (object.isGarbage) {
-                object.unload();
-                object.isGarbage = false;
-            }
-
-            return true;
-        }
-
-        return false;
-    });
-
-    this.garbageCount = 0;
-};
-
 CLOUD.Scene.prototype.getHitPoint = function (x, y, camera) {
 
     var raycaster = this.raycaster;
     raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
 
-    var intersects = this.hitTestClipPlane(raycaster.ray, raycaster.intersectObjects(this.children, true));
+    var intersects =  this.hitTestClipPlane(raycaster.ray, raycaster.intersectObjects(this.children, true));
     intersects = this.hitTestClipPlanes(raycaster, intersects);
 
     if (intersects.length < 1) {
@@ -9302,19 +9950,19 @@ CLOUD.Scene.prototype.getHitPoint = function (x, y, camera) {
     });
 
     for (var ii = 0, len = intersects.length; ii < len; ++ii) {
-
         var intersect = intersects[ii];
-        if (intersect.distance <= camera.near) continue;
+
+        if (intersect.distance <= camera.near)
+            continue;
 
         var meshNode = intersect.object;
 
         if (this.filter.isVisible(meshNode)) {
-
             return intersect.point;
         }
     }
 
-    return null;
+    return  null;
 };
 
 // 获取相机到场景包围盒8个顶点的最大距离对应点所在平面与所给射线的交点
@@ -9326,7 +9974,16 @@ CLOUD.Scene.prototype.getTrackingPointFromBoundingBox = function (direction, ray
     var box = this.worldBoundingBox();
     var maxLen = 0;
 
-    var corners = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
+    var corners = [
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3()
+    ];
 
     corners[0].set(box.min.x, box.min.y, box.min.z); // 000
     corners[1].set(box.min.x, box.min.y, box.max.z); // 001
@@ -9335,7 +9992,7 @@ CLOUD.Scene.prototype.getTrackingPointFromBoundingBox = function (direction, ray
     corners[4].set(box.max.x, box.min.y, box.min.z); // 100
     corners[5].set(box.max.x, box.min.y, box.max.z); // 101
     corners[6].set(box.max.x, box.max.y, box.min.z); // 110
-    corners[7].set(box.max.x, box.max.y, box.max.z); // 111
+    corners[7].set(box.max.x, box.max.y, box.max.z);  // 111
 
     for (var i = 0; i < 8; i++) {
 
@@ -9367,14 +10024,12 @@ CLOUD.Scene.prototype.getNearDepthByRect = function () {
 
     // 计算最近的深度
     function calcNearDepth(object) {
-
-        projectPosition.setFromMatrixPosition(object.matrixWorld);
-        projectPosition.applyProjection(projectScreenMatrix);
+        projectPosition.setFromMatrixPosition( object.matrixWorld );
+        projectPosition.applyProjection( projectScreenMatrix );
 
         var depth = projectPosition.z;
 
-        if (depth < nearDepth && depth >= 0 && depth <= 1) {
-
+        if (depth < nearDepth && depth >= 0 && depth <= 1)   {
             nearDepth = depth;
         }
     }
@@ -9382,14 +10037,14 @@ CLOUD.Scene.prototype.getNearDepthByRect = function () {
     function intersectObjectByBox(frustum, object) {
 
         if (object.boundingBox && !(object instanceof THREE.Mesh)) {
-
             box.copy(object.boundingBox);
             box.applyMatrix4(object.matrixWorld);
-        } else {
-
+        }
+        else {
             var geometry = object.geometry;
 
-            if (geometry.boundingBox === null) geometry.computeBoundingBox();
+            if (geometry.boundingBox === null)
+                geometry.computeBoundingBox();
 
             box.copy(geometry.boundingBox);
             box.applyMatrix4(object.matrixWorld);
@@ -9402,10 +10057,8 @@ CLOUD.Scene.prototype.getNearDepthByRect = function () {
     }
 
     return function (frustum, camera) {
-
         nearDepth = Infinity;
-
-        projectScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+        projectScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 
         function frustumTest(node) {
 
@@ -9430,7 +10083,8 @@ CLOUD.Scene.prototype.getNearDepthByRect = function () {
             }
 
             var children = node.children;
-            if (!children) return;
+            if (!children)
+                return;
 
             for (var i = 0, l = children.length; i < l; i++) {
                 var child = children[i];
@@ -9449,642 +10103,563 @@ CLOUD.Scene.prototype.getNearDepthByRect = function () {
         }
 
         return nearDepth;
-    };
+    }
 }();
 
-// 获得未进行矩阵变换的对象的世界矩阵
-CLOUD.Scene.prototype.getObjectMatrixWorld = function (object) {
+CLOUD.Scene.prototype.getClipWidget = function(){
 
-    var matList = [];
-    var parent = object.parent;
+    if (this.clipWidget == null) {
+        var bbox = new THREE.Box3();
+        bbox.copy(this.rootNode.boundingBox);
+        bbox.applyMatrix4(this.rootNode.matrix);
 
-    while (parent) {
-
-        if (parent instanceof CLOUD.SubScene || parent instanceof CLOUD.Cell) {
-            break;
-        }
-
-        matList.push(parent.matrix);
-
-        parent = parent.parent;
+        this.clipWidget = new CLOUD.ClipWidget(new THREE.Vector4(0, 0, 1, 0), bbox.center());
+        this.add(this.clipWidget);
     }
 
-    var matTmp = new THREE.Matrix4();
-
-    if (matList.length > 0) {
-
-        matTmp = matList[matList.length - 1];
-
-        for (var i = matList.length - 2; i >= 0; --i) {
-            matTmp.multiply(matList[i]);
-        }
-    }
-
-    var objMatrixWorld = new THREE.Matrix4();
-    objMatrixWorld.multiplyMatrices(matTmp, object.matrix);
-
-    return objMatrixWorld;
+    return this.clipWidget;
 };
 
-// 获得未进行矩阵变换的对象的世界包围盒
-CLOUD.Scene.prototype.getObjectBoundingBoxWorld = function (object) {
+CLOUD.Scene.prototype.getClipPlanes = function(){
 
-    // 计算世界坐标下的包围盒
-    var boxTmp = object.boundingBox;
-    var boxRet = new THREE.Box3();
+    if (this.clipPlanes == null) {
+        var bbox = new THREE.Box3();
+        bbox.copy(this.rootNode.boundingBox);
+        bbox.applyMatrix4(this.rootNode.matrix);
 
-    // 特殊类型处理
-    if (object.geometry instanceof THREE.BoxGeometry) {
+        this.clipPlanes = new CLOUD.ClipPlanes(bbox.size(), bbox.center());
+        this.add(this.clipPlanes);
+    }
 
-        if (boxTmp) {
+    return this.clipPlanes;
+};
 
-            var objPosition = new THREE.Vector3();
-            var objQuaternion = new THREE.Quaternion();
-            var objScale = new THREE.Vector3();
-            var objMatrix = object.matrix;
-            objMatrix.decompose(objPosition, objQuaternion, objScale);
+CLOUD.Scene.prototype.hitTestClipPlane = function (ray, intersects) {
 
-            // 抽取缩放系数
-            var invScale = new THREE.Vector3(1 / objScale.x, 1 / objScale.y, 1 / objScale.z);
+    if (this.clipWidget && this.clipWidget.isEnabled()) {
 
-            // 计算包围盒
-            boxRet = boxTmp.clone();
-            boxRet.min.multiply(invScale);
-            boxRet.max.multiply(invScale);
+        var hit = this.clipWidget.hitTest(ray);
+
+        if (hit.distance == null)
+            return intersects;
+
+        function isBigEnough(element, index, array) {
+            return (element.distance >= hit.distance);
+        }
+
+        function isSmallEnough(element, index, array) {
+            return (element.distance <= hit.distance);
+        }
+
+        return intersects.filter(hit.sign ? isBigEnough:isSmallEnough);
+    }
+
+    return intersects;
+};
+
+CLOUD.Scene.prototype.hitTestClipPlanes = function (ray, intersects) {
+
+    if (this.clipPlanes && this.clipPlanes.isEnabled()) {
+
+        var hit = this.clipPlanes.hitTest(ray);
+
+        if (hit.distance == null)
+            return intersects;
+
+        function isBigEnough(element, index, array) {
+            return (element.distance >= hit.distance);
+        }
+
+        function isSmallEnough(element, index, array) {
+            return (element.distance <= hit.distance);
+        }
+
+        return intersects.filter(hit.sign ? isBigEnough:isSmallEnough);
+    }
+
+    return intersects;
+};
+
+// callback(point:Vector3)
+// point == null if hit nothing.
+CLOUD.Scene.prototype.hitTestPosition = function (mouse, camera, callback) {
+
+    //console.time("hitTest");
+    var raycaster = this.raycaster;
+    raycaster.setFromCamera(mouse, camera);
+
+    var intersects =  this.hitTestClipPlane(raycaster.ray, raycaster.intersectObjects(this.children, true));
+    intersects = this.hitTestClipPlanes(raycaster, intersects);
+
+    if (intersects.length < 1) {
+
+        // modified 2016-5-3  begin
+        // 如果没有选中构件，绕场景中心旋转
+        if (this.rootNode.boundingBox ) {
+            var bBox = this.worldBoundingBox();
+            var pivot = bBox.center();
+
+            // 如果没有选中构件，绕场景中心旋转
+            callback(pivot);
         } else {
-            object.geometry.computeBoundingBox();
-            boxRet = object.geometry.boundingBox;
+            callback(null);
         }
 
-        var sceneMatrix = this.getRootNodeMatrix();
-        var inverseMatrix = new THREE.Matrix4();
-        inverseMatrix.getInverse(sceneMatrix);
-
-        boxRet.applyMatrix4(object.matrixWorld);
-        boxRet.applyMatrix4(inverseMatrix);
-    } else {
-
-        if (!boxTmp) {
-            object.geometry.computeBoundingBox();
-            boxTmp = object.geometry.boundingBox;
-        }
-
-        boxRet = boxTmp.clone();
-
-        var objMatrixWorld = this.getObjectMatrixWorld(object);
-
-        boxRet.applyMatrix4(objMatrixWorld);
+        //callback(null);
+        // modified 2016-5-3  end
+        //console.timeEnd("hitTest");
+        return;
     }
 
-    return boxRet;
-};
-
-CLOUD.Mesh = function (geometry, material, meshId) {
-    CLOUD.Object3D.call(this, geometry, material);
-
-    this.type = "Mesh";
-
-    this.geometry = geometry;
-    this.material = material;
-
-    this.boundingBox = null;
-
-    if (meshId) {
-        this.loaded = 0;
-        this.meshId = meshId;
-        this.visible = false;
-    }
-};
-
-CLOUD.Mesh.prototype = Object.create(CLOUD.Object3D.prototype);
-CLOUD.Mesh.prototype.constructor = CLOUD.Mesh;
-
-CLOUD.Mesh.prototype.updateGeometry = function (mesh) {
-
-    this.geometry = mesh;
-    this.visible = true;
-};
-
-CLOUD.Mesh.prototype.unload = function () {
-
-    // parameter geometry
-    if (!this.meshId) return;
-
-    var geometry = this.geometry;
-    if (geometry.refCount === undefined) return;
-
-    if (this.loaded == 0) return;
-
-    this.loaded = 0;
-    geometry.refCount -= 1;
-
-    if (geometry.refCount <= 0) {
-
-        geometry.refCount = 0;
-        if (geometry.symbol === undefined) {
-
-            CLOUD.PrimitiveCount.vertexCount -= geometry.getAttribute("position").count;
-            CLOUD.PrimitiveCount.triangleCount -= geometry.getIndex().count;
-
-            geometry.dispose();
-        }
-    }
-};
-
-CLOUD.Mesh.prototype.load = function () {
-
-    if (!this.meshId) return;
-
-    if (this.geometry.refCount === undefined) return;
-
-    if (this.loaded == 0) {
-        this.geometry.refCount += 1;
-
-        CLOUD.PrimitiveCount.vertexCount += this.geometry.getAttribute("position").count;
-        CLOUD.PrimitiveCount.triangleCount += this.geometry.getIndex().count;
-    }
-
-    this.loaded = 1;
-};
-
-CLOUD.Mesh.prototype.raycast = function () {
-
-    var inverseMatrix = new THREE.Matrix4();
-    var ray = new THREE.Ray();
-    var descSort = function descSort(a, b) {
+    intersects.sort(function (a, b) {
         return a.distance - b.distance;
+    });
+
+    callback(intersects[0].point);
+    //console.timeEnd("hitTest");
+};
+
+CLOUD.Scene.prototype.pickByRect = function () {
+
+    var sphere = new THREE.Sphere();
+    var box = new THREE.Box3();
+
+    var INTERSECTION_STATE = {
+        IS_Leave:0,
+        IS_Intersection:1,
+        IS_Contains : 2
     };
 
-    var intersectionPoint = new THREE.Vector3();
-    var intersectionPointWorld = new THREE.Vector3();
+    function intersectObjectBySphere(frustum, object) {
 
-    function checkIntersection(object, raycaster, ray, pA, pB, pC, point) {
+        var geometry = object.geometry;
+        if (geometry.boundingSphere === null) geometry.computeBoundingSphere();
 
-        var intersect;
-        var material = object.material;
+        sphere.copy(geometry.boundingSphere);
+        sphere.applyMatrix4(object.matrixWorld);
 
-        if (material.side === THREE.BackSide) {
+        var planes = frustum.planes;
+        var center = sphere.center;
+        var negRadius = -sphere.radius;
 
-            intersect = ray.intersectTriangle(pC, pB, pA, true, point);
-        } else {
+        var nCount = 0;
+        for (var i = 0; i < 6; i++) {
 
-            intersect = ray.intersectTriangle(pA, pB, pC, material.side !== THREE.DoubleSide, point);
-        }
+            var distance = planes[i].distanceToPoint(center);
 
-        if (intersect === null) return null;
+            if (distance < negRadius) {
 
-        intersectionPointWorld.copy(point);
-        intersectionPointWorld.applyMatrix4(object.matrixWorld);
+                return INTERSECTION_STATE.IS_Leave;
 
-        var distance = raycaster.ray.origin.distanceTo(intersectionPointWorld);
-
-        if (distance < raycaster.near || distance > raycaster.far) return null;
-
-        return {
-            distance: distance,
-            point: intersectionPointWorld.clone(),
-            object: object
-        };
-    }
-
-    return function (raycaster, intersects) {
-
-        var geometry = this.geometry;
-        var boundingBox = this.boundingBox;
-
-        // Check boundingBox before continuing
-        inverseMatrix.getInverse(this.matrixWorld);
-        ray.copy(raycaster.ray).applyMatrix4(inverseMatrix);
-
-        if (boundingBox !== null) {
-            if (ray.isIntersectionBox(boundingBox) === false) {
-                return;
             }
-        }
-
-        //Check the submesh exsiting.
-        var userId = "";
-
-        if (geometry instanceof THREE.Geometry) {
-            var fvA, fvB, fvC;
-            var isFaceMaterial = material instanceof THREE.MeshFaceMaterial;
-            var materials = isFaceMaterial === true ? material.materials : null;
-
-            var vertices = geometry.vertices;
-            var faces = geometry.faces;
-            //var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
-            //if ( faceVertexUvs.length > 0 ) uvs = faceVertexUvs;
-
-            for (var f = 0, fl = faces.length; f < fl; f++) {
-
-                var face = faces[f];
-                var faceMaterial = isFaceMaterial === true ? materials[face.materialIndex] : material;
-
-                if (faceMaterial === undefined) continue;
-
-                fvA = vertices[face.a];
-                fvB = vertices[face.b];
-                fvC = vertices[face.c];
-
-                var intersection = checkIntersection(this, raycaster, ray, fvA, fvB, fvC, intersectionPoint);
-
-                if (intersection) {
-
-                    intersection.face = face;
-                    intersection.faceIndex = f;
-                    intersects.push(intersection);
-                }
-            }
-        } else {
-            // We have to check the full mesh.
-            this.hitTestGeometry(raycaster, intersects, ray, userId, geometry.name);
-        }
-    };
-}();
-
-CLOUD.Mesh.prototype.clone = function (object, recursive) {
-    if (object === undefined) object = new CLOUD.Mesh(this.geometry, this.material);
-
-    THREE.Mesh.prototype.clone.call(this, object, recursive);
-
-    return object;
-};
-
-CLOUD.Mesh.prototype.hitTestGeometry = function (raycaster, intersects, ray, userId, meshId) {
-    var geometry = this.geometry;
-
-    if (geometry instanceof THREE.InstancedBufferGeometry) {
-
-        var material = this.material;
-        if (material === undefined) return;
-
-        var precision = raycaster.precision;
-
-        for (var i = 0; i < geometry.maxInstancedCount; i++) {
-
-            var userId = geometry.extProperty.userIds[i];
-            var bbox = geometry.extProperty.bboxs[i];
-            var transformMatrix = geometry.extProperty.transformMatrixs[i];
-
-            var intersectionPoint = ray.intersectBox(bbox);
-
-            if (intersectionPoint === null) continue;
-
-            intersectionPoint.applyMatrix4(this.matrixWorld);
-
-            var distance = raycaster.ray.origin.distanceTo(intersectionPoint);
-
-            if (distance < precision || distance < raycaster.near || distance > raycaster.far) continue;
-
-            intersects.push({
-                transformMatrix: transformMatrix,
-                bbox: bbox,
-                distance: distance,
-                point: intersectionPoint,
-                face: null,
-                faceIndex: null,
-                object: this,
-                ray: ray
-            });
-        }
-    } else if (geometry instanceof THREE.BufferGeometry) {
-        var material = this.material;
-        if (material === undefined) return;
-
-        var attributes = geometry.attributes;
-
-        if (geometry.index != null) {
-            var indices = geometry.index.array;
-            var positions = attributes.position.array;
-            var offsets = geometry.groups;
-
-            if (offsets.length === 0) {
-                offsets = [{ start: 0, count: indices.length, index: 0 }];
+            else if (distance >= sphere.radius) {
+                ++nCount;
             }
 
-            for (var oi = 0, ol = offsets.length; oi < ol; ++oi) {
-                this.hitTestSubMesh(offsets[oi], raycaster, intersects, ray, userId, meshId);
-            }
-        } else {
-            var vA = new THREE.Vector3();
-            var vB = new THREE.Vector3();
-            var vC = new THREE.Vector3();
-
-            var a, b, c;
-            var precision = raycaster.precision;
-
-            var positions = attributes.position.array;
-
-            for (var i = 0, j = 0, il = positions.length; i < il; i += 3, j += 9) {
-                a = i;
-                b = i + 1;
-                c = i + 2;
-
-                vA.fromArray(positions, j);
-                vB.fromArray(positions, j + 3);
-                vC.fromArray(positions, j + 6);
-                var intersectionPoint;
-                if (material.side === THREE.BackSide) {
-                    intersectionPoint = ray.intersectTriangle(vC, vB, vA, true);
-                } else {
-                    intersectionPoint = ray.intersectTriangle(vA, vB, vC, material.side !== THREE.DoubleSide);
-                }
-
-                if (intersectionPoint === null) continue;
-
-                intersectionPoint.applyMatrix4(this.matrixWorld);
-
-                var distance = raycaster.ray.origin.distanceTo(intersectionPoint);
-
-                if (distance < precision || distance < raycaster.near || distance > raycaster.far) continue;
-
-                intersects.push({
-                    distance: distance,
-                    point: intersectionPoint,
-                    face: new THREE.Face3(a, b, c, THREE.Triangle.normal(vA, vB, vC)),
-                    faceIndex: null,
-                    object: this,
-                    ray: ray
-                });
-            }
-        }
-    }
-};
-
-CLOUD.Mesh.prototype.hitTestSubMesh = function (offset, raycaster, intersects, ray, userId, meshId) {
-    var material = this.material;
-
-    var vA = new THREE.Vector3();
-    var vB = new THREE.Vector3();
-    var vC = new THREE.Vector3();
-
-    var a, b, c;
-    var precision = raycaster.precision;
-
-    var geometry = this.geometry;
-    var attributes = geometry.attributes;
-    var indices = geometry.index.array;
-    var positions = attributes.position.array;
-
-    var start = offset.start;
-    var count = offset.count;
-    //var index = offset.index;
-
-    for (var i = start, il = start + count; i < il; i += 3) {
-        a = indices[i];
-        b = indices[i + 1];
-        c = indices[i + 2];
-
-        vA.fromArray(positions, a * 3);
-        vB.fromArray(positions, b * 3);
-        vC.fromArray(positions, c * 3);
-
-        if (material.side === THREE.BackSide) {
-            var intersectionPoint = ray.intersectTriangle(vC, vB, vA, true);
-        } else {
-            var intersectionPoint = ray.intersectTriangle(vA, vB, vC, material.side !== THREE.DoubleSide);
+            
         }
 
-        if (intersectionPoint === null) continue;
-
-        intersectionPoint.applyMatrix4(this.matrixWorld);
-
-        var distance = raycaster.ray.origin.distanceTo(intersectionPoint);
-
-        if (distance < precision || distance < raycaster.near || distance > raycaster.far) continue;
-
-        intersects.push({
-            distance: distance,
-            point: intersectionPoint,
-            face: new THREE.Face3(a, b, c, THREE.Triangle.normal(vA, vB, vC)),
-            faceIndex: i,
-            object: this,
-            ray: ray,
-            meshId: meshId
-        });
-    }
-};
-
-CLOUD.Cell = function () {
-    "use strict";
-
-    CLOUD.Group.call(this);
-
-    this.type = 'Cell';
-
-    this.worldBoundingBox = null;
-};
-
-CLOUD.Cell.prototype = Object.create(CLOUD.Group.prototype);
-CLOUD.Cell.prototype.constructor = CLOUD.Cell;
-
-CLOUD.Cell.prototype.clone = function (object, recursive) {
-    if (object === undefined) {
-        object = new CLOUD.Cell();
+        return nCount == 6 ? INTERSECTION_STATE.IS_Contains : INTERSECTION_STATE.IS_Intersection;
     }
 
-    CLOUD.Group.prototype.clone.call(this, object, recursive);
+    var p1 = new THREE.Vector3(),
+        p2 = new THREE.Vector3();
 
-    return object;
-};
+    function intersectBox(frustum, box) {
 
-CLOUD.Cell.prototype.load = function () {
-    if (this.leaf) return;
+        var nCount = 0;
+        var planes = frustum.planes;
 
-    var children = this.children;
-    for (var ii = 0, len = children.length; ii < len; ++ii) {
-        children[ii].load();
+        for (var i = 0; i < 6 ; i++) {
+
+            var plane = planes[i];
+
+            p1.x = plane.normal.x > 0 ? box.min.x : box.max.x;
+            p2.x = plane.normal.x > 0 ? box.max.x : box.min.x;
+            p1.y = plane.normal.y > 0 ? box.min.y : box.max.y;
+            p2.y = plane.normal.y > 0 ? box.max.y : box.min.y;
+            p1.z = plane.normal.z > 0 ? box.min.z : box.max.z;
+            p2.z = plane.normal.z > 0 ? box.max.z : box.min.z;
+
+            var d1 = plane.distanceToPoint(p1);
+            var d2 = plane.distanceToPoint(p2);
+
+            // if both outside plane, no intersection
+
+            if (d1 < 0 && d2 < 0) {
+
+                return INTERSECTION_STATE.IS_Leave;
+
+            }
+            else if (d1 * d2 >= 0) {
+                ++nCount;
+            }           
+        }
+
+        return nCount == 6 ? INTERSECTION_STATE.IS_Contains : INTERSECTION_STATE.IS_Intersection;
     }
-};
 
-CLOUD.Cell.prototype.update2 = function (camera) {
-    this.visible = true;
-};
+    function intersectObjectByBox(frustum, object) {
 
-CLOUD.Cell.prototype.update = function () {
+        if (object.boundingBox && !(object instanceof THREE.Mesh)) {
+             box.copy(object.boundingBox);          
+        }
+        else {
+            var geometry = object.geometry;
 
-    var v2 = new THREE.Vector3();
-    var v1 = new THREE.Vector3();
+            if (geometry.boundingBox === null)
+                geometry.computeBoundingBox();
 
-    return function (camera) {
+            box.copy(geometry.boundingBox);
+        }
+
+        box.applyMatrix4(object.matrixWorld);
+
+        return intersectBox(frustum, box);
+    }
+
+    return function (frustum, selectState, callback) {
 
         var scope = this;
 
-        var shouldShow = scope.level === undefined;
+        if (selectState === CLOUD.OPSELECTIONTYPE.Clear)
+            scope.filter.setSelectedIds();
 
-        if (CLOUD.GlobalData.GarbageCollection === false && scope.visible) {
-            shouldShow = true;
-        }
+        var count = 0;
 
-        if (!shouldShow) {
+        function frustumTest(node) {
 
-            //shouldShow = scope.level > (CLOUD.GlobalData.SubSceneVisibleDistance * CLOUD.GlobalData.CellVisibleLOD);
+            if (node instanceof CLOUD.Group) {
+                if (node.fileId && scope.filter.hasFileFilter(node.fileId))
+                    return;
+            }
 
-            //if (!shouldShow)
-            {
+            if (node.worldBoundingBox) {
 
-                scope.worldBoundingBox.center(v2);
-                //var distance = camera.positionPlane.distanceToPoint(v2);
-                //distance = distance * distance;
-                var distance = 0;
-                if (CLOUD.GlobalData.ByTargetDistance) {
-                    if (scope.worldBoundingBox.containsPoint(camera.target)) {
-                        distance = 0;
-                    } else {
-                        distance = camera.target.distanceToSquared(v2);
+                if (intersectBox(frustum, node.worldBoundingBox) === INTERSECTION_STATE.IS_Leave) {
+                    return;
+                }
+
+            }
+
+            if (node.userData) {
+                var state = intersectObjectByBox(frustum, node);
+                if (state === INTERSECTION_STATE.IS_Contains) {
+
+                    if (scope.filter.isVisible(node) && scope.filter.isSelectable(node)) {
+
+                        if (selectState === CLOUD.OPSELECTIONTYPE.Remove) {
+                            scope.filter.removeSelectedId(node.name);                            
+                        }
+                        else {
+                            scope.filter.addSelectedId(node.name, node.userData);
+                        }
+                        ++count;
                     }
-                } else {
-                    distance = camera.position.distanceToSquared(v2);
-                }
-                distance = distance * 0.002;
 
-                var target = CLOUD.GlobalData.CellVisibleLOD * CLOUD.GlobalData.SubSceneVisibleDistance;
-                if (scope.out && !camera.inside) {
-                    target = target * 20;
-                    shouldShow = true;
-                } else {
-                    shouldShow = distance < target;
                 }
+                else {
+                    return;
+                }
+            }
 
-                //if(!shouldShow)
-                //    console.log(distance + " " + target);
+            var children = node.children;
+            if (!children)
+                return;
+
+            for (var i = 0, l = children.length; i < l; i++) {
+                var child = children[i];
+                if (child.visible) {
+                    frustumTest(child);
+                }
             }
         }
 
-        this.visible = shouldShow;
+        var children = this.rootNode.children;
+        for (var i = 0, l = children.length; i < l; i++) {
+            var child = children[i];
+            if (child.visible) {
+                frustumTest(child);
+            }
+        }
 
-        return this.visible;
-    };
+        callback();
+    }
+
 }();
 
-CLOUD.SubScene = function () {
-    "use strict";
-
-    CLOUD.Cell.call(this);
-
-    this.type = 'SubScene';
-    this.sceneId = '';
-    this.client = null;
-    this.loaded = false;
-    this.visible = false;
+CLOUD.Scene.prototype.isPickable = function (node) {
+    return this.filter.isVisible(node) && this.filter.isSelectable(node);
 };
 
-CLOUD.SubScene.prototype = Object.create(CLOUD.Cell.prototype);
-CLOUD.SubScene.prototype.constructor = CLOUD.SubScene;
+CLOUD.Scene.prototype.pick = function (mouse, camera, callback) {
 
-CLOUD.SubScene.prototype.unload = function () {
+    var scope = this;
+    var raycaster = this.raycaster;
+    raycaster.setFromCamera(mouse, camera);
 
-    var children = this.children;
+    var intersects = this.hitTestClipPlane(raycaster.ray, raycaster.intersectObjects(scope.children, true));
+    intersects = this.hitTestClipPlanes(raycaster, intersects);
+
+    var length = intersects.length;
+
+    if (length > 0) {
+
+        intersects.sort(function (a, b) {
+            return a.distance - b.distance;
+        });
+
+        for (var ii = 0; ii < length; ++ii) {
+
+            var intersect = intersects[ii];
+
+            if (intersect.distance <= camera.near)
+                continue;
+
+            var meshNode = intersect.object;
+
+            if (scope.isPickable(meshNode)) {
+
+                if (meshNode.geometry) {
+                    intersect.userId = meshNode.name; // name -> userId
+                    callback(intersect);
+                    return;
+                }
+
+            }
+        }
+
+    }
+
+   callback(null);
+};
+
+CLOUD.Scene.prototype.hitTest = function (mouse, camera) {
+
+    var ray = this.raycaster;
+    ray.setFromCamera(mouse, camera);
+
+    var intersects =  this.hitTestClipPlane(ray.ray, ray.intersectObjects(this.children, true));
+    intersects =  this.hitTestClipPlanes(ray, intersects);
+
+    if (intersects.length < 1) {
+        return null;
+    }
+
+    intersects.sort(function (a, b) {
+        return a.distance - b.distance;
+    });
+
+    return intersects[0].point;
+};
+
+CLOUD.Scene.prototype.traverseIf = function (callback) {
+
+    function traverseChild(node, callback) {
+        var children = node.children;
+
+        for (var i = 0, len = children.length; i < len; i++) {
+            var child = children[i];
+
+            if (!callback(child, node)) {
+                break;
+            }
+
+            if(child.visible) {
+                traverseChild(child, callback);
+            }
+        }
+    }
+
+    var children = this.rootNode.children;
+
+    for (var i = 0, len = children.length; i < len; i++) {
+        var child = children[i];
+        traverseChild(child, callback);
+    }
+};
+
+CLOUD.Scene.prototype.findSceneNode = function (sceneId) {
+
+    var children = this.rootNode.children;
     for (var i = 0, l = children.length; i < l; i++) {
         var child = children[i];
-        if (child.unload) child.unload();
+        if (sceneId == child.sceneId) {
+            return child;
+        }
     }
 
-    if (this.embedded === undefined) this.children = [];
-    this.loaded = false;
-
-    this.client.geomCacheVer += 1;
+    return null;
 };
 
-CLOUD.SubScene.prototype.clone = function (object, recursive) {
-    if (object === undefined) {
-        object = new CLOUD.SubScene();
-    }
+CLOUD.Scene.prototype.showSceneNodes = function (client, bVisible) {
+    var children = this.rootNode.children;
 
-    CLOUD.Cell.prototype.clone.call(this, object, recursive);
+    for (var i = 0, l = children.length; i < l; i++) {
+        var child = children[i];
 
-    return object;
-};
-
-CLOUD.SubScene.prototype.load = function () {
-
-    if (!this.loaded) {
-        this.visible = false;
-        this.client.loadSubScene(this);
-    } else {
-
-        this.visible = true;
+        if (child.client.databagId === client.databagId) {
+            child.visible = bVisible;
+        }
     }
 };
 
-CLOUD.SubScene.prototype.update2 = function (camera) {
-    this.load();
-};
+CLOUD.Scene.prototype.containsBoxInFrustum = function () {
+    var p1 = new THREE.Vector3(),
+        p2 = new THREE.Vector3();
 
-CLOUD.SubScene.prototype.update = function () {
+    return function (frustum, box) {
 
-    var v2 = new THREE.Vector3();
-    var v1 = new THREE.Vector3();
-    var minBox = new THREE.Box3();
+        var planes = frustum.planes;
 
-    return function (camera) {
+        for (var i = 0; i < 6 ; i++) {
+            var plane = planes[i];
 
-        var scope = this;
+            p1.x = plane.normal.x > 0 ? box.min.x : box.max.x;
+            p2.x = plane.normal.x > 0 ? box.max.x : box.min.x;
+            p1.y = plane.normal.y > 0 ? box.min.y : box.max.y;
+            p2.y = plane.normal.y > 0 ? box.max.y : box.min.y;
+            p1.z = plane.normal.z > 0 ? box.min.z : box.max.z;
+            p2.z = plane.normal.z > 0 ? box.max.z : box.min.z;
 
-        var distance = 0;
+            var d1 = plane.distanceToPoint(p1);
+            var d2 = plane.distanceToPoint(p2);
 
-        var needLoad = false;
+            // if one outside plane, is not contained.
 
-        if (CLOUD.GlobalData.GarbageCollection === false && scope.visible) {
-            needLoad = true;
-        }
-
-        if (CLOUD.GlobalData.ByTargetDistance) {
-            if (scope.worldBoundingBox.containsPoint(camera.target)) {
-                needLoad = true;
-            }
-        } else {
-            if (scope.worldBoundingBox.containsPoint(camera.position)) {
-                needLoad = true;
+            if (d1 < 0 || d2 < 0) {
+                return false;
             }
         }
 
-        if (!needLoad) {
-            scope.worldBoundingBox.center(v2);
-
-            if (CLOUD.GlobalData.ByTargetDistance) {
-                distance = camera.target.distanceToSquared(v2);
-            } else {
-                distance = camera.position.distanceToSquared(v2);
-            }
-
-            distance = distance * 0.002;
-
-            var lodValue = CLOUD.ObjectLevelLoD[scope.level];
-            if (!lodValue) {
-                console.warn("invalid lod!");
-                lodValue = 5;
-            }
-
-            var target = lodValue * CLOUD.GlobalData.SubSceneVisibleDistance * CLOUD.GlobalData.SubSceneVisibleLOD;
-
-            var loadOutside = scope.out && !camera.inside;
-            if (scope.level > CLOUD.EnumObjectLevel.Small && loadOutside) {
-                target = target * 8;
-            }
-
-            if (loadOutside) distance = distance * 0.01;
-
-            needLoad = distance < target;
-        }
-
-        scope.distance = distance;
-
-        if (needLoad) {
-
-            this.load();
-        } else {
-
-            this.visible = false;
-            //console.log(distance + " " + target);
-            //if (CLOUD.GlobalData.DynamicRelease && scope.loaded && distance < scope.level * CLOUD.GlobalData.SubSceneVisibleDistance  * 2) {
-            //    this.unload();
-            //}
-        }
-
-        return this.visible;
+        return true;
     };
+
 }();
+
+CLOUD.Scene.prototype.prepareScene = function () {
+
+};
+
+CLOUD.Scene.prototype.parseRootNode = function (data) {
+
+    var rootNode = this.rootNode;
+    var boundingBox = CLOUD.Utils.box3FromArray(data.view.bbox);
+
+    if (rootNode.boundingBox === null) {
+        rootNode.boundingBox = boundingBox;
+
+        var position = new THREE.Vector3();
+        var rotation = new THREE.Quaternion();
+        var scale = new THREE.Vector3(1,1,1);
+
+        if (data.view.position) {
+            position.fromArray(data.view.position);
+        }
+
+        if (data.view.rotation) {
+            var euler = new THREE.Euler();
+            euler.fromArray(data.view.rotation);
+            rotation.setFromEuler(euler, false);
+        }
+
+        if (data.view.scale) {
+            scale.fromArray(data.view.scale);
+        }
+
+        rootNode.matrix.compose(position, rotation, scale);
+        rootNode.matrixAutoUpdate = false;
+        rootNode.updateMatrixWorld(true);
+
+    } else {
+        rootNode.boundingBox.expandByPoint(boundingBox.min);
+        rootNode.boundingBox.expandByPoint(boundingBox.max);
+    }
+};
+
+CLOUD.Scene.prototype.hasVisibleNode = function () {
+    return this.rootNode.children[0] && this.rootNode.children[0].visible;
+};
+
+CLOUD.Scene.prototype.updateLights = function (camera) {
+    var headLamp = this.lampHead;
+    headLamp.position.copy(camera.getWorldDirection()).multiplyScalar(-1);
+    headLamp.updateMatrixWorld(true);
+
+    var assistLamp = this.lampAssist;
+    assistLamp.position.copy(headLamp.position).add(this.lightOffset).normalize();
+    assistLamp.updateMatrixWorld();
+};
+
+CLOUD.Scene.prototype.updateOctreeBox = function (rootNode) {
+    var groupBox = this.groupOctreeBox;
+
+    function traverse(parent) {
+
+        for ( var i = 0, len = parent.childOctants.length; i < len; i ++ ) {
+            var child = parent.childOctants[i];
+            var box = new THREE.Box3(child.min, child.max);
+            var clr = 0xff;
+            clr = clr << (child.depth * 5);
+
+            var boxNode = new CLOUD.BBoxNode(box, clr);
+            groupBox.add(boxNode);
+            boxNode.updateMatrixWorld(true);
+
+            traverse(child);
+        }
+    }
+
+    if (CLOUD.GlobalData.ShowOctant) {
+
+        groupBox.visible = true;
+
+        if(groupBox.children.length === 0) {
+
+            // var rootNodeMatrix = this.getMatrixWorldOfRootNode();
+            // groupBox.matrixWorld.copy(rootNodeMatrix);
+
+            var box = new THREE.Box3(rootNode.min, rootNode.max);
+            var clr = 0xff0000;
+            var boxNode = new CLOUD.BBoxNode(box, clr);
+            groupBox.add(boxNode);
+            boxNode.updateMatrixWorld(true);
+
+            traverse(rootNode);
+        }
+
+    } else {
+        groupBox.visible = false;
+    }
+
+};
+
+
+//
+function intersectObject(object, raycaster, intersects, recursive, filter) {
+
+    if (!object.visible) {
+        return;
+    }
+
+    if (object instanceof CLOUD.Group) {
+        if (object.fileId && filter.hasFileFilter(object.fileId))
+            return;
+    }
+
+    var hit = object.raycast(raycaster, intersects);
+
+    if (recursive === true && object.children) {
+        // Group
+        var children = object.children;
+        if (children.length > 0 && !hit)
+            return;
+
+        for (var i = 0, l = children.length; i < l; i++) {
+            intersectObject(children[i], raycaster, intersects, true, filter);
+        }
+    }
+}
 
 CLOUD.Raycaster = function (origin, direction, near, far) {
     "use strict";
@@ -10098,59 +10673,38 @@ CLOUD.Raycaster = function (origin, direction, near, far) {
     this.params = {
         Sprite: {},
         Mesh: {},
-        PointCloud: { threshold: 1 },
+        PointCloud: {threshold: 1},
         LOD: {},
         Line: {}
     };
 };
 
-//
-CLOUD.intersectObject = function (object, raycaster, intersects, recursive, filter) {
-    if (!object.visible) {
-        return;
-    }
-
-    if (object instanceof CLOUD.Group) {
-        if (object.fileId && filter.hasFileFilter(object.fileId)) return;
-    }
-
-    var hit = object.raycast(raycaster, intersects);
-
-    if (recursive === true && object.children) {
-        // Group
-        var children = object.children;
-        if (children.length > 0 && !hit) return;
-
-        for (var i = 0, l = children.length; i < l; i++) {
-            CLOUD.intersectObject(children[i], raycaster, intersects, true, filter);
-        }
-    }
-};
-
 CLOUD.Raycaster.prototype = {
+
     constructor: CLOUD.Raycaster,
 
     precision: 0.0001,
     linePrecision: 1,
 
-    descSort: function descSort(a, b) {
+    descSort: function (a, b) {
         return a.distance - b.distance;
     },
 
-    set: function set(origin, direction) {
+    set: function (origin, direction) {
         // direction is assumed to be normalized (for accurate distance calculations)
 
         this.ray.set(origin, direction);
     },
 
-    setFilter: function setFilter(filter) {
+    setFilter: function (filter) {
         this.filter = filter;
     },
 
-    setFromCamera: function setFromCamera(coords, camera) {
+    setFromCamera: function (coords, camera) {
+
         // camera is assumed _not_ to be a child of a transformed object
         if (camera instanceof THREE.CombinedCamera) {
-            if (camera.inPerspectiveMode) {
+            if (camera.isPerspective) {
                 this.ray.origin.copy(camera.position);
                 this.ray.direction.set(coords.x, coords.y, 0.5).unproject(camera).sub(camera.position).normalize();
             } else {
@@ -10168,21 +10722,22 @@ CLOUD.Raycaster.prototype = {
         }
     },
 
-    intersectObject: function intersectObject(object, recursive) {
+    intersectObject: function (object, recursive) {
+
         var intersects = [];
 
-        CLOUD.intersectObject(object, this, intersects, recursive, this.filter);
+        intersectObject(object, this, intersects, recursive, this.filter);
 
         //intersects.sort( descSort );
 
         return intersects;
     },
 
-    intersectObjects: function intersectObjects(objects, recursive) {
+    intersectObjects: function (objects, recursive) {
         var intersects = [];
 
-        for (var i = 0, l = objects.length; i < l; i++) {
-            CLOUD.intersectObject(objects[i], this, intersects, recursive, this.filter);
+        for (var i = 0, len = objects.length; i < len; i++) {
+            intersectObject(objects[i], this, intersects, recursive, this.filter);
         }
 
         //intersects.sort( descSort );
@@ -10190,13 +10745,11 @@ CLOUD.Raycaster.prototype = {
         return intersects;
     }
 };
-
 CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     "use strict";
 
     this.viewer = viewer;
-
-    this.object = camera;
+    this.camera = camera;
     this.domElement = domElement;
 
     this.cameraDirty = true;
@@ -10204,10 +10757,24 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     // Set to false to disable this control
     this.enabled = true;
 
-    // "target" sets the location of focus
-    this.target = new THREE.Vector3();
     // the orbit center
     this.pivot = null;
+
+    var geometry = new THREE.SphereBufferGeometry(15, 64, 64);
+    this.pivotBall = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
+        color: 0xffffff,
+        depthTest: false,
+        opacity: 0.5,
+        transparent: true
+    }));
+
+    geometry = new THREE.SphereBufferGeometry(1, 64, 64);
+    this.pivotCenter = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
+        color: 0xff0000,
+        depthTest: false,
+        opacity: 0.5,
+        transparent: true
+    }));
 
     //this.movementSpeed = 0.005 * CLOUD.GlobalData.SceneSize; // 移动速度
     this.movementSpeed = 0.0008 * CLOUD.GlobalData.SceneSize; // 移动速度
@@ -10223,7 +10790,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     //this.minDistance = camera.near;//
     this.minDistance = 0.1; // 0.000001; // 可能影响pick，pick对象与camera.near有关，是否这里也设置成camera.near？待进一步测试
     //this.maxDistance = Infinity;
-    this.maxDistance = camera.far - CLOUD.GlobalData.SceneSize * 2; //camera.far * 0.9
+    this.maxDistance = camera.far - CLOUD.GlobalData.SceneSize * 2;//camera.far * 0.9
 
     this.defaultThroughOutDistance = 0.1;
 
@@ -10233,13 +10800,13 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     // Set to true to disable this control
     this.noPan = false;
-    this.keyPanSpeed = 2.0; // pixels moved per arrow key push
+    this.keyPanSpeed = 2.0;	// pixels moved per arrow key push
     this.defaultKeyPanSpeed = this.keyPanSpeed;
     this.minKeyPanSpeed = 0.01;
     //this.movementSpeedMultiplier = 1.0;
 
     // Set to true to automatically rotate around the target
-    this.autoRotate = false;
+    this.autoRotate = true;
     this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
 
     // How far you can orbit vertically, upper and lower limits.
@@ -10313,13 +10880,10 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     var lastPosition = new THREE.Vector3();
     var lastQuaternion = new THREE.Quaternion();
 
-    var STATE = { NONE: -1, ROTATE: 0, DOLLY: 1, PAN: 2 };
-
+    var STATE = {NONE: -1, ROTATE: 0, DOLLY: 1, PAN: 2};
     var state = STATE.NONE;
 
     var lastTrackingPoint;
-
-    var lastEvent;
 
     this.destroy = function () {
         this.viewer = null;
@@ -10329,19 +10893,243 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         return state === STATE.NONE;
     };
 
+    this.update = function () {
+
+        return function (forceRender, updateRenderList) {
+
+            var position = this.camera.position;
+            var pivot = this.pivot !== null ? this.pivot : this.camera.target;
+            var scope = this;
+
+            if (state !== STATE.NONE) {
+                this.dirtyCamera(true);
+            }
+
+            if (!this.isDisableRotate) {
+                if (state == STATE.ROTATE) {
+
+                    var eye = this.camera.target.clone().sub(position);
+                    var eyeDistance = eye.length();
+                    var viewVec = position.clone().sub(pivot);
+                    var viewLength = viewVec.length();
+                    var viewTrf = null;
+                    var camDir = this.camera.getWorldDirection();
+
+                    viewVec.normalize();
+
+                    // 调整相机位置
+                    var adjustCameraPosition = function (trf) {
+
+                        var newTarget = new THREE.Vector3(); // 新目标点
+                        var newViewDir = viewVec.clone().applyQuaternion(trf).normalize();
+
+                        // 相机新位置
+                        position.copy(pivot).add(newViewDir.multiplyScalar(viewLength));
+
+                        // 保持相机到目标点的距离不变
+                        camDir.applyQuaternion(trf).normalize();
+                        newTarget.copy(position).add(camDir.multiplyScalar(eyeDistance));
+                        // 相机目标点位置
+                        scope.camera.target.copy(newTarget);
+                    };
+
+                    var up = this.camera.realUp || this.camera.up;
+                    var rightDir = camDir.clone().cross(up).normalize();
+                    var realUp = rightDir.clone().cross(camDir).normalize();
+                    this.camera.realUp.copy(realUp);
+
+                    var rotAxis;
+
+                    // 锁定Z轴
+                    if (this.isConstrainedAxisZ) {
+
+                        // 水平旋转
+                        if (Math.abs(thetaDelta) > Math.abs(phiDelta)) {
+
+                            rotAxis = _zAxisUp;
+                            viewTrf = new THREE.Quaternion().setFromAxisAngle(rotAxis, thetaDelta);
+                            adjustCameraPosition(viewTrf);
+                            this.camera.realUp.applyQuaternion(viewTrf).normalize();
+
+                        }
+
+                    } else {
+
+                        // 水平旋转
+                        if (Math.abs(thetaDelta) > Math.abs(phiDelta)) {
+
+                            // remark: this.camera.up 的使用有些奇怪，大多数都被置成了 THREE.Object3D.DefaultUp，后续需要在重新考虑下
+                            // 当this.camera.up为THREE.Object3D.DefaultUp时，其实水平旋转就是锁定了Z轴的旋转(模型的Z轴对应场景的Y轴)
+                            rotAxis = this.camera.up.clone().normalize();
+                            viewTrf = new THREE.Quaternion().setFromAxisAngle(rotAxis, thetaDelta);
+                            adjustCameraPosition(viewTrf);
+                            this.camera.realUp.applyQuaternion(viewTrf).normalize();
+
+                        } else if (Math.abs(phiDelta) > 0.01) { // 垂直旋转
+
+                            rotAxis = camDir.clone().cross(up).normalize();
+                            viewTrf = new THREE.Quaternion().setFromAxisAngle(rotAxis, phiDelta);
+                            adjustCameraPosition(viewTrf);
+                            this.camera.realUp.applyQuaternion(viewTrf).normalize();
+
+                            // 旋转180度时，up的y值应该反向，否则移动会反
+                            this.adjustCameraUp();
+                        }
+
+                    }
+
+                }
+            }
+
+
+            if (state === STATE.PAN) {
+
+                this.camera.target.add(pan);
+                this.camera.position.add(pan);
+
+            }
+
+            // lookAt使用realUp
+            var tmpUp = new THREE.Vector3();
+            tmpUp.copy(this.camera.up);
+            this.camera.up.copy(this.camera.realUp);
+            this.camera.lookAt(this.camera.target);
+            this.camera.up.copy(tmpUp);
+
+            thetaDelta = 0;
+            phiDelta = 0;
+            scale = 1;
+            pan.set(0, 0, 0);
+
+            if (forceRender) {
+                //console.log("CameraEditor.forceRender");
+                if (updateRenderList !== undefined) {
+                    this.needUpdateRenderList(updateRenderList);
+                }
+
+                onChange();
+
+                this.dirtyCamera(false);
+
+                lastPosition.copy(this.camera.position);
+                lastQuaternion.copy(this.camera.quaternion);
+            } else {
+
+                // update condition is:
+                // min(camera displacement, camera rotation in radians)^2 > EPS
+                // using small-angle approximation cos(x/2) = 1 - x^2 / 8
+
+                if (lastPosition.distanceToSquared(this.camera.position) > EPS
+                    || 8 * (1 - lastQuaternion.dot(this.camera.quaternion)) > EPS) {
+
+                    //console.log("CameraEditor.render");
+                    onChange();
+
+                    this.dirtyCamera(false);
+
+                    lastPosition.copy(this.camera.position);
+                    lastQuaternion.copy(this.camera.quaternion);
+                }
+            }
+        }
+
+    }();
+
+    this.updateAuto = function () {
+
+        var offset = new THREE.Vector3();
+
+        // so camera.up is the orbit axis
+        var quat = new THREE.Quaternion().setFromUnitVectors(camera.up, new THREE.Vector3(0, 1, 0));
+        var quatInverse = quat.clone().inverse();
+
+        var lastPosition = new THREE.Vector3();
+        var lastQuaternion = new THREE.Quaternion();
+
+        return function () {
+
+            var position = this.camera.position;
+
+            offset.copy(position).sub(this.camera.target);
+
+            // rotate offset to "y-axis-is-up" space
+            offset.applyQuaternion(quat);
+
+            // angle from z-axis around y-axis
+
+            theta = Math.atan2(offset.x, offset.z);
+
+            // angle from y-axis
+
+            phi = Math.atan2(Math.sqrt(offset.x * offset.x + offset.z * offset.z), offset.y);
+
+            theta += thetaDelta;
+            phi += phiDelta;
+
+            // restrict theta to be between desired limits
+            theta = Math.max(this.minAzimuthAngle, Math.min(this.maxAzimuthAngle, theta));
+
+            // restrict phi to be between desired limits
+            phi = Math.max(this.minPolarAngle, Math.min(this.maxPolarAngle, phi));
+
+            // restrict phi to be betwee EPS and PI-EPS
+            phi = Math.max(EPS, Math.min(Math.PI - EPS, phi));
+
+            var radius = offset.length() * scale;
+
+            // restrict radius to be between desired limits
+            radius = Math.max(this.minDistance, Math.min(this.maxDistance, radius));
+
+            // move target to panned location
+            this.camera.target.add(panOffset);
+
+            offset.x = radius * Math.sin(phi) * Math.sin(theta);
+            offset.y = radius * Math.cos(phi);
+            offset.z = radius * Math.sin(phi) * Math.cos(theta);
+
+            // rotate offset back to "camera-up-vector-is-up" space
+            offset.applyQuaternion(quatInverse);
+
+            position.copy(this.camera.target).add(offset);
+
+            this.camera.lookAt(this.camera.target);
+
+            thetaDelta = 0;
+            phiDelta = 0;
+            scale = 1;
+            panOffset.set(0, 0, 0);
+
+            lastPosition.copy(this.camera.position);
+            lastQuaternion.copy(this.camera.quaternion);
+
+            onChange();
+
+            return true;
+
+        };
+
+    }();
+
     // 锁定Z轴
     this.lockAxisZ = function (isLock) {
 
         this.isConstrainedAxisZ = isLock;
+
     };
 
     this.updateView = function (updateRenderList) {
 
         if (updateRenderList !== undefined) {
-            this.viewer.editorManager.isUpdateRenderList = updateRenderList;
+            this.needUpdateRenderList(updateRenderList);
         }
 
+
         onChange();
+    };
+
+    // 是否需要更新RenderList
+    this.needUpdateRenderList = function (need) {
+        this.viewer.editorManager.isUpdateRenderList = need;
     };
 
     // 是否禁止旋转
@@ -10368,7 +11156,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     // pass in distance in world space to move left
     this.panLeft = function (distance) {
-        var te = this.object.matrix.elements;
+        var te = this.camera.matrix.elements;
 
         // get X column of matrix
         panOffset.set(te[0], te[1], te[2]);
@@ -10380,7 +11168,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     // pass in distance in world space to move up
     this.panUp = function (distance) {
-        var te = this.object.matrix.elements;
+        var te = this.camera.matrix.elements;
 
         // get Y column of matrix
         panOffset.set(te[4], te[5], te[6]);
@@ -10395,23 +11183,23 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     this.pan = function (deltaX, deltaY) {
         var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
-        if (scope.object.fov !== undefined) {
+        if (scope.camera.fov !== undefined) {
             // perspective
-            var position = scope.object.position;
-            var offset = position.clone().sub(scope.target);
+            var position = scope.camera.position;
+            var offset = position.clone().sub(scope.camera.target);
             var targetDistance = offset.length();
 
             // half of the fov is center to top of screen
-            targetDistance *= Math.tan(scope.object.fov / 2 * Math.PI / 180.0);
+            targetDistance *= Math.tan((scope.camera.fov / 2) * Math.PI / 180.0);
 
             //console.log(targetDistance);
             // we actually don't use screenWidth, since perspective camera is fixed to screen height
             scope.panLeft(2 * deltaX * targetDistance / element.clientHeight);
             scope.panUp(2 * deltaY * targetDistance / element.clientHeight);
-        } else if (scope.object.top !== undefined) {
+        } else if (scope.camera.top !== undefined) {
             // orthographic
-            scope.panLeft(deltaX * (scope.object.right - scope.object.left) / element.clientWidth);
-            scope.panUp(deltaY * (scope.object.top - scope.object.bottom) / element.clientHeight);
+            scope.panLeft(deltaX * (scope.camera.right - scope.camera.left) / element.clientWidth);
+            scope.panUp(deltaY * (scope.camera.top - scope.camera.bottom) / element.clientHeight);
         } else {
             // camera neither orthographic or perspective
             console.warn('WARNING: CloudPickEditor.js encountered an unknown camera type - pan disabled.');
@@ -10450,7 +11238,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             panDeltaBasedWorld.addVectors(deltaX, deltaY);
 
             pan.add(panDeltaBasedWorld);
-        };
+        }
+
     }();
 
     this.dolly = function () {
@@ -10466,7 +11255,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             var minDistance = this.minDistance;
             var factor = 2 - scale; // 1 - (scale - 1)
 
-            var cameraPos = this.object.position;
+            var cameraPos = this.camera.position;
             var eye = this.getWorldEye();
 
             var dir = new THREE.Vector3();
@@ -10481,18 +11270,20 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                 var offsetVec = dir.clone().normalize();
                 offsetVec.normalize().multiplyScalar(minDistance);
                 newCameraPos.addVectors(offsetVec, cameraPos);
-            } else {
+            }
+            else {
 
                 dir.multiplyScalar(-factor);
                 newCameraPos.addVectors(dir, centerPosition);
             }
 
-            this.object.position.copy(newCameraPos);
-            this.target.copy(eye.add(newCameraPos));
-        } else {
+            this.camera.position.copy(newCameraPos);
+            this.camera.target.copy(eye.add(newCameraPos));
+        }
+        else {
             scope.dollyByCenter();
         }
-    };
+    }
 
     this.dollyIn = function (dollyScale) {
         if (dollyScale === undefined) {
@@ -10519,7 +11310,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         var minDistance = this.minDistance;
         var factor = 2 - scale; // 1 - (scale - 1)
 
-        var cameraPos = this.object.position;
+        var cameraPos = this.camera.position;
         var eye = this.getWorldEye();
         var dollyPoint = this.getTrackingPoint(cx, cy);
 
@@ -10537,20 +11328,21 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             offsetVec.normalize().multiplyScalar(minDistance);
             newCameraPos.addVectors(offsetVec, cameraPos);
 
-            this.object.position.copy(newCameraPos);
-            this.target.copy(eye.add(newCameraPos));
+            this.camera.position.copy(newCameraPos);
+            this.camera.target.copy(eye.add(newCameraPos));
 
             // 更新追踪点
             offsetVec.normalize().multiplyScalar(this.defaultThroughOutDistance);
             lastTrackingPoint = dollyPoint.clone();
             lastTrackingPoint.add(offsetVec);
+
         } else {
 
             dir.multiplyScalar(-factor);
             newCameraPos.addVectors(dir, dollyPoint);
 
-            this.object.position.copy(newCameraPos);
-            this.target.copy(eye.add(newCameraPos));
+            this.camera.position.copy(newCameraPos);
+            this.camera.target.copy(eye.add(newCameraPos));
         }
     };
 
@@ -10567,242 +11359,27 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         var dir = eye.clone().normalize();
 
         dir.multiplyScalar(deltaStep);
-        this.object.position.add(dir);
-        this.target.addVectors(this.object.position, eye);
+        this.camera.position.add(dir);
+        this.camera.target.addVectors(this.camera.position, eye);
     };
 
     this.updateCamera = function (target, noRest) {
 
-        this.cameraDirty = true;
+        this.dirtyCamera(true);
 
-        lastPosition.copy(this.object.position);
-        lastQuaternion.copy(this.object.quaternion);
-        this.target.copy(target);
+        lastPosition.copy(this.camera.position);
+        lastQuaternion.copy(this.camera.quaternion);
+        this.camera.target.copy(target);
 
         if (!noRest) {
             scope.reset();
         }
+
     };
 
-    this.update = function () {
-
-        return function (forceRender, updateRenderList) {
-
-            var position = this.object.position;
-            var pivot = this.pivot !== null ? this.pivot : this.target;
-            var scope = this;
-
-            if (state !== STATE.NONE) {
-                this.cameraDirty = true;
-            }
-
-            if (!this.isDisableRotate) {
-                if (state == STATE.ROTATE) {
-
-                    //            var eye = this.target.clone().sub(position);
-                    //            var eyeDistance = eye.length();
-                    //
-                    //            var viewVec = position.clone().sub(pivot);
-                    //            var viewLength = viewVec.length();
-                    //            viewVec.normalize();
-                    //            var viewTrf = null;
-                    //            var camDir = this.object.getWorldDirection();
-                    //
-                    //            console.log("up", [this.object.up.x, this.object.up.y, this.object.up.z]);
-                    //
-                    //            // 水平旋转
-                    //            if (Math.abs(thetaDelta) > Math.abs(phiDelta)) {
-                    //
-                    //                var rightDir = camDir.clone().cross(this.object.up);
-                    //                if (rightDir.lengthSq() > 0.001) {
-                    //
-                    //                    viewTrf = new THREE.Quaternion().setFromAxisAngle(this.object.up, thetaDelta);
-                    //
-                    //                    var newViewDir = viewVec.clone().applyQuaternion(viewTrf);
-                    //                    newViewDir.normalize();
-                    //
-                    //                    position.copy(pivot).add(newViewDir.multiplyScalar(viewLength));
-                    //
-                    //                    camDir.applyQuaternion(viewTrf);
-                    //                    camDir.normalize();
-                    //
-                    //                    // 保持相机到目标点的距离不变
-                    //                    var newTarget = new THREE.Vector3();
-                    //                    //newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
-                    //                    newTarget.copy(position).add(camDir.multiplyScalar(eyeDistance));
-                    //
-                    //                    this.target.copy(newTarget);
-                    //                    this.object.realUp.copy(rightDir).cross(camDir);
-                    //                }
-                    //
-                    //            }
-                    //            else if (Math.abs(phiDelta) > 0.01) { // 垂直旋转
-                    //
-                    //                var abortRotation = false;
-                    //                var rightDir = camDir.clone().cross(this.object.up);
-                    //                if (rightDir.lengthSq() < 0.001) {
-                    //
-                    //                    var shouldAbortRotation = function (realUp) {
-                    //                        if (Math.abs(camDir.dot(new THREE.Vector3(0, 1, 0)) - 1) < 0.001) {
-                    //                            if (phiDelta > 0)
-                    //                                return true;
-                    //                            rightDir = camDir.clone().cross(realUp);
-                    //
-                    //                            //console.log("BOTTOM");
-                    //                        }
-                    //
-                    //                        if (Math.abs(camDir.dot(new THREE.Vector3(0, -1, 0)) - 1) < 0.001) {
-                    //                            if (phiDelta < 0)
-                    //                                return true;
-                    //
-                    //                            rightDir = camDir.clone().cross(realUp);
-                    //                            //console.log("TOP");
-                    //                        }
-                    //
-                    //                        return false;
-                    //                    }
-                    //                    abortRotation = shouldAbortRotation(this.object.realUp);
-                    //                }
-                    //
-                    //                if (!abortRotation) {
-                    //                    viewTrf = new THREE.Quaternion().setFromAxisAngle(rightDir, phiDelta);
-                    //
-                    //                    var newViewDir = viewVec.clone().applyQuaternion(viewTrf);
-                    //                    newViewDir.normalize();
-                    //
-                    //                    position.copy(pivot).add(newViewDir.multiplyScalar(viewLength));
-                    //
-                    //                    camDir.applyQuaternion(viewTrf);
-                    //                    camDir.normalize();
-                    //
-                    //                    // 保持相机到目标点的距离不变
-                    //                    var newTarget = new THREE.Vector3();
-                    //                    //newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
-                    //                    newTarget.copy(position).add(camDir.multiplyScalar(eyeDistance));
-                    //
-                    //                    this.object.realUp.copy(rightDir).cross(camDir);
-                    //                    this.target.copy(newTarget);
-                    //                }
-                    //            }
-
-                    var eye = this.target.clone().sub(position);
-                    var eyeDistance = eye.length();
-                    var viewVec = position.clone().sub(pivot);
-                    var viewLength = viewVec.length();
-                    var viewTrf = null;
-                    var camDir = this.object.getWorldDirection();
-
-                    viewVec.normalize();
-
-                    // 调整相机位置
-                    var adjustCameraPosition = function adjustCameraPosition(trf) {
-
-                        var newTarget = new THREE.Vector3(); // 新目标点
-                        var newViewDir = viewVec.clone().applyQuaternion(trf).normalize();
-
-                        // 相机新位置
-                        position.copy(pivot).add(newViewDir.multiplyScalar(viewLength));
-
-                        // 保持相机到目标点的距离不变
-                        camDir.applyQuaternion(trf).normalize();
-                        newTarget.copy(position).add(camDir.multiplyScalar(eyeDistance));
-                        // 相机目标点位置
-                        scope.target.copy(newTarget);
-                    };
-
-                    var up = this.object.realUp || this.object.up;
-                    var rightDir = camDir.clone().cross(up).normalize();
-                    var realUp = rightDir.clone().cross(camDir).normalize();
-                    this.object.realUp.copy(realUp);
-
-                    var rotAxis;
-
-                    // 锁定Z轴
-                    if (this.isConstrainedAxisZ) {
-
-                        // 水平旋转
-                        if (Math.abs(thetaDelta) > Math.abs(phiDelta)) {
-
-                            rotAxis = _zAxisUp;
-                            viewTrf = new THREE.Quaternion().setFromAxisAngle(rotAxis, thetaDelta);
-                            adjustCameraPosition(viewTrf);
-                            this.object.realUp.applyQuaternion(viewTrf).normalize();
-                        }
-                    } else {
-
-                        // 水平旋转
-                        if (Math.abs(thetaDelta) > Math.abs(phiDelta)) {
-
-                            // remark: this.object.up 的使用有些奇怪，大多数都被置成了 THREE.Object3D.DefaultUp，后续需要在重新考虑下
-                            // 当this.object.up为THREE.Object3D.DefaultUp时，其实水平旋转就是锁定了Z轴的旋转(模型的Z轴对应场景的Y轴)
-                            rotAxis = this.object.up.clone().normalize();
-                            viewTrf = new THREE.Quaternion().setFromAxisAngle(rotAxis, thetaDelta);
-                            adjustCameraPosition(viewTrf);
-                            this.object.realUp.applyQuaternion(viewTrf).normalize();
-                        } else if (Math.abs(phiDelta) > 0.01) {
-                            // 垂直旋转
-
-                            rotAxis = camDir.clone().cross(up).normalize();
-                            viewTrf = new THREE.Quaternion().setFromAxisAngle(rotAxis, phiDelta);
-                            adjustCameraPosition(viewTrf);
-                            this.object.realUp.applyQuaternion(viewTrf).normalize();
-
-                            // 旋转180度时，up的y值应该反向，否则移动会反
-                            this.adjustCameraUp();
-                        }
-                    }
-                }
-            }
-
-            if (state === STATE.PAN) {
-
-                this.target.add(pan);
-                this.object.position.add(pan);
-            }
-
-            // lookAt使用realUp
-            var tmpUp = new THREE.Vector3();
-            tmpUp.copy(this.object.up);
-            this.object.up.copy(this.object.realUp);
-            this.object.lookAt(this.target);
-            this.object.up.copy(tmpUp);
-
-            thetaDelta = 0;
-            phiDelta = 0;
-            scale = 1;
-            pan.set(0, 0, 0);
-
-            if (forceRender) {
-                //console.log("CameraEditor.forceRender");
-                if (updateRenderList !== undefined) {
-                    this.viewer.editorManager.isUpdateRenderList = updateRenderList;
-                }
-
-                onChange();
-
-                this.cameraDirty = false;
-
-                lastPosition.copy(this.object.position);
-                lastQuaternion.copy(this.object.quaternion);
-            } else {
-
-                // update condition is:
-                // min(camera displacement, camera rotation in radians)^2 > EPS
-                // using small-angle approximation cos(x/2) = 1 - x^2 / 8
-
-                if (lastPosition.distanceToSquared(this.object.position) > EPS || 8 * (1 - lastQuaternion.dot(this.object.quaternion)) > EPS) {
-
-                    //console.log("CameraEditor.render");
-                    onChange();
-
-                    this.cameraDirty = false;
-
-                    lastPosition.copy(this.object.position);
-                    lastQuaternion.copy(this.object.quaternion);
-                }
-            }
-        };
-    }();
+    this.dirtyCamera = function (dirty) {
+        this.cameraDirty = dirty;
+    };
 
     this.clamp = function (value, min, max) {
         return Math.max(min, Math.min(max, value));
@@ -10818,7 +11395,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         offset.x = sinPhiRadius * Math.sin(theta);
         offset.y = Math.cos(phi) * radius;
         offset.z = sinPhiRadius * Math.cos(theta);
-    };
+    }
 
     this.getDirFromPositionAndTarget = function (quat, position, target, fix) {
         var distance = position.clone().sub(target).length();
@@ -10835,7 +11412,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
         if (fix) {
             theta = this.clamp(theta, scope.minAzimuthAngle, scope.maxAzimuthAngle);
-            var tempPhi = this.clamp(phi, scope.minPolarAngle + EPS, scope.maxPolarAngle - EPS); //Math.max( scope.minPolarAngle + EPS, Math.min( scope.maxPolarAngle - EPS, phi ) );
+            var tempPhi = this.clamp(phi, scope.minPolarAngle + EPS, scope.maxPolarAngle - EPS);//Math.max( scope.minPolarAngle + EPS, Math.min( scope.maxPolarAngle - EPS, phi ) );
             phiDelta += tempPhi - phi;
             phi = tempPhi;
         }
@@ -10845,43 +11422,45 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         offset.applyQuaternion(quatInverse);
 
         return offset;
-    };
+    }
 
     this.touchUpdate = function () {
-        var quat = new THREE.Quaternion().setFromUnitVectors(scope.object.up, new THREE.Vector3(0, 1, 0));
+        var quat = new THREE.Quaternion().setFromUnitVectors(scope.camera.up, new THREE.Vector3(0, 1, 0));
 
         var lastPosition = new THREE.Vector3();
         var lastQuaternion = new THREE.Quaternion();
 
         return function (forceRender, updateRenderList) {
             if (state !== STATE.NONE) {
-                this.cameraDirty = true;
+                this.dirtyCamera(true);
             }
 
             if (state == STATE.ROTATE) {
-                var position = this.object.position;
+                var position = this.camera.position;
 
-                var camDir = this.getDirFromPositionAndTarget(quat, position, this.target, true);
+                var camDir = this.getDirFromPositionAndTarget(quat, position, this.camera.target, true);
 
                 if (this.pivot !== null) {
                     var offset = this.getDirFromPositionAndTarget(quat, position, this.pivot, false);
                     position.copy(this.pivot).add(offset);
                     camDir.setLength(offset.length());
-                    this.target.copy(position.clone().sub(camDir));
-                } else {
-                    position.copy(this.target).add(camDir);
+                    this.camera.target.copy(position.clone().sub(camDir));
                 }
+                else {
+                    position.copy(this.camera.target).add(camDir);
+                }
+
             }
 
-            this.target.add(pan);
-            this.object.position.add(pan);
+            this.camera.target.add(pan);
+            this.camera.position.add(pan);
 
             // lookAt使用realUp
             var tmpUp = new THREE.Vector3();
-            tmpUp.copy(this.object.up);
-            this.object.up.copy(this.object.realUp);
-            this.object.lookAt(this.target);
-            this.object.up.copy(tmpUp);
+            tmpUp.copy(this.camera.up);
+            this.camera.up.copy(this.camera.realUp);
+            this.camera.lookAt(this.camera.target);
+            this.camera.up.copy(tmpUp);
 
             thetaDelta = 0;
             phiDelta = 0;
@@ -10891,28 +11470,30 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             if (forceRender) {
                 //console.log("CameraEditor.forceRender");
                 if (updateRenderList !== undefined) {
-                    this.viewer.editorManager.isUpdateRenderList = updateRenderList;
+                    this.needUpdateRenderList(updateRenderList);
                 }
 
                 onChange();
 
-                this.cameraDirty = false;
+                this.dirtyCamera(false);
 
-                lastPosition.copy(this.object.position);
-                lastQuaternion.copy(this.object.quaternion);
-            } else {
-                if (lastPosition.distanceToSquared(this.object.position) > EPS || 8 * (1 - lastQuaternion.dot(this.object.quaternion)) > EPS) {
+                lastPosition.copy(this.camera.position);
+                lastQuaternion.copy(this.camera.quaternion);
+            }
+            else {
+                if (lastPosition.distanceToSquared(this.camera.position) > EPS
+                    || 8 * (1 - lastQuaternion.dot(this.camera.quaternion)) > EPS) {
 
                     //console.log("CameraEditor.render");
                     onChange();
 
-                    this.cameraDirty = false;
+                    this.dirtyCamera(false);
 
-                    lastPosition.copy(this.object.position);
-                    lastQuaternion.copy(this.object.quaternion);
+                    lastPosition.copy(this.camera.position);
+                    lastQuaternion.copy(this.camera.quaternion);
                 }
             }
-        };
+        }
     }();
 
     this.setState = function (val) {
@@ -10923,7 +11504,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         state = STATE.NONE;
 
         //this.target.copy( this.target0 );
-        //this.object.position.copy( this.position0 );
+        //this.camera.position.copy( this.position0 );
 
         // Modified by xmh 2016-6-24 begin
         // 强制重刷一帧，设置视点后，将相机设成脏状态，不强制刷新，状态设成正常状态的时机可能会出错。
@@ -10989,7 +11570,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
             this.dollyByCenter();
             this.update();
-        } else {
+        }
+        else {
 
             if (factor > 0) {
                 this.dollyIn(1 - factor);
@@ -11006,16 +11588,16 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     // 基于相机空间的漫游
     this.fly = function (moveVector, quaternion) {
-        this.object.translateX(moveVector.x);
-        this.object.translateY(moveVector.y);
-        this.object.translateZ(moveVector.z);
-        this.object.quaternion.multiply(quaternion);
+        this.camera.translateX(moveVector.x);
+        this.camera.translateY(moveVector.y);
+        this.camera.translateZ(moveVector.z);
+        this.camera.quaternion.multiply(quaternion);
 
         // expose the rotation vector for convenience
-        this.object.rotation.setFromQuaternion(this.object.quaternion, this.object.rotation.order);
+        this.camera.rotation.setFromQuaternion(this.camera.quaternion, this.camera.rotation.order);
 
         // update target
-        this.target.copy(this.object.position).add(this.object.getWorldDirection());
+        this.camera.target.copy(this.camera.position).add(this.camera.getWorldDirection());
 
         onChange();
     };
@@ -11023,17 +11605,17 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     // 基于世界空间的漫游
     this.flyOnWorld = function () {
 
-        var up = this.object.up.clone();
+        var up = this.camera.up.clone();
 
-        if (this.object.realUp) {
-            this.object.up.copy(this.object.realUp);
+        if (this.camera.realUp) {
+            this.camera.up.copy(this.camera.realUp);
         }
 
         // 使用realUp
-        this.object.lookAt(this.target);
+        this.camera.lookAt(this.camera.target);
 
-        if (this.object.realUp) {
-            this.object.up.copy(up);
+        if (this.camera.realUp) {
+            this.camera.up.copy(up);
         }
 
         // 调用Render刷新
@@ -11068,7 +11650,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             rotateEnd.set(cx, cy);
             rotateDelta.subVectors(rotateEnd, rotateStart);
 
-            if (rotateDelta.x == 0 && rotateDelta.y == 0) return;
+            if (rotateDelta.x == 0 && rotateDelta.y == 0)
+                return;
 
             // rotating across whole screen goes 360 degrees around
             scope.rotateLeft(2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed);
@@ -11077,12 +11660,15 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             scope.rotateUp(2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed);
 
             rotateStart.copy(rotateEnd);
+
+
         } else if (state === STATE.DOLLY) {
             if (scope.noZoom === true) return;
 
             dollyEnd.set(cx, cy);
             dollyDelta.subVectors(dollyEnd, dollyStart);
-            if (dollyDelta.x == 0 && dollyDelta.y == 0) return;
+            if (dollyDelta.x == 0 && dollyDelta.y == 0)
+                return;
             if (dollyDelta.y > 0) {
                 //console.log("dollyOut");
                 scope.dollyOut();
@@ -11099,7 +11685,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
             panEnd.set(cx, cy);
             panDelta.subVectors(panEnd, panStart);
-            if (panDelta.x == 0 && panDelta.y == 0) return;
+            if (panDelta.x == 0 && panDelta.y == 0)
+                return;
 
             scope.panOnWorld();
             //scope.pan( panDelta.x, panDelta.y );
@@ -11107,14 +11694,14 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             panStart.copy(panEnd);
         }
 
-        if (state !== STATE.NONE) scope.update(forceRender);
+        if (state !== STATE.NONE)
+            scope.update(forceRender);
     };
 
     this.processTouch = function (input, forceRender) {
         var pointersLength = input.pointers.length;
 
-        if (pointersLength > 1) {
-            // 多指操作
+        if (pointersLength > 1) {// 多指操作
             // ROTATE
             if (scope.noRotate !== true) {
                 state = STATE.ROTATE;
@@ -11134,8 +11721,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                 state = STATE.DOLLY;
                 scale /= input.relativeScale;
             }
-        } else {
-            // 单指操作
+        } else {// 单指操作
             if (scope.noPan !== true) {
                 state = STATE.PAN;
 
@@ -11165,13 +11751,13 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
         return function (x1, x2, y1, y2, frustum, dim) {
 
-            var camera = this.object;
+            var camera = this.camera;
 
             var ymax = camera.near * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
             var xmax = ymax * camera.aspect;
 
-            var rx1 = (x1 - dim.left) / dim.width * 2 - 1;
-            var rx2 = (x2 - dim.left) / dim.width * 2 - 1;
+            var rx1 = ((x1 - dim.left) / dim.width) * 2 - 1;
+            var rx2 = ((x2 - dim.left) / dim.width) * 2 - 1;
             var ry1 = -((y1 - dim.top) / dim.height) * 2 + 1;
             var ry2 = -((y2 - dim.top) / dim.height) * 2 + 1;
 
@@ -11181,21 +11767,23 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             camera.matrixWorldInverse.getInverse(camera.matrixWorld);
             viewProjectionMatrix.multiplyMatrices(projectionMatrix, camera.matrixWorldInverse);
             frustum.setFromMatrix(viewProjectionMatrix);
+
         };
+
     }();
 
     this.mapWindowToViewport = function (cx, cy, target) {
         var dim = this.getContainerDimensions();
         var mouse = target || new THREE.Vector2();
 
-        mouse.x = (cx - dim.left) / dim.width * 2 - 1;
+        mouse.x = ((cx - dim.left) / dim.width) * 2 - 1;
         mouse.y = -((cy - dim.top) / dim.height) * 2 + 1;
 
         return mouse;
     };
 
     this.getCameraInfo = function () {
-        var camInfo = new CLOUD.CameraInfo(this.object.position, this.target, this.object.up);
+        var camInfo = new CLOUD.CameraInfo(this.camera.position, this.camera.target, this.camera.up);
         return JSON.stringify(camInfo);
     };
 
@@ -11210,8 +11798,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             maxDistance = this.maxDistance;
         }
 
-        var position = this.object.position;
-        var target = this.target;
+        var position = this.camera.position;
+        var target = this.camera.target;
         var offset = new THREE.Vector3();
 
         offset.copy(position).sub(target);
@@ -11227,7 +11815,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     this.computeRotation = function () {
         // 旋转矩阵
         var m1 = new THREE.Matrix4();
-        m1.lookAt(this.object.position, this.target, this.object.up);
+        m1.lookAt(this.camera.position, this.camera.target, this.camera.up);
 
         var quat2 = new THREE.Quaternion();
         quat2.setFromRotationMatrix(m1);
@@ -11241,45 +11829,54 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     this.adjustCameraUp = function () {
 
-        if (this.object.realUp.y > 0) {
+        if (this.camera.realUp.y > 0) {
 
-            this.object.up = new THREE.Vector3(0, 1, 0);
-        } else if (this.object.realUp.y < 0) {
+            this.camera.up = new THREE.Vector3(0, 1, 0);
 
-            this.object.up = new THREE.Vector3(0, -1, 0);
+        } else if (this.camera.realUp.y < 0) {
+
+            this.camera.up = new THREE.Vector3(0, -1, 0);
+
         } else {
 
-            if (this.object.realUp.x > 0) {
+            if (this.camera.realUp.x > 0) {
 
-                this.object.up = new THREE.Vector3(1, 0, 0);
-            } else if (this.object.realUp.x < 0) {
+                this.camera.up = new THREE.Vector3(1, 0, 0);
 
-                this.object.up = new THREE.Vector3(-1, 0, 0);
+            } else if (this.camera.realUp.x < 0) {
+
+                this.camera.up = new THREE.Vector3(-1, 0, 0);
+
             } else {
 
-                if (this.object.realUp.z > 0) {
+                if (this.camera.realUp.z > 0) {
 
-                    this.object.up = new THREE.Vector3(0, 0, 1);
-                } else if (this.object.realUp.z < 0) {
+                    this.camera.up = new THREE.Vector3(0, 0, 1);
 
-                    this.object.up = new THREE.Vector3(0, 0, -1);
+                } else if (this.camera.realUp.z < 0) {
+
+                    this.camera.up = new THREE.Vector3(0, 0, -1);
                 }
             }
         }
+
     };
 
     this.getWorldEye = function () {
-        return this.target.clone().sub(this.object.position);
+        return this.camera.target.clone().sub(this.camera.position);
     };
 
     this.getWorldRight = function () {
         var right = new THREE.Vector3();
-        var up = this.object.up;
+        var up = this.camera.up;
         var eye = this.getWorldEye();
         right.crossVectors(eye, up);
 
         if (right.lengthSq() === 0) {
-            if (up.z > up.y) eye.y -= 0.0001;else eye.z += 0.0001;
+            if (up.z > up.y)
+                eye.y -= 0.0001;
+            else
+                eye.z += 0.0001;
 
             right.crossVectors(eye, up);
         }
@@ -11295,7 +11892,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     this.getWorldDimension = function (cx, cy) {
 
-        var position = this.object.position;
+        var position = this.camera.position;
         var eye = this.getWorldEye().normalize();
 
         // 计算跟踪距离
@@ -11305,7 +11902,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
         var canvasContainer = this.getContainerDimensions();
         var aspect = canvasContainer.width / canvasContainer.height;
-        var height = 2.0 * distance * Math.tan(THREE.Math.degToRad(this.object.fov * 0.5));
+        var height = 2.0 * distance * Math.tan(THREE.Math.degToRad(this.camera.fov * 0.5));
         var width = height * aspect;
 
         return new THREE.Vector2(width, height);
@@ -11314,7 +11911,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     this.getHitPoint = function (normalizedX, normalizedY) {
 
         var scene = this.viewer.getScene();
-        var camera = this.object;
+        var camera = this.camera;
         var hitPoint = scene.getHitPoint(normalizedX, normalizedY, camera);
 
         if (hitPoint) {
@@ -11331,7 +11928,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
         return worldPoint;
 
-        //var camera = this.object;
+        //var camera = this.camera;
         //var position = camera.position;
         //var eye = this.getWorldEye();
         //
@@ -11364,13 +11961,13 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         var canvasX = cx - canvasContainer.left;
         var canvasY = cy - canvasContainer.top;
         // 规范化到[-1, 1]
-        var normalizedX = canvasX / canvasContainer.width * 2.0 - 1.0;
-        var normalizedY = (canvasContainer.height - canvasY) / canvasContainer.height * 2.0 - 1.0;
+        var normalizedX = (canvasX / canvasContainer.width) * 2.0 - 1.0;
+        var normalizedY = ((canvasContainer.height - canvasY) / canvasContainer.height) * 2.0 - 1.0;
         var trackingPoint = this.getHitPoint(normalizedX, normalizedY);
 
         if (!trackingPoint) {
 
-            var position = this.object.position;
+            var position = this.camera.position;
             var normEye = this.getWorldEye().normalize();
             var worldPoint = this.pointToWorld(normalizedX, normalizedY);
 
@@ -11381,6 +11978,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             if (!lastTrackingPoint) {
 
                 trackingPoint = this.getTrackingPointFromBoundingBox(normEye, ray);
+
             } else {
 
                 // 保持上一次的基点和本次基点在同一平面内
@@ -11395,6 +11993,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
                     //console.log("trackingPoint === null");
                     trackingPoint = this.getTrackingPointFromBoundingBox(normEye, ray);
+
                 } else {
 
                     // 基准点在相机位置，重新取点
@@ -11446,11 +12045,11 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
         var up = new THREE.Vector3(0, 1, 0);
 
-        this.object.up = up;
-        this.object.realUp = up.clone();
+        this.camera.up = up;
+        this.camera.realUp = up.clone();
 
-        this.object.position.copy(point);
-        this.target.addVectors(this.object.position, dir);
+        this.camera.position.copy(point);
+        this.camera.target.addVectors(this.camera.position, dir);
 
         this.update(true);
     };
@@ -11458,15 +12057,15 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     // 飞到指定点（保持视角）
     this.flyToPoint = function (point) {
 
-        var position = this.object.position;
+        var position = this.camera.position;
         var eye = this.getWorldEye();
         var normalizedEye = eye.clone().normalize();
         var trackingEye = point.clone().sub(position);
         var distance = Math.abs(normalizedEye.dot(trackingEye));
         var flyOffset = normalizedEye.clone().multiplyScalar(distance);
 
-        this.object.position.subVectors(point, flyOffset);
-        this.target.addVectors(this.object.position, eye);
+        this.camera.position.subVectors(point, flyOffset);
+        this.camera.target.addVectors(this.camera.position, eye);
 
         this.update(true);
     };
@@ -11474,8 +12073,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     // 后退
     this.moveBackward = function (step, keepHeight) {
 
-        var position = this.object.position;
-        var target = this.target;
+        var position = this.camera.position;
+        var target = this.camera.target;
         if (keepHeight) {
             var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
             var len = diff.length();
@@ -11484,9 +12083,10 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
             position.add(stepDiff);
             target.add(stepDiff);
-        } else {
+        }
+        else {
             var eye = target.clone().sub(position);
-            this.object.translateZ(step);
+            this.camera.translateZ(step);
             target.addVectors(position, eye);
         }
     };
@@ -11494,8 +12094,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     // 前进
     this.moveForward = function (step, keepHeight) {
 
-        var position = this.object.position;
-        var target = this.target;
+        var position = this.camera.position;
+        var target = this.camera.target;
 
         if (keepHeight) {
             var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
@@ -11505,12 +12105,14 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
             position.add(stepDiff);
             target.add(stepDiff);
-        } else {
+        }
+        else {
             var eye = target.clone().sub(position);
 
-            this.object.translateZ(-step);
+            this.camera.translateZ(-step);
             target.addVectors(position, eye);
         }
+
     };
 
     this.updatePivot = function (bySelection, failback) {
@@ -11530,15 +12132,13 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     this.touchStartHandler = function (event) {
         switch (event.touches.length) {
 
-            case 1:
-                // one-fingered touch: rotate
+            case 1:	// one-fingered touch: rotate
                 if (this.noRotate === true) return;
                 handleTouchStartRotate(event);
                 state = STATE.ROTATE;
                 break;
 
-            case 2:
-                // two-fingered touch: dolly and pan
+            case 2:	// two-fingered touch: dolly and pan
                 if (this.noZoom !== true) {
                     handleTouchStartDolly(event);
                 }
@@ -11550,19 +12150,20 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             default:
                 state = STATE.NONE;
         }
-    };
+    }
 
     this.touchMoveHandler = function (event) {
         switch (event.touches.length) {
-            case 1:
-                // one-fingered touch: rotate
+            case 1: // one-fingered touch: rotate
                 if (this.noRotate !== true) {
                     handleTouchMoveRotate(event);
                 }
                 break;
 
-            case 2:
-                // two-fingered touch: dolly or pan
+            case 2: // two-fingered touch: dolly or pan
+                this.viewer.getScene().remove(this.pivotBall);
+                this.viewer.getScene().remove(this.pivotCenter);
+
                 if (this.noZoom !== true) {
                     handleTouchMoveDolly(event);
                     state = STATE.DOLLY;
@@ -11579,7 +12180,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         }
 
         this.touchUpdate();
-    };
+    }
 
     this.touchEndHandler = function (event) {
         switch (event.touches.length) {
@@ -11592,12 +12193,57 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             default:
                 state = STATE.NONE;
         }
-    };
+
+        this.viewer.getScene().remove(this.pivotBall);
+        this.viewer.getScene().remove(this.pivotCenter);
+    }
+
+    function pivotBallSize() {
+        var camera = scope.camera;
+        var position = camera.position;
+
+        var cameraDir = scope.camera.target.clone().sub(position);
+        cameraDir.normalize();
+
+        var plane = new THREE.Plane();
+        plane.setFromNormalAndCoplanarPoint(cameraDir.clone().negate(), scope.pivotBall.position);
+        plane.normalize();
+        var distance = plane.distanceToPoint(position);
+        var planeWidth = distance * Math.tan(camera.fov * 0.5);
+
+        var dim = scope.getContainerDimensions();
+        return planeWidth * 2 / (dim.height - dim.top);
+    }
 
     function handleTouchStartRotate(event) {
         //console.log( 'handleTouchStartRotate' );
 
         rotateStart.set(event.touches[0].clientX, event.touches[0].clientY);
+
+        if (scope.pivot != null) {
+            scope.pivotBall.position.copy(scope.pivot);
+            scope.pivotCenter.position.copy(scope.pivot);
+
+            var scale = pivotBallSize();
+            scope.pivotBall.scale.set(scale, scale, scale);
+            scope.pivotCenter.scale.set(scale, scale, scale);
+        }
+        else {
+            var scene = scope.viewer.getScene();
+            var center = scene.worldBoundingBox().center();
+            scope.pivotBall.position.copy(center);
+            scope.pivotCenter.position.copy(center);
+
+            var scale = pivotBallSize();
+            scope.pivotBall.scale.set(scale, scale, scale);
+            scope.pivotCenter.scale.set(scale, scale, scale);
+        }
+
+        scope.pivotBall.updateMatrixWorld();
+        scope.viewer.getScene().add(scope.pivotBall);
+
+        scope.pivotCenter.updateMatrixWorld();
+        scope.viewer.getScene().add(scope.pivotCenter);
     }
 
     function handleTouchStartDolly(event) {
@@ -11629,6 +12275,12 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         phiDelta -= 2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed;
 
         rotateStart.copy(rotateEnd);
+
+        var scale = pivotBallSize();
+        scope.pivotBall.scale.set(scale, scale, scale);
+        scope.pivotCenter.scale.set(scale, scale, scale);
+        scope.pivotBall.updateMatrixWorld();
+        scope.pivotCenter.updateMatrixWorld();
     }
 
     function handleTouchMoveDolly(event) {
@@ -11647,7 +12299,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
         if (dollyDelta.y > 0) {
             scale /= getZoomScale();
-        } else if (dollyDelta.y < 0) {
+        }
+        else if (dollyDelta.y < 0) {
             scale *= getZoomScale();
         }
         dollyStart.copy(dollyEnd);
@@ -11676,7 +12329,6 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         panStart.copy(panEnd);
     }
 };
-
 CLOUD.PickHelper = function (scene, cameraEditor, onObjectSelected) {
     "use strict";
 
@@ -11689,21 +12341,21 @@ CLOUD.PickHelper = function (scene, cameraEditor, onObjectSelected) {
 
     // debug 用
     this.debugInfoDiv = null;
-    this.lastDebugInfoDivShow = false;
+    this.lastDebugInfoDivShow = false;   
 };
 
 CLOUD.PickHelper.prototype = {
 
     constructor: CLOUD.PickHelper,
 
-    destroy: function destroy() {
+    destroy : function(){
         this.cameraEditor = null;
         this.scene = null;
         this.filter = null;
         this.onObjectSelected = null;
     },
-
-    click: function click(event) {
+    
+    click: function (event) {
         var scope = this;
 
         function handleMouseUp() {
@@ -11718,7 +12370,7 @@ CLOUD.PickHelper.prototype = {
         scope.timerId = setTimeout(handleMouseUp, 300);
     },
 
-    doubleClick: function doubleClick(event) {
+    doubleClick : function (event) {
 
         event.preventDefault();
 
@@ -11729,11 +12381,13 @@ CLOUD.PickHelper.prototype = {
         this.handleMousePick(event, true);
     },
 
-    handleMousePick: function handleMousePick(event, isDoubleClick) {
+    handleMousePick : function (event, isDoubleClick) {
 
         var cameraEditor = this.cameraEditor;
 
-        if (cameraEditor.enabled === false) return false;
+        if (cameraEditor.enabled === false)
+            return false;
+
 
         var scope = this;
 
@@ -11742,15 +12396,14 @@ CLOUD.PickHelper.prototype = {
 
         var mouse = cameraEditor.mapWindowToViewport(screenX, screenY);
 
-        scope.scene.pick(mouse, cameraEditor.object, function (intersect) {
+        scope.scene.pick(mouse, cameraEditor.camera, function (intersect) {
 
             if (!intersect) {
 
                 if (scope.filter.setSelectedIds()) {
-                    cameraEditor.updateView(true);
+                    cameraEditor.updateView(true);                    
                 }
                 scope.onObjectSelected(null, false);
-                scope.showPickedInformation(null);
                 return;
             }
 
@@ -11763,203 +12416,55 @@ CLOUD.PickHelper.prototype = {
             if (isDoubleClick) {
 
                 if (CLOUD.GlobalData.EnableDemolishByDClick) {
-                    scope.filter.addDemolishId(userId, false);
-                    cameraEditor.updateView(true);
+                     scope.filter.addDemolishId(userId, false);
+                     cameraEditor.updateView(true);                     
                 }
                 scope.onObjectSelected(intersect, true);
-            } else {
+            }
+            else {
 
                 if (!event.ctrlKey) {
                     scope.filter.setSelectedIds();
                 }
-
+                
                 if (scope.filter.addSelectedId(userId, intersect.object.userData, true)) {
-
-                    var defaultMiniMap = cameraEditor.viewer.extensionHelper.getDefaultMiniMap();
-                    if (defaultMiniMap) {
-                        intersect.axisGridInfo = defaultMiniMap.getAxisGridInfoByPoint(intersect.point);
-                    }
 
                     scope.onObjectSelected(intersect, false);
 
-                    if (event.altKey) {
-                        scope.showPickedInformation(intersect, screenX, screenY);
-                    } else {
-                        scope.showPickedInformation(null);
-                    }
-                } else {
-                    scope.showPickedInformation(null);
+                }
+                else {
+
                     scope.onObjectSelected(null, false);
                 }
                 cameraEditor.updateView(true);
             }
+
         });
+ 
     },
 
     // 将位置和包围盒转换到世界系
-    intersectToWorld: function intersectToWorld(intersect) {
+    intersectToWorld : function(intersect) {
 
         // 注意：不确定相对坐标位置是否被其他模块使用，暂时先采用新的变量来保存世界坐标下的位置及包围盒
         // 最好是在求交点的时候，包围盒就和位置一起进行坐标变换, 就可以免除这里的计算了
-        var sceneMatrix = this.scene.getRootNodeMatrix();
+        var sceneMatrix = this.scene.getMatrixOfRootNode();
 
         // 获得世界坐标下的位置
         intersect.worldPosition = CLOUD.GeomUtil.toMeshWorldPosition(intersect.point, sceneMatrix);
         // 获得世界坐标下的包围盒
-        intersect.worldBoundingBox = CLOUD.GeomUtil.getMeshWorldBoundingBox(intersect.object, sceneMatrix);
-    },
-
-    showPickedInformation: function showPickedInformation(intersect, cx, cy) {
-
-        var divWidth = 340,
-            divHeight = 320,
-            offset = 15;
-        var scope = this;
-
-        function hideDiv() {
-
-            var info = scope.debugInfoDiv;
-
-            if (info) {
-                info.style.display = "none";
-                //info.parentNode.removeChild(info);
-
-                if (scope.lastDebugInfoDivShow) {
-                    info.removeEventListener('dblclick', hideDiv, false);
-                    scope.lastDebugInfoDivShow = false;
-                }
-            }
-        }
-
-        function adjustLocation(div, posX, posY) {
-
-            if (!div) return;
-
-            if (div.style.display != "none") {
-                var oLeft, oTop;
-
-                var tmpX = posX + divWidth;
-                var tmpY = posY + divHeight;
-
-                if (posX !== undefined && posY !== undefined) {
-                    if (window.innerWidth) {
-
-                        if (tmpX > window.innerWidth) {
-                            oLeft = window.pageXOffset + (posX - divWidth) + "px";
-                        } else {
-                            oLeft = window.pageXOffset + posX + "px";
-                        }
-
-                        if (tmpY > window.innerHeight) {
-                            oTop = window.pageYOffset + (posY - divHeight) + "px";
-                        } else {
-                            oTop = window.pageYOffset + posY + "px";
-                        }
-
-                        //oLeft = window.pageXOffset + posX + "px";
-                        //oTop = window.pageYOffset + posY + "px";
-                    } else {
-                        var dde = document.documentElement;
-                        oLeft = dde.scrollLeft + posX + "px";
-                        oTop = dde.scrollTop + posY + "px";
-                    }
-                } else {
-                    // 居中
-                    if (window.innerWidth) {
-                        oLeft = window.pageXOffset + (window.innerWidth - divWidth) / 2 + "px";
-                        oTop = window.pageYOffset + (window.innerHeight - divHeight) / 2 + "px";
-                    } else {
-                        var dde = document.documentElement;
-                        oLeft = dde.scrollLeft + (dde.offsetWidth - divWidth) / 2 + "px";
-                        oTop = dde.scrollTop + (dde.offsetHeight - divHeight) / 2 + "px";
-                    }
-                }
-
-                div.style.left = oLeft;
-                div.style.top = oTop;
-            }
-        }
-
-        if (!intersect) {
-            hideDiv();
-            return;
-        }
-
-        if (!this.debugInfoDiv) {
-            this.debugInfoDiv = document.createElement("div");
-            this.debugInfoDiv.id = "debugPickedInfo";
-            this.debugInfoDiv.style.display = "block";
-            this.debugInfoDiv.style.position = "absolute";
-            this.debugInfoDiv.style.width = divWidth + "px";
-            this.debugInfoDiv.style.height = divHeight + "px";
-            this.debugInfoDiv.style.backgroundColor = "#ffffdd";
-            this.debugInfoDiv.style.borderWidth = "2px";
-            this.debugInfoDiv.style.borderStyle = "solid";
-            this.debugInfoDiv.style.opacity = "0.8";
-
-            document.body.appendChild(this.debugInfoDiv);
-        }
-
-        this.debugInfoDiv.style.display = "";
-
-        // 支持面板一直显示
-        if (!this.lastDebugInfoDivShow) {
-            this.lastDebugInfoDivShow = true;
-            this.debugInfoDiv.addEventListener('dblclick', hideDiv, false);
-        }
-
-        var axisGridInfo = intersect.axisGridInfo;
-
-        // 加些样式
-        var html = "";
-        html += "<span>&#9830;&nbsp;&nbsp;Base Information</span><ul style='width:340px;list-style:none'>";
-        html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;border-bottom: 1px solid #ccc;float:left;width:80px;height:66px;text-align:left;line-height:66px'>ID</li>";
-        html += "<li style='border:1px solid #ccc;float:left;width:200px;height:66px;text-align:left;'>" + intersect.userId + "</li>";
-        html += "</ul>";
-
-        if (axisGridInfo) {
-
-            html += "</br><span>&#9830;&nbsp;&nbsp;Position</span><ul style='width:340px;list-style:none'>";
-            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px'>X</li>";
-            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px;border-right: 1px solid #ccc'>" + axisGridInfo.position.x + "</li>";
-            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px'>Y</li>";
-            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px;border-right: 1px solid #ccc'>" + axisGridInfo.position.y + "</li>";
-            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px;border-bottom: 1px solid #ccc'>Z</li>";
-            html += "<li style='border:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px'>" + axisGridInfo.position.z + "</li>";
-            html += "</ul>";
-
-            html += "</br><span>&#9830;&nbsp;&nbsp;Axis Grid Information</span><ul style='width:340px;list-style:none'>";
-            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px'>distanceX</li>";
-            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px;border-right: 1px solid #ccc'>(" + axisGridInfo.numeralName + ", " + axisGridInfo.offsetX + ")</li>";
-            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px;border-bottom: 1px solid #ccc'>distanceY</li>";
-            html += "<li style='border:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px'>(" + axisGridInfo.abcName + ", " + axisGridInfo.offsetY + ")</li>";
-            html += "</ul>";
-        } else {
-
-            html += "</br><span>&#9830;&nbsp;&nbsp;Other</span><ul style='width:340px;list-style:none'>";
-            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px;border-bottom: 1px solid #ccc'>message</li>";
-            html += "<li style='border:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px'><span style='color: red'> not exist axis grid!!!</span></li>";
-            html += "</ul>";
-        }
-
-        this.debugInfoDiv.innerHTML = html + "<br /><br />";
-
-        //var box = this.debugInfoDiv.getBoundingClientRect();
-        //divWidth = box.width + offset;
-        //divHeight = box.height;
-        //
-        //this.debugInfoDiv.style.width = divWidth + "px";
-        //this.debugInfoDiv.style.height = divHeight + "px";
-
-        adjustLocation(this.debugInfoDiv, cx, cy);
+        intersect.worldBoundingBox = CLOUD.GeomUtil.getBoundingBoxWorldOfMesh(intersect.object, sceneMatrix);
     }
+
 };
+
+
+
 
 CLOUD.OrbitEditor = function (cameraEditor, scene, domElement) {
     "use strict";
-
     this.scene = scene;
-    this.domElement = domElement !== undefined ? domElement : document;
+    this.domElement = (domElement !== undefined) ? domElement : document;
 
     // Mouse buttons
     //this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, PAN: THREE.MOUSE.MIDDLE, ZOOM: THREE.MOUSE.RIGHT };
@@ -11978,9 +12483,14 @@ CLOUD.OrbitEditor = function (cameraEditor, scene, domElement) {
 CLOUD.OrbitEditor.prototype = Object.create(THREE.EventDispatcher.prototype);
 CLOUD.OrbitEditor.prototype.constructor = CLOUD.OrbitEditor;
 
-CLOUD.OrbitEditor.prototype.destroy = function () {};
+CLOUD.OrbitEditor.prototype.destroy = function () {
+};
 
-CLOUD.OrbitEditor.prototype.onExistEditor = function () {};
+CLOUD.OrbitEditor.prototype.onExistEditor = function () {
+};
+
+CLOUD.OrbitEditor.prototype.resize = function () {
+};
 
 CLOUD.OrbitEditor.prototype.getDomElement = function () {
     return this.domElement;
@@ -11993,7 +12503,7 @@ CLOUD.OrbitEditor.prototype.getDomElement = function () {
 CLOUD.OrbitEditor.prototype.delayHandle = function () {
     var camera_scope = this.cameraEditor;
 
-    function handle() {
+    function handle() {        
         camera_scope.update(true, true);
     }
 
@@ -12027,19 +12537,22 @@ CLOUD.OrbitEditor.prototype.processMouseDown = function (event) {
     event.preventDefault();
 
     if (event.button === scope.mouseButtons.ORBIT) {
-        if (camera_scope.noRotate === true) return;
-
+        if (camera_scope.noRotate === true)
+            return;
+        
         var mouse = camera_scope.mapWindowToViewport(event.clientX, event.clientY);
 
         camera_scope.updatePivot(this.orbitBySelection, function () {
-            scope.scene.hitTestPosition(mouse, camera_scope.object, function (pt) {
+            scope.scene.hitTestPosition(mouse, camera_scope.camera, function (pt) {
                 camera_scope.pivot = pt;
             });
         });
-
+ 
         camera_scope.beginRotate(event.clientX, event.clientY);
+
     } else if (event.button === scope.mouseButtons.ZOOM) {
-        if (camera_scope.noZoom === true) return;
+        if (camera_scope.noZoom === true)
+            return;
 
         camera_scope.beginZoom(event.clientX, event.clientY);
     } else if (event.button === scope.mouseButtons.PAN || event.button === scope.mouseButtons.PAN2) {
@@ -12088,7 +12601,8 @@ CLOUD.OrbitEditor.prototype.processMouseUp = function (event) {
     }
 
     var camera_scope = this.cameraEditor;
-    if (camera_scope.enabled === false) return false;
+    if (camera_scope.enabled === false)
+        return false;
     if (camera_scope.IsIdle() === true) {
         return false;
     }
@@ -12118,7 +12632,7 @@ CLOUD.OrbitEditor.prototype.onMouseWheel = function (event) {
     // 五大浏览器（IE、Opera、Safari、Firefox、Chrome）中Firefox 使用detail，其余四类使用wheelDelta；
     //两者只在取值上不一致，代表含义一致，detail与wheelDelta只各取两个值，detail只取±3，wheelDelta只取±120，其中正数表示为向上，负数表示向下。
     var delta = 0 || event.wheelDelta || event.detail;
-    delta = Math.abs(delta) > 10 ? delta : -delta * 40;
+    delta = (Math.abs(delta) > 10 ? delta : -delta * 40);
     delta *= 0.0001; // 0.0005
 
     this.delayHandle();
@@ -12211,8 +12725,8 @@ CLOUD.OrbitEditor.prototype.onKeyUp = function (event) {
             this.scene.filter.clearSelectionSet();
             this.fireEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: null, click: 1 });
             break;
-        default:
-            break;
+        default :
+            break
     }
 };
 
@@ -12234,18 +12748,16 @@ CLOUD.OrbitEditor.prototype.touchmove = function (event) {
     camera_scope.touchMoveHandler(event);
 };
 
-CLOUD.OrbitEditor.prototype.touchend = function () /* event */{
+CLOUD.OrbitEditor.prototype.touchend = function( /* event */ ) {
     var camera_scope = this.cameraEditor;
-    if (camera_scope.enabled === false) return;
+    if ( camera_scope.enabled === false ) return;
 
     camera_scope.touchEndHandler(event);
 
     //scope.dispatchEvent( endEvent );
 };
-
 CLOUD.PickEditor = function (object, scene, domElement) {
     "use strict";
-
     CLOUD.OrbitEditor.call(this, object, scene, domElement);
 
     // Customize the mouse buttons
@@ -12270,7 +12782,8 @@ CLOUD.PickEditor.prototype.processMouseUp = function (event) {
 
     if (scope.oldMouseX == event.clientX && scope.oldMouseY == event.clientY) {
         this.pickByClick(event);
-    } else {
+    }
+    else {
 
         scope.cameraEditor.update(true);
     }
@@ -12292,6 +12805,7 @@ CLOUD.RectPickEditor = function (slaveEditor, onSelectionChanged) {
 
     this.onObjectSelected = onSelectionChanged;
 
+
     this.startPt = new THREE.Vector2();
     this.endPt = new THREE.Vector2();
 
@@ -12305,11 +12819,12 @@ CLOUD.RectPickEditor = function (slaveEditor, onSelectionChanged) {
     });
 };
 
+
 CLOUD.RectPickEditor.prototype = {
 
     onstructor: CLOUD.RectPickEditor,
 
-    destroy: function destroy() {
+    destroy: function () {
 
         this.onObjectSelected = null;
         this.slaveEditor = null;
@@ -12318,11 +12833,14 @@ CLOUD.RectPickEditor.prototype = {
         this.pickHelper = null;
     },
 
-    getDomElement: function getDomElement() {
+    resize: function () {
+    },
+
+    getDomElement: function () {
         return this.slaveEditor.domElement;
     },
 
-    udpateFrustum: function udpateFrustum(updateUI) {
+    udpateFrustum: function (updateUI) {
 
         var x1 = this.startPt.x;
         var x2 = this.endPt.x;
@@ -12334,6 +12852,7 @@ CLOUD.RectPickEditor.prototype = {
             var tmp1 = x1;
             x1 = x2;
             x2 = tmp1;
+
         }
 
         if (y1 > y2) {
@@ -12341,9 +12860,11 @@ CLOUD.RectPickEditor.prototype = {
             var tmp2 = y1;
             y1 = y2;
             y2 = tmp2;
+
         }
 
-        if (x2 - x1 == 0 || y2 - y1 == 0) return false;
+        if (x2 - x1 == 0 || y2 - y1 == 0)
+            return false;
 
         var helper = this.slaveEditor.cameraEditor;
         var dim = helper.getContainerDimensions();
@@ -12351,29 +12872,36 @@ CLOUD.RectPickEditor.prototype = {
         helper.computeFrustum(x1, x2, y1, y2, this.frustum, dim);
 
         if (updateUI) {
-            this.onUpdateUI({ visible: true, dir: this.startPt.x < this.endPt.x, left: x1 - dim.left, top: y1 - dim.top, width: x2 - x1, height: y2 - y1 });
+            this.onUpdateUI({
+                visible: true,
+                dir: this.startPt.x < this.endPt.x,
+                left: (x1 - dim.left),
+                top: (y1 - dim.top),
+                width: (x2 - x1),
+                height: (y2 - y1)
+            });
         }
 
         return true;
     },
 
-    onExistEditor: function onExistEditor() {
+    onExistEditor: function () {
         this.slaveEditor.onExistEditor();
     },
 
-    onKeyDown: function onKeyDown(evt) {
+    onKeyDown: function (evt) {
         this.slaveEditor.onKeyDown(evt);
     },
 
-    onKeyUp: function onKeyUp(evt) {
+    onKeyUp: function (evt) {
         this.slaveEditor.onKeyUp(evt);
     },
 
-    onMouseDoubleClick: function onMouseDoubleClick(evt) {
+    onMouseDoubleClick: function (evt) {
         this.pickHelper.doubleClick(evt);
     },
 
-    onMouseDown: function onMouseDown(event) {
+    onMouseDown: function (event) {
 
         event.preventDefault();
         //event.stopPropagation();
@@ -12386,7 +12914,7 @@ CLOUD.RectPickEditor.prototype = {
         return this.slaveEditor.processMouseDown(event);
     },
 
-    onMouseMove: function onMouseMove(event) {
+    onMouseMove: function (event) {
 
         event.preventDefault();
         var allowRectPick = event.shiftKey || event.ctrlKey || event.altKey;
@@ -12400,20 +12928,21 @@ CLOUD.RectPickEditor.prototype = {
         this.slaveEditor.processMouseMove(event);
     },
 
-    onMouseUp: function onMouseUp(event) {
+    onMouseUp: function (event) {
 
         event.preventDefault();
         //event.stopPropagation();
         var slaveEditor = this.slaveEditor;
 
-        this.onUpdateUI({ visible: false });
+        this.onUpdateUI({visible: false});
 
         if (event.button === THREE.MOUSE.LEFT) {
 
-            if (Math.abs(this.startPt.x - event.clientX) < 2 && Math.abs(this.startPt.y - event.clientY) < 2) {
+            if (this.startPt.x == event.clientX && this.startPt.y == event.clientY) {
                 this.pickHelper.click(event);
                 return true;
-            } else {
+            }
+            else {
                 var allowRectPick = event.shiftKey || event.ctrlKey || event.altKey;
                 if (allowRectPick) {
 
@@ -12427,12 +12956,14 @@ CLOUD.RectPickEditor.prototype = {
 
                     if (event.ctrlKey) {
                         state = CLOUD.OPSELECTIONTYPE.Add;
-                    } else if (event.altKey) {
+                    }
+                    else if (event.altKey) {
                         state = CLOUD.OPSELECTIONTYPE.Remove;
                     }
 
+
                     var scope = this;
-                    slaveEditor.scene.pickByReck(this.frustum, state, function () {
+                    slaveEditor.scene.pickByRect(this.frustum, state, function () {
                         scope.onObjectSelected(null, false);
                     });
                     slaveEditor.cameraEditor.updateView(true);
@@ -12440,12 +12971,14 @@ CLOUD.RectPickEditor.prototype = {
                     return true;
                 }
             }
+
         }
+
 
         return slaveEditor.processMouseUp(event);
     },
 
-    onMouseWheel: function onMouseWheel(evt) {
+    onMouseWheel: function (evt) {
         this.slaveEditor.onMouseWheel(evt);
     }
 };
@@ -12476,15 +13009,15 @@ CLOUD.RectPickEditor.prototype.touchend = function (event) {
 
     camera_scope.touchend(event);
 };
-
-CLOUD.ZoomEditor = function (object, scene, domElement) {
-    CLOUD.OrbitEditor.call(this, object, scene, domElement);
-
-    //this.mouseButtons = { ZOOM: THREE.MOUSE.LEFT, PAN: THREE.MOUSE.MIDDLE, ORBIT: THREE.MOUSE.RIGHT };
-    this.mouseButtons = { ZOOM: THREE.MOUSE.LEFT, PAN2: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
+CLOUD.ZoomEditor = function ( object, scene, domElement ) {
+	CLOUD.OrbitEditor.call( this,  object, scene, domElement );
+	
+	//this.mouseButtons = { ZOOM: THREE.MOUSE.LEFT, PAN: THREE.MOUSE.MIDDLE, ORBIT: THREE.MOUSE.RIGHT };
+	this.mouseButtons = { ZOOM: THREE.MOUSE.LEFT, PAN2: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
 };
-CLOUD.ZoomEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
+CLOUD.ZoomEditor.prototype = Object.create( CLOUD.OrbitEditor.prototype );
 CLOUD.ZoomEditor.prototype.constructor = CLOUD.ZoomEditor;
+
 
 CLOUD.RectZoomEditor = function (cameraEditor, scene, domElement) {
 
@@ -12498,7 +13031,7 @@ CLOUD.RectZoomEditor = function (cameraEditor, scene, domElement) {
 CLOUD.RectZoomEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
 CLOUD.RectZoomEditor.prototype.constructor = CLOUD.RectZoomEditor;
 
-CLOUD.RectZoomEditor.prototype.updateFrustum = function (updateUI) {
+CLOUD.RectZoomEditor.prototype.updateFrustum = function(updateUI) {
 
     var x1 = this.startPt.x;
     var x2 = this.endPt.x;
@@ -12510,6 +13043,7 @@ CLOUD.RectZoomEditor.prototype.updateFrustum = function (updateUI) {
         var tmp1 = x1;
         x1 = x2;
         x2 = tmp1;
+
     }
 
     if (y1 > y2) {
@@ -12517,9 +13051,11 @@ CLOUD.RectZoomEditor.prototype.updateFrustum = function (updateUI) {
         var tmp2 = y1;
         y1 = y2;
         y2 = tmp2;
+
     }
 
-    if (x2 - x1 == 0 || y2 - y1 == 0) return false;
+    if (x2 - x1 == 0 || y2 - y1 == 0)
+        return false;
 
     var dim = this.cameraEditor.getContainerDimensions();
 
@@ -12530,17 +13066,17 @@ CLOUD.RectZoomEditor.prototype.updateFrustum = function (updateUI) {
         this.onUpdateUI({
             visible: true,
             dir: this.startPt.x < this.endPt.x,
-            left: x1 - dim.left,
-            top: y1 - dim.top,
-            width: x2 - x1,
-            height: y2 - y1
+            left: (x1 - dim.left),
+            top: (y1 - dim.top),
+            width: (x2 - x1),
+            height: (y2 - y1)
         });
     }
 
     return true;
 };
 
-CLOUD.RectZoomEditor.prototype.onMouseDown = function (event) {
+CLOUD.RectZoomEditor.prototype.onMouseDown = function(event) {
 
     event.preventDefault();
     event.stopPropagation();
@@ -12553,7 +13089,7 @@ CLOUD.RectZoomEditor.prototype.onMouseDown = function (event) {
     return this.processMouseDown(event);
 };
 
-CLOUD.RectZoomEditor.prototype.onMouseMove = function (event) {
+CLOUD.RectZoomEditor.prototype.onMouseMove = function(event) {
 
     event.preventDefault();
 
@@ -12567,19 +13103,20 @@ CLOUD.RectZoomEditor.prototype.onMouseMove = function (event) {
     this.processMouseMove(event);
 };
 
-CLOUD.RectZoomEditor.prototype.onMouseUp = function (event) {
+CLOUD.RectZoomEditor.prototype.onMouseUp = function(event) {
 
     event.preventDefault();
     event.stopPropagation();
 
-    this.onUpdateUI({ visible: false });
+    this.onUpdateUI({visible: false});
 
     if (event.button === THREE.MOUSE.LEFT) {
 
         if (this.startPt.x == event.clientX && this.startPt.y == event.clientY) {
 
             return true;
-        } else {
+        }
+        else {
 
             this.endPt.set(event.clientX, event.clientY);
 
@@ -12591,128 +13128,16 @@ CLOUD.RectZoomEditor.prototype.onMouseUp = function (event) {
 
             return true;
         }
+
     }
 
     return this.processMouseUp(event);
 };
 
-//CLOUD.RectZoomEditor.prototype.zoomToRectangle = function(closeDepth) {
-//
-//    var scope = this;
-//    var camera = this.cameraEditor.object;
-//    var target = this.cameraEditor.target;
-//    var cameraPos = camera.position;
-//    var near = camera.near;
-//    var dim = this.cameraEditor.getContainerDimensions();
-//    var x1 = scope.startPt.x - dim.left;
-//    var x2 = scope.endPt.x - dim.left;
-//    var y1 = scope.startPt.y - dim.top;
-//    var y2 = scope.endPt.y - dim.top;
-//
-//    var rcZoom = {};
-//    rcZoom.left = Math.min(x1, x2);
-//    rcZoom.top = Math.min(y1, y2);
-//    rcZoom.right = Math.max(x1, x2);
-//    rcZoom.bottom = Math.max(y1, y2);
-//
-//    var rCenter = new THREE.Vector3((x1 + x2) / 2, (y1 + y2) / 2, closeDepth);
-//    var rCorner = new THREE.Vector3(rcZoom.left, rcZoom.top, closeDepth);
-//
-//    var wCenter = this.clientToWorld(rCenter);
-//    var wCorner = this.clientToWorld(rCorner);
-//    var dvec = wCenter.clone().sub(wCorner);
-//    var newDist = dvec.length();
-//
-//    if (newDist < near) {
-//        //console.log("new dist", [newDist, near]);
-//        newDist = near;
-//    }
-//
-//    var dirEye = target.clone().sub(cameraPos);
-//    var distance = dirEye.length();
-//    dirEye.normalize();
-//
-//    var newPos = wCenter.clone();
-//    newPos.sub(dirEye.clone().multiplyScalar(newDist));
-//    cameraPos.copy(newPos);
-//    target.copy(newPos).add(dirEye.clone().multiplyScalar(distance));
-//
-//    this.cameraEditor.updateView(true);
-//};
-
-//CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
-//
-//    var scope = this;
-//    var camera = this.cameraEditor.object;
-//    var target = this.cameraEditor.target;
-//    var zNear = camera.near;
-//
-//    var canvasBounds = this.cameraEditor.getContainerDimensions();
-//    var startX = scope.startPt.x - canvasBounds.left;
-//    var startY = scope.startPt.y - canvasBounds.top;
-//    var endX = scope.endPt.x - canvasBounds.left;
-//    var endY = scope.endPt.y - canvasBounds.top;
-//    var rectWidth = Math.abs(endX - startX);
-//    var rectHeight = Math.abs(startY - endY);
-//
-//    if (rectWidth === 0 || rectHeight === 0)  return;
-//
-//    var rCenter = new THREE.Vector2((startX + endX) / 2, (startY + endY) / 2);
-//    var normalizeCenterX = rCenter.x / canvasBounds.width * 2 - 1;
-//    var normalizeCenterY = -rCenter.y / canvasBounds.height * 2 + 1;
-//    var normalizeCenter = new THREE.Vector2(normalizeCenterX, normalizeCenterY);
-//
-//    var eye = camera.position.clone();
-//    var dirEyeToTarget = target.clone().sub(eye);
-//    var distEyeToTarget = dirEyeToTarget.length();
-//
-//    var dirRight = this.cameraEditor.getWorldRight();
-//    var dirUp = this.cameraEditor.getWorldUp();
-//    var pivot = this.scene.hitTest(normalizeCenter, camera);
-//
-//    if (!pivot) {
-//
-//        //var halfFrustumHeight = distEyeToTarget * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
-//        var halfFrustumHeight = zNear * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
-//        var halfFrustumWidth = halfFrustumHeight * camera.aspect;
-//        var rightWidth = rCenter.x * 2 * halfFrustumWidth / canvasBounds.width;
-//        var distCenterToRight = rightWidth - halfFrustumWidth;
-//        var upHeight = rCenter.y * 2 * halfFrustumHeight / canvasBounds.height;
-//        var distCenterToUp = upHeight - halfFrustumHeight;
-//
-//        dirRight.normalize().multiplyScalar(distCenterToRight);
-//        dirUp.multiplyScalar(distCenterToUp);
-//
-//        var dirRay = dirEyeToTarget.clone().add(dirUp).add(dirRight);
-//
-//        pivot = eye.clone().add(dirRay);
-//    }
-//
-//    dirEyeToTarget.normalize();
-//
-//    var scaleFactor = rectWidth / rectHeight > canvasBounds.width / canvasBounds.height ? rectWidth / canvasBounds.width : rectHeight / canvasBounds.height;
-//    var distEyeToPivot = pivot.distanceTo(eye);
-//    var distZoom = distEyeToPivot * scaleFactor;
-//
-//    //if (zoomDist < zNear) {
-//    //    console.log("zoomDist < zNear");
-//    //    zoomDist = zNear;
-//    //}
-//
-//    //var zoomDir = eye.clone().sub(pivot).normalize().multiplyScalar(zoomDist);
-//    var dirZoom = dirEyeToTarget.clone().negate().multiplyScalar(distZoom);
-//
-//    eye = pivot.clone().add(dirZoom);
-//    camera.position.copy(eye);
-//    target.copy(eye).add(dirZoom.clone().negate().normalize().multiplyScalar(distEyeToTarget));
-//    scope.cameraEditor.updateView(true);
-//
-//};
-
 CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
 
-    var camera = this.cameraEditor.object;
-    var target = this.cameraEditor.target;
+    var camera = this.cameraEditor.camera;
+    var target = this.cameraEditor.camera.target;
     var zNear = camera.near;
 
     var canvasBounds = this.cameraEditor.getContainerDimensions();
@@ -12723,7 +13148,7 @@ CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
     var rectWidth = Math.abs(endX - startX);
     var rectHeight = Math.abs(startY - endY);
 
-    if (rectWidth === 0 || rectHeight === 0) return;
+    if (rectWidth === 0 || rectHeight === 0)  return;
 
     var rectCenter = new THREE.Vector2((startX + endX) / 2, (startY + endY) / 2);
     var normalizeCenterX = rectCenter.x / canvasBounds.width * 2 - 1;
@@ -12747,6 +13172,7 @@ CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
         dirEyeToTarget.normalize();
         //dirZoom = eye.clone().sub(pivot).normalize().multiplyScalar(zoomDist);
         dirZoom = dirEyeToTarget.clone().negate().multiplyScalar(distZoom);
+
     } else {
 
         var rcZoom = {};
@@ -12757,7 +13183,7 @@ CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
 
         var closeDepth = this.scene.getNearDepthByRect(this.frustum, camera);
 
-        if (closeDepth !== Infinity) {
+        if (closeDepth !== Infinity){
 
             var rCenter = new THREE.Vector3((startX + endX) / 2, (startY + endY) / 2, closeDepth);
             var rCorner = new THREE.Vector3(rcZoom.left, rcZoom.top, closeDepth);
@@ -12773,6 +13199,7 @@ CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
             pivot = wCenter.clone();
             dirEyeToTarget.normalize();
             dirZoom = dirEyeToTarget.clone().negate().multiplyScalar(distZoom);
+
         } else {
 
             var halfFrustumHeight = zNear * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
@@ -12799,6 +13226,7 @@ CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
             //dirZoom = eye.clone().sub(pivot).normalize().multiplyScalar(zoomDist);
             dirZoom = dirEyeToTarget.clone().negate().multiplyScalar(distZoom);
         }
+
     }
 
     eye = pivot.clone().add(dirZoom);
@@ -12809,7 +13237,7 @@ CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
 
 CLOUD.RectZoomEditor.prototype.worldToClient = function (wPoint) {
 
-    var camera = this.cameraEditor.object;
+    var camera = this.cameraEditor.camera;
     var result = new THREE.Vector3(wPoint.x, wPoint.y, wPoint.z);
 
     result.project(camera);
@@ -12820,7 +13248,7 @@ CLOUD.RectZoomEditor.prototype.worldToClient = function (wPoint) {
 CLOUD.RectZoomEditor.prototype.clientToWorld = function (cPoint) {
 
     var rect = this.cameraEditor.getContainerDimensions();
-    var camera = this.cameraEditor.object;
+    var camera = this.cameraEditor.camera;
     var result = new THREE.Vector3();
 
     result.x = cPoint.x / rect.width * 2 - 1;
@@ -12831,10 +13259,8 @@ CLOUD.RectZoomEditor.prototype.clientToWorld = function (cPoint) {
 
     return result;
 };
-
 CLOUD.PanEditor = function (object, scene, domElement) {
     "use strict";
-
     CLOUD.OrbitEditor.call(this, object, scene, domElement);
 
     //this.mouseButtons = { PAN: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, ORBIT: THREE.MOUSE.RIGHT };
@@ -12842,19 +13268,18 @@ CLOUD.PanEditor = function (object, scene, domElement) {
 
 CLOUD.PanEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
 CLOUD.PanEditor.prototype.constructor = CLOUD.PanEditor;
-
 CLOUD.FlyEditorUI = function (domElement, onChangeSpeed) {
     "use strict";
 
-    this.domElement = domElement !== undefined ? domElement : document;
+    this.domElement = (domElement !== undefined) ? domElement : document;
 
     if (domElement) this.domElement.setAttribute('tabindex', -1);
 
-    this.enableControlPanel = false; // 是否允许控制面板
+    this.enableControlPanel = false;// 是否允许控制面板
 
     this.crossContainer = null; // 十字图标父容器
     this.crossBoxWidth = 30; // 十字图标包围盒宽度
-    this.crossBoxHeight = 30; // 十字图标包围盒高度
+    this.crossBoxHeight = 30;// 十字图标包围盒高度
 
     this.elementIds = {
         imgKeyQ: 'imgKeyQ',
@@ -12900,7 +13325,7 @@ CLOUD.FlyEditorUI = function (domElement, onChangeSpeed) {
 CLOUD.FlyEditorUI.prototype = {
 
     // 初始化方向控制器
-    initCross: function initCross() {
+    initCross: function () {
 
         if (!this.crossContainer) {
             var container = this.domElement;
@@ -12954,7 +13379,7 @@ CLOUD.FlyEditorUI.prototype = {
             this.crossContainer = svgContainer;
         }
     },
-    resize: function resize() {
+    resize: function() {
         var container = this.domElement;
         var boxWidth = this.crossBoxWidth;
         var boxHeight = this.crossBoxHeight;
@@ -12967,17 +13392,18 @@ CLOUD.FlyEditorUI.prototype = {
         svgContainer.style.left = left + "px";
         svgContainer.style.top = top + "px";
     },
-    onKeyDown: function onKeyDown(moveState, MoveDirection) {
-        if (!this.enableControlPanel) return;
+    onKeyDown: function (moveState, MoveDirection) {
+        if (!this.enableControlPanel)
+            return;
 
-        if (moveState & MoveDirection.FORWARD) {
+        if (moveState &  MoveDirection.FORWARD) {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyW, false);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyW2, true);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgTipW, true);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.tipRemarkW, true);
         }
 
-        if (moveState & MoveDirection.BACK) {
+        if ( moveState & MoveDirection.BACK) {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyS, false);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyS2, true);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgTipS, true);
@@ -12997,6 +13423,7 @@ CLOUD.FlyEditorUI.prototype = {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgTipD, true);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.tipRemarkD, true);
         }
+   
 
         if (moveState & MoveDirection.UP) {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyQ, false);
@@ -13013,23 +13440,24 @@ CLOUD.FlyEditorUI.prototype = {
         }
     },
 
-    onKeyUp: function onKeyUp(moveState, MoveDirection) {
-        if (!this.enableControlPanel) return;
+    onKeyUp: function (moveState, MoveDirection) {
+        if (!this.enableControlPanel)
+            return;
 
         if (moveState & MoveDirection.FORWARD) {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyW, true);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyW2, false);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgTipW, false);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.tipRemarkW, false);
-        }
+        } 
 
-        if (moveState & MoveDirection.BACK) {
+        if ( moveState & MoveDirection.BACK) {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyS, true);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyS2, false);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgTipS, false);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.tipRemarkS, false);
         }
-
+ 
         if (moveState & MoveDirection.LEFT) {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyA, true);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyA2, false);
@@ -13059,7 +13487,7 @@ CLOUD.FlyEditorUI.prototype = {
         }
     },
 
-    changeMoveSpeed: function changeMoveSpeed(delta, cur) {
+    changeMoveSpeed: function (delta, cur) {
         // 鼠标滚轮控制运动速度
         if (delta > 0) {
             cur += this.sliderStep;
@@ -13083,12 +13511,12 @@ CLOUD.FlyEditorUI.prototype = {
     },
 
     // 启用或关闭控制面板
-    enableFlyControlPanel: function enableFlyControlPanel(enable) {
+    enableFlyControlPanel: function (enable) {
         this.enableControlPanel = enable;
     },
 
     // 是否显示控制面板
-    showControlPanel: function showControlPanel(isShow) {
+    showControlPanel: function (isShow) {
 
         if (isShow === undefined) {
             isShow = false;
@@ -13112,9 +13540,9 @@ CLOUD.FlyEditorUI.prototype = {
     },
 
     // 设置方向控制器可见性
-    setCrossVisible: function setCrossVisible(visible) {
+    setCrossVisible: function (visible) {
 
-        if (this.crossContainer) {
+        if(this.crossContainer) {
             if (visible) {
                 this.crossContainer.style.display = "";
             } else {
@@ -13124,12 +13552,14 @@ CLOUD.FlyEditorUI.prototype = {
     },
 
     // 创建滑动条面板
-    createVelocitySliderPanel: function createVelocitySliderPanel(parentNode) {
+    createVelocitySliderPanel: function (parentNode) {
         if (parentNode !== undefined) {
             var scope = this;
 
             if (this.velocitySliderPanel === undefined) {
-                var htmlText = '<span class="span-align">Min</span>' + '<span  class="span-align"><input type="range" name="slider" id="velocitySlider" /></span>' + '<span class="span-align">Max</span>';
+                var htmlText = '<span class="span-align">Min</span>' +
+                    '<span  class="span-align"><input type="range" name="slider" id="velocitySlider" /></span>' +
+                    '<span class="span-align">Max</span>';
                 this.velocitySliderPanel = document.createElement("div");
                 this.velocitySliderPanel.id = "velocitySliderPanel";
                 //this.velocitySliderPanel.className = "row iconk-small iconk-widthFollow";
@@ -13155,7 +13585,7 @@ CLOUD.FlyEditorUI.prototype = {
     },
 
     // 创建键盘控制面板
-    createKeyControlPanel: function createKeyControlPanel(parentNode) {
+    createKeyControlPanel: function (parentNode) {
         if (parentNode !== undefined) {
             if (this.keyControlPanel === undefined) {
                 // 构造一个6 * 5 的格子面板
@@ -13184,7 +13614,7 @@ CLOUD.FlyEditorUI.prototype = {
                 }, {
                     id: 'key11', imgId: '', imgUrl: '', imgId2: '', imgUrl2: '', tipId: '', tipText: '', tipCss: ''
                 }, {
-                    id: 'key12', imgId: 'imgTipW', imgUrl: CLOUD.GlobalData.TextureResRoot + 'cloud-tip-forward.png', imgId2: '', imgUrl2: '', tipId: '', tipText: '', tipCss: ''
+                    id: 'key12', imgId: 'imgTipW', imgUrl:CLOUD.GlobalData.TextureResRoot + 'cloud-tip-forward.png', imgId2: '', imgUrl2: '', tipId: '', tipText: '', tipCss: ''
                 }, {
                     id: 'key13', imgId: '', imgUrl: '', imgId2: '', imgUrl2: '', tipId: '', tipText: '', tipCss: ''
                 }, {
@@ -13192,11 +13622,11 @@ CLOUD.FlyEditorUI.prototype = {
                 }, {
                     id: 'key20', imgId: 'imgTipQ', imgUrl: CLOUD.GlobalData.TextureResRoot + 'cloud-tip-up.png', imgId2: '', imgUrl2: '', tipId: '', tipText: '', tipCss: ''
                 }, {
-                    id: 'keyQ', imgId: 'imgKeyQ', imgUrl: CLOUD.GlobalData.TextureResRoot + 'cloud-key-Q.png', imgId2: 'imgKeyQ2', imgUrl2: CLOUD.GlobalData.TextureResRoot + 'cloud-press-Q.png', tipId: '', tipText: '', tipCss: ''
+                    id: 'keyQ', imgId: 'imgKeyQ', imgUrl: CLOUD.GlobalData.TextureResRoot + 'cloud-key-Q.png', imgId2: 'imgKeyQ2', imgUrl2: CLOUD.GlobalData.TextureResRoot + 'cloud-press-Q.png',tipId: '', tipText: '', tipCss: ''
                 }, {
-                    id: 'keyW', imgId: 'imgKeyW', imgUrl: CLOUD.GlobalData.TextureResRoot + 'cloud-key-W.png"', imgId2: 'imgKeyW2', imgUrl2: CLOUD.GlobalData.TextureResRoot + 'cloud-press-W.png', tipId: '', tipText: '', tipCss: ''
+                    id: 'keyW', imgId: 'imgKeyW', imgUrl: CLOUD.GlobalData.TextureResRoot + 'cloud-key-W.png"', imgId2: 'imgKeyW2', imgUrl2: CLOUD.GlobalData.TextureResRoot + 'cloud-press-W.png',tipId: '', tipText: '', tipCss: ''
                 }, {
-                    id: 'keyE', imgId: 'imgKeyE', imgUrl: CLOUD.GlobalData.TextureResRoot + 'cloud-key-E.png', imgId2: 'imgKeyE2', imgUrl2: CLOUD.GlobalData.TextureResRoot + 'cloud-press-E.png', tipId: '', tipText: '', tipCss: ''
+                    id: 'keyE', imgId: 'imgKeyE', imgUrl: CLOUD.GlobalData.TextureResRoot + 'cloud-key-E.png', imgId2: 'imgKeyE2', imgUrl2: CLOUD.GlobalData.TextureResRoot + 'cloud-press-E.png',tipId: '', tipText: '', tipCss: ''
                 }, {
                     id: 'key24', imgId: 'imgTipE', imgUrl: CLOUD.GlobalData.TextureResRoot + 'cloud-tip-down.png', imgId2: '', imgUrl2: '', tipId: '', tipText: '', tipCss: ''
                 }, {
@@ -13204,9 +13634,9 @@ CLOUD.FlyEditorUI.prototype = {
                 }, {
                     id: 'keyA', imgId: 'imgKeyA', imgUrl: CLOUD.GlobalData.TextureResRoot + 'cloud-key-A.png', imgId2: 'imgKeyA2', imgUrl2: CLOUD.GlobalData.TextureResRoot + 'cloud-press-A.png', tipId: '', tipText: '', tipCss: ''
                 }, {
-                    id: 'keyS', imgId: 'imgKeyS', imgUrl: CLOUD.GlobalData.TextureResRoot + 'cloud-key-S.png', imgId2: 'imgKeyS2', imgUrl2: CLOUD.GlobalData.TextureResRoot + 'cloud-press-S.png', tipId: '', tipText: '', tipCss: ''
+                    id: 'keyS', imgId: 'imgKeyS', imgUrl: CLOUD.GlobalData.TextureResRoot + 'cloud-key-S.png', imgId2: 'imgKeyS2', imgUrl2: CLOUD.GlobalData.TextureResRoot + 'cloud-press-S.png',tipId: '', tipText: '', tipCss: ''
                 }, {
-                    id: 'keyD', imgId: 'imgKeyD', imgUrl: CLOUD.GlobalData.TextureResRoot + 'cloud-key-D.png', imgId2: 'imgKeyD2', imgUrl2: CLOUD.GlobalData.TextureResRoot + 'cloud-press-D.png', tipId: '', tipText: '', tipCss: ''
+                    id: 'keyD', imgId: 'imgKeyD', imgUrl: CLOUD.GlobalData.TextureResRoot + 'cloud-key-D.png', imgId2: 'imgKeyD2', imgUrl2: CLOUD.GlobalData.TextureResRoot + 'cloud-press-D.png',tipId: '', tipText: '', tipCss: ''
                 }, {
                     id: 'key34', imgId: 'imgTipD', imgUrl: CLOUD.GlobalData.TextureResRoot + 'cloud-tip-right.png', imgId2: '', imgUrl2: '', tipId: '', tipText: '', tipCss: ''
                 }, {
@@ -13244,10 +13674,10 @@ CLOUD.FlyEditorUI.prototype = {
 
                     if (element.imgId !== '') {
                         if (element.imgId2 !== '') {
-                            htmlText += '<img id="' + element.imgId + '" class="icon-medium" src="' + element.imgUrl + '" />';
-                            htmlText += '<img id="' + element.imgId2 + '" class="icon-medium" src="' + element.imgUrl2 + '" style="display: none" />';
+                            htmlText += '<images id="' + element.imgId + '" class="icon-medium" src="' + element.imgUrl + '" />';
+                            htmlText += '<images id="' + element.imgId2 + '" class="icon-medium" src="' + element.imgUrl2 + '" style="display: none" />';
                         } else {
-                            htmlText += '<img id="' + element.imgId + '" class="icon-medium" src="' + element.imgUrl + '" style="display: none" />';
+                            htmlText += '<images id="' + element.imgId + '" class="icon-medium" src="' + element.imgUrl + '" style="display: none" />';
                         }
                     }
 
@@ -13266,14 +13696,12 @@ CLOUD.FlyEditorUI.prototype = {
             }
         }
     }
-};
-
+}
 CLOUD.FlyEditor = function (cameraEditor, scene, domElement) {
     "use strict";
-
     this.cameraEditor = cameraEditor;
     this.scene = scene;
-    this.domElement = domElement !== undefined ? domElement : document;
+    this.domElement = (domElement !== undefined) ? domElement : document;
 
     // API
     this.movementSpeed = 0.005 * CLOUD.GlobalData.SceneSize; // 移动速度
@@ -13289,7 +13717,7 @@ CLOUD.FlyEditor = function (cameraEditor, scene, domElement) {
     this.pitchMax = 0.5 * Math.PI - this.pitchMin; // 仰角最大值
     this.pitchDeltaTotal = 0;
 
-    this.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, PAN2: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
+    this.mouseButtons = {ORBIT: THREE.MOUSE.RIGHT, PAN2: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT};
 
     this.MoveDirection = {
         NONE: 0,
@@ -13331,14 +13759,23 @@ CLOUD.FlyEditor = function (cameraEditor, scene, domElement) {
 CLOUD.FlyEditor.prototype = {
     constructor: CLOUD.FlyEditor,
 
-    destroy: function destroy() {},
+    destroy: function () {
+        this.ui = null;
+        this.cameraEditor = null;
+        this.scene = null;
+        this.domElement = null;
+    },
 
-    handleEvent: function handleEvent(event) {
+    resize: function () {
+        this.ui.resize();
+    },
+
+    handleEvent: function (event) {
         if (typeof this[event.type] == 'function') {
             this[event.type](event);
         }
     },
-    delayHandle: function delayHandle() {
+    delayHandle: function () {
         var scope = this;
 
         function handle() {
@@ -13356,64 +13793,55 @@ CLOUD.FlyEditor.prototype = {
         this.timeoutId = setTimeout(handle, 200);
         this.cameraEditor.viewer.editorManager.isUpdateRenderList = false;
     },
-    activate: function activate() {
+    activate: function () {
         //this.clock.start();
     },
-    deactivate: function deactivate() {
+    deactivate: function () {
         //this.clock.stop();
     },
-    onExistEditor: function onExistEditor() {
+    onExistEditor: function () {
         this.deactivate();
         this.ui.showControlPanel(false);
     },
-    onKeyDown: function onKeyDown(event) {
+    onKeyDown: function (event) {
         if (event.altKey) {
             return;
         }
 
         var moveDirection = this.MoveDirection.NONE;
         switch (event.keyCode) {
-            case 48:
-                /* 0 - 恢复速度 */
+            case 48: /* 0 - 恢复速度 */
                 this.movementSpeed = this.defaultMovementSpeed;
                 break;
-            case 187:
-                /* 等号&加号 - 加速*/
+            case 187: /* 等号&加号 - 加速*/
                 this.movementSpeed *= 1.1;
                 break;
-            case 189:
-                /* 破折号&减号 - 减速*/
+            case 189: /* 破折号&减号 - 减速*/
                 this.movementSpeed *= 0.9;
                 if (this.movementSpeed < this.minMovementSpeed) {
                     this.movementSpeed = this.minMovementSpeed;
                 }
                 break;
             case 38: /*up - 前进*/
-            case 87:
-                /*W - 前进*/
+            case 87: /*W - 前进*/
                 moveDirection = this.MoveDirection.FORWARD;
                 break;
             case 40: /*down - 后退 */
-            case 83:
-                /*S - 后退*/
+            case 83: /*S - 后退*/
                 moveDirection = this.MoveDirection.BACK;
                 break;
             case 37: /*left - 左移 */
-            case 65:
-                /*A - 左移*/
+            case 65: /*A - 左移*/
                 moveDirection = this.MoveDirection.LEFT;
                 break;
             case 39: /*right - 右移*/
-            case 68:
-                /*D - 右移*/
+            case 68: /*D - 右移*/
                 moveDirection = this.MoveDirection.RIGHT;
                 break;
-            case 81:
-                /*Q - 上移*/
+            case 81: /*Q - 上移*/
                 moveDirection = this.MoveDirection.UP;
                 break;
-            case 69:
-                /*E - 下移*/
+            case 69: /*E - 下移*/
                 moveDirection = this.MoveDirection.DOWN;
                 break;
             default:
@@ -13431,46 +13859,40 @@ CLOUD.FlyEditor.prototype = {
         this.update();
     },
 
-    onKeyUp: function onKeyUp(event) {
+    onKeyUp: function (event) {
         var moveDirection = this.MoveDirection.NONE;
         switch (event.keyCode) {
             case 38: /*up - 前进*/
-            case 87:
-                /*W - 前进 */
+            case 87: /*W - 前进 */
                 moveDirection = this.MoveDirection.FORWARD;
                 break;
             case 40: /*down - 后退 */
-            case 83:
-                /*S - 后退 */
+            case 83: /*S - 后退 */
                 moveDirection = this.MoveDirection.BACK;
                 break;
             case 37: /*left - 左移 */
-            case 65:
-                /*A - 左移 */
+            case 65: /*A - 左移 */
                 moveDirection = this.MoveDirection.LEFT;
                 break;
             case 39: /*right - 右移*/
-            case 68:
-                /*D - 右移 */
+            case 68: /*D - 右移 */
                 moveDirection = this.MoveDirection.RIGHT;
                 break;
-            case 81:
-                /*Q - 上移 */
+            case 81: /*Q - 上移 */
                 moveDirection = this.MoveDirection.UP;
                 break;
-            case 69:
-                /*E - 下移 */
+            case 69: /*E - 下移 */
                 moveDirection = this.MoveDirection.DOWN;
                 break;
         }
 
         if (moveDirection !== this.MoveDirection.NONE) {
             this.ui.onKeyUp(moveDirection, this.MoveDirection);
-            this.moveState &= ~moveDirection;
+            this.moveState &= ~moveDirection
         }
     },
 
-    processMouseDown: function processMouseDown(event) {
+    processMouseDown: function (event) {
         if (this.domElement !== document) {
             this.domElement.focus();
         }
@@ -13481,6 +13903,7 @@ CLOUD.FlyEditor.prototype = {
         if (event.button === this.mouseButtons.ORBIT) {
             // 设置旋转起点
             this.rotateStart.set(event.clientX, event.clientY);
+
         } else if (event.button === this.mouseButtons.PAN) {
             //this.cameraEditor.beginPan(event.clientX, event.clientY);
             this.cameraEditor.beginPan(event.clientX, event.clientY);
@@ -13493,12 +13916,12 @@ CLOUD.FlyEditor.prototype = {
         return true;
     },
 
-    onMouseDown: function onMouseDown(event) {
+    onMouseDown: function (event) {
 
         return this.processMouseDown(event);
     },
 
-    processMouseMove: function processMouseMove(event) {
+    processMouseMove: function (event) {
         if (event.button === this.mouseButtons.ORBIT) {
 
             this.rotateEnd.set(event.clientX, event.clientY);
@@ -13523,11 +13946,12 @@ CLOUD.FlyEditor.prototype = {
         }
     },
 
-    onMouseMove: function onMouseMove(event) {
+    onMouseMove: function (event) {
         this.processMouseMove(event);
     },
 
-    processMouseUp: function processMouseUp(event) {
+
+    processMouseUp: function (event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -13538,6 +13962,7 @@ CLOUD.FlyEditor.prototype = {
             this.deltaPitch = 0;
             this.isFirstPerson = !event.shiftKey;
             this.update();
+
         } else if (event.button === this.mouseButtons.PAN) {
 
             if (this.isLockCameraHeight) {
@@ -13552,11 +13977,11 @@ CLOUD.FlyEditor.prototype = {
         return true;
     },
 
-    onMouseUp: function onMouseUp(event) {
+    onMouseUp: function (event) {
         return this.processMouseUp(event);
     },
 
-    onMouseWheel: function onMouseWheel(event) {
+    onMouseWheel: function (event) {
 
         // 鼠标滚轮缩放
 
@@ -13581,13 +14006,13 @@ CLOUD.FlyEditor.prototype = {
         cameraEditor.zoom(delta, clientX, clientY);
     },
 
-    update: function update() {
+    update: function () {
 
         //var moveStep = delta * this.movementSpeed * this.movementSpeedMultiplier;
         var moveStep = this.movementSpeed;
-        var camera = this.cameraEditor.object;
+        var camera = this.cameraEditor.camera;
         var position = camera.position;
-        var target = this.cameraEditor.target;
+        var target = this.cameraEditor.camera.target;
         var eye = target.clone().sub(position);
 
         this.cameraEditor.cameraDirty = true;
@@ -13687,14 +14112,14 @@ CLOUD.FlyEditor.prototype = {
     },
 
     // 前进
-    goForward: function goForward(step) {
+    goForward: function (step) {
 
         if (this.isFirstPerson) {
-            this.cameraEditor.object.translateZ(-step);
+            this.cameraEditor.camera.translateZ(-step);
         } else {
 
-            var position = this.cameraEditor.object.position;
-            var target = this.cameraEditor.target;
+            var position = this.cameraEditor.camera.position;
+            var target = this.cameraEditor.camera.target;
             // 新的target和eye在Y轴上的坐标不变
             var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
             var len = diff.length();
@@ -13707,15 +14132,16 @@ CLOUD.FlyEditor.prototype = {
     },
 
     // 后退
-    goBack: function goBack(step) {
+    goBack: function (step) {
 
         if (this.isFirstPerson) {
 
-            this.cameraEditor.object.translateZ(step);
+            this.cameraEditor.camera.translateZ(step);
+
         } else {
 
-            var position = this.cameraEditor.object.position;
-            var target = this.cameraEditor.target;
+            var position = this.cameraEditor.camera.position;
+            var target = this.cameraEditor.camera.target;
 
             // 新的target和eye在Y轴上的坐标不变
             var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
@@ -13729,15 +14155,16 @@ CLOUD.FlyEditor.prototype = {
     },
 
     // 左移
-    goLeft: function goLeft(step) {
+    goLeft: function (step) {
 
         if (this.isFirstPerson) {
 
-            this.cameraEditor.object.translateX(-step);
+            this.cameraEditor.camera.translateX(-step);
+
         } else {
 
-            var position = this.cameraEditor.object.position;
-            var target = this.cameraEditor.target;
+            var position = this.cameraEditor.camera.position;
+            var target = this.cameraEditor.camera.target;
 
             // 新的target和eye在Y轴上的坐标不变
             var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
@@ -13751,15 +14178,17 @@ CLOUD.FlyEditor.prototype = {
     },
 
     // 右移
-    goRight: function goRight(step) {
+    goRight: function (step) {
+
 
         if (this.isFirstPerson) {
 
-            this.cameraEditor.object.translateX(step);
+            this.cameraEditor.camera.translateX(step);
+
         } else {
 
-            var position = this.cameraEditor.object.position;
-            var target = this.cameraEditor.target;
+            var position = this.cameraEditor.camera.position;
+            var target = this.cameraEditor.camera.target;
 
             // 新的target和eye在Y轴上的坐标不变
             var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
@@ -13773,15 +14202,17 @@ CLOUD.FlyEditor.prototype = {
     },
 
     // 上移
-    goUp: function goUp(step) {
+    goUp: function (step) {
+
 
         if (this.isFirstPerson) {
 
-            this.cameraEditor.object.translateY(step);
+            this.cameraEditor.camera.translateY(step);
+
         } else {
 
-            var position = this.cameraEditor.object.position;
-            var target = this.cameraEditor.target;
+            var position = this.cameraEditor.camera.position;
+            var target = this.cameraEditor.camera.target;
 
             // target和eye的Y轴上的坐标增加step
             position.y += step;
@@ -13790,15 +14221,16 @@ CLOUD.FlyEditor.prototype = {
     },
 
     // 下移
-    goDown: function goDown(step) {
+    goDown: function (step) {
 
         if (this.isFirstPerson) {
 
-            this.cameraEditor.object.translateY(-step);
+            this.cameraEditor.camera.translateY(-step);
+
         } else {
 
-            var position = this.cameraEditor.object.position;
-            var target = this.cameraEditor.target;
+            var position = this.cameraEditor.camera.position;
+            var target = this.cameraEditor.camera.target;
 
             position.y -= step;
             target.y -= step;
@@ -13806,9 +14238,9 @@ CLOUD.FlyEditor.prototype = {
     },
 
     //  右转：angle为正； 左转：angle为负
-    goTurn: function goTurn(angle) {
-        var position = this.cameraEditor.object.position;
-        var target = this.cameraEditor.target;
+    goTurn: function (angle) {
+        var position = this.cameraEditor.camera.position;
+        var target = this.cameraEditor.camera.target;
 
         var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
         var cosAngle = Math.cos(angle);
@@ -13820,9 +14252,9 @@ CLOUD.FlyEditor.prototype = {
     },
 
     // 俯仰
-    goPitch: function goPitch(angle) {
-        var position = this.cameraEditor.object.position;
-        var target = this.cameraEditor.target;
+    goPitch: function (angle) {
+        var position = this.cameraEditor.camera.position;
+        var target = this.cameraEditor.camera.target;
 
         var offsetX = target.x - position.x;
         var offsetZ = target.z - position.z;
@@ -13838,263 +14270,479 @@ CLOUD.FlyEditor.prototype = {
         target.z = position.z + percent * offsetZ;
     },
 
-    resize: function resize() {
-        this.ui.resize();
-    },
-    setCrossVisible: function setCrossVisible(visible) {
+    setCrossVisible: function (visible) {
         this.ui.setCrossVisible(visible);
     },
 
     // 启用或关闭控制面板
-    enableFlyControlPanel: function enableFlyControlPanel(enable) {
+    enableFlyControlPanel: function (enable) {
         this.ui.enableFlyControlPanel(enable);
     },
 
-    showControlPanel: function showControlPanel(isShow) {
+    showControlPanel: function (isShow) {
         this.ui.showControlPanel(isShow);
     }
 };
+// handleViewHouseEvent
+CLOUD.EditorManager = function() {
 
-CLOUD.CameraAnimator = function () {
+    this.editor = null;
+    this.editors = {};
 
-    var _duration = 500; // 500毫秒
-    var _frameTime = 13; // 周期性执行或调用函数之间的时间间隔，以毫秒计
-    var _isPlaying = false;
-    var _animation = new CLOUD.Animation();
+    this.animationDuration = 500; // 500毫秒
+    this.animationFrameTime = 13; // 周期性执行或调用函数之间的时间间隔，以毫秒计
+    this.enableAnimation = true; // 是否允许动画
+    this.isUpdateRenderList = true; // 是否更新渲染列表
 
-    this.setDuration = function (duration) {
-        _duration = duration;
+    this.movePad = null;
+
+    var scope = this;
+    var _canMouseMoveOperation = false; // 是否可以进行mouseMove相关操作
+
+    function touchmove(event) {
+        scope.editor.touchmove(event);
+    }
+
+    function touchstart(event) {
+        scope.editor.touchstart(event);
+    }
+
+    function touchend(event) {
+        scope.editor.touchend(event);
+    }
+
+    function onKeyDown(event) {
+        scope.editor.onKeyDown(event);
+    }
+
+    function onKeyUp(event) {
+        scope.editor.onKeyUp(event);
+    }
+
+    function onMouseWheel(event) {
+        scope.editor.onMouseWheel(event);
+    }
+
+    function onMouseDown(event) {
+
+        // 每次按下鼠标激活canvas
+        setFocuse();
+
+        _canMouseMoveOperation = true;
+        scope.isUpdateRenderList = false;
+
+        var isAnimating = scope.isAnimating();
+
+        // 判断是否在动画中, 若是动画中，不响应事件
+        if (isAnimating) return;
+
+        scope.editor.onMouseDown(event);
+    }
+
+    function onMouseMove(event) {
+
+        var isAnimating = scope.isAnimating();
+
+        // 判断是否在动画中, 若是动画中，不响应事件
+        if (isAnimating) return;
+
+        // 其它交互
+        if (_canMouseMoveOperation) {
+            // 不更新渲染列表
+            scope.isUpdateRenderList = false;
+            scope.editor.onMouseMove(event);
+        }
+    }
+
+    function onMouseUp(event) {
+
+        var isAnimating = scope.isAnimating();
+
+        // 只要存在up事件，允许更新渲染列表
+        scope.isUpdateRenderList = true;
+
+        var isCanMouseMove = _canMouseMoveOperation;
+        // 只要存在up事件，就将其置为false
+        _canMouseMoveOperation = false;
+
+        // 判断是否在动画中, 若是动画中，不响应事件
+        if (isAnimating) return;
+
+        if (isCanMouseMove) {
+            // 其它交互
+            scope.editor.onMouseUp(event);
+        }
+    }
+
+
+    function onMouseDoubleClick(event) {
+        scope.editor.onMouseDoubleClick(event);
+    }
+
+    function setFocuse() {
+        // 设置焦点
+        var dom = scope.editor.getDomElement();
+        if (dom) {
+            var canvas = dom.querySelector("#cloud-main-canvas");
+            if (canvas)
+                canvas.focus();
+        }
+    }
+
+    // 返回鼠标运动状态
+    this.isMouseMoving = function() {
+        return _canMouseMoveOperation;
     };
 
-    this.setFrameTime = function (frameTime) {
-        _frameTime = frameTime;
+    this.registerDomEventListeners = function(domElement) {
+
+        domElement.addEventListener('contextmenu', function(event) { event.preventDefault(); }, false);
+        domElement.addEventListener('mousedown', onMouseDown, false);
+        domElement.addEventListener('mousewheel', onMouseWheel, false);
+        domElement.addEventListener('DOMMouseScroll', onMouseWheel, false); // firefox
+        domElement.addEventListener('dblclick', onMouseDoubleClick, false);
+
+        // 注册在document上会影响dbgUI的resize事件
+        window.addEventListener('mousemove', onMouseMove, false);
+        window.addEventListener('mouseup', onMouseUp, false);
+
+        domElement.addEventListener('touchstart', touchstart, false);
+        domElement.addEventListener('touchend', touchend, false);
+        domElement.addEventListener('touchmove', touchmove, false);
+
+        //window.addEventListener( 'keydown', onKeyDown, false );
+        //window.addEventListener( 'keyup', onKeyUp, false );
+        domElement.addEventListener('keydown', onKeyDown, false);
+        domElement.addEventListener('keyup', onKeyUp, false);
+
+        setFocuse();
     };
 
-    this.setStandardView = function (stdView, viewer, margin, callback) {
+    this.unregisterDomEventListeners = function(domElement) {
 
-        _isPlaying = false; // 无动画，将状态置成 false
+        domElement.removeEventListener('contextmenu', function(event) { event.preventDefault(); }, false);
+        domElement.removeEventListener('mousedown', onMouseDown, false);
+        domElement.removeEventListener('mousewheel', onMouseWheel, false);
+        domElement.removeEventListener('DOMMouseScroll', onMouseWheel, false); // firefox
+        domElement.removeEventListener('dblclick', onMouseDoubleClick, false);
 
-        var redoRender = function redoRender(viewer, box) {
+        // 注册在document上会影响dbgUI的resize事件
+        window.removeEventListener('mousemove', onMouseMove, false);
+        window.removeEventListener('mouseup', onMouseUp, false);
+
+        domElement.removeEventListener('touchstart', touchstart, false);
+        domElement.removeEventListener('touchend', touchend, false);
+        domElement.removeEventListener('touchmove', touchmove, false);
+
+        //window.removeEventListener( 'keydown', onKeyDown, false );
+        //window.removeEventListener( 'keyup', onKeyUp, false );
+        domElement.removeEventListener('keydown', onKeyDown, false);
+        domElement.removeEventListener('keyup', onKeyUp, false);
+    };
+
+};
+
+
+CLOUD.EditorManager.prototype = {
+
+    constructor: CLOUD.EditorManager,
+
+    destroy: function() {
+
+        this.editor = null;
+
+        for (var name in this.editors) {
+            var editor = this.editors[name];
+            editor.destroy();
+        }
+
+        this.editors = {};
+        this.movePad = null;
+    },
+
+    setEditor: function(newEditor, slaveEditor) {
+
+        if (this.editor !== null) {
+            if (this.editor == this.editors['orbitEditor']) {
+                //this.movePad.hideOverlay();
+            }
+            this.editor.onExistEditor();
+        }
+
+        if (slaveEditor)
+            newEditor.slaveEditor = slaveEditor;
+
+        if (newEditor == this.editors['orbitEditor']) {
+            //this.movePad.showOverlay();
+        }
+
+        this.editor = newEditor;
+
+    },
+
+    setPickMode: function(viewer) {
+        var scope = this;
+
+        var pickEditor = this.editors["pickEditor"];
+
+        if (pickEditor === undefined) {
+
+            pickEditor = new CLOUD.PickEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+            pickEditor.onObjectSelected = function (intersect, doubleClick) {
+                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect, click: doubleClick ? 2 : 1 })
+            };
+            this.editors["pickEditor"] = pickEditor;
+        }
+
+        scope.setEditor(pickEditor);
+    },
+
+    getOrbitEditor: function(viewer) {
+
+        var orbitEditor = this.editors["orbitEditor"];
+        if (orbitEditor === undefined) {
+            orbitEditor = new CLOUD.OrbitEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+            this.editors["orbitEditor"] = orbitEditor;
+            if (this.movePad == null) {
+                //this.movePad = new CLOUD.MovePad(viewer);
+            }
+        }
+
+        return orbitEditor;
+    },
+
+    getRectPickEditor: function(viewer) {
+
+        var rectPickEditor = this.editors["rectPickEditor"];
+        if (rectPickEditor === undefined) {
+
+            rectPickEditor = new CLOUD.RectPickEditor(this.getOrbitEditor(viewer),
+                function (intersect, doubleClick) {
+                    viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect, click: doubleClick ? 2 : 1 });
+                });
+            rectPickEditor.onUpdateUI = function(obj) {
+                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_UPDATE_SELECTION_UI, data: obj })
+            };
+            this.editors["rectPickEditor"] = rectPickEditor;
+        }
+
+        return rectPickEditor;
+    },
+
+    setRectPickMode: function(viewer, orbitBySelection) {
+        var scope = this;
+
+        var orbitEditor = this.getOrbitEditor(viewer);
+        var rectPickEditor = this.getRectPickEditor(viewer);
+
+        orbitEditor.orbitBySelection = orbitBySelection || false;
+        scope.setEditor(rectPickEditor, orbitEditor);
+    },
+
+    setRectZoomMode: function (viewer) {
+        var scope = this;
+
+        var editor = this.editors["rectZoomEditor"];
+        if (editor === undefined) {
+            editor = new CLOUD.RectZoomEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+            editor.onUpdateUI = function (obj) {
+                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_UPDATE_SELECTION_UI, data: obj })
+            };
+            this.editors["rectZoomEditor"] = editor;
+        }
+
+        scope.setEditor(editor);
+    },
+
+    setOrbitMode: function(viewer) {
+        var scope = this;
+
+        var orbitEditor = this.getOrbitEditor(viewer);
+
+        scope.setEditor(orbitEditor);
+    },
+
+    setZoomMode: function(viewer) {
+        var scope = this;
+
+        var zoomEditor = this.editors["zoomEditor"];
+        if (zoomEditor === undefined) {
+            zoomEditor = new CLOUD.ZoomEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+            this.editors["zoomEditor"] = zoomEditor;
+        }
+
+        scope.setEditor(zoomEditor);
+    },
+
+    setPanMode: function(viewer) {
+        var scope = this;
+
+        var panEditor = this.editors["panEditor"];
+        if (panEditor === undefined) {
+            panEditor = new CLOUD.PanEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+            this.editors["panEditor"] = panEditor;
+        }
+
+        scope.setEditor(panEditor);
+    },
+
+    setClipPlanesMode : function (viewer) {
+        var scope = this;
+
+        var clipPlanes = this.editors["clipPlanesEditor"];
+        if (clipPlanes === undefined) {
+            clipPlanes = new CLOUD.ClipPlanesEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement,
+                function (intersect, doubleClick) {
+                    viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect, click: doubleClick ? 2 : 1 });
+                });
+            clipPlanes.onUpdateUI = function(obj) {
+                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_UPDATE_SELECTION_UI, data: obj })
+            };
+            this.editors["clipPlanesEditor"] = clipPlanes;
+            clipPlanes.update(viewer.camera);
+        }
+
+        scope.setEditor(clipPlanes);
+    },
+
+    setFlyMode: function(bShowControlPanel, viewer) {
+        var scope = this;
+
+        var flyEditor = this.editors["flyEditor"];
+        if (flyEditor === undefined) {
+            flyEditor = new CLOUD.FlyEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+            this.editors["flyEditor"] = flyEditor;
+        }
+
+        var rectPickEditor = this.getRectPickEditor(viewer);
+
+        scope.setEditor(flyEditor, rectPickEditor);
+        flyEditor.showControlPanel(bShowControlPanel);
+        flyEditor.activate();
+    },
+
+    isFlyMode: function() {
+
+        if (this.editor === this.editors["flyEditor"]) {
+            return true;
+        }
+
+        return false;
+    },
+
+    zoomIn: function(factor, viewer) {
+        //if(factor === undefined){
+        //    factor = viewer.camera.zoom * 1.1;
+        //}
+
+        // 缩放时，改变相机缩放因子zoom，就会改变相机FOV，从而造成模型显示变形
+        // 思路：保持相机FOV和目标点位置不变，调整相机位置达到缩放的目的
+        //this.camera.setZoom(factor);
+
+        // 放大，factor > 0
+        if (factor === undefined) {
+            factor = 0.1;
+        }
+
+        if (factor < 0) {
+            factor = 0;
+        }
+
+        viewer.cameraEditor.zoom(factor);
+
+    },
+
+    zoomOut: function(factor, viewer) {
+
+        //if(factor === undefined){
+        //    factor = viewer.camera.zoom * 0.9;
+        //}
+        //if(factor < 0.28){
+        //    factor = 0.28;
+        //}
+
+        // 缩放时，改变相机缩放因子zoom，就会改变相机FOV，从而造成模型显示变形
+        // 思路：保持相机FOV和目标点位置不变，调整相机位置达到缩放的目的
+        //this.camera.setZoom(factor);
+
+        if (factor === undefined) {
+            factor = 0.1;
+        }
+
+        if (factor > 0) {
+            factor *= -1;
+        } else {
+            factor = 0;
+        }
+
+        // 缩小，factor < 0
+        viewer.cameraEditor.zoom(factor);
+    },
+
+    zoomToBBox: function (viewer, box, margin, ratio, direction) {
+        margin = margin || -0.05;
+        var target = viewer.camera.zoomToBBox(box, margin, ratio, direction);
+        viewer.cameraEditor.updateCamera(target, true);
+        viewer.render();
+    },
+
+    isAnimating: function() {
+        return (this.enableAnimation && this.animator && this.animator.isPlaying());
+    },
+
+    setStandardView: function(stdView, viewer, margin, callback) {
+
+        var camera = viewer.camera;
+
+        if (this.enableAnimation) {
+
+            if (!this.animator) {
+                this.animator = new CLOUD.CameraAnimator();
+            }
+
+            this.animator.setDuration(this.animationDuration);
+            this.animator.setFrameTime(this.animationFrameTime);
+            this.animator.setStandardView(stdView, viewer, margin, callback);
+
+        } else {
+
+            var box = viewer.getScene().worldBoundingBox();
+            camera.setStandardView(stdView, box); // 设置观察视图
 
             // fit all
             var target = viewer.camera.zoomToBBox(box, margin);
-            viewer.cameraEditor.updateCamera(target);
+            viewer.cameraEditor.updateCamera(target, true);
             viewer.render();
 
-            // 增加回调
-            callback && callback();
-        };
+            callback && callback();// 是否回调
+            camera.up.copy(THREE.Object3D.DefaultUp); // 渲染完成后才可以恢复相机up方向
+        }
+    },
+
+    setTopView: function(viewer, box, margin, ratio) {
 
         var camera = viewer.camera;
-        var focal = CLOUD.GlobalData.SceneSize / 2;
-        var threshold = 0.9995;
+        var worldBox = viewer.getScene().worldBoundingBox();
+        var target = camera.setStandardView(CLOUD.EnumStandardView.ISO, worldBox); // 设置观察视图
 
-        // 1. 记录动画开始参数
-        var startDir = camera.getWorldDirection().clone();
-        startDir.normalize();
-
-        var startUp = new THREE.Vector3();
-        startUp.copy(camera.realUp || camera.up);
-        startUp.normalize();
-
-        // 2. 设置视图模式
-        var box = viewer.getScene().worldBoundingBox();
-        var target = camera.setStandardView(stdView, box);
-
-        // 3. 记录动画结束参数
-        var endDir = camera.getWorldDirection().clone();
-        endDir.normalize();
-
-        var endUp = new THREE.Vector3();
-        endUp.copy(camera.realUp || camera.up);
-        endUp.normalize();
-
-        // 开始结束点之间角度
-        var cosThetaDir = startDir.dot(endDir);
-        var cosThetaUp = startUp.dot(endUp);
-
-        // dir和up都一样, 无动画
-        if (threshold < cosThetaDir && threshold < cosThetaUp) {
-
-            // 绘制
-            redoRender(viewer, box);
-
-            camera.up.copy(THREE.Object3D.DefaultUp);
+        if (box) {
+            // fit all
+            target = camera.zoomToBBox(box, margin, ratio);
         } else {
-
-            _isPlaying = true; // 动画中
-
-            // 启动定时器
-            _animation.from({ animDir: startDir, animUp: startUp }).to({
-                animDir: endDir,
-                animUp: endUp
-            }, _duration).onUpdate(function () {
-                if (viewer.viewHouse) {
-                    viewer.viewHouse.isAnimationFinish = false;
-                }
-
-                // 传入更新值,这里的this是 CLOUD.Animation._object
-                var interpDir = this.animDir;
-                var interpUp = this.animUp;
-
-                viewer.camera.LookAt(target, interpDir, interpUp, focal);
-
-                redoRender(viewer, box);
-            }).onComplete(function () {
-
-                if (viewer.viewHouse) {
-                    // 处理最后一帧
-                    viewer.viewHouse.isAnimationFinish = true; // 标记ViewHouse动画结束
-                }
-
-                viewer.camera.LookAt(target, endDir, endUp, focal);
-
-                // 绘制
-                redoRender(viewer, box);
-
-                _isPlaying = false; //动画结束
-                viewer.camera.up.copy(THREE.Object3D.DefaultUp); // 渲染完成后才可以恢复相机up方向
-            }).start(_frameTime);
-        }
-    };
-
-    this.isPlaying = function () {
-        return _isPlaying;
-    };
-};
-
-CLOUD.MaterialLoader = function (showStatus) {
-    THREE.Loader.call(this, showStatus);
-};
-
-CLOUD.MaterialLoader.prototype = Object.create(THREE.Loader.prototype);
-CLOUD.MaterialLoader.prototype.constructor = CLOUD.MaterialLoader;
-
-CLOUD.MaterialLoader.prototype.setCrossOrigin = function (value) {
-    this.crossOrigin = value;
-};
-
-CLOUD.MaterialLoader.prototype.load = function (materialUrl, callback, client) {
-
-    var scope = this;
-
-    function createMaterial(json) {
-        var material = new THREE[json.type](json.parameters);
-
-        if (json.textures) {
-            var texturesJSON = json.textures;
-            if (texturesJSON.map) {
-                var mapJSON = texturesJSON.map;
-                var texture = scope.loadTexture(client.textureUrl(mapJSON.sourceFile));
-                texture.repeat.fromArray(mapJSON.scale);
-                texture.offset.fromArray(mapJSON.offset);
-                texture.wangle = THREE.Math.degToRad(mapJSON.angle);
-                if (mapJSON.repeatU) texture.wrapS = THREE.RepeatWrapping;
-                if (mapJSON.repeatV) texture.wrapT = THREE.RepeatWrapping;
-                material.map = texture;
-            }
+            target = camera.zoomToBBox(worldBox, margin, ratio);
         }
 
-        if (CloudShaderLib === undefined) {
-            return material;
-        }
+        viewer.cameraEditor.updateCamera(target);
+        viewer.render();
+        camera.up.copy(THREE.Object3D.DefaultUp); // 渲染完成后才可以恢复相机up方向
+    },
 
-        if (json.type === 'MeshPhongMaterial') {
-            material.type = 'phong_cust_clip';
-            material.uniforms = CloudShaderLib.phong_cust_clip.uniforms;
-            material.vertexShader = CloudShaderLib.phong_cust_clip.vertexShader;
-            material.fragmentShader = CloudShaderLib.phong_cust_clip.fragmentShader;
+    resize: function () {
+        if (this.editor) {
+            this.editor.resize();
         }
-
-        return material;
     }
-
-    var loader = new THREE.XHRLoader();
-
-    loader.load(materialUrl, function (text) {
-        var matData = JSON.parse(text);
-
-        for (var matID in matData.materials) {
-
-            var matJSON = matData.materials[matID];
-
-            if (matJSON.parameters.opacity !== undefined && matJSON.parameters.opacity < 1.0) {
-                matJSON.parameters.transparent = true;
-            }
-            if (matJSON.parameters.side != undefined && matJSON.parameters.side === "double") {
-                matJSON.parameters.side = THREE.DoubleSide;
-            }
-
-            if (matJSON.parameters.ambient !== undefined) delete matJSON.parameters.ambient; // ambient is removed for PhongMaterial
-
-            var material = createMaterial(matJSON);
-            material.name = matID;
-
-            if (material.metal === false) {
-                material.specular.setRGB(0, 0, 0);
-            }
-
-            client.cache.materials[matID] = material;
-        }
-
-        callback();
-    });
 };
-
-CLOUD.MaterialLoader.prototype.loadTexture = function (url, onLoad, onProgress, onError) {
-
-    var texture;
-    var loader = THREE.Loader.Handlers.get(url);
-    var manager = this.manager !== undefined ? this.manager : THREE.DefaultLoadingManager;
-
-    if (loader !== null) {
-
-        texture = loader.load(url, onLoad);
-    } else {
-
-        texture = new THREE.Texture();
-
-        loader = new THREE.ImageLoader(manager);
-        loader.setCrossOrigin(this.crossOrigin);
-        loader.load(url, function (image) {
-
-            texture.image = CLOUD.MaterialLoader.ensurePowerOfTwo(image);
-            texture.needsUpdate = true;
-
-            if (onLoad) onLoad(texture);
-        }, onProgress, onError);
-    }
-
-    return texture;
-};
-
-CLOUD.MaterialLoader.ensurePowerOfTwo = function (image) {
-
-    if (!THREE.Math.isPowerOfTwo(image.width) || !THREE.Math.isPowerOfTwo(image.height)) {
-
-        var canvas = document.createElement("canvas");
-        canvas.width = CLOUD.MaterialLoader.nextHighestPowerOfTwo(image.width);
-        canvas.height = CLOUD.MaterialLoader.nextHighestPowerOfTwo(image.height);
-
-        var ctx = canvas.getContext("2d");
-        ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height);
-        return canvas;
-    }
-
-    return image;
-};
-
-CLOUD.MaterialLoader.nextHighestPowerOfTwo = function (x) {
-
-    --x;
-
-    for (var i = 1; i < 32; i <<= 1) {
-        x = x | x >> i;
-    }
-
-    return x + 1;
-};
-
 /*global ArrayBuffer, Uint32Array, Int32Array, Float32Array, Int8Array, Uint8Array, window, performance, Console*/
 
 /*
@@ -14119,9 +14767,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-var o3dgc = function () {
+var o3dgc = (function () {
     "use strict";
-
     var module, local;
     module = {};
     local = {};
@@ -14221,16 +14868,16 @@ var o3dgc = function () {
     module.SC3DMCTriplet.prototype.Less = function (rhs) {
         var res;
         if (this.m_c !== rhs.m_c) {
-            res = this.m_c < rhs.m_c;
+            res = (this.m_c < rhs.m_c);
         } else if (this.m_b !== rhs.m_b) {
-            res = this.m_b < rhs.m_b;
+            res = (this.m_b < rhs.m_b);
         } else {
-            res = this.m_a < rhs.m_a;
+            res = (this.m_a < rhs.m_a);
         }
         return res;
     };
     module.SC3DMCTriplet.prototype.Equal = function (rhs) {
-        return this.m_c === rhs.m_c && this.m_b === rhs.m_b && this.m_a === rhs.m_a;
+        return (this.m_c === rhs.m_c && this.m_b === rhs.m_b && this.m_a === rhs.m_a);
     };
     // SC3DMCPredictor class
     module.SC3DMCPredictor = function () {
@@ -14278,48 +14925,48 @@ var o3dgc = function () {
     }
     // Timer class
     // if (typeof window.performance === 'undefined') {
-    // window.performance = {};
+        // window.performance = {};
     // }
     // if (!window.performance.now) {
-    // local.nowOffset = Date.now();
-    // if (performance.timing && performance.timing.navigationStart) {
-    // local.nowOffset = performance.timing.navigationStart;
+        // local.nowOffset = Date.now();
+        // if (performance.timing && performance.timing.navigationStart) {
+            // local.nowOffset = performance.timing.navigationStart;
+        // }
+        // window.performance.now = function now() {
+            // return Date.now() - local.nowOffset;
+        // };
     // }
-    // window.performance.now = function now() {
-    // return Date.now() - local.nowOffset;
-    // };
-    // }
-
-    // begin - william
-    var getTimestamp = function () {
+	
+	    // begin - william 
+	    var getTimestamp = (function() {
         if (typeof performance != 'undefined' && typeof performance.now !== 'undefined') {
-            return function () {
-                return performance.now();
-            };
-        } else {
-            var nowOffset = Date.now();
-            return function () {
-                return Date.now() - nowOffset;
-            };
-        }
-    }();
-    //end
-
+             return function() {
+                 return performance.now();
+             };
+         } else {
+             var nowOffset = Date.now();
+             return function() {
+                 return Date.now() - nowOffset;
+             };
+          }
+		  })();
+		  //end 
+		  
     module.Timer = function () {
         this.m_start = 0;
         this.m_end = 0;
     };
     module.Timer.prototype.Tic = function () {
-        // begin - william
+		// begin - william 
         //this.m_start = window.performance.now();
-        this.m_start = getTimestamp();
-        //end
+		this.m_start = getTimestamp();
+		//end 
     };
     module.Timer.prototype.Toc = function () {
-        // begin - william
+		// begin - william
         //this.m_end = window.performance.now();
-        this.m_end = getTimestamp();
-        //end
+		this.m_end = getTimestamp();
+		//end 
     };
     module.Timer.prototype.GetElapsedTime = function () {
         return this.m_end - this.m_start;
@@ -14396,42 +15043,42 @@ var o3dgc = function () {
         }
     }
     local.CubeToSphere = {
-        0: function _(vin, vout) {
+        0: function (vin, vout) {
             vout.m_x = vin.m_x;
             vout.m_y = vin.m_y;
             vout.m_z = Math.sqrt(Math.max(0.0, 1.0 - vout.m_x * vout.m_x - vout.m_y * vout.m_y));
         },
-        1: function _(vin, vout) {
+        1: function (vin, vout) {
             vout.m_x = -vin.m_x;
             vout.m_y = -vin.m_y;
             vout.m_z = -Math.sqrt(Math.max(0.0, 1.0 - vout.m_x * vout.m_x - vout.m_y * vout.m_y));
         },
-        2: function _(vin, vout) {
+        2: function (vin, vout) {
             vout.m_z = vin.m_x;
             vout.m_x = vin.m_y;
             vout.m_y = Math.sqrt(Math.max(0.0, 1.0 - vout.m_x * vout.m_x - vout.m_z * vout.m_z));
         },
-        3: function _(vin, vout) {
+        3: function (vin, vout) {
             vout.m_z = -vin.m_x;
             vout.m_x = -vin.m_y;
             vout.m_y = -Math.sqrt(Math.max(0.0, 1.0 - vout.m_x * vout.m_x - vout.m_z * vout.m_z));
         },
-        4: function _(vin, vout) {
+        4: function (vin, vout) {
             vout.m_y = vin.m_x;
             vout.m_z = vin.m_y;
             vout.m_x = Math.sqrt(Math.max(0.0, 1.0 - vout.m_y * vout.m_y - vout.m_z * vout.m_z));
         },
-        5: function _(vin, vout) {
+        5: function (vin, vout) {
             vout.m_y = -vin.m_x;
             vout.m_z = -vin.m_y;
             vout.m_x = -Math.sqrt(Math.max(0.0, 1.0 - vout.m_y * vout.m_y - vout.m_z * vout.m_z));
         }
     };
     function IntToUInt(value) {
-        return value < 0 ? -1 - 2 * value : 2 * value;
+        return (value < 0) ? (-1 - (2 * value)) : (2 * value);
     }
     function UIntToInt(uiValue) {
-        return uiValue & 1 ? -(uiValue + 1 >>> 1) : uiValue >>> 1;
+        return (uiValue & 1) ? -((uiValue + 1) >>> 1) : ((uiValue >>> 1));
     }
     module.Iterator = function () {
         this.m_count = 0;
@@ -14485,7 +15132,7 @@ var o3dgc = function () {
         value = 0;
         shift = 0;
         for (i = 0; i < local.O3DGC_BINARY_STREAM_NUM_SYMBOLS_UINT32; ++i) {
-            value += this.m_stream[bsIterator.m_count++] << shift >>> 0;
+            value += (this.m_stream[bsIterator.m_count++] << shift) >>> 0;
             shift += local.O3DGC_BINARY_STREAM_BITS_PER_SYMBOL0;
         }
         return value;
@@ -14521,7 +15168,7 @@ var o3dgc = function () {
             i = 0;
             do {
                 x = this.m_stream[bsIterator.m_count++];
-                value += x >>> 1 << i >>> 0;
+                value += ((x >>> 1) << i) >>> 0;
                 i += local.O3DGC_BINARY_STREAM_BITS_PER_SYMBOL1;
             } while (x & 1);
         }
@@ -14555,55 +15202,55 @@ var o3dgc = function () {
     // Copyright (c) 2004 Amir Said (said@ieee.org) & William A. Pearlman (pearlw@ecse.rpi.edu)
     // All rights reserved.
 
-    local.O3DGC_AC_MIN_LENGTH = 0x01000000; // threshold for renormalization
-    local.O3DGC_AC_MAX_LENGTH = 0xFFFFFFFF; // maximum AC interval length
-    local.O3DGC_AC_BM_LENGTH_SHIFT = 13; // Maximum values for binary models length bits discarded before mult.
-    local.O3DGC_AC_BM_MAX_COUNT = 1 << local.O3DGC_AC_BM_LENGTH_SHIFT >>> 0; // for adaptive models
+    local.O3DGC_AC_MIN_LENGTH = 0x01000000;   // threshold for renormalization
+    local.O3DGC_AC_MAX_LENGTH = 0xFFFFFFFF;      // maximum AC interval length
+    local.O3DGC_AC_BM_LENGTH_SHIFT = 13;     // Maximum values for binary models length bits discarded before mult.
+    local.O3DGC_AC_BM_MAX_COUNT = (1 << local.O3DGC_AC_BM_LENGTH_SHIFT) >>> 0;  // for adaptive models
     local.O3DGC_AC_DM_LENGTH_SHIFT = 15; // Maximum values for general models length bits discarded before mult.
-    local.O3DGC_AC_DM_MAX_COUNT = 1 << local.O3DGC_AC_DM_LENGTH_SHIFT >>> 0; // for adaptive models
-    // StaticBitModel class
+    local.O3DGC_AC_DM_MAX_COUNT = (1 << local.O3DGC_AC_DM_LENGTH_SHIFT) >>> 0;  // for adaptive models
+    // StaticBitModel class 
     module.StaticBitModel = function () {
-        this.m_bit0Prob = 1 << local.O3DGC_AC_BM_LENGTH_SHIFT - 1 >>> 0; // p0 = 0.5
+        this.m_bit0Prob = (1 << (local.O3DGC_AC_BM_LENGTH_SHIFT - 1)) >>> 0; // p0 = 0.5
     };
     module.StaticBitModel.prototype.SetProbability = function (p) {
-        this.m_bit0Prob = Math.floor(p * (1 << local.O3DGC_AC_BM_LENGTH_SHIFT >>> 0));
+        this.m_bit0Prob = Math.floor(p * ((1 << local.O3DGC_AC_BM_LENGTH_SHIFT) >>> 0));
     };
-    // AdaptiveBitModel class
+    // AdaptiveBitModel class 
     module.AdaptiveBitModel = function () {
         // initialization to equiprobable model
         this.m_updateCycle = 4;
         this.m_bitsUntilUpdate = 4;
-        this.m_bit0Prob = 1 << local.O3DGC_AC_BM_LENGTH_SHIFT - 1 >>> 0;
+        this.m_bit0Prob = (1 << (local.O3DGC_AC_BM_LENGTH_SHIFT - 1)) >>> 0;
         this.m_bit0Count = 1;
         this.m_bitCount = 2;
     };
     module.AdaptiveBitModel.prototype.Reset = function () {
         this.m_updateCycle = 4;
         this.m_bitsUntilUpdate = 4;
-        this.m_bit0Prob = 1 << local.O3DGC_AC_BM_LENGTH_SHIFT - 1 >>> 0;
+        this.m_bit0Prob = (1 << (local.O3DGC_AC_BM_LENGTH_SHIFT - 1)) >>> 0;
         this.m_bit0Count = 1;
         this.m_bitCount = 2;
     };
     module.AdaptiveBitModel.prototype.Update = function () {
         // halve counts when a threshold is reached
         if ((this.m_bitCount += this.m_updateCycle) > local.O3DGC_AC_BM_MAX_COUNT) {
-            this.m_bitCount = this.m_bitCount + 1 >>> 1;
-            this.m_bit0Count = this.m_bit0Count + 1 >>> 1;
+            this.m_bitCount = (this.m_bitCount + 1) >>> 1;
+            this.m_bit0Count = (this.m_bit0Count + 1) >>> 1;
             if (this.m_bit0Count === this.m_bitCount) {
                 ++this.m_bitCount;
             }
         }
         // compute scaled bit 0 probability
         var scale = Math.floor(0x80000000 / this.m_bitCount);
-        this.m_bit0Prob = this.m_bit0Count * scale >>> 31 - local.O3DGC_AC_BM_LENGTH_SHIFT;
+        this.m_bit0Prob = (this.m_bit0Count * scale) >>> (31 - local.O3DGC_AC_BM_LENGTH_SHIFT);
         // set frequency of model updates
-        this.m_updateCycle = 5 * this.m_updateCycle >>> 2;
+        this.m_updateCycle = (5 * this.m_updateCycle) >>> 2;
         if (this.m_updateCycle > 64) {
             this.m_updateCycle = 64;
         }
         this.m_bitsUntilUpdate = this.m_updateCycle;
     };
-    // AdaptiveDataModel class
+    // AdaptiveDataModel class 
     module.AdaptiveDataModel = function () {
         this.m_buffer = {};
         this.m_distribution = {};
@@ -14623,7 +15270,7 @@ var o3dgc = function () {
         if ((this.m_totalCount += this.m_updateCycle) > local.O3DGC_AC_DM_MAX_COUNT) {
             this.m_totalCount = 0;
             for (n = 0; n < this.m_dataSymbols; ++n) {
-                this.m_totalCount += this.m_symbolCount[n] = this.m_symbolCount[n] + 1 >>> 1;
+                this.m_totalCount += (this.m_symbolCount[n] = (this.m_symbolCount[n] + 1) >>> 1);
             }
         }
         // compute cumulative distribution, decoder table
@@ -14632,12 +15279,12 @@ var o3dgc = function () {
         scale = Math.floor(0x80000000 / this.m_totalCount);
         if (this.m_tableSize === 0) {
             for (k = 0; k < this.m_dataSymbols; ++k) {
-                this.m_distribution[k] = scale * sum >>> 31 - local.O3DGC_AC_DM_LENGTH_SHIFT;
+                this.m_distribution[k] = (scale * sum) >>> (31 - local.O3DGC_AC_DM_LENGTH_SHIFT);
                 sum += this.m_symbolCount[k];
             }
         } else {
             for (k = 0; k < this.m_dataSymbols; ++k) {
-                this.m_distribution[k] = scale * sum >>> 31 - local.O3DGC_AC_DM_LENGTH_SHIFT;
+                this.m_distribution[k] = (scale * sum) >>> (31 - local.O3DGC_AC_DM_LENGTH_SHIFT);
                 sum += this.m_symbolCount[k];
                 w = this.m_distribution[k] >>> this.m_tableShift;
                 while (s < w) {
@@ -14650,8 +15297,8 @@ var o3dgc = function () {
             }
         }
         // set frequency of model updates
-        this.m_updateCycle = 5 * this.m_updateCycle >>> 2;
-        max_cycle = this.m_dataSymbols + 6 << 3 >>> 0;
+        this.m_updateCycle = (5 * this.m_updateCycle) >>> 2;
+        max_cycle = ((this.m_dataSymbols + 6) << 3) >>> 0;
         if (this.m_updateCycle > max_cycle) {
             this.m_updateCycle = max_cycle;
         }
@@ -14669,31 +15316,29 @@ var o3dgc = function () {
             this.m_symbolCount[k] = 1;
         }
         this.Update();
-        this.m_symbolsUntilUpdate = this.m_updateCycle = this.m_dataSymbols + 6 >>> 1;
+        this.m_symbolsUntilUpdate = this.m_updateCycle = (this.m_dataSymbols + 6) >>> 1;
     };
     module.AdaptiveDataModel.prototype.SetAlphabet = function (number_of_symbols) {
-        if (number_of_symbols < 2 || number_of_symbols > 1 << 11) {
+        if ((number_of_symbols < 2) || (number_of_symbols > (1 << 11))) {
             Console.log("invalid number of data symbols");
             return module.O3DGC_ERROR_AC;
         }
-        if (this.m_dataSymbols !== number_of_symbols) {
-            // assign memory for data model
+        if (this.m_dataSymbols !== number_of_symbols) { // assign memory for data model
             this.m_dataSymbols = number_of_symbols;
             this.m_lastSymbol = this.m_dataSymbols - 1;
             // define size of table for fast decoding
             if (this.m_dataSymbols > 16) {
                 var table_bits = 3;
-                while (this.m_dataSymbols > 1 << table_bits + 2 >>> 0) {
+                while (this.m_dataSymbols > ((1 << (table_bits + 2)) >>> 0)) {
                     ++table_bits;
                 }
-                this.m_tableSize = 1 << table_bits >>> 0;
+                this.m_tableSize = (1 << table_bits) >>> 0;
                 this.m_tableShift = local.O3DGC_AC_DM_LENGTH_SHIFT - table_bits;
                 this.m_buffer = new ArrayBuffer(4 * (2 * this.m_dataSymbols + this.m_tableSize + 2));
                 this.m_distribution = new Uint32Array(this.m_buffer, 0, this.m_dataSymbols);
                 this.m_symbolCount = new Uint32Array(this.m_buffer, 4 * this.m_dataSymbols, this.m_dataSymbols);
                 this.m_decoderTable = new Uint32Array(this.m_buffer, 8 * this.m_dataSymbols, this.m_tableSize + 2);
-            } else {
-                // small alphabet: no table needed
+            } else {// small alphabet: no table needed
                 this.m_tableSize = this.m_tableShift = 0;
                 this.m_buffer = new ArrayBuffer(4 * 2 * this.m_dataSymbols);
                 this.m_distribution = new Uint32Array(this.m_buffer, 0, this.m_dataSymbols);
@@ -14739,7 +15384,7 @@ var o3dgc = function () {
         this.m_mode = 2;
         this.m_length = local.O3DGC_AC_MAX_LENGTH;
         this.m_acShift = 3;
-        this.m_value = (this.m_codeBuffer[0] << 24 | this.m_codeBuffer[1] << 16 | this.m_codeBuffer[2] << 8 | this.m_codeBuffer[3]) >>> 0;
+        this.m_value = ((this.m_codeBuffer[0] << 24) | (this.m_codeBuffer[1] << 16) | (this.m_codeBuffer[2] << 8) | (this.m_codeBuffer[3])) >>> 0;
     };
     module.ArithmeticDecoder.prototype.StopDecoder = function () {
         if (this.m_mode !== 2) {
@@ -14750,7 +15395,7 @@ var o3dgc = function () {
     };
     module.ArithmeticDecoder.prototype.GetBit = function () {
         this.m_length >>>= 1; // halve interval
-        var bit = this.m_value >= this.m_length; // decode bit
+        var bit = (this.m_value >= this.m_length); // decode bit
         if (bit) {
             this.m_value -= this.m_length; // move base
         }
@@ -14770,7 +15415,7 @@ var o3dgc = function () {
     module.ArithmeticDecoder.prototype.DecodeStaticBitModel = function (M) {
         var x, bit;
         x = M.m_bit0Prob * (this.m_length >>> local.O3DGC_AC_BM_LENGTH_SHIFT); // product l x p0
-        bit = this.m_value >= x; // decision
+        bit = (this.m_value >= x); // decision
         // update & shift interval
         if (!bit) {
             this.m_length = x;
@@ -14785,8 +15430,8 @@ var o3dgc = function () {
     };
     module.ArithmeticDecoder.prototype.DecodeAdaptiveBitModel = function (M) {
         var x, bit;
-        x = M.m_bit0Prob * (this.m_length >>> local.O3DGC_AC_BM_LENGTH_SHIFT); // product l x p0
-        bit = this.m_value >= x; // decision
+        x = M.m_bit0Prob * (this.m_length >>> local.O3DGC_AC_BM_LENGTH_SHIFT);   // product l x p0
+        bit = (this.m_value >= x); // decision
         // update interval
         if (!bit) {
             this.m_length = x;
@@ -14806,15 +15451,13 @@ var o3dgc = function () {
     module.ArithmeticDecoder.prototype.DecodeAdaptiveDataModel = function (M) {
         var n, s, x, y, t, dv, z, m;
         y = this.m_length;
-        if (M.m_tableSize > 0) {
-            // use table look-up for faster decoding
+        if (M.m_tableSize > 0) { // use table look-up for faster decoding
             dv = Math.floor(this.m_value / (this.m_length >>>= local.O3DGC_AC_DM_LENGTH_SHIFT));
             t = dv >>> M.m_tableShift;
-            s = M.m_decoderTable[t]; // initial decision based on table look-up
+            s = M.m_decoderTable[t];         // initial decision based on table look-up
             n = M.m_decoderTable[t + 1] + 1;
-            while (n > s + 1) {
-                // finish with bisection search
-                m = s + n >>> 1;
+            while (n > s + 1) { // finish with bisection search
+                m = (s + n) >>> 1;
                 if (M.m_distribution[m] > dv) {
                     n = m;
                 } else {
@@ -14826,8 +15469,7 @@ var o3dgc = function () {
             if (s !== M.m_lastSymbol) {
                 y = M.m_distribution[s + 1] * this.m_length;
             }
-        } else {
-            // decode using only multiplications
+        } else { // decode using only multiplications
             x = s = 0;
             this.m_length >>>= local.O3DGC_AC_DM_LENGTH_SHIFT;
             m = (n = M.m_dataSymbols) >>> 1;
@@ -14841,7 +15483,7 @@ var o3dgc = function () {
                     s = m;
                     x = z; // value is larger or equal
                 }
-            } while ((m = s + n >>> 1) !== s);
+            } while ((m = (s + n) >>> 1) !== s);
         }
         this.m_value -= x; // update interval
         this.m_length = y - x;
@@ -14861,23 +15503,21 @@ var o3dgc = function () {
         do {
             l = this.DecodeAdaptiveBitModel(bModel1);
             if (l) {
-                symbol += 1 << k >>> 0;
+                symbol += (1 << k) >>> 0;
                 k++;
             }
         } while (l);
-        while (k--) {
-            //next binary part
+        while (k--) { //next binary part
             if (this.DecodeStaticBitModel(bModel0)) {
-                binary_symbol = (binary_symbol | 1 << k) >>> 0;
+                binary_symbol = (binary_symbol | (1 << k)) >>> 0;
             }
         }
-        return symbol + binary_symbol;
+        return (symbol + binary_symbol);
     };
     module.ArithmeticDecoder.prototype.RenormDecInterval = function () {
-        do {
-            // read least-significant byte
-            this.m_value = (this.m_value << 8 | this.m_codeBuffer[++this.m_acShift]) >>> 0;
-            this.m_length = this.m_length << 8 >>> 0;
+        do { // read least-significant byte
+            this.m_value = ((this.m_value << 8) | this.m_codeBuffer[++this.m_acShift]) >>> 0;
+            this.m_length = (this.m_length << 8) >>> 0;
         } while (this.m_length < local.O3DGC_AC_MIN_LENGTH); // length multiplied by 256
     };
     module.ArithmeticDecoder.prototype.DecodeIntACEGC = function (mModelValues, bModel0, bModel1, exp_k, M) {
@@ -14895,7 +15535,7 @@ var o3dgc = function () {
         return uiValue;
     };
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
     // FIFO class
     module.FIFO = function () {
         this.m_data = {};
@@ -15007,10 +15647,10 @@ var o3dgc = function () {
         return this.m_normalMax;
     };
     module.IndexedFaceSet.prototype.GetFloatAttributeMinArray = function (a) {
-        return new Float32Array(this.m_minFloatAttributeBuffer, a * local.O3DGC_SC3DMC_MAX_DIM_ATTRIBUTES * 4, this.GetFloatAttributeDim(a));
+        return (new Float32Array(this.m_minFloatAttributeBuffer, a * local.O3DGC_SC3DMC_MAX_DIM_ATTRIBUTES * 4, this.GetFloatAttributeDim(a)));
     };
     module.IndexedFaceSet.prototype.GetFloatAttributeMaxArray = function (a) {
-        return new Float32Array(this.m_maxFloatAttributeBuffer, a * local.O3DGC_SC3DMC_MAX_DIM_ATTRIBUTES * 4, this.GetFloatAttributeDim(a));
+        return (new Float32Array(this.m_maxFloatAttributeBuffer, a * local.O3DGC_SC3DMC_MAX_DIM_ATTRIBUTES * 4, this.GetFloatAttributeDim(a)));
     };
     module.IndexedFaceSet.prototype.GetFloatAttributeDim = function (a) {
         return this.m_dimFloatAttribute[a];
@@ -15066,12 +15706,18 @@ var o3dgc = function () {
     module.IndexedFaceSet.prototype.SetNCoordIndex = function (nCoordIndex) {
         this.m_nCoordIndex = nCoordIndex;
     };
-    module.IndexedFaceSet.prototype.SetNNormalIndex = function (nNormalIndex) {};
-    module.IndexedFaceSet.prototype.SetNormalPerVertex = function (perVertex) {};
-    module.IndexedFaceSet.prototype.SetNFloatAttributeIndex = function (nFloatAttributeIndex) {};
-    module.IndexedFaceSet.prototype.SetNIntAttributeIndex = function (nIntAttributeIndex) {};
-    module.IndexedFaceSet.prototype.SetFloatAttributePerVertex = function (perVertex) {};
-    module.IndexedFaceSet.prototype.SetIntAttributePerVertex = function (perVertex) {};
+    module.IndexedFaceSet.prototype.SetNNormalIndex = function (nNormalIndex) {
+    };
+    module.IndexedFaceSet.prototype.SetNormalPerVertex = function (perVertex) {
+    };
+    module.IndexedFaceSet.prototype.SetNFloatAttributeIndex = function (nFloatAttributeIndex) {
+    };
+    module.IndexedFaceSet.prototype.SetNIntAttributeIndex = function (nIntAttributeIndex) {
+    };
+    module.IndexedFaceSet.prototype.SetFloatAttributePerVertex = function (perVertex) {
+    };
+    module.IndexedFaceSet.prototype.SetIntAttributePerVertex = function (perVertex) {
+    };
     module.IndexedFaceSet.prototype.SetNCoord = function (nCoord) {
         this.m_nCoord = nCoord;
     };
@@ -15252,9 +15898,9 @@ var o3dgc = function () {
     };
     // AdjacencyInfo class
     module.AdjacencyInfo = function () {
-        this.m_neighborsSize = 0; // actual allocated size for m_neighbors
+        this.m_neighborsSize = 0;    // actual allocated size for m_neighbors
         this.m_numNeighborsSize = 0; // actual allocated size for m_numNeighbors
-        this.m_numElements = 0; // number of elements
+        this.m_numElements = 0;      // number of elements 
         this.m_neighbors = {};
         this.m_numNeighbors = {};
     };
@@ -15304,7 +15950,7 @@ var o3dgc = function () {
         return module.O3DGC_OK;
     };
     module.AdjacencyInfo.prototype.Begin = function (element) {
-        return element > 0 ? this.m_numNeighbors[element - 1] : 0;
+        return (element > 0) ? this.m_numNeighbors[element - 1] : 0;
     };
     module.AdjacencyInfo.prototype.End = function (element) {
         return this.m_numNeighbors[element];
@@ -15639,11 +16285,11 @@ var o3dgc = function () {
             }
             this.m_sizeTFAN = tmp_sizeTFAN;
         }
-        this.m_sizeTFAN[this.m_numTFANs - 1] = this.m_numTFANs > 1 ? this.m_sizeTFAN[this.m_numTFANs - 2] : 0;
+        this.m_sizeTFAN[this.m_numTFANs - 1] = (this.m_numTFANs > 1) ? this.m_sizeTFAN[this.m_numTFANs - 2] : 0;
         return module.O3DGC_OK;
     };
     module.TriangleFans.prototype.Begin = function (tfan) {
-        return tfan > 0 ? this.m_sizeTFAN[tfan - 1] : 0;
+        return (tfan > 0) ? this.m_sizeTFAN[tfan - 1] : 0;
     };
     module.TriangleFans.prototype.End = function (tfan) {
         return this.m_sizeTFAN[tfan];
@@ -15687,8 +16333,7 @@ var o3dgc = function () {
         this.m_decodeTrianglesOrder = false;
         this.m_decodeVerticesOrder = false;
         this.m_processConfig = {
-            0: function _(decoder, degree) {
-                // ops: 1000001 vertices: -1 -2
+            0: function (decoder, degree) { // ops: 1000001 vertices: -1 -2
                 var u;
                 decoder.m_tfans.AddVertex(decoder.m_visitedVertices[0]);
                 for (u = 1; u < degree - 1; ++u) {
@@ -15697,8 +16342,7 @@ var o3dgc = function () {
                 }
                 decoder.m_tfans.AddVertex(decoder.m_visitedVertices[1]);
             },
-            1: function _(decoder, degree, focusVertex) {
-                // ops: 1xxxxxx1 vertices: -1 x x x x x -2
+            1: function (decoder, degree, focusVertex) { // ops: 1xxxxxx1 vertices: -1 x x x x x -2
                 var u, op, index;
                 decoder.m_tfans.AddVertex(decoder.m_visitedVertices[0]);
                 for (u = 1; u < degree - 1; ++u) {
@@ -15717,8 +16361,7 @@ var o3dgc = function () {
                 }
                 decoder.m_tfans.AddVertex(decoder.m_visitedVertices[1]);
             },
-            2: function _(decoder, degree) {
-                // ops: 00000001 vertices: -1
+            2: function (decoder, degree) { // ops: 00000001 vertices: -1
                 var u;
                 for (u = 0; u < degree - 1; ++u) {
                     decoder.m_visitedVertices[decoder.m_numVisitedVertices++] = decoder.m_vertexCount;
@@ -15726,8 +16369,7 @@ var o3dgc = function () {
                 }
                 decoder.m_tfans.AddVertex(decoder.m_visitedVertices[0]);
             },
-            3: function _(decoder, degree) {
-                // ops: 00000001 vertices: -2
+            3: function (decoder, degree) { // ops: 00000001 vertices: -2
                 var u;
                 for (u = 0; u < degree - 1; ++u) {
                     decoder.m_visitedVertices[decoder.m_numVisitedVertices++] = decoder.m_vertexCount;
@@ -15735,8 +16377,7 @@ var o3dgc = function () {
                 }
                 decoder.m_tfans.AddVertex(decoder.m_visitedVertices[1]);
             },
-            4: function _(decoder, degree) {
-                // ops: 10000000 vertices: -1
+            4: function (decoder, degree) {// ops: 10000000 vertices: -1
                 var u;
                 decoder.m_tfans.AddVertex(decoder.m_visitedVertices[0]);
                 for (u = 1; u < degree; ++u) {
@@ -15744,8 +16385,7 @@ var o3dgc = function () {
                     decoder.m_tfans.AddVertex(decoder.m_vertexCount++);
                 }
             },
-            5: function _(decoder, degree) {
-                // ops: 10000000 vertices: -2
+            5: function (decoder, degree) { // ops: 10000000 vertices: -2
                 var u;
                 decoder.m_tfans.AddVertex(decoder.m_visitedVertices[1]);
                 for (u = 1; u < degree; ++u) {
@@ -15753,16 +16393,14 @@ var o3dgc = function () {
                     decoder.m_tfans.AddVertex(decoder.m_vertexCount++);
                 }
             },
-            6: function _(decoder, degree) {
-                // ops: 00000000 vertices:
+            6: function (decoder, degree) { // ops: 00000000 vertices:
                 var u;
                 for (u = 0; u < degree; ++u) {
                     decoder.m_visitedVertices[decoder.m_numVisitedVertices++] = decoder.m_vertexCount;
                     decoder.m_tfans.AddVertex(decoder.m_vertexCount++);
                 }
             },
-            7: function _(decoder, degree) {
-                // ops: 1000001 vertices: -2 -1
+            7: function (decoder, degree) { // ops: 1000001 vertices: -2 -1
                 var u;
                 decoder.m_tfans.AddVertex(decoder.m_visitedVertices[1]);
                 for (u = 1; u < degree - 1; ++u) {
@@ -15771,8 +16409,7 @@ var o3dgc = function () {
                 }
                 decoder.m_tfans.AddVertex(decoder.m_visitedVertices[0]);
             },
-            8: function _(decoder, degree, focusVertex) {
-                // ops: 1xxxxxx1 vertices: -2 x x x x x -1
+            8: function (decoder, degree, focusVertex) { // ops: 1xxxxxx1 vertices: -2 x x x x x -1
                 var u, op, index;
                 decoder.m_tfans.AddVertex(decoder.m_visitedVertices[1]);
                 for (u = 1; u < degree - 1; ++u) {
@@ -15791,8 +16428,7 @@ var o3dgc = function () {
                 }
                 decoder.m_tfans.AddVertex(decoder.m_visitedVertices[0]);
             },
-            9: function _(decoder, degree, focusVertex) {
-                // general case
+            9: function (decoder, degree, focusVertex) { // general case
                 var u, op, index;
                 for (u = 0; u < degree; ++u) {
                     op = decoder.m_ctfans.ReadOperation(decoder.m_itOperation);
@@ -15857,7 +16493,7 @@ var o3dgc = function () {
         numConqueredTriangles = 0;
         numVisitedVertices = 0;
         t = 0;
-        for (i = beginV2T; t >= 0 && i < endV2T; ++i) {
+        for (i = beginV2T; (t >= 0) && (i < endV2T); ++i) {
             t = vertexToTriangle.GetNeighbor(i);
             if (t >= 0) {
                 ++numConqueredTriangles;
@@ -15865,8 +16501,7 @@ var o3dgc = function () {
                 // extract visited vertices
                 for (k = 0; k < 3; ++k) {
                     v = triangles[p + k];
-                    if (v > focusVertex) {
-                        // vertices are insertices by increasing traversal order
+                    if (v > focusVertex) { // vertices are insertices by increasing traversal order
                         foundOrInserted = false;
                         for (j = 0; j < numVisitedVertices; ++j) {
                             if (v === visitedVertices[j]) {
@@ -15900,7 +16535,7 @@ var o3dgc = function () {
             for (x = 1; x < numVisitedVertices; ++x) {
                 if (visitedVerticesValence[x] === 1) {
                     y = x;
-                    while (y > 0 && visitedVerticesValence[y] < visitedVerticesValence[y - 1]) {
+                    while ((y > 0) && (visitedVerticesValence[y] < visitedVerticesValence[y - 1])) {
                         tmp = visitedVerticesValence[y];
                         visitedVerticesValence[y] = visitedVerticesValence[y - 1];
                         visitedVerticesValence[y - 1] = tmp;
@@ -16003,10 +16638,9 @@ var o3dgc = function () {
     module.TriangleListDecoder.prototype.Decode = function (triangles, numTriangles, numVertices, bstream, it) {
         var compressionMask, maxSizeV2T;
         compressionMask = bstream.ReadUChar(it, this.m_streamType);
-        this.m_decodeTrianglesOrder = (compressionMask & 2) !== 0;
-        this.m_decodeVerticesOrder = (compressionMask & 1) !== 0;
-        if (this.m_decodeVerticesOrder) {
-            // vertices reordering not supported
+        this.m_decodeTrianglesOrder = ((compressionMask & 2) !== 0);
+        this.m_decodeVerticesOrder = ((compressionMask & 1) !== 0);
+        if (this.m_decodeVerticesOrder) { // vertices reordering not supported
             return module.O3DGC_ERROR_NON_SUPPORTED_FEATURE;
         }
         maxSizeV2T = bstream.ReadUInt32(it, this.m_streamType);
@@ -16175,7 +16809,7 @@ var o3dgc = function () {
                         id.m_a = b;
                         id.m_b = a;
                     }
-                    id.m_c = -c - 1;
+                    id.m_c = (-c - 1);
                     p = InsertPredictor(id, nPred, neighbors, dimFloatArray);
                     if (p !== -1) {
                         as = a * stride;
@@ -16189,7 +16823,13 @@ var o3dgc = function () {
             }
         }
     }
-    module.SC3DMCDecoder.prototype.DecodeIntArrayBinary = function (intArray, numIntArray, dimIntArray, stride, ifs, predMode, bstream) {
+    module.SC3DMCDecoder.prototype.DecodeIntArrayBinary = function (intArray,
+                                                                    numIntArray,
+                                                                    dimIntArray,
+                                                                    stride,
+                                                                    ifs,
+                                                                    predMode,
+                                                                    bstream) {
         var testPredEnabled, bestPred, i, u, ta, u_begin, u_end, buffer, iterator, streamType, predResidual, acd, bModel0, bModel1, mModelPreds, v2T, v2TNeighbors, triangles, size, start, streamSize, mask, binarization, iteratorPred, exp_k, M, id, mModelValues, neighbors, normals, nPred, v;
         iterator = this.m_iterator;
         streamType = this.m_streamType;
@@ -16203,11 +16843,11 @@ var o3dgc = function () {
         triangles = ifs.GetCoordIndex();
         size = numIntArray * dimIntArray;
         start = iterator.m_count;
-        streamSize = bstream.ReadUInt32(iterator, streamType); // bitsream size
+        streamSize = bstream.ReadUInt32(iterator, streamType);        // bitsream size
         mask = bstream.ReadUChar(iterator, streamType);
-        binarization = mask >>> 4 & 7;
+        binarization = (mask >>> 4) & 7;
         predMode.m_value = mask & 7;
-        streamSize -= iterator.m_count - start;
+        streamSize -= (iterator.m_count - start);
         iteratorPred = new module.Iterator();
         iteratorPred.m_count = iterator.m_count + streamSize;
         exp_k = 0;
@@ -16262,7 +16902,13 @@ var o3dgc = function () {
         iterator.m_count = iteratorPred.m_count;
         return module.O3DGC_OK;
     };
-    module.SC3DMCDecoder.prototype.DecodeIntArrayASCII = function (intArray, numIntArray, dimIntArray, stride, ifs, predMode, bstream) {
+    module.SC3DMCDecoder.prototype.DecodeIntArrayASCII = function (intArray,
+                                                                   numIntArray,
+                                                                   dimIntArray,
+                                                                   stride,
+                                                                   ifs,
+                                                                   predMode,
+                                                                   bstream) {
         var testPredEnabled, iterator, streamType, predResidual, v2T, v2TNeighbors, triangles, size, start, streamSize, mask, binarization, iteratorPred, id, neighbors, normals, nPred, v, u_begin, u_end, u, ta, i, bestPred;
         iterator = this.m_iterator;
         streamType = this.m_streamType;
@@ -16271,18 +16917,18 @@ var o3dgc = function () {
         triangles = ifs.GetCoordIndex();
         size = numIntArray * dimIntArray;
         start = iterator.m_count;
-        streamSize = bstream.ReadUInt32(iterator, streamType); // bitsream size
+        streamSize = bstream.ReadUInt32(iterator, streamType);        // bitsream size
         mask = bstream.ReadUChar(iterator, streamType);
-        binarization = mask >>> 4 & 7;
+        binarization = (mask >>> 4) & 7;
         predMode.m_value = mask & 7;
-        streamSize -= iterator.m_count - start;
+        streamSize -= (iterator.m_count - start);
         iteratorPred = new module.Iterator();
         iteratorPred.m_count = iterator.m_count + streamSize;
         id = new module.SC3DMCTriplet(-1, -1, -1);
         if (binarization !== local.O3DGC_SC3DMC_BINARIZATION_ASCII) {
             return module.O3DGC_ERROR_CORRUPTED_STREAM;
         }
-        bstream.ReadUInt32(iteratorPred, streamType); // predictors bitsream size
+        bstream.ReadUInt32(iteratorPred, streamType);        // predictors bitsream size
         neighbors = this.m_neighbors;
         normals = this.m_normals;
         nPred = new module.NumberRef();
@@ -16321,7 +16967,13 @@ var o3dgc = function () {
         iterator.m_count = iteratorPred.m_count;
         return module.O3DGC_OK;
     };
-    module.SC3DMCDecoder.prototype.DecodeIntArray = function (intArray, numIntArray, dimIntArray, stride, ifs, predMode, bstream) {
+    module.SC3DMCDecoder.prototype.DecodeIntArray = function (intArray,
+                                                              numIntArray,
+                                                              dimIntArray,
+                                                              stride,
+                                                              ifs,
+                                                              predMode,
+                                                              bstream) {
         if (this.m_streamType === local.O3DGC_STREAM_TYPE_ASCII) {
             return this.DecodeIntArrayASCII(intArray, numIntArray, dimIntArray, stride, ifs, predMode, bstream);
         }
@@ -16391,7 +17043,7 @@ var o3dgc = function () {
             rnb0 = n1.m_y / norm0;
             ni1 = n1.m_z + orientation[v];
             orientation[v] = ni1;
-            if (ni1 >>> 1 !== n1.m_z >>> 1) {
+            if ((ni1 >>> 1) !== (n1.m_z >>> 1)) {
                 rna0 = 0.0;
                 rnb0 = 0.0;
             }
@@ -16401,7 +17053,14 @@ var o3dgc = function () {
         }
         return module.O3DGC_OK;
     };
-    module.SC3DMCDecoder.prototype.IQuantize = function (floatArray, numFloatArray, dimFloatArray, stride, minFloatArray, maxFloatArray, nQBits, predMode) {
+    module.SC3DMCDecoder.prototype.IQuantize = function (floatArray,
+                                                         numFloatArray,
+                                                         dimFloatArray,
+                                                         stride,
+                                                         minFloatArray,
+                                                         maxFloatArray,
+                                                         nQBits,
+                                                         predMode) {
         var v, nin, nout, orientation, normals, CubeToSphere;
         if (predMode.m_value === local.O3DGC_SC3DMC_SURF_NORMALS_PREDICTION) {
             CubeToSphere = local.CubeToSphere;
@@ -16423,7 +17082,16 @@ var o3dgc = function () {
             this.IQuantizeFloatArray(floatArray, numFloatArray, dimFloatArray, stride, minFloatArray, maxFloatArray, nQBits);
         }
     };
-    module.SC3DMCDecoder.prototype.DecodeFloatArrayBinary = function (floatArray, numFloatArray, dimFloatArray, stride, minFloatArray, maxFloatArray, nQBits, ifs, predMode, bstream) {
+    module.SC3DMCDecoder.prototype.DecodeFloatArrayBinary = function (floatArray,
+                                                                      numFloatArray,
+                                                                      dimFloatArray,
+                                                                      stride,
+                                                                      minFloatArray,
+                                                                      maxFloatArray,
+                                                                      nQBits,
+                                                                      ifs,
+                                                                      predMode,
+                                                                      bstream) {
         var maxNPred, testPredEnabled, testParaPredEnabled, bestPred, dModel, buffer, quantFloatArray, neighbors, normals, nPred, ta, i, v, u, u_begin, u_end, iterator, orientation, streamType, predResidual, acd, bModel0, bModel1, mModelPreds, v2T, v2TNeighbors, triangles, size, start, streamSize, mask, binarization, iteratorPred, exp_k, M, mModelValues;
         iterator = this.m_iterator;
         orientation = this.m_orientation;
@@ -16441,9 +17109,9 @@ var o3dgc = function () {
         start = iterator.m_count;
         streamSize = bstream.ReadUInt32(iterator, streamType);
         mask = bstream.ReadUChar(iterator, streamType);
-        binarization = mask >>> 4 & 7;
+        binarization = (mask >>> 4) & 7;
         predMode.m_value = mask & 7;
-        streamSize -= iterator.m_count - start;
+        streamSize -= (iterator.m_count - start);
         iteratorPred = new module.Iterator();
         iteratorPred.m_count = iterator.m_count + streamSize;
         exp_k = 0;
@@ -16529,7 +17197,16 @@ var o3dgc = function () {
         this.IQuantize(floatArray, numFloatArray, dimFloatArray, stride, minFloatArray, maxFloatArray, nQBits, predMode);
         return module.O3DGC_OK;
     };
-    module.SC3DMCDecoder.prototype.DecodeFloatArrayASCII = function (floatArray, numFloatArray, dimFloatArray, stride, minFloatArray, maxFloatArray, nQBits, ifs, predMode, bstream) {
+    module.SC3DMCDecoder.prototype.DecodeFloatArrayASCII = function (floatArray,
+                                                                     numFloatArray,
+                                                                     dimFloatArray,
+                                                                     stride,
+                                                                     minFloatArray,
+                                                                     maxFloatArray,
+                                                                     nQBits,
+                                                                     ifs,
+                                                                     predMode,
+                                                                     bstream) {
         var maxNPred, testPredEnabled, testParaPredEnabled, iterator, orientation, streamType, predResidual, v2T, v2TNeighbors, triangles, size, start, streamSize, mask, binarization, iteratorPred, quantFloatArray, neighbors, normals, nPred, v, u, u_begin, u_end, ta, i, bestPred;
         maxNPred = local.O3DGC_SC3DMC_MAX_PREDICTION_NEIGHBORS;
         iterator = this.m_iterator;
@@ -16542,9 +17219,9 @@ var o3dgc = function () {
         start = iterator.m_count;
         streamSize = bstream.ReadUInt32(iterator, streamType);
         mask = bstream.ReadUChar(iterator, streamType);
-        binarization = mask >>> 4 & 7;
+        binarization = (mask >>> 4) & 7;
         predMode.m_value = mask & 7;
-        streamSize -= iterator.m_count - start;
+        streamSize -= (iterator.m_count - start);
         iteratorPred = new module.Iterator();
         iteratorPred.m_count = iterator.m_count + streamSize;
         if (binarization !== local.O3DGC_SC3DMC_BINARIZATION_ASCII) {
@@ -16619,7 +17296,16 @@ var o3dgc = function () {
         this.IQuantize(floatArray, numFloatArray, dimFloatArray, stride, minFloatArray, maxFloatArray, nQBits, predMode);
         return module.O3DGC_OK;
     };
-    module.SC3DMCDecoder.prototype.DecodeFloatArray = function (floatArray, numFloatArray, dimFloatArray, stride, minFloatArray, maxFloatArray, nQBits, ifs, predMode, bstream) {
+    module.SC3DMCDecoder.prototype.DecodeFloatArray = function (floatArray,
+                                                                numFloatArray,
+                                                                dimFloatArray,
+                                                                stride,
+                                                                minFloatArray,
+                                                                maxFloatArray,
+                                                                nQBits,
+                                                                ifs,
+                                                                predMode,
+                                                                bstream) {
         if (this.m_streamType === local.O3DGC_STREAM_TYPE_ASCII) {
             return this.DecodeFloatArrayASCII(floatArray, numFloatArray, dimFloatArray, stride, minFloatArray, maxFloatArray, nQBits, ifs, predMode, bstream);
         }
@@ -16632,7 +17318,7 @@ var o3dgc = function () {
         for (d = 0; d < dimFloatArray; ++d) {
             r = maxFloatArray[d] - minFloatArray[d];
             if (r > 0.0) {
-                idelta[d] = r / ((1 << nQBits >>> 0) - 1);
+                idelta[d] = r / (((1 << nQBits) >>> 0) - 1);
             } else {
                 idelta[d] = 1.0;
             }
@@ -16829,7 +17515,7 @@ var o3dgc = function () {
         p = 2;
         data[shift] -= data[shift + 1] >> 1;
         while (p < size1) {
-            data[shift + p] -= data[shift + p - 1] + data[shift + p + 1] + 2 >> 2;
+            data[shift + p] -= (data[shift + p - 1] + data[shift + p + 1] + 2) >> 2;
             p += 2;
         }
         if (p === size1) {
@@ -16842,7 +17528,7 @@ var o3dgc = function () {
         size1 = size - 1;
         p = 1;
         while (p < size1) {
-            data[shift + p] += data[shift + p - 1] + data[shift + p + 1] + 1 >> 1;
+            data[shift + p] += (data[shift + p - 1] + data[shift + p + 1] + 1) >> 1;
             p += 2;
         }
         if (p === size1) {
@@ -16871,27 +17557,33 @@ var o3dgc = function () {
         n = size;
         even = 0;
         k = 0;
-        even += (n & 1) << k++ >>> 0;
+        even += ((n & 1) << k++) >>> 0;
         while (n > 1) {
             n = (n >> 1) + ((n & 1) >>> 0);
-            even += (n & 1) << k++ >>> 0;
+            even += ((n & 1) << k++) >>> 0;
         }
         for (i = k - 2; i >= 0; --i) {
-            n = (n << 1 >>> 0) - (even >>> i & 1) >>> 0;
+            n = ((n << 1) >>> 0) - (((even >>> i) & 1)) >>> 0;
             this.Merge(data, shift, n);
             this.IUpdate(data, shift, n);
             this.IPredict(data, shift, n);
         }
         return module.O3DGC_OK;
     };
-    module.DynamicVectorDecoder.prototype.IQuantize = function (floatArray, numFloatArray, dimFloatArray, stride, minFloatArray, maxFloatArray, nQBits) {
+    module.DynamicVectorDecoder.prototype.IQuantize = function (floatArray,
+                                                       numFloatArray,
+                                                       dimFloatArray,
+                                                       stride,
+                                                       minFloatArray,
+                                                       maxFloatArray,
+                                                       nQBits) {
         var quantVectors, r, idelta, size, d, v;
         quantVectors = this.m_quantVectors;
         size = numFloatArray * dimFloatArray;
         for (d = 0; d < dimFloatArray; ++d) {
             r = maxFloatArray[d] - minFloatArray[d];
             if (r > 0.0) {
-                idelta = r / ((1 << nQBits >>> 0) - 1);
+                idelta = r / (((1 << nQBits) >>> 0) - 1);
             } else {
                 idelta = 1.0;
             }
@@ -16943,7 +17635,7 @@ var o3dgc = function () {
         acd = new module.ArithmeticDecoder();
         bModel0 = new module.StaticBitModel();
         bModel1 = new module.AdaptiveBitModel();
-        streamSize -= iterator.m_count - start;
+        streamSize -= (iterator.m_count - start);
         exp_k = 0;
         M = 0;
         if (streamType === local.O3DGC_STREAM_TYPE_BINARY) {
@@ -16977,16 +17669,19 @@ var o3dgc = function () {
         for (d = 0; d < dim; ++d) {
             this.ITransform(quantVectors, d * num, num);
         }
-        this.IQuantize(dynamicVector.GetVectors(), num, dim, dynamicVector.GetStride(), dynamicVector.GetMinArray(), dynamicVector.GetMaxArray(), this.m_params.GetQuantBits());
+        this.IQuantize(dynamicVector.GetVectors(), num, dim,
+                       dynamicVector.GetStride(), dynamicVector.GetMinArray(),
+                       dynamicVector.GetMaxArray(), this.m_params.GetQuantBits());
         return ret;
     };
 
     return module;
-}();
+})();
+
 
 /**
- * @author Liwei.Ma
- */
+* @author Liwei.Ma
+*/
 var S3D = S3D || {};
 
 S3D.S3DLoader = function () {
@@ -16998,43 +17693,28 @@ S3D.S3DLoader.prototype = {
 
     constructor: S3D.S3DLoader,
 
-    destroy: function destroy() {
+    destroy : function(){
         this.ifs = null;
     },
 
-    position: function position() {
+    position : function () {
         return this.ifs.GetCoord();
     },
 
-    normal: function normal() {
-        var ifs = this.ifs;
-        return ifs.GetNNormal() > 0 ? this.ifs.GetNormal() : null;
-    },
-
-    texCoord: function texCoord() {
-        var ifs = this.ifs;
-        var numNumFloatAttributes = ifs.GetNumFloatAttributes();
-        for (var a = 0; a < numNumFloatAttributes; ++a) {
-            if (ifs.GetFloatAttributeType(a) === o3dgc.O3DGC_IFS_FLOAT_ATTRIBUTE_TYPE_TEXCOORD) {
-                return ifs.GetFloatAttribute(a);
-            }
-        }
-        return null;
-    },
-
-    index: function index() {
+    index : function () {
         return this.ifs.GetCoordIndex();
     },
 
-    vertexCount: function vertexCount() {
+    vertexCount : function () {
         return this.ifs.GetNCoord();
     },
 
-    faceCount: function faceCount() {
+   faceCount : function () {
         return this.ifs.GetNCoordIndex();
-    },
+   },
 
-    parse: function parse(arrayBuffer) {
+
+   parse: function (arrayBuffer) {
 
         var ifs = this.ifs;
 
@@ -17071,2159 +17751,2178 @@ S3D.S3DLoader.prototype = {
 
         // decode mesh
         decoder.DecodePlayload(ifs, bstream);
-    },
+   },
 
-    load: function load(url, callback) {
+   load: function (url, callback) {
 
-        var scope = this;
+       var scope = this;
 
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", url, true);
-        xhr.responseType = "arraybuffer";
+       var xhr = new XMLHttpRequest();
+       xhr.open("GET", url, true);
+       xhr.responseType = "arraybuffer";
 
-        xhr.onload = function (evt) {
+       xhr.onload = function (evt) {
 
-            scope.parse(xhr.response);
-            callback();
-        };
+           scope.parse(xhr.response);
+           callback();
+       };
 
-        xhr.send(null);
-    }
+       xhr.send(null);
+   }
 };
 
-CLOUD.MpkLoader = function (showStatus) {
+	
+var CLOUD = CLOUD || {};
+CLOUD.Loader = CLOUD.Loader || {};
 
-    THREE.Loader.call(this, showStatus);
+CLOUD.Loader.ConfigLoader = function (manager) {
+    this.manager = manager;
 };
 
-CLOUD.MpkLoader.prototype = Object.create(THREE.Loader.prototype);
-CLOUD.MpkLoader.prototype.constructor = CLOUD.MpkLoader;
+CLOUD.Loader.ConfigLoader.prototype = {
 
-CLOUD.MpkLoader.prototype.load = function (mpkId, parameters, client, callback, onComplete, useWorker) {
+    constructor: CLOUD.Loader.ConfigLoader,
 
-    var scope = this;
-    if (parameters.binaryData) {
-        // open a worker thread
-        if (useWorker == true) {} else {
-            scope.parseS3D(parameters.binaryData, parameters, client, callback);
-            onComplete();
-            parameters.binaryData = null;
-        }
-        return;
+    load: function (cfgUrl, callback) {
+
+        // cfg
+        var loader = new THREE.XHRLoader();
+        loader.setCrossOrigin(this.manager.crossOrigin);
+        loader.load(cfgUrl, function (text) {
+
+            callback(text);
+
+        });
+
     }
 
-    var useArraybuffer = CLOUD.GlobalData.UseArrayBuffer;
+};
+/**
+ * @author muwj 2016/12/15
+ */
 
-    var xhr = new XMLHttpRequest();
+CLOUD.Loader.IdReader = function( buffer ) {
 
-    var length = 0;
+    var header = new Uint32Array( buffer, 0, 2 );
+    this.size  = header[0];
+    this.count = header[1];
 
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 200 || xhr.status === 0) {
-                if (useWorker == true) {
+    this.idBuffer = buffer.slice( 4 * 2 );
 
-                    var worker = new Worker(CLOUD.GlobalData.MpkWorkerUrl);
+    this.getSize = function () {
 
-                    worker.onmessage = function (event) {
+        return this.size;
+    };
 
-                        var files = event.data;
-                        var symbol = parameters.symbol;
-                        var i = 0;
-                        for (var meshId in parameters.items) {
+    this.getCount = function () {
 
-                            var s3dFile = files[i];
+        return this.count;
+    };
 
-                            scope.createModel(s3dFile[0], s3dFile[1], s3dFile[2], s3dFile[3], meshId, symbol, callback);
-                            s3dFile = null;
-                            ++i;
-                        }
+    this.getString = function ( index_id ) {
 
-                        onComplete();
-                    };
-                    var offsets = parameters.items;
-                    worker.postMessage({ "data": xhr.response, "offsets": offsets });
-                } else {
-                    scope.parseS3D(xhr.response, parameters, client, callback);
-                    onComplete();
-                }
-                xhr = null;
-            }
+        if( index_id >= 0 && index_id < this.count ) {
+
+            var buf = new Uint8Array( this.idBuffer, this.size * index_id, this.size );
+            return String.fromCharCode.apply( null, buf );
         }
     };
 
-    var url = client.mpkUrl(mpkId);
-    xhr.open("GET", url, true);
+    this.getIndex = function ( string_id ) {
 
-    if (useArraybuffer) {
-        xhr.responseType = "arraybuffer";
+        if( string_id == undefined )
+            return -1;
+
+        var left = 0;
+        var right = this.count - 1;
+        var length = string_id.length;
+
+        while( left <= right )
+        {
+            var mid = Math.floor( ( left + right ) / 2 );
+            var buf = new Uint8Array( this.idBuffer, this.size * mid, length );
+            var str = String.fromCharCode.apply( null, buf );
+
+            var rt = string_id.localeCompare( str );
+            if( rt == 0 )
+                return mid;
+            else if( rt < 0 )
+                right = mid - 1;
+            else if( rt > 0 )
+                left = mid + 1;
+        }
+        return -1;
+    }
+};
+/**
+ * @author xiaoj-a@glodon.com
+ **/
+
+// Simple Stack used in re-construct octree
+
+CLOUD.Loader.Stack = function () {
+    this.size = 0;
+    this.storage = {};
+};
+
+CLOUD.Loader.Stack.prototype.push = function (data) {
+    var size = ++this.size;
+    this.storage[size] = data;
+};
+
+CLOUD.Loader.Stack.prototype.pop = function () {
+    var size = this.size,
+        deletedData;
+
+    if (size) {
+        deletedData = this.storage[size];
+
+        delete this.storage[size];
+        this.size--;
+
+        return deletedData;
+    }
+};
+
+CLOUD.Loader.Stack.prototype.top = function () {
+    var size = this.size,
+        topData;
+
+    if (size) {
+        topData = this.storage[size];
+        return topData;
+    }
+};
+
+CLOUD.Loader.Stack.prototype.empty = function () {
+    if (this.size > 0) {
+        return false;
+    }
+    return true;
+};
+
+// Spatial hierarchy representation
+CLOUD.Loader.OctreeNode = function(oId, depth) {
+
+    if (oId === undefined) {
+        alert("Invalid Octant Id");
+    }
+
+    this.octantId = oId;
+    this.childOctants = new Array();
+    this.min = null;
+    this.max = null;
+    this.depth = 0;
+    this.center = null;
+    this.size = -1;   // square length of octant size
+    // used in generate priority factor F = size / (sqDistanceToCamera * cosTheta)
+    this.priority = -1;
+};
+
+// CLOUD.Loader.OctreeNode.prototype.constructor = CLOUD.Loader.OctreeNode;
+
+CLOUD.Loader.OctreeNode.prototype.add = function (octant) {
+    octant.depth = this.depth + 1;
+    this.childOctants.push(octant);
+};
+
+CLOUD.Loader.OctreeNode.prototype.setBounds = function (bounds) {
+
+    if (this.octantId == undefined) {
+        alert("Invalid Octant Id");
+    }
+    this.min = bounds[this.octantId].min;
+    this.max = bounds[this.octantId].max;
+    this.center = new THREE.Vector3(0.5 * (this.max.x + this.min.x),
+        0.5 * (this.max.y + this.min.y), 0.5 * (this.max.z + this.min.z));
+    var x = this.max.x - this.min.x;
+    var y = this.max.y - this.min.y;
+    var z = this.max.z - this.min.z;
+    this.size = x * x + y * y + z * z;
+
+    var childCount = this.childOctants.length;
+    for (var i = 0; i < childCount; ++i) {
+        this.childOctants[i].setBounds(bounds);
+    }
+};
+
+CLOUD.Loader.OctreeNode.prototype.intersectFrustum = function (frustum, visibleOctants, depth) {
+
+    // test intersects
+    var intersects;
+    var node;
+
+    if (frustum && this.depth < depth) {
+        intersects = frustum.intersectsBox(new THREE.Box3(this.min, this.max));
+    }
+    // if intersects
+    if (intersects === true) {
+
+        // gather objects
+        visibleOctants.push(this);
+
+        // search subtree
+
+        for (var i = 0, length = this.childOctants.length; i < length; ++i) {
+
+            node = this.childOctants[i];
+            node.intersectFrustum(frustum, visibleOctants, depth);
+        }
+    }
+    //else {
+    //	console.log("Octant" + this.octantId + "culled!")
+    //}
+};
+
+CLOUD.Loader.OctreeNode.prototype.intersectFrustumWithPriority
+    = function (frustum,depth,camPos, camDir,camInside, depthCriteria, visibleOctants) {
+
+    // test intersects
+    var intersects;
+    var node;
+
+    if (frustum && this.depth < depth) {
+        intersects = frustum.intersectsBox(new THREE.Box3(this.min, this.max));
+    }
+    // if intersects
+    if (intersects === true) {
+
+        var camToOctantDir = new THREE.Vector3(this.center.x - camPos.x,
+            this.center.y - camPos.y, this.center.z - camPos.z );
+        var distance = camToOctantDir.lengthSq();
+        camToOctantDir.normalize();
+        var cosTheta = camToOctantDir.dot(camDir);
+        this.priority = 1 / (distance * cosTheta);
+
+        if(camInside) {
+            this.priority *= this.size;
+        } else {
+            if(this.depth < depthCriteria) {
+                this.priority *= this.size;
+            }
+        }
+
+        // gather objects
+        visibleOctants.push(this);
+
+        // search subtree
+        for (var i = 0, length = this.childOctants.length; i < length; ++i) {
+
+            node = this.childOctants[i];
+            node.intersectFrustumWithPriority(frustum,depth,camPos, camDir,camInside, depthCriteria, visibleOctants);
+        }
+    }
+    //else {
+    //	console.log("Octant" + this.octantId + "culled!")
+    //}
+};
+
+CLOUD.Loader.OctreeNode.prototype.findRadiusNeighborOctants = function (queryPoint,radius, squareRadius, depth, neighborOctants) {
+
+    var node;
+    var intersects = false;
+
+    if (queryPoint && this.depth < depth) {
+        // does inner box intersect with octant
+        intersects = !(queryPoint.x + radius < this.min.x || queryPoint.x - radius > this.max.x ||
+            queryPoint.y + radius < this.min.y || queryPoint.y - radius > this.max.y ||
+            queryPoint.z + radius < this.min.z || queryPoint.z - radius > this.max.z);
+    }
+
+    if (intersects === true) {
+
+        var queryPointToOctant = new THREE.Vector3(0.5 * (this.max.x + this.min.x) - queryPoint.x,
+            0.5 * (this.max.y + this.min.y) - queryPoint.y, 0.5 * (this.max.z + this.min.z) - queryPoint.z );
+        var distance = queryPointToOctant.lengthSq();
+        if(distance < squareRadius ) {
+            // gather octants
+            neighborOctants.push(this);
+        }
+
+        // search subtree
+        for (var i = 0, length = this.childOctants.length; i < length; ++i) {
+
+            node = this.childOctants[i];
+            node.findRadiusNeighborOctants(queryPoint, radius, squareRadius, depth, neighborOctants);
+        }
+    }
+    //else {
+    //	console.log("Octant" + this.octantId + "culled!")
+    //}
+};
+
+CLOUD.Loader.OctreeNode.prototype.intersectRayDistance = function (origin, direction) {
+    var Tmin, Tmax, TYmin, TYmax;
+    // X Axis
+    var invDirectionX = 1 / direction.x;
+    if(direction.x >= 0) {
+        Tmin = (this.min.x - origin.x) * invDirectionX;
+        Tmax = (this.max.x - origin.x) * invDirectionX;
+    }else {
+        Tmin = (this.max.x - origin.x) * invDirectionX;
+        Tmax = (this.min.x - origin.x) * invDirectionX;
+    }
+
+    // Y Axis
+    var invDirectionY = 1 / direction.y;
+    if(direction.y >= 0){
+        TYmin = (this.min.y - origin.y) * invDirectionY;
+        TYmax = (this.max.y - origin.y) * invDirectionY;
     } else {
-        xhr.setRequestHeader("Content-Type", "text/plain; charset=x-user-defined");
-        xhr.overrideMimeType('text/plain; charset=x-user-defined');
-    }
-    xhr.send(null);
-};
-
-CLOUD.MpkLoader.prototype.parseS3D = function (arrayBuffer, parameters, client, callback) {
-
-    var symbol = parameters.symbol;
-
-    for (var meshId in parameters.items) {
-
-        if (client.cache.geometries[meshId]) continue;
-
-        var offset = parameters.items[meshId];
-        var s3dFile = new S3D.S3DLoader();
-        s3dFile.parse(arrayBuffer.slice(offset.offset, offset.offset + offset.size));
-        this.createModel(s3dFile.index(), s3dFile.position(), s3dFile.normal(), s3dFile.texCoord(), meshId, symbol, callback);
-        s3dFile.destroy();
-        s3dFile = null;
-    }
-};
-
-CLOUD.MpkLoader.prototype.createModel = function (indices, vertices, normals, texCoords, meshId, symbol, callback) {
-
-    var geometry = new THREE.BufferGeometry();
-    geometry.refCount = 0;
-    geometry.name = meshId;
-    if (symbol) geometry.symobl = symbol;
-
-    var ib = new THREE.BufferAttribute(indices, 1);
-    ib.setDynamic(true);
-    geometry.setIndex(ib);
-    geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-
-    if (!normals) geometry.computeVertexNormals();else geometry.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
-
-    if (texCoords) geometry.addAttribute('uv', new THREE.BufferAttribute(texCoords, 2));
-
-    for (var name in geometry.attributes) {
-        geometry.attributes[name].setDynamic(true);
+        TYmin = (this.max.y - origin.y) * invDirectionY;
+        TYmax = (this.min.y - origin.y) * invDirectionY;
     }
 
-    callback(geometry);
-};
+    if((Tmin > TYmax) || (TYmin > Tmax)){
+        //no intersection
+        return Infinity;
+    }
+    if(TYmin > Tmin) {
+        Tmin = TYmin;
+    }
+    if(TYmax < Tmax) {
+        Tmax = TYmax;
+    }
 
-/**
- * @author Liwei.Ma
- */
-CLOUD.SubSceneLoader = function (manager, crossOrigin) {
+    // Z Axis
+    var TZmin, TZmax;
+    var invDirectionZ = 1 / direction.z;
+    if(direction.z >= 0) {
+        TZmin = (this.min.z - origin.z) * invDirectionZ;
+        TZmax = (this.max.z - origin.z) * invDirectionZ;
+    } else {
+        TZmin = (this.max.z - origin.z) * invDirectionZ;
+        TZmaz = (this.min.z - origin.z) * invDirectionZ;
+    }
+    if((Tmin > TZmax) || (TZmin > Tmax)) {
+        // no intersection
+        return Infinity;
+    }
+    if(TZmin > Tmin) {
+        Tmin = TZmin;
+    }
+    if(TZmax < Tmax) {
+        Tmax = TZmax;
+    }
+    // return nearest intersection distance
+    return Tmin;
+};
+CLOUD.Loader.OctreeNode.prototype.getDepthDescending = function () {
+
+    if(this.depth > CLOUD.GlobalData.MaximumDepth) {
+        CLOUD.GlobalData.MaximumDepth = this.depth;
+    }
+    var childCount = this.childOctants.length;
+    for (var i = 0; i < childCount; ++i) {
+        this.childOctants[i].getDepthDescending();
+    }
+};
+CLOUD.Loader.OctreeLoader = function (manager) {
+
     this.manager = manager;
-    this.crossOrigin = crossOrigin;
-};
-
-CLOUD.SubSceneLoader.prototype = {
-    constructor: CLOUD.SubSceneLoader,
-
-    update: function update(subScene) {
-
-        var scope = this;
-
-        var resource = subScene.client.cache;
-        var client = subScene.client;
-
-        function on_load_mesh(meshNode) {
-            return function () {
-                var mesh = resource.geometries[meshNode.meshId];
-                if (mesh) {
-                    meshNode.updateGeometry(mesh);
-                } else {
-                    console.log("err: " + item + " may be in other mpk");
-                }
-            };
-        }
-
-        function update_children(children) {
-
-            for (var child in children) {
-                var meshNode = children[child];
-
-                if (meshNode instanceof CLOUD.Mesh) {
-
-                    var meshId = meshNode.meshId;
-                    if (meshId === undefined) continue;
-
-                    if (!meshNode.geometry || meshNode.geometry.refCount === undefined) {
-                        var mesh = resource.geometries[meshId];
-                        if (mesh) {
-                            meshNode.updateGeometry(mesh);
-                        } else {
-                            var mpkId = client.meshIds[meshId];
-                            client.addDelayLoadMesh(mpkId, { meshNode: meshNode });
-                        }
-                    }
-                    continue;
-                }
-
-                update_children(meshNode.children);
-            }
-        }
-
-        update_children(subScene.children);
-        client.processMpkTasks();
-    },
-
-    /**
-     * Parse the scene only, will not load the mesh data.
-     */
-    parse: function parse(subScene, sceneJSON) {
-
-        var scope = this;
-
-        var client = subScene.client;
-        var resource = client.cache;
-        var level = subScene.level;
-
-        function handle_children(parent, children, userId, userData, trf, overridedMaterialId) {
-
-            for (var nodeId in children) {
-
-                var objJSON = children[nodeId];
-
-                // override user id.
-                if (userId !== undefined) {
-                    objJSON.userId = userId;
-                }
-
-                if (objJSON.userData) userData = objJSON.userData;
-
-                var materialId = overridedMaterialId || objJSON.materialId;
-
-                var object;
-
-                if (objJSON.nodeType == "MpkNode") {
-
-                    handle_children(parent, objJSON.nodes);
-                } else if (objJSON.nodeType == "CellNode") {
-                    console.log("Should not call here!");
-                } else if (objJSON.nodeType == "SceneNode") {
-                    console.log("Should not call here!");
-                } else if (objJSON.nodeType == "GroupNode") {
-
-                    object = new CLOUD.Group();
-                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
-
-                    handle_children(parent, objJSON.children, userId, userData, object.matrix, materialId);
-                } else if (objJSON.nodeType == "MeshNode") {
-
-                    if (resource.bOutOfLimitation == true) continue;
-
-                    var matObj = client.findMaterial(materialId, false);
-
-                    object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, objJSON.meshId);
-                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
-                    object.userData = userData;
-
-                    // will not load the mesh.
-
-                    parent.add(object);
-                } else if (objJSON.nodeType == "PGeomNode") {
-
-                    var matObj = client.findMaterial(materialId, false);
-                    object = object = CLOUD.GeomUtil.parsePGeomNodeInstance(objJSON, matObj, trf, true);
-
-                    if (object) {
-
-                        //object.name = nodeId;
-                        object.name = objJSON.userId;
-                        object.userData = userData;
-
-                        parent.add(object);
-                    }
-                } else if (objJSON.nodeType == "SymbolInstance") {
-
-                    var symbolJSON = client.findSymbol(objJSON.symbolId);
-
-                    if (symbolJSON) {
-                        if (symbolJSON.nodeType === "GroupNode") {
-
-                            object = new CLOUD.Group();
-                            CLOUD.GeomUtil.parseNodeProperties(object, objJSON, objJSON.userId, trf);
-
-                            handle_children(parent, symbolJSON.children, objJSON.userId, userData, object.matrix, materialId);
-                        } else if (symbolJSON.nodeType === "MeshNode") {
-
-                            var newMaterialId = materialId || symbolJSON.materialId;
-                            var matObj = client.findMaterial(newMaterialId, false);
-
-                            object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, symbolJSON.meshId);
-                            CLOUD.GeomUtil.parseNodeProperties(object, objJSON, objJSON.userId, trf);
-                            object.name = objJSON.userId;
-                            object.userData = userData;
-                            parent.add(object);
-                        } else if (symbolJSON.nodeType === "PGeomNode") {
-
-                            var newMaterialId = materialId || symbolJSON.materialId;
-                            var matObj = client.findMaterial(newMaterialId, false);
-
-                            var trfLocal = new THREE.Matrix4();
-                            if (objJSON.matrix) {
-                                trfLocal.fromArray(objJSON.matrix);
-                            }
-                            if (trf) {
-                                trfLocal.multiplyMatrices(trf, trfLocal.clone());
-                            }
-
-                            object = CLOUD.GeomUtil.parsePGeomNodeInstance(symbolJSON, matObj, trfLocal, true);
-
-                            if (object) {
-
-                                //object.name = nodeId;
-                                object.name = objJSON.userId;
-                                object.userData = userData;
-
-                                parent.add(object);
-                            }
-                        }
-                    }
-                } else if (objJSON.nodeType == "InstancedMeshNode") {
-                    if (resource.bOutOfLimitation === true) {
-                        continue;
-                    }
-
-                    var matObj = client.findMaterial(materialId, true);
-
-                    object = new CLOUD.Mesh(undefined, matObj, objJSON.meshId);
-                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
-
-                    parent.add(object);
-                }
-
-                if (object) {
-                    object.updateMatrixWorld(true);
-                    object.level = level;
-                }
-            }
-        }
-
-        if (sceneJSON.children) {
-            subScene.embedded = true;
-            handle_children(subScene, sceneJSON.children);
-        }
-    }
-};
-
-/**
- * @author Liwei.Ma
- */
-CLOUD.SceneLoader = function (manager, crossOrigin) {
-    this.manager = manager;
-    this.crossOrigin = crossOrigin;
     this.loader = new THREE.XHRLoader(manager);
 };
 
-CLOUD.SceneLoader.prototype = {
-    constructor: CLOUD.SceneLoader,
+CLOUD.Loader.OctreeLoader.prototype = {
 
-    // Load the scene as children of group
-    load: function load(sceneId, group, client, notifyProgress, callbackFinished) {
+    constructor: CLOUD.Loader.OctreeLoader,
+
+    load: function (octreeUrl, callback) {
+
         var scope = this;
+        var loader = this.loader;
+        var rootNode;
+        var bounds = [];
 
-        if (client.subSceneItems) {
-            var jsonData = client.subSceneItems[sceneId];
-            if (jsonData) {
-                scope.parse(jsonData, sceneId, group, client, notifyProgress, callbackFinished);
-                delete client.subSceneItems[sceneId];
-                return;
-            }
-        }
-
-        var loader = this.loader; //new THREE.XHRLoader(scope.manager);
-        loader.setCrossOrigin(this.crossOrigin);
-
-        loader.load(client.sceneUrl(sceneId), function (data) {
-            scope.parse(JSON.parse(data), sceneId, group, client, notifyProgress, callbackFinished);
-        });
-    },
-
-    setCrossOrigin: function setCrossOrigin(value) {
-        this.crossOrigin = value;
-    },
-
-    parse: function parse(json, sceneId, group, client, notifyProgress, callbackFinished) {
-        var scope = this;
-
-        var delayLoadMeshNodes = [];
-
-        var data = json;
-
-        var triangleCount = 0;
-        var vertexCount = 0;
-
-        var resource = client.cache;
-
-        var total_models = data.metadata.count;
-        if (total_models <= 0) {
-            callbackFinished(resource, total_models);
-            return;
-        }
-
-        var counter_models = total_models;
-
-        var localRoot = CLOUD.Utils.parseRootNode(group, data);
-        localRoot.sceneId = sceneId;
-        localRoot.client = client;
-        localRoot.subSceneRoot = true;
-
-        var sceneLevel = group.level;
-        if (sceneLevel === undefined) sceneLevel = CLOUD.EnumObjectLevel.Large;
-
-        if (notifyProgress) scope.manager.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_START, sceneId: sceneId });
-
-        function loadMeshNode(object, meshId) {
-
-            var mesh = resource.geometries[meshId];
-            if (mesh) {
-                object.updateGeometry(mesh);
-            } else {
-                //delayLoadMeshNodes.push({ meshNode: object, isInstanced: false });
-                var mpkId = client.meshIds[meshId];
-                client.addDelayLoadMesh(mpkId, { meshNode: object });
-                //console.log("delay load!");
-            }
-        }
-
-        function loadInstanceMeshNode(object, meshId, objJSON) {
-
-            var mesh = resource.geometries[meshId];
-            if (mesh) {
-                var geometry = CLOUD.GeomUtil.createInstancedBufferGeometry(mesh, objJSON);
-                object.updateGeometry(geometry);
-            } else {
-                delayLoadMeshNodes.push({ meshNode: object, isInstanced: true });
-            }
-        }
-
-        function handle_symbol_instance(parent, objJSON, symbolJSON, userData, localUserId, level, trf, nodeId, overrideMaterialId) {
-
-            var object;
-
-            if (symbolJSON.nodeType === "GroupNode") {
-
-                object = new CLOUD.Group();
-                CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
-
-                //handle_children(parent, symbolJSON.children, level + 1, objJSON.userId, userData, object.matrix);
-
-                handle_children(object, symbolJSON.children, level + 1, localUserId, userData, undefined, overrideMaterialId);
-                object.userData = userData;
-                parent.add(object);
-            } else if (symbolJSON.nodeType === "MeshNode") {
-
-                var materialId = overrideMaterialId || symbolJSON.materialId;
-                var matObj = client.findMaterial(materialId, false);
-
-                object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, symbolJSON.meshId);
-                CLOUD.GeomUtil.parseNodeProperties(object, objJSON, localUserId, trf);
-                object.userData = userData;
-                object.name = localUserId;
-
-                loadMeshNode(object, symbolJSON.meshId);
-
-                parent.add(object);
-            } else if (symbolJSON.nodeType === "PGeomNode") {
-
-                var materialId = overrideMaterialId || symbolJSON.materialId;
-                var matObj = client.findMaterial(materialId, false);
-
-                var trfLocal = new THREE.Matrix4();
-                if (objJSON.matrix) {
-                    trfLocal.fromArray(objJSON.matrix);
-                }
-                if (trf) {
-                    trfLocal.multiplyMatrices(trf, trfLocal.clone());
-                }
-
-                object = CLOUD.GeomUtil.parsePGeomNodeInstance(symbolJSON, matObj, trfLocal);
-
-                if (object) {
-
-                    if (!localUserId) console.log(object);
-
-                    //object.name = nodeId;
-                    object.name = localUserId;
-                    object.userData = userData;
-
-                    parent.add(object);
-                }
-            } else if (symbolJSON.nodeType === "SymbolInstance") {
-
-                var symbolSymbolJSON = client.findSymbol(symbolJSON.symbolId);
-                if (symbolSymbolJSON) {
-                    object = new CLOUD.Group();
-                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
-                    object.userData = userData;
-
-                    var newMaterialId = overrideMaterialId || symbolJSON.materialId;
-
-                    handle_symbol_instance(object, symbolJSON, symbolSymbolJSON, userData, localUserId, level + 1, null, nodeId, newMaterialId);
-                    parent.add(object);
-                } else {
-                    console.log("missing symbol" + symbolJSON.symbolId);
-                }
-            }
-
-            return object;
-        }
-
-        function handle_children(parent, children, level, userId, userData, trf, overridedMaterialId) {
-
-            for (var nodeId in children) {
-
-                var objJSON = children[nodeId];
-
-                // override userId
-                if (userId !== undefined) objJSON.userId = userId;
-
-                var materialId = overridedMaterialId || objJSON.materialId;
-
-                if (objJSON.userData) {
-                    userData = objJSON.userData;
-
-                    // TODO: REMOVE
-                    if (!userData.categoryId) userData.categoryId = "0";
-                }
-
-                var object;
-
-                if (objJSON.nodeType == "MpkNode") {
-
-                    scope.manager.loadMpk(objJSON.mpkId, client, onload_mpk_complete(parent, objJSON, level + 1));
-                    continue;
-                } else if (objJSON.nodeType == "CellNode") {
-
-                    object = new CLOUD.Cell();
-                    if (objJSON.leaf) {
-                        object.leaf = objJSON.leaf;
+        function constructHierarchy(content) {
+            var length = content.length;
+            var pos = 0;
+            var root = null;
+            var parent = null;
+            var stack = new CLOUD.Loader.Stack();
+            var octantCount = 0;
+            var depth = 0;
+            var tmpOctantIds = [];
+            while (pos < length && content[pos] != 'D') {
+                if (content[pos] == '{') {
+                    var octantId = "";
+                    ++pos;
+                    while (content[pos] != '}' && content[pos] != '{') {
+                        octantId += content[pos];
+                        ++pos;
                     }
-                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
-
-                    // set world bbox
-                    object.worldBoundingBox = object.boundingBox.clone();
-                    object.worldBoundingBox.applyMatrix4(scope.manager.getGlobalTransform());
-                    object.level = objJSON.level;
-
-                    if (objJSON.order) {
-                        object.out = 1;
+                    --pos;
+                    if (octantId === undefined) {
+                        alert("bad id");
                     }
 
-                    if (level === 0 && object.out) {
-                        group.innerBoundingBox.expandByPoint(object.worldBoundingBox.min);
-                        group.innerBoundingBox.expandByPoint(object.worldBoundingBox.max);
-                        group.innerBoundingBox.valid = true;
-                    }
+                    var node = new CLOUD.Loader.OctreeNode(octantId, depth);
+                    tmpOctantIds.push(octantId);
 
-                    if (CLOUD.GlobalData.ShowCellBox) {
-                        var clr = 0xff;
-                        clr = clr << level * 5;
-
-                        var boxNode = new CLOUD.BBoxNode(object.boundingBox, clr);
-                        CLOUD.Utils.parseTransform(boxNode, objJSON);
-                        object.add(boxNode);
-                    }
-
-                    handle_children(object, objJSON.children, level + 1);
-                    parent.add(object);
-                } else if (objJSON.nodeType == "SceneNode") {
-
-                    if (objJSON.sceneType == CLOUD.SCENETYPE.Child) {
-
-                        object = new CLOUD.SubScene();
-                        CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
-                        object.leaf = 1;
-
-                        object.client = client;
-                        if (objJSON.nodeCount) object.nodeCount = objJSON.nodeCount;
-
-                        CLOUD.GeomUtil.parseSceneNode(object, objJSON, scope.manager, level);
-
-                        parent.add(object);
-
-                        scope.manager.subSceneLoader.parse(object, objJSON);
+                    ++octantCount;
+                    //bounds[octantId] = null;
+                    if (parent == null) {
+                        root = node;
                     } else {
-                        // Will not load.
+                        parent.add(node);
+
                     }
-                } else if (objJSON.nodeType == "GroupNode") {
-
-                    object = new CLOUD.Group();
-                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
-
-                    var localUserId = userId || objJSON.userId;
-
-                    //handle_children(parent, objJSON.children, level + 1, localUserId, userData, object.matrix);
-
-
-                    handle_children(object, objJSON.children, level + 1, localUserId, userData, undefined, materialId);
-                    object.userData = userData;
-                    parent.add(object);
-                } else if (objJSON.nodeType == "MeshNode") {
-                    if (resource.bOutOfLimitation == true) continue;
-
-                    var matObj = client.findMaterial(materialId, false);
-
-                    object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, objJSON.meshId);
-                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
-                    object.userData = userData;
-                    if (!object.name) console.log(object);
-
-                    loadMeshNode(object, objJSON.meshId);
-
-                    parent.add(object);
-                } else if (objJSON.nodeType == "PGeomNode") {
-
-                    var matObj = client.findMaterial(materialId, false);
-                    object = CLOUD.GeomUtil.parsePGeomNodeInstance(objJSON, matObj, trf);
-
-                    if (object) {
-
-                        //object.name = nodeId;
-                        object.name = objJSON.userId;
-                        object.userData = userData;
-
-                        //console.log(userData);
-
-                        parent.add(object);
-                    }
-                } else if (objJSON.nodeType == "SymbolInstance") {
-
-                    var localUserId = userId || objJSON.userId;
-
-                    var symbolJSON = client.findSymbol(objJSON.symbolId);
-                    if (symbolJSON) {
-
-                        object = handle_symbol_instance(parent, objJSON, symbolJSON, userData, localUserId, level + 1, trf, nodeId, materialId);
-                    }
-                } else if (objJSON.nodeType == "InstancedMeshNode") {
-                    if (resource.bOutOfLimitation === true) {
-                        continue;
-                    }
-
-                    var matObj = client.findMaterial(materialId, true);
-
-                    object = new CLOUD.Mesh(undefined, matObj, objJSON.meshId);
-                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
-
-                    loadInstanceMeshNode(object, objJSON.meshId, objJSON);
-
-                    parent.add(object);
-                }
-
-                if (object) {
-                    object.updateMatrixWorld(true);
-
-                    object.renderOrder = sceneLevel;
-                }
-
-                if (level == 0) {
-                    onload_node_complete();
-                }
-            }
-        }
-
-        function onload_node_complete(level) {
-
-            counter_models -= 1;
-            async_callback_gate();
-        }
-
-        function onload_mpk_complete(parent, objJSON, level) {
-
-            return function () {
-                handle_children(parent, objJSON.nodes, level);
-                counter_models -= 1;
-                async_callback_gate();
-            };
-        }
-
-        function async_callback_gate() {
-
-            var progress = {
-                total: total_models,
-                loaded: total_models - counter_models
-            };
-
-            // update progress
-            if (notifyProgress) scope.manager.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_PROGRESS, progress: progress });
-
-            if (counter_models == 0) {
-                counter_models -= 1;
-                finalize();
-                callbackFinished(resource, data.metadata.count);
-            }
-        }
-
-        function on_load_mesh(item) {
-            var mesh = resource.geometries[item.meshNode.meshId];
-            if (mesh) {
-                item.meshNode.updateGeometry(mesh);
-            } else {
-                console.log("err: " + item + " may be in other mpk");
-            }
-        }
-
-        function finalize() {
-            // take care of targets which could be asynchronously loaded objects
-            client.processMpkTasks();
-
-            if (client.needGroupBySceneId()) {
-                (function () {
-                    var groupBySceneId = function groupBySceneId(node) {
-
-                        if (node instanceof CLOUD.Cell) {
-
-                            if (node.leaf === true || node.leaf === 1) {
-
-                                var groups = {};
-                                var children = node.children;
-                                for (var ii = 0, len = children.length; ii < len; ++ii) {
-                                    var object = children[ii];
-                                    var fileId = object.userData.sceneId;
-                                    if (fileId === undefined) {
-                                        console.warn("no scene id!");
-                                    } else {
-                                        var group = groups[fileId];
-                                        if (group === undefined) {
-                                            group = new CLOUD.Group();
-                                            group.fileId = fileId;
-                                            groups[fileId] = group;
-                                        }
-
-                                        group.children.push(object);
-                                    }
-                                }
-
-                                var sceneGroup = [];
-                                for (var name in groups) {
-                                    sceneGroup.push(groups[name]);
-                                }
-                                node.children = sceneGroup;
-                                return;
-                            }
-                        }
-
-                        var children = node.children;
-                        for (var ii = 0, len = children.length; ii < len; ++ii) {
-                            groupBySceneId(children[ii]);
-                        }
-                    };
-
-                    groupBySceneId(localRoot);
-                })();
-            }
-        }
-
-        // load mpks
-        if (data.mpks) {
-
-            var len = data.mpks.length;
-            for (var ii = 0, len = data.mpks.length; ii < len; ++ii) {
-                client.addDelayLoadMesh(data.mpks[ii], null);
-            }
-
-            var loaded = false;
-            total_models += len;
-            client.processMpkTasks(function (curIdx, allCount) {
-
-                if (curIdx !== undefined && notifyProgress) {
-
-                    var loadedCount = allCount - curIdx;
-                    var progress = {
-                        total: total_models,
-                        loaded: loadedCount
-                    };
-
-                    scope.manager.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_PROGRESS, progress: progress });
-                }
-
-                if (curIdx === 0) {
-
-                    if (!loaded) {
-                        counter_models = total_models;
-                        counter_models -= len;
-                        loaded = true;
-                        handle_children(localRoot, data.objects, 0);
-                        async_callback_gate();
+                    stack.push(node);
+                    parent = node;
+                } else if (content[pos] == '}') {
+                    stack.pop();
+                    if (!stack.empty()) {
+                        parent = stack.top();
                     }
                 }
-            });
-        } else {
-            handle_children(localRoot, data.objects, 0);
-            async_callback_gate();
+                ++pos;
+            }
+            rootNode = root;
+            ++pos;  // skip 'D'
+            var index = 0;
+            var scale = 1000;
+            while (pos < length && index <= octantCount) {
+                var x = '';
+                while (content[pos] != ',') {
+                    x += content[pos];
+                    ++pos;
+                }
+                ++pos;
+                var y = '';
+                while (content[pos] != ',') {
+                    y += content[pos];
+                    ++pos;
+                }
+                ++pos;
+                var z = '';
+                while (content[pos] != ',') {
+                    z += content[pos];
+                    ++pos;
+                }
+                ++pos;
+                var x1 = '';
+                while (content[pos] != ',') {
+                    x1 += content[pos];
+                    ++pos;
+                }
+                ++pos;
+                var y1 = '';
+                while (content[pos] != ',') {
+                    y1 += content[pos];
+                    ++pos;
+                }
+                ++pos;
+                var z1 = '';
+                while (content[pos] != ',') {
+                    z1 += content[pos];
+                    ++pos;
+                }
+                ++pos;
+                bounds[tmpOctantIds[index]] = new THREE.Box3(
+                    new THREE.Vector3(x * scale, y * scale, z * scale),
+                    new THREE.Vector3(x1 * scale, y1 * scale, z1 * scale));
+                ++index;
+            }
+            rootNode.setBounds(bounds);
+            rootNode.getDepthDescending();
+            console.log("Maximum Depth:", CLOUD.GlobalData.MaximumDepth);
+        }
+
+        loader.setCrossOrigin(scope.manager.crossOrigin);
+        // loader.setResponseType('arraybuffer');
+        loader.load(octreeUrl, function (data) {
+
+            constructHierarchy(data);
+
+            callback(rootNode);
+
+        });
+    }
+
+};
+/**
+ * @author muwj 2016/12/15
+ */
+
+CLOUD.Loader.Material = function (buffer, offset) {
+
+    var data_i = new Uint32Array( buffer, offset, 5 );
+
+    this.id = data_i[0];
+    this.color = data_i[1];
+    this.emissive = data_i[2];
+    this.specular = data_i[3];
+    this.side     = data_i[4];
+
+    var data_f = new Float32Array( buffer, offset + 4 * 5, 2);
+    this.shininess = data_f[0];
+    this.opacity   = data_f[1];
+
+    data_i = null;
+    data_f = null;
+};
+
+CLOUD.Loader.MaterialReader = function (buffer) {
+
+    var header = new Uint32Array(buffer, 0, 2);
+
+    this.count = header[0];
+    this.offset = header[1];
+
+    this.dataSize = 4 * 7;
+    this.dataBuffer  = buffer.slice( this.offset );
+
+    // for data reading
+    this.material_id = 0;
+    this.material_cur = new CLOUD.Loader.Material(this.dataBuffer, 0);
+
+    header = null;
+};
+
+CLOUD.Loader.MaterialReader.prototype = {
+
+    constructor: CLOUD.Loader.MaterialReader,
+
+    getData: function (id) {
+
+        if (id >= 0 && id < this.count) {
+            return new CLOUD.Loader.Material(this.dataBuffer, id * this.dataSize)
+        }
+    },
+
+    getDataInfo: function (id) {
+
+        if (id == this.material_id) {
+            return this.material_cur;
+        }
+
+        if (id >= 0 && id < this.count) {
+
+            var data_i = new Uint32Array( this.dataBuffer, id * this.dataSize, 5 );
+            this.material_cur.id       = data_i[0];
+            this.material_cur.color    = data_i[1];
+            this.material_cur.emissive = data_i[2];
+            this.material_cur.specular = data_i[3];
+            this.material_cur.side     = data_i[4];
+
+            var data_f = new Float32Array( this.dataBuffer, id * this.dataSize + 4 * 5, 2 );
+            this.material_cur.shininess = data_f[0];
+            this.material_cur.opacity   = data_f[1];
+
+            this.material_id = id;
+            return this.material_cur;
         }
     }
 };
-
-/**
- * @author Liwei.Ma
- * Load the index, material and mpkIndex
- */
-CLOUD.IndexLoader = function (crossOrigin, manager) {
-    this.taskCount = 0;
-    this.crossOrigin = crossOrigin;
-    this.maxTaskCount = 3;
+CLOUD.Loader.MaterialLoader = function (manager, showStatus) {
+    THREE.Loader.call(this, showStatus);
     this.manager = manager;
 };
 
-CLOUD.IndexLoader.prototype = {
-    constructor: CLOUD.IndexLoader,
+CLOUD.Loader.MaterialLoader.prototype = Object.create(THREE.Loader.prototype);
+CLOUD.Loader.MaterialLoader.prototype.constructor = CLOUD.Loader.MaterialLoader;
 
-    load: function load(client, callbackFinished) {
+CLOUD.Loader.MaterialLoader.prototype.setBaseUrl = function (value) {
+    this.baseUrl = value;
+};
 
-        var scope = this;
+CLOUD.Loader.MaterialLoader.prototype.setCrossOrigin = function (value) {
+    this.crossOrigin = value;
+};
 
-        function onTaskFinished() {
-            scope.taskCount++;
-            if (scope.taskCount >= scope.maxTaskCount) {
-                callbackFinished();
-            }
+CLOUD.Loader.MaterialLoader.prototype.load = function (materialUrl, callback) {
+
+    // var scope = this;
+    // var texturePath = this.baseUrl;
+
+    var loader = new THREE.XHRLoader();
+    loader.setResponseType('arraybuffer');
+    loader.load(materialUrl, function (data) {
+
+        callback(data);
+    });
+};
+
+CLOUD.Loader.MaterialLoader.prototype.loadTexture = function (url, mapping, onLoad, onProgress, onError) {
+
+    var texture;
+    var loader = THREE.Loader.Handlers.get(url);
+    var manager = ( this.manager !== undefined ) ? this.manager : THREE.DefaultLoadingManager;
+
+    if (loader !== null) {
+
+        texture = loader.load(url, onLoad);
+
+    } else {
+
+        texture = new THREE.Texture();
+
+        loader = new THREE.ImageLoader(manager);
+        loader.setCrossOrigin(this.crossOrigin);
+        loader.load(url, function (image) {
+
+            texture.image = CLOUD.MaterialUtil.ensurePowerOfTwo(image);
+            texture.needsUpdate = true;
+
+            if (onLoad) onLoad(texture);
+
+        }, onProgress, onError);
+
+    }
+
+    if (mapping !== undefined) texture.mapping = mapping;
+
+    return texture;
+};
+/**
+ * @author muwj 2016/12/29
+ */
+
+CLOUD.Loader.SymbolHeader = function ( buffer ) {
+
+    var header = new Uint32Array( buffer, 0, 11 );
+
+    this.blockId        = header[0];
+    this.symbolCount    = header[1];
+    this.itemCount      = header[2];
+    this.matrixCount    = header[3];
+    this.meshCount      = header[4];
+    this.geomCount      = header[5];
+    this.symbolOffset   = header[6];
+    this.itemOffset     = header[7];
+    this.matrixOffset   = header[8];
+    this.meshOffset     = header[9];
+    this.geomOffset     = header[10];
+
+    var bbox = new Float32Array( buffer, 4 * 11, 6 );
+    this.boundingBox = new THREE.Box3(
+        new THREE.Vector3( bbox[0], bbox[1], bbox[2] ),
+        new THREE.Vector3( bbox[3], bbox[4], bbox[5] ) );
+
+    header = null;
+    bbox = null;
+};
+
+CLOUD.Loader.Symbol = function ( buffer, offset ) {
+
+    var item_i = new Int32Array( buffer, offset, 3 );
+
+    this.symbolId  = item_i[0];
+    this.itemIndex = item_i[1];
+    this.itemCount = item_i[2];
+
+    var bbox = new Float32Array( buffer, offset + 4 * 3, 6 );
+    this.boundingBox = new THREE.Box3(
+        new THREE.Vector3( bbox[0], bbox[1], bbox[2] ),
+        new THREE.Vector3( bbox[3], bbox[4], bbox[5] ) );
+
+    item_i = null;
+    bbox = null;
+};
+
+CLOUD.Loader.SymbolReader = function ( buffer ) {
+
+    this.header = new CLOUD.Loader.SymbolHeader( buffer );
+
+    this.symbolSize   = 4 * 9;
+    this.itemSize     = 4 * 13;
+    this.matrixSize   = 4 * 16;
+    this.meshSize     = 4 * 2;
+    this.geomSize     = 4 * 8;
+    this.maxSize      = 4 * 64;
+
+    this.symbolBuffer = buffer.slice( this.header.symbolOffset, this.header.symbolOffset + this.header.symbolCount * this.symbolSize );
+    this.itemBuffer   = buffer.slice( this.header.itemOffset,   this.header.itemOffset   + this.header.itemCount   * this.itemSize );
+    this.matrixBuffer = buffer.slice( this.header.matrixOffset, this.header.matrixOffset + this.header.matrixCount * this.matrixSize );
+    this.meshBuffer   = buffer.slice( this.header.meshOffset,   this.header.meshOffset   + this.header.meshCount   * this.meshSize );
+    this.geomBuffer   = buffer.slice( this.header.geomOffset,   this.header.geomOffset   + this.header.geomOffset  * this.geomSize );
+
+    // for data reading
+    this.matr_cur_id = -1;
+
+    this.pt_symb_min = new THREE.Vector3( 0.0, 0.0, 0.0 );
+    this.pt_symb_max = new THREE.Vector3( 0.0, 0.0, 0.0 );
+    this.pt_item_min = new THREE.Vector3( 0.0, 0.0, 0.0 );
+    this.pt_item_max = new THREE.Vector3( 0.0, 0.0, 0.0 );
+
+    var tmp_buffer = new ArrayBuffer( this.maxSize );
+    this.symb_cur = new CLOUD.Loader.Symbol( tmp_buffer, 0 );
+    this.item_cur = new CLOUD.Loader.Item( tmp_buffer, 0 );
+    this.matr_cur = new CLOUD.Loader.Matrix( tmp_buffer, 0 );
+    this.mesh_cur = new CLOUD.Loader.MeshAttr( tmp_buffer, 0 );
+    this.geom_cur = new CLOUD.Loader.GeomAttr( tmp_buffer, 0 );
+
+    this.symb_cur.boundingBox.set( this.pt_symb_min, this.pt_symb_max );
+    this.item_cur.boundingBox.set( this.pt_item_min, this.pt_item_max );
+};
+
+CLOUD.Loader.SymbolReader.prototype = {
+
+    constructor: CLOUD.Loader.SymbolReader,
+
+    getSymbol: function ( index ) {
+
+        if ( index >= 0 && index < this.header.symbolCount ) {
+            return new CLOUD.Loader.Symbol( this.symbolBuffer, index * this.symbolSize );
+        }
+    },
+
+    getItem: function ( index ) {
+
+        if ( index >= 0 && index < this.header.itemCount ) {
+            return new CLOUD.Loader.Item( this.itemBuffer, index * this.itemSize );
+        }
+    },
+
+    getMatrix: function ( index ) {
+
+        if ( index >= 0 && index < this.header.matrixCount ) {
+            return new CLOUD.Loader.Matrix( this.matrixBuffer, index * this.matrixSize );
+        }
+    },
+
+    getMeshAttr: function ( index ) {
+
+        if ( index >= 0 && index < this.header.meshCount ) {
+            return new CLOUD.Loader.MeshAttr( this.meshBuffer, index * this.meshSize );
+        }
+    },
+
+    getGeomAttr: function ( index ) {
+
+        if ( index >= 0 && index < this.header.geomCount ) {
+            return new CLOUD.Loader.GeomAttr( this.geomBuffer, index * this.geomSize );
+        }
+    },
+
+    getSymbolInfo: function ( index ) {
+
+        if ( index >= 0 && index < this.header.symbolCount ) {
+
+            var item_i = new Int32Array( this.symbolBuffer, index * this.symbolSize, 3 );
+            this.symb_cur.symbolId  = item_i[0];
+            this.symb_cur.itemIndex = item_i[1];
+            this.symb_cur.itemCount = item_i[2];
+
+            var data_f = new Float32Array( this.symbolBuffer, index * this.symbolSize + 4 * 3, 6 );
+            this.pt_symb_min.set( data_f[0], data_f[1], data_f[2] );
+            this.pt_symb_max.set( data_f[3], data_f[4], data_f[5] );
+            this.symb_cur.boundingBox.set( this.pt_symb_min, this.pt_symb_max );
+
+            return this.symb_cur;
+        }
+    },
+
+    getItemInfo: function ( index ) {
+
+        if ( index >= 0 && index < this.header.itemCount ) {
+
+            var data_i = new Int32Array( this.itemBuffer, index * this.itemSize, 7 );
+            this.item_cur.ItemId     = data_i[0];
+            this.item_cur.originalId = data_i[1];
+            this.item_cur.materialId = data_i[2];
+            this.item_cur.userDataId = data_i[3];
+            this.item_cur.matrixId   = data_i[4];
+            this.item_cur.type       = data_i[5];
+            this.item_cur.attrIndex  = data_i[6];
+
+            var data_f = new Float32Array( this.itemBuffer, index * this.itemSize + 4 * 7, 6 );
+            this.pt_item_min.set( data_f[0], data_f[1], data_f[2] );
+            this.pt_item_max.set( data_f[3], data_f[4], data_f[5] );
+            this.item_cur.boundingBox.set( this.pt_item_min, this.pt_item_max );
+
+            return this.item_cur;
+        }
+    },
+
+    getMatrixInfo: function ( index ) {
+
+        if ( index == this.matr_cur_id ) {
+            return this.matr_cur;
         }
 
-        // Index
-        var loader = new THREE.XHRLoader(scope.manager);
-        loader.setCrossOrigin(this.crossOrigin);
-        loader.load(client.projectUrl(), function (text) {
+        if ( index >= 0 && index < this.header.matrixCount ) {
 
-            var index = JSON.parse(text);
-            client.index = index;
+            var data = new Float32Array( this.matrixBuffer, index * this.matrixSize, 4 * 4 );
+            this.matr_cur.matrix.fromArray( data );
 
-            // Parse global transform
-            if (client.slave === false && index.view) {
+            this.matr_cur_id = index;
+            return this.matr_cur;
+        }
+    },
 
-                var position = new THREE.Vector3();
-                position.fromArray(index.view.position);
+    getMeshAttrInfo: function ( index ) {
 
-                var rotation = new THREE.Quaternion();
-                var euler = new THREE.Euler();
-                euler.fromArray(index.view.rotation);
-                rotation.setFromEuler(euler, false);
+        if ( index >= 0 && index < this.header.meshCount ) {
 
-                var scale = new THREE.Vector3(1, 1, 1);
-                scale.fromArray(index.view.scale);
-                //scale.multiplyScalar(CLOUD.GlobalData.SceneScale);
+            var data = new Int32Array( this.meshBuffer, index * this.meshSize, 2 );
 
-                var rootNode = scope.manager.scene.rootNode;
-                rootNode.matrix.compose(position, rotation, scale);
-                rootNode.matrixAutoUpdate = false;
+            this.mesh_cur.blockId = data[0];
+            this.mesh_cur.meshId  = data[1];
 
-                CLOUD.GlobalData.SubSceneVisibleDistance = CLOUD.GlobalData.LengthUnitScale * scale.x;
-                console.log(CLOUD.GlobalData.SubSceneVisibleDistance);
+            return this.mesh_cur;
+        }
+    },
+
+    getGeomInfo: function ( index ) {
+
+        if ( index >= 0 && index < this.header.geomCount ) {
+
+            var data = new Float32Array( this.geomBuffer, index * this.geomSize, 8 );
+
+            this.geom_cur.startPt.set( data[0], data[1], data[2] );
+            this.geom_cur.endPt.  set( data[3], data[4], data[5] );
+            this.geom_cur.radius    = data[6];
+            this.geom_cur.thickness = data[7];
+
+            return this.geom_cur;
+        }
+    }
+};
+CLOUD.Loader.SymbolLoader = function (manager) {
+
+    this.manager = manager;
+    this.loader = new THREE.XHRLoader(manager);
+};
+
+CLOUD.Loader.SymbolLoader.prototype = {
+
+    constructor: CLOUD.Loader.SymbolLoader,
+
+    load: function (symbolUrl, callback) {
+
+        var scope = this;
+        var loader = this.loader;
+
+        loader.setCrossOrigin(scope.manager.crossOrigin);
+        loader.setResponseType('arraybuffer');
+        loader.load(symbolUrl, function (data) {
+
+            callback(data);
+
+        });
+    }
+
+};
+/**
+ * @author muwj 2016/12/15
+ */
+
+CLOUD.Loader.MPKHeader = function (buffer) {
+
+    var header = new Uint32Array( buffer, 0, 7 );
+
+    this.blockId      = header[0];
+    this.startId      = header[1];
+    this.vtFormat     = header[2];
+    this.meshCount    = header[3];
+    this.meshOffset   = header[4];
+    this.bufferSize   = header[5];
+    this.bufferOffset = header[6];
+
+    header = null;
+};
+
+CLOUD.Loader.MeshData = function (buffer, offset) {
+
+    var mesh_info = new Uint32Array(buffer, offset, 4);
+
+    this.mesh_id = mesh_info[0];
+    this.ptCount = mesh_info[1];
+    this.idxCount = mesh_info[2];
+    this.dataOffset = mesh_info[3];
+
+    var base_info = new Float32Array(buffer, offset + 4 * 4, 4);
+
+    this.baseScale = base_info[0];
+    this.baseVector = new THREE.Vector3(base_info[1], base_info[2], base_info[3]);
+
+    mesh_info = null;
+    base_info = null;
+};
+
+CLOUD.Loader.MPKReader = function (buffer) {
+
+    this.header = new CLOUD.Loader.MPKHeader(buffer);
+
+    this.meshSize = 4 * 8;
+    this.maxSize = 4 * 64;
+    this.meshBuffer = buffer.slice(this.header.meshOffset, this.header.meshOffset + this.header.meshCount * this.meshSize);
+    this.geomBuffer = buffer.slice(this.header.bufferOffset, this.header.bufferOffset + this.header.bufferSize);
+
+    // for data reading
+    this.mesh_cur_id = -1;
+    this.pt_pos = new THREE.Vector3(0.0, 0.0, 0.0);
+
+    var tmp_buffer = new ArrayBuffer(this.maxSize);
+    this.mesh_cur = new CLOUD.Loader.MeshData(tmp_buffer, 0);
+    this.mesh_cur.baseVector = this.pt_pos;
+};
+
+CLOUD.Loader.MPKReader.prototype = {
+
+    constructor: CLOUD.Loader.MPKReader,
+
+    getMeshData: function (id) {
+
+        var index = id - this.header.startId;
+        if (index >= 0 && index < this.header.meshCount) {
+
+            return new CLOUD.Loader.MeshData(this.meshBuffer, index * this.meshSize);
+        }
+    },
+
+    getMeshInfo: function (id) {
+
+        if (id == this.mesh_cur_id) {
+            return this.mesh_cur;
+        }
+
+        var index = id - this.header.startId;
+        if (index >= 0 && index < this.header.meshCount) {
+
+            var data_i = new Uint32Array(this.meshBuffer, index * this.meshSize, 4);
+            this.mesh_cur.mesh_id = data_i[0];
+            this.mesh_cur.ptCount = data_i[1];
+            this.mesh_cur.idxCount = data_i[2];
+            this.mesh_cur.dataOffset = data_i[3];
+
+            var data_f = new Float32Array(this.meshBuffer, index * this.meshSize + 4 * 4, 4);
+            this.mesh_cur.baseScale = data_f[0];
+            this.mesh_cur.baseVector.set(data_f[1], data_f[2], data_f[3]);
+
+            this.mesh_cur_id = id;
+            return this.mesh_cur;
+        }
+    },
+
+    getPtBuffer: function (id) {
+
+        var index = id - this.header.startId;
+        if (index >= 0 && index < this.header.meshCount) {
+
+            var mesh = this.getMeshInfo(id);
+            if (mesh === undefined) {
+                return undefined;
             }
 
-            // Adjust LoD
-            var statics = index.statics;
-            if (statics) {
-                var number = statics.meshNode + statics.pgeomNode + statics.symbolInstance;
-                if (number < 10000) {
-                    CLOUD.GlobalData.CellVisibleLOD = 100000;
-                    CLOUD.GlobalData.SubSceneVisibleLOD = 100000;
-                } else if (number < 50000) {
-                    CLOUD.GlobalData.CellVisibleLOD = 10000;
-                    CLOUD.GlobalData.SubSceneVisibleLOD = 10000;
-                } else if (number < 100000) {
-                    CLOUD.GlobalData.CellVisibleLOD = 1000;
-                    CLOUD.GlobalData.SubSceneVisibleLOD = 1000;
-                } else if (number < 200000) {
-                    CLOUD.GlobalData.CellVisibleLOD = 200;
-                    CLOUD.GlobalData.SubSceneVisibleLOD = 150;
-                } else if (number < 400000) {
-                    CLOUD.GlobalData.CellVisibleLOD = 50;
-                    CLOUD.GlobalData.SubSceneVisibleLOD = 50;
-                } else {
-                    // by default
+            if (mesh.baseScale == 0.0) {
+                return new Float32Array(this.geomBuffer, mesh.dataOffset, mesh.ptCount * 3);
+            }
+            else {
+                return new Uint16Array(this.geomBuffer, mesh.dataOffset, mesh.ptCount * 3);
+            }
+        }
+    },
+
+    getIdxBuffer: function (id) {
+
+        var index = id - this.header.startId;
+        if (index >= 0 && index < this.header.meshCount) {
+
+            var mesh = this.getMeshInfo(id);
+            if (mesh === undefined) {
+                return undefined;
+            }
+
+            var offset = mesh.dataOffset;
+            if (mesh.baseScale == 0.0) {
+                offset += mesh.ptCount * 3 * 4;
+            }
+            else {
+                offset += mesh.ptCount * 3 * 2;
+                if (mesh.ptCount % 2 == 1) {
+                    offset += 2;
                 }
-                console.log(number);
             }
 
-            // Load symbol index
-            if (index.metadata.symbol) {
+            if (mesh.ptCount > 65535) {
+                return new Uint32Array(this.geomBuffer, offset, mesh.idxCount);
+            }
+            else {
+                return new Uint16Array(this.geomBuffer, offset, mesh.idxCount);
+            }
+        }
+    },
 
-                loader.load(client.symbolIndexUrl(), function (textSymbol) {
-                    client.symbolIndex = JSON.parse(textSymbol);
+    getNormalBuffer: function ( id ) {
+
+        var index = id - this.header.startId;
+        if ( (this.header.vtFormat & 2) == 2 &&
+            index >= 0 &&
+            index < this.header.meshCount ) {
+
+            var mesh = this.getMeshInfo( id );
+            if ( mesh === undefined ) {
+                return undefined;
+            }
+
+            var offset = mesh.dataOffset;
+            if ( mesh.baseScale == 0.0 ) {
+                offset += mesh.ptCount * 3 * 4;
+            }
+            else {
+                offset += mesh.ptCount * 3 * 2;
+                if ( mesh.ptCount % 2 == 1 ) {
+                    offset += 2;
+                }
+            }
+
+            if ( mesh.ptCount > 65535 ) {
+                offset += mesh.idxCount * 4;
+            }
+            else {
+                offset += mesh.idxCount * 2;
+                if ( mesh.idxCount % 2 == 1 ) {
+                    offset += 2;
+                }
+            }
+
+            return new Float32Array( this.geomBuffer, offset, mesh.ptCount * 3 );
+        }
+    }
+};
+CLOUD.Loader.MeshLoader = function (manager) {
+
+    this.manager = manager;
+    this.loader = new THREE.XHRLoader(manager);
+};
+
+CLOUD.Loader.MeshLoader.prototype = {
+
+    constructor: CLOUD.Loader.MeshLoader,
+
+    load: function (mpkUrl, callback) {
+
+        var scope = this;
+        var loader = this.loader;
+
+        loader.setCrossOrigin(scope.manager.crossOrigin);
+        loader.setResponseType('arraybuffer');
+        loader.load(mpkUrl, function (data) {
+            callback(data);
+        });
+    }
+
+};
+/**
+ * @author muwj 2016/12/15
+ */
+
+CLOUD.Loader.SceneHeader = function ( buffer ) {
+
+    var header = new Uint32Array( buffer, 0, 13 );
+
+    this.blockId        = header[0];
+    this.cellCount      = header[1];
+    this.itemCount      = header[2];
+    this.userDataCount  = header[3];
+    this.matrixCount    = header[4];
+    this.meshCount      = header[5];
+    this.geomCount      = header[6];
+    this.cellOffset     = header[7];
+    this.itemOffset     = header[8];
+    this.userDataOffset = header[9];
+    this.matrixOffset   = header[10];
+    this.meshOffset     = header[11];
+    this.geomOffset     = header[12];
+
+    var bbox = new Float32Array( buffer, 4 * 13, 6 );
+    this.boundingBox = new THREE.Box3(
+        new THREE.Vector3( bbox[0], bbox[1], bbox[2] ),
+        new THREE.Vector3( bbox[3], bbox[4], bbox[5] ) );
+
+    header = null;
+    bbox = null;
+};
+
+CLOUD.Loader.Cell = function ( buffer, offset ) {
+
+    var cell_i = new Int32Array( buffer, offset, 5 );
+
+    this.cellId    = cell_i[0];
+    this.depth     = cell_i[1];
+    this.itemIndex = cell_i[2];
+    this.itemCount = cell_i[3];
+
+    this.layerCount= cell_i[4];
+    this.layerIdxBuffer = new Int32Array( buffer, offset + 5*4, 64 );
+    this.categoryBuffer = new Int32Array( buffer, offset + (5+64)*4, 64 );
+
+    var bbox = new Float32Array( buffer, offset + (5+64+64)*4, 6 );
+    this.boundingBox = new THREE.Box3(
+        new THREE.Vector3( bbox[0], bbox[1], bbox[2] ),
+        new THREE.Vector3( bbox[3], bbox[4], bbox[5] ) );
+
+    cell_i = null;
+    bbox = null;
+};
+
+CLOUD.Loader.Item = function ( buffer, offset ) {
+
+    var item_i = new Int32Array( buffer, offset, 7 );
+
+    this.ItemId     = item_i[0];
+    this.originalId = item_i[1];
+    this.materialId = item_i[2];
+    this.userDataId = item_i[3];
+    this.matrixId   = item_i[4];
+    this.type       = item_i[5];
+    this.attrIndex  = item_i[6];
+
+    var bbox = new Float32Array( buffer, offset + 4 * 7, 6 );
+    this.boundingBox = new THREE.Box3(
+        new THREE.Vector3( bbox[0], bbox[1], bbox[2] ),
+        new THREE.Vector3( bbox[3], bbox[4], bbox[5] ) );
+
+    item_i = null;
+    bbox = null;
+};
+
+CLOUD.Loader.Matrix = function ( buffer, offset ) {
+
+    var matrixData = new Float32Array( buffer, offset, 4 * 4 );
+    this.matrix = new THREE.Matrix4().fromArray( matrixData );
+    matrixData = null;
+};
+
+CLOUD.Loader.UserData = function ( buffer, offset ) {
+
+    var userData = new Int32Array( buffer, offset, 3 );
+
+    this.category = userData[0];
+    this.scene_id = userData[1];
+    this.plan     = userData[2];
+
+    this.classCode = new Uint8Array( buffer, offset + 4 * 3, 20 );
+    userData = null;
+};
+
+CLOUD.Loader.MeshAttr = function ( buffer, offset ) {
+
+    var meshData = new Int32Array( buffer, offset, 2 );
+
+    this.blockId = meshData[0];
+    this.meshId  = meshData[1];
+
+    meshData = null;
+};
+
+CLOUD.Loader.GeomAttr = function ( buffer, offset ) {
+
+    var geomData = new Float32Array( buffer, offset, 8 );
+
+    this.startPt = new THREE.Vector3( geomData[0], geomData[1], geomData[2] );
+    this.endPt   = new THREE.Vector3( geomData[3], geomData[4], geomData[5] );
+    this.radius    = geomData[6];
+    this.thickness = geomData[7];
+
+    geomData = null;
+};
+
+CLOUD.Loader.SceneReader = function ( buffer ) {
+
+    this.header = new CLOUD.Loader.SceneHeader( buffer );
+
+    this.cellSize     = 4 * (5+64+64+6);
+    this.itemSize     = 4 * 13;
+    this.matrixSize   = 4 * 16;
+    this.userDataSize = 4 * 3 + 20;
+    this.meshSize     = 4 * 2;
+    this.geomSize     = 4 * 8;
+    this.maxSize      = 4 * 256;
+
+    this.cellBuffer     = buffer.slice( this.header.cellOffset,     this.header.cellOffset     + this.header.cellCount     * this.cellSize );
+    this.itemBuffer     = buffer.slice( this.header.itemOffset,     this.header.itemOffset     + this.header.itemCount     * this.itemSize );
+    this.matrixBuffer   = buffer.slice( this.header.matrixOffset,   this.header.matrixOffset   + this.header.matrixCount   * this.matrixSize );
+    this.userDataBuffer = buffer.slice( this.header.userDataOffset, this.header.userDataOffset + this.header.userDataCount * this.userDataSize );
+    this.meshBuffer     = buffer.slice( this.header.meshOffset,     this.header.meshOffset     + this.header.meshCount     * this.meshSize );
+    this.geomBuffer     = buffer.slice( this.header.geomOffset,     this.header.geomOffset     + this.header.geomOffset    * this.geomSize );
+
+    // for data reading
+    this.matr_cur_id = -1;
+    this.user_cur_id = -1;
+
+    this.pt_cell_min = new THREE.Vector3( 0.0, 0.0, 0.0 );
+    this.pt_cell_max = new THREE.Vector3( 0.0, 0.0, 0.0 );
+    this.pt_item_min = new THREE.Vector3( 0.0, 0.0, 0.0 );
+    this.pt_item_max = new THREE.Vector3( 0.0, 0.0, 0.0 );
+
+    var tmp_buffer = new ArrayBuffer( this.maxSize );
+    this.cell_cur = new CLOUD.Loader.Cell( tmp_buffer, 0 );
+    this.item_cur = new CLOUD.Loader.Item( tmp_buffer, 0 );
+    this.matr_cur = new CLOUD.Loader.Matrix( tmp_buffer, 0 );
+    this.user_cur = new CLOUD.Loader.UserData( tmp_buffer, 0 );
+    this.mesh_cur = new CLOUD.Loader.MeshAttr( tmp_buffer, 0 );
+    this.geom_cur = new CLOUD.Loader.GeomAttr( tmp_buffer, 0 );
+
+    this.cell_cur.boundingBox.set( this.pt_cell_min, this.pt_cell_max );
+    this.item_cur.boundingBox.set( this.pt_item_min, this.pt_item_max );
+};
+
+CLOUD.Loader.SceneReader.prototype = {
+
+    constructor: CLOUD.Loader.SceneReader,
+
+    getCellMpks: function( index ) {
+
+        if ( index >= 0 && index < this.header.cellCount ) {
+            var src = [];
+            var cell = this.getCellInfo( index );
+            for ( var i = cell.itemIndex; i < cell.itemCount; ++i ) {
+                var item = this.getItemInfo( i );
+                if( item.type == 1 ) { // mesh
+
+                    var meshAttr = this.getMeshAttrInfo( item.attrIndex );
+                    src.push( meshAttr.blockId );
+                }
+            }
+
+            var key = {};
+            var dist = [];
+            for ( var j = 0; j < src.length; ++j ) {
+                if ( ! key[src[j]] ) {
+                    key[src[j]] = true;
+                    dist.push( src[j] );
+                }
+            }
+            return dist;
+        }
+    },
+
+    getCell: function ( index ) {
+
+        if ( index >= 0 && index < this.header.cellCount ) {
+            return new CLOUD.Loader.Cell( this.cellBuffer, index * this.cellSize );
+        }
+    },
+
+    getItem: function ( index ) {
+
+        if ( index >= 0 && index < this.header.itemCount ) {
+            return new CLOUD.Loader.Item( this.itemBuffer, index * this.itemSize );
+        }
+    },
+
+    getMatrix: function ( index ) {
+
+        if ( index >= 0 && index < this.header.matrixCount ) {
+            return new CLOUD.Loader.Matrix( this.matrixBuffer, index * this.matrixSize );
+        }
+    },
+
+    getUserData: function ( index ) {
+
+        if ( index >= 0 && index < this.header.userDataCount ) {
+            return new CLOUD.Loader.UserData( this.userDataBuffer, index * this.userDataSize );
+        }
+    },
+
+    getMeshAttr: function ( index ) {
+
+        if ( index >= 0 && index < this.header.meshCount ) {
+            return new CLOUD.Loader.MeshAttr( this.meshBuffer, index * this.meshSize );
+        }
+    },
+
+    getGeomAttr: function ( index ) {
+
+        if ( index >= 0 && index < this.header.geomCount ) {
+            return new CLOUD.Loader.GeomAttr( this.geomBuffer, index * this.geomSize );
+        }
+    },
+
+    getCellInfo: function ( index ) {
+
+        if ( index >= 0 && index < this.header.cellCount ) {
+
+            var data_i = new Int32Array( this.cellBuffer, index * this.cellSize, 5 );
+            this.cell_cur.cellId    = data_i[0];
+            this.cell_cur.depth     = data_i[1];
+            this.cell_cur.itemIndex = data_i[2];
+            this.cell_cur.itemCount = data_i[3];
+
+            this.layerCount = data_i[4];
+            this.layerIdxBuffer = new Int32Array( this.cellBuffer, index * this.cellSize + 5*4, 64 );
+            this.categoryBuffer = new Int32Array( this.cellBuffer, index * this.cellSize + (5+64)*4, 64 );
+
+            var data_f = new Float32Array( this.cellBuffer, index * this.cellSize + (5+64+64)*4, 6 );
+            this.pt_cell_min.set( data_f[0], data_f[1], data_f[2] );
+            this.pt_cell_max.set( data_f[3], data_f[4], data_f[5] );
+            this.cell_cur.boundingBox.set( this.pt_cell_min, this.pt_cell_max );
+
+            return this.cell_cur;
+        }
+    },
+
+    getItemInfo: function ( index ) {
+
+        if ( index >= 0 && index < this.header.itemCount ) {
+
+            var data_i = new Int32Array( this.itemBuffer, index * this.itemSize, 7 );
+            this.item_cur.ItemId     = data_i[0];
+            this.item_cur.originalId = data_i[1];
+            this.item_cur.materialId = data_i[2];
+            this.item_cur.userDataId = data_i[3];
+            this.item_cur.matrixId   = data_i[4];
+            this.item_cur.type       = data_i[5];
+            this.item_cur.attrIndex  = data_i[6];
+
+            var data_f = new Float32Array( this.itemBuffer, index * this.itemSize + 4 * 7, 6 );
+            this.pt_item_min.set( data_f[0], data_f[1], data_f[2] );
+            this.pt_item_max.set( data_f[3], data_f[4], data_f[5] );
+            this.item_cur.boundingBox.set( this.pt_item_min, this.pt_item_max );
+
+            return this.item_cur;
+        }
+    },
+
+    getMatrixInfo: function ( index ) {
+
+        if ( index == this.matr_cur_id ) {
+            return this.matr_cur;
+        }
+
+        if ( index >= 0 && index < this.header.matrixCount ) {
+
+            var data = new Float32Array( this.matrixBuffer, index * this.matrixSize, 4 * 4 );
+            this.matr_cur.matrix.fromArray( data );
+
+            this.matr_cur_id = index;
+            return this.matr_cur;
+        }
+    },
+
+    getUserInfo: function ( index ) {
+
+        if ( index == this.user_cur_id ) {
+            return this.user_cur;
+        }
+
+        if ( index >= 0 && index < this.header.userDataCount ) {
+
+            var data = new Int32Array( this.userDataBuffer, index * this.userDataSize, 3 );
+            this.user_cur.category = data[0];
+            this.user_cur.scene_id = data[1];
+            this.user_cur.plan     = data[2];
+
+            this.user_cur.classCode = new Uint8Array( this.userDataBuffer, index * this.userDataSize + 4 * 3, 20 );
+
+            this.user_cur_id = index;
+            return this.user_cur;
+        }
+    },
+
+    getMeshAttrInfo: function ( index ) {
+
+        if ( index >= 0 && index < this.header.meshCount ) {
+
+            var data = new Int32Array( this.meshBuffer, index * this.meshSize, 2 );
+            this.mesh_cur.blockId = data[0];
+            this.mesh_cur.meshId  = data[1];
+
+            return this.mesh_cur;
+        }
+    },
+
+    getGeomInfo: function ( index ) {
+
+        if ( index >= 0 && index < this.header.geomCount ) {
+
+            var data = new Float32Array( this.geomBuffer, index * this.geomSize, 8 );
+            this.geom_cur.startPt.set( data[0], data[1], data[2] );
+            this.geom_cur.endPt.set  ( data[3], data[4], data[5] );
+            this.geom_cur.radius    = data[6];
+            this.geom_cur.thickness = data[7];
+
+            return this.geom_cur;
+        }
+    }
+};
+/**
+ * @author Liwei.Ma
+ */
+
+CLOUD.Loader.SceneLoader = function (manager) {
+
+    this.manager = manager;
+    this.loader = new THREE.XHRLoader(manager);
+};
+
+CLOUD.Loader.SceneLoader.prototype = {
+
+    constructor: CLOUD.Loader.SceneLoader,
+
+    // Load the scene as children of group
+    load: function (sceneUrl, callback) {
+
+        var scope = this;
+        var loader = this.loader;
+
+        loader.setCrossOrigin(scope.manager.crossOrigin);
+        loader.setResponseType('arraybuffer');
+        loader.load(sceneUrl, function (data) {
+            callback(data);
+        });
+    }
+};
+CLOUD.Model = function (manager, serverUrl, databagId, texturePath) {
+
+    THREE.LoadingManager.call(this);
+
+    this.manager = manager;
+    this.serverUrl = serverUrl;
+    this.databagId = databagId;
+    this.texturePath = texturePath;
+    this.crossOrigin = true;
+
+    this.cache = {
+        cells: {},
+        geometries: {},
+        materials: {},
+        instancedMaterials: {}
+    };
+
+    this.cfgInfo = null;
+
+    // Loaders
+    this.sceneLoader = new CLOUD.Loader.SceneLoader(this);
+    this.materialLoader = new CLOUD.Loader.MaterialLoader(this);
+    this.symbolLoader = new CLOUD.Loader.SymbolLoader(this);
+    this.meshLoader = new CLOUD.Loader.MeshLoader(this);
+    this.octreeLoader = new CLOUD.Loader.OctreeLoader(this);
+    this.userIdLoader = new THREE.XHRLoader(this);
+    this.octreeRootNode = null;
+    this.octreeRootNodeI = null;
+    this.visibleOctant = new Array();
+
+    this.materialReader = null;
+    this.symbolReader = null;
+    this.userIdReader = null;
+
+    this.sceneArray = null;
+    this.sceneCount = 0;
+    this.mpkArray = null;
+    this.mpkCount = 0;
+
+    this.taskCount = 0;
+    this.maxTaskCount = 4;
+};
+
+CLOUD.Model.prototype = Object.create(THREE.LoadingManager.prototype);
+CLOUD.Model.prototype.constructor = CLOUD.Model;
+
+CLOUD.Model.prototype.load = function () {
+
+    var scope = this;
+
+    function onTaskFinished() {
+        scope.taskCount++;
+
+        if (scope.taskCount >= scope.maxTaskCount) {
+            scope.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_COMPLETE});
+        } else {
+            var progress = {
+                total: scope.maxTaskCount,
+                loaded: scope.taskCount
+            };
+            scope.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_PROGRESS, progress: progress});
+        }
+    }
+
+    var cfgLoader = new CLOUD.Loader.ConfigLoader(this);
+    cfgLoader.load(this.projectUrl(), function (text) {
+        var cfg = JSON.parse(text);
+        scope.cfgInfo = cfg;
+        scope.sceneCount = cfg.metadata.scenes;
+        scope.mpkCount = cfg.metadata.mpks;
+        scope.sceneArray = new Array(scope.sceneCount);
+        scope.mpkArray = new Array(scope.mpkCount);
+        scope.manager.scene.parseRootNode(cfg);
+
+        var sceneId = 0;
+
+        scope.sceneLoader.load(scope.sceneUrl(sceneId), function (data) {
+            var sceneReader = new CLOUD.Loader.SceneReader(data);
+
+            if (sceneReader.header.blockId < scope.sceneCount) {
+                scope.sceneArray[sceneReader.header.blockId] = sceneReader;
+            }
+
+            sceneReader = null;
+            scope.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_START, sceneId: sceneId});
+
+            if (scope.mpkCount > 0) {
+                scope.maxTaskCount += scope.mpkCount - 1;
+                // scope.maxTaskCount += scope.mpkCount;
+            }
+
+            for (var j = 0; j < scope.mpkCount; ++j) {
+                scope.meshLoader.load(scope.mpkUrl(j), function (data) {
+                    scope.parseMpk(data);
                     onTaskFinished();
                 });
-            } else {
-                onTaskFinished();
             }
         });
 
         // Material
-        var materialLoader = new CLOUD.MaterialLoader();
-        materialLoader.setCrossOrigin(this.crossOrigin);
-        materialLoader.load(client.materialUrl("material"), function () {
+        // scope.materialLoader.setBaseUrl(scope.getTexturePath());
+        scope.materialLoader.setCrossOrigin(scope.crossOrigin);
+        scope.materialLoader.load(scope.materialUrl(), function (data) {
+            scope.parseMaterial(data);
             onTaskFinished();
-        }, client);
+        }, scope.cache);
 
-        // MPK Index
-        loader.load(client.mpkIndexUrl(), function (text) {
-            client.mkpIndex = JSON.parse(text);
-
-            // build meshId to mpkIndex
-            for (var mpkId in client.mkpIndex.items) {
-
-                var meshIds = client.mkpIndex.items[mpkId].items;
-                for (var meshId in meshIds) {
-                    client.meshIds[meshId] = mpkId;
-                }
-            }
-
-            //client.taskManager.loadSceneFiles(client, function () { });
-            //client.taskManager.loadMpkFiles(client, onTaskFinished);
+        scope.symbolLoader.load(scope.symbolUrl(), function (data) {
+            scope.parseSymbol(data);
             onTaskFinished();
         });
-    },
 
-    setCrossOrigin: function setCrossOrigin(value) {
-        this.crossOrigin = value;
-    }
-};
-
-/**
- * @author Liwei.Ma
- */
-CLOUD.SceneBoxLoader = function (manager, crossOrigin) {
-    this.manager = manager;
-    this.crossOrigin = crossOrigin;
-};
-
-CLOUD.SceneBoxLoader.prototype = {
-    constructor: CLOUD.SceneBoxLoader,
-
-    load: function load(sceneId, scene, cloudClient, callbackFinished) {
-        var scope = this;
-
-        var loader = new THREE.XHRLoader(scope.manager);
-        loader.setCrossOrigin(this.crossOrigin);
-
-        loader.load(cloudClient.sceneUrl(sceneId), function (data) {
-            scope.parse(sceneId, JSON.parse(data), scene, cloudClient, callbackFinished);
+        scope.userIdLoader.setResponseType("arraybuffer");
+        scope.userIdLoader.load(scope.userIdUrl(), function (data) {
+            scope.parseUserId(data);
+            onTaskFinished();
         });
-    },
-
-    setCrossOrigin: function setCrossOrigin(value) {
-        this.crossOrigin = value;
-    },
-
-    parse: function parse(sceneId, json, scene, cloudClient, callbackFinished) {
-        var scope = this;
-
-        var data = json;
-
-        var result = cloudClient.cache;
-
-        var total_models = data.metadata.count;
-        if (total_models <= 0) {
-            callbackFinished(result);
-            return;
-        }
-
-        var counter_models = total_models;
-
-        var localRoot = CLOUD.Utils.parseRootNode(scene, data);
-
-        this.manager.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_START, sceneId: sceneId });
-
-        // handle all the children from the loaded json and attach them to given parent
-
-        var level = -1;
-
-        function handle_children(parent, children) {
-            level++;
-            for (var nodeId in children) {
-
-                if (level == 0) --counter_models;
-
-                var objJSON = children[nodeId];
-
-                var object;
-
-                if (objJSON.nodeType == "MpkNode") {
-                    handle_children(parent, objJSON.nodes);
-                } else if (objJSON.nodeType == "CellNode") {
-
-                    var clr = 0xff;
-                    if (objJSON.leaf) {
-                        clr = 0x00ff00;
-                    }
-
-                    var bbox = CLOUD.Utils.box3FromArray(objJSON.bbox);
-                    object = new CLOUD.BBoxNode(bbox, clr);
-                    CLOUD.Utils.parseTransform(object, objJSON);
-
-                    if (level < 1) {
-                        localRoot.add(object);
-                    }
-                    //if (objJSON.deep == 2 && objJSON.leaf) {
-                    // localRoot.add(object);
-                    //}
-
-                    object.worldBoundingBox = bbox.clone();
-                    object.worldBoundingBox.applyMatrix4(scope.manager.getGlobalTransform());
-
-                    if (objJSON.leaf === undefined) handle_children(object, objJSON.children);
-                }
-                //else if(objJSON.nodeType == "SceneNode"){
-                //    var clr = 0xff0000;
-
-                //    var bbox = CLOUD.Utils.box3FromArray(objJSON.bbox);
-                //    object = new CLOUD.BBoxNode(bbox, clr);
-                //    CLOUD.Utils.parseTransform(object, objJSON);
-                //    object.worldBoundingBox = bbox.clone();
-                //    object.worldBoundingBox.applyMatrix4(scope.manager.getGlobalTransform());
-
-                //    localRoot.add(object);
-                //}
-            }
-            level--;
-        }
-
-        function async_callback_gate() {
-
-            var progress = {
-                total: total_models,
-                loaded: total_models - counter_models
-            };
-
-            //upate progress
-            scope.manager.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_PROGRESS, progress: progress });
-
-            if (counter_models == 0) {
-                counter_models -= 1;
-                callbackFinished(result);
-            }
-        }
-
-        handle_children(localRoot, data.objects);
-
-        localRoot.updateMatrixWorld(true);
-        // just in case there are no async elements
-        async_callback_gate();
-    }
-};
-
-/**
- * @author Liwei.Ma
- * Load the index, material and mpkIndex
- */
-CLOUD.TaskWorker = function (threadCount, finishCallback) {
-
-    this.MaxThreadCount = threadCount || 6;
-
-    var scope = this;
-    scope.todoList = {};
-    scope.todoCount = 0;
-    scope.doingCount = 0;
-
-    this.hasTask = function () {
-        return scope.todoCount > 0;
-    };
-
-    this.addItem = function (id, item) {
-        scope.todoList[id] = item;
-        scope.todoCount++;
-    };
-
-    this.clearTasks = function () {
-        scope.todoList = {};
-        scope.todoCount = 0;
-    };
-
-    this.run = function (renderId, loader, sorter) {
-
-        var scope = this;
-        if (scope.doingCount > 0) {
-            //console.log("busy");
-            return;
-        }
-
-        var items = [];
-
-        var todoList = scope.todoList;
-        for (var name in todoList) {
-            items.push(todoList[name]);
-        }
-        //console.log(scope.todoCount + "/" + items.length);
-        scope.todoList = {};
-        scope.todoCount = 0;
-
-        var itemCount = items.length;
-        if (itemCount == 0) return;
-
-        if (sorter) {
-            items.sort(sorter);
-        }
-
-        itemCount = Math.min(itemCount, CLOUD.GlobalData.MaxLoadSceneCount);
-
-        var TASK_COUNT = Math.min(this.MaxThreadCount, itemCount);
-        scope.doingCount = itemCount;
-
-        function processItem(i) {
-
-            if (i >= itemCount) {
-                if (scope.doingCount < 1) {
-                    finishCallback();
-                }
-                return;
-            }
-
-            var item = items[i];
-
-            loader(item, i + TASK_COUNT, processItem);
-        }
-
-        for (var ii = 0; ii < TASK_COUNT; ++ii) {
-            processItem(ii);
-        }
-    };
-};
-
-CLOUD.FileTaskWorker = function (threadCount) {
-
-    this.MaxThreadCount = threadCount || 6;
-
-    var scope = this;
-
-    this.doingCount = 0;
-
-    this.run = function (fileItems, loader, onFinished) {
-
-        var items = [];
-        var itemCount = 0;
-        for (var item in fileItems) {
-            items[itemCount] = item;
-            ++itemCount;
-        }
-
-        if (itemCount == 0) return;
-
-        var scope = this;
-        scope.doingCount = itemCount;
-
-        var TASK_COUNT = Math.min(this.MaxThreadCount, itemCount);
-
-        function processItem(i) {
-
-            if (i >= itemCount) {
-
-                if (scope.doingCount < 1) {
-                    //finished
-                    onFinished();
-                }
-
-                return;
-            }
-
-            var mpkId = items[i];
-
-            loader(mpkId, i + TASK_COUNT, processItem);
-        }
-
-        for (var ii = 0; ii < TASK_COUNT; ++ii) {
-            processItem(ii);
-        }
-    };
-};
-
-CLOUD.MpkNodeTaskWorker = function (threadCount) {
-
-    this.MaxThreadCount = threadCount || 8;
-
-    var scope = this;
-
-    this.todoList = {};
-    this.doingCount = 0;
-
-    this.listners = [];
-
-    this.addItem = function (mpkId, item) {
-
-        if (mpkId === undefined) {
-            console.log("undefined mpkId");
-            return;
-        }
-
-        if (this.todoList[mpkId] === undefined) this.todoList[mpkId] = [];
-
-        this.todoList[mpkId].push(item);
-    };
-
-    this.run = function (loader, onFinished) {
-
-        if (this.doingCount > 0) {
-            this.listners.push(onFinished);
-            return;
-        }
-
-        var doingList = this.todoList;
-        this.todoList = {};
-
-        var items = [];
-
-        for (var item in doingList) {
-            items.push(item);
-        }
-
-        var scope = this;
-        var itemCount = items.length;
-        if (itemCount == 0) {
-            onFinished();
-            return;
-        }
-
-        var doingListners = this.listners;
-        this.listners = [];
-
-        scope.doingCount = itemCount;
-
-        var TASK_COUNT = Math.min(this.MaxThreadCount, itemCount);
-
-        function processItem(i) {
-
-            if (i >= itemCount) {
-
-                if (scope.doingCount < 1) {
-                    // next loop
-                    onFinished(0, itemCount);
-
-                    for (var ii = 0, len = doingListners.length; ii < len; ++ii) {
-                        doingListners[ii](0, itemCount);
-                    }
-                    doingListners = [];
-
-                    scope.run(loader, function () {});
-                } else {
-                    onFinished(scope.doingCount, itemCount);
-                }
-
-                return;
-            }
-
-            if (i >= TASK_COUNT) onFinished(scope.doingCount, itemCount);
-
-            var mpkId = items[i];
-            //console.log(mpkId);
-            loader(mpkId, doingList[mpkId], i + TASK_COUNT, processItem);
-        }
-
-        for (var ii = 0; ii < TASK_COUNT; ++ii) {
-            processItem(ii);
-        }
-    };
-};
-
-CLOUD.TaskManager = function (manager, finishCallback) {
-    this.manager = manager;
-    this.onTaskFinished = finishCallback;
-
-    var scope = this;
-
-    // MPK
-    this.mpkWorker = new CLOUD.MpkNodeTaskWorker(8);
-
-    // SubScene
-    this.sceneWorker = new CLOUD.TaskWorker(10, function () {
-        if (scope.onTaskFinished) scope.onTaskFinished();
+    });
+
+    // load spatial index
+    var octreeLoader = this.octreeLoader;
+    octreeLoader.load(this.octreeUrl('o'), function (rootNode) {
+        scope.octreeRootNode = rootNode;
+        CLOUD.Logger.log("octreeLoader outer layer.");
+    });
+    octreeLoader.load(this.octreeUrl('i'), function (rootNode) {
+        scope.octreeRootNodeI = rootNode;
+        CLOUD.Logger.log("octreeLoader inner layer.");
     });
 };
 
-CLOUD.TaskManager.prototype = {
+CLOUD.Model.prototype.destroy = function () {
+    this.cache = null;
+    this.cfgInfo = null;
+    this.sceneLoader = null;
+    this.materialLoader = null;
+    this.symbolLoader = null;
+    this.meshLoader = null;
+    this.userIdReader = null;
+    this.octreeLoader = null;
+    this.octreeRootNode = null;
+    this.octreeRootNodeI = null;
+    this.visibleOctant = null;
+    this.materialReader = null;
+    this.symbolReader = null;
+    this.sceneArray = null;
+    this.mpkArray = null;
+};
 
-    constructor: CLOUD.TaskManager,
+CLOUD.Model.prototype.projectUrl = function () {
+    return this.serverUrl + this.databagId + "/config.json";
+};
 
-    addMpkTask: function addMpkTask(mpkId, param) {
+CLOUD.Model.prototype.sceneUrl = function (idx) {
+    idx = idx || 0;
+    return this.serverUrl + this.databagId + "/scene/scene_" + idx;
+};
 
-        this.mpkWorker.addItem(mpkId, param);
-    },
+CLOUD.Model.prototype.sceneIdUrl = function () {
+    return this.serverUrl + this.databagId + "/scene/scene_id";
+};
 
-    loadSceneFiles: function loadSceneFiles(client, onFinished) {
+CLOUD.Model.prototype.userIdUrl = function () {
+    return this.serverUrl + this.databagId + "/scene/user_id";
+};
 
-        var subScenes = client.index.metadata.subScenes;
-        if (subScenes == undefined) return;
+CLOUD.Model.prototype.octreeUrl = function (idx) {
+    idx = idx || 'o';
+    return this.serverUrl + this.databagId + "/scene/index_" + idx;
+};
 
-        client.subSceneItems = {};
-        var sceneItems = client.subSceneItems;
-        for (var ii = 0, len = subScenes.length; ii < len; ++ii) {
-            sceneItems[subScenes[ii]] = null;
+CLOUD.Model.prototype.symbolUrl = function () {
+    return this.serverUrl + this.databagId + "/symbol/symbol";
+};
+
+CLOUD.Model.prototype.mpkUrl = function (idx) {
+    idx = idx || 0;
+    return this.serverUrl + this.databagId + "/mpk/mpk_" + idx;
+};
+
+CLOUD.Model.prototype.meshIdUrl = function () {
+    return this.serverUrl + this.databagId + "/mpk/mesh_id";
+};
+
+CLOUD.Model.prototype.materialUrl = function () {
+    return this.serverUrl + this.databagId + "/material/material";
+};
+
+CLOUD.Model.prototype.materialIdUrl = function () {
+    return this.serverUrl + this.databagId + "/material/material_id";
+};
+
+CLOUD.Model.prototype.getTexturePath = function () {
+    return this.texturePath ? this.texturePath : THREE.Loader.prototype.extractUrlBase(this.materialUrl("material"));
+};
+
+CLOUD.Model.prototype.findMaterial = function (materialId, isInstanced) {
+
+};
+
+CLOUD.Model.prototype.setCrossOrigin = function (crossOrigin) {
+    this.crossOrigin = crossOrigin;
+};
+
+CLOUD.Model.prototype.parseMaterial = function (data) {
+
+    this.materialReader = new CLOUD.Loader.MaterialReader(data);
+
+    var materialReader = this.materialReader;
+    var len = materialReader.count;
+
+    if (len < 0) {
+        return;
+    }
+
+    for (var i = 0; i < len; ++i) {
+
+        var materialParameters = {};
+        var materialData = materialReader.getData(i);
+
+        if (materialData.color !== undefined) {
+            materialParameters.color = materialData.color;
         }
 
-        var worker = new CLOUD.FileTaskWorker(8);
+        if (materialData.opacity !== undefined) {
+            materialParameters.opacity = materialData.opacity;
 
-        function loadScene(sceneId, nextIdx, processNextItem) {
-            var url = client.sceneUrl(sceneId);
-            var loader = new THREE.XHRLoader();
-            loader.setCrossOrigin(true);
-
-            loader.load(url, function (data) {
-                --worker.doingCount;
-                sceneItems[sceneId] = JSON.parse(data);
-                processNextItem(nextIdx);
-            });
-        }
-        worker.run(sceneItems, loadScene, onFinished);
-    },
-
-    loadMpkFiles: function loadMpkFiles(client, onFinished) {
-
-        var mpkItems = client.mkpIndex.items;
-
-        var useArraybuffer = true;
-
-        //this.fileWorker =
-        var worker = new CLOUD.FileTaskWorker(8);
-        function loadRawData(mpkId, nextIdx, processNextItem) {
-            var url = client.mpkUrl(mpkId);
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200 || xhr.status === 0) {
-                        --worker.doingCount;
-
-                        mpkItems[mpkId].binaryData = xhr.response;
-                        processNextItem(nextIdx);
-                    }
-                }
-            };
-            xhr.open("GET", url, true);
-            if (useArraybuffer) {
-                xhr.responseType = "arraybuffer";
-            } else {
-                xhr.setRequestHeader("Content-Type", "text/plain; charset=x-user-defined");
-                xhr.overrideMimeType('text/plain; charset=x-user-defined');
+            if (materialData.opacity < 1.0) {
+                materialParameters.transparent = true;
             }
-            xhr.send(null);
         }
 
-        worker.run(mpkItems, loadRawData, onFinished);
-    },
-
-    processMpkTasks: function processMpkTasks(client, finishCallback) {
-
-        var scope = this;
-
-        function on_load_mesh(client, item) {
-
-            if (item === null) return;
-
-            var mesh = client.cache.geometries[item.meshNode.meshId];
-            if (mesh) {
-                item.meshNode.updateGeometry(mesh);
-            } else {
-                console.log("err: " + item + " may be in other mpk");
-            }
+        if (materialData.side !== undefined && materialData.side) {
+            materialParameters.side = THREE.DoubleSide;
         }
 
-        function loader(mpkId, items, nextIdx, callback) {
+        var material;
 
-            scope.manager.loadMpk(mpkId, client, function () {
-                if (items == undefined) console.log("error");
+        if (CLOUD.ShaderMaterial.ShaderLib === undefined) {
 
-                for (var ii = 0, len = items.length; ii < len; ++ii) {
-                    on_load_mesh(client, items[ii]);
-                }
+            material = new THREE.MeshBasicMaterial(materialParameters);
 
-                --scope.mpkWorker.doingCount;
-                // next task
-                callback(nextIdx);
-            });
-        }
+        } else {
 
-        this.mpkWorker.run(loader, finishCallback || function () {});
-    },
-
-    addSceneTask: function addSceneTask(sceneNode) {
-
-        this.sceneWorker.addItem(sceneNode.sceneId, sceneNode);
-    },
-
-    processSceneTasks: function processSceneTasks(client, renderId, load) {
-
-        var scope = this;
-
-        if (!load) {
-            scope.sceneWorker.clearTasks();
-        }
-
-        if (!scope.sceneWorker.hasTask()) return;
-
-        var sceneLoader = scope.manager.sceneLoader;
-
-        scope.sceneWorker.run(renderId, function (item, nextIdx, callback) {
-            var sceneNode = item;
-            if (sceneNode === undefined) console.warn("err");
-
-            if (sceneNode.loaded) {
-                --scope.sceneWorker.doingCount;
-                callback(nextIdx);
-                return;
+            if (materialData.emissive !== undefined) {
+                materialParameters.emissive = materialData.emissive;
             }
 
-            if (sceneNode.children.length == 0) {
-
-                sceneNode.loaded = true;
-                sceneLoader.load(sceneNode.sceneId, sceneNode, client, false, function () {
-
-                    --scope.sceneWorker.doingCount;
-                    sceneNode.visible = true;
-                    callback(nextIdx);
-                });
-            } else {
-                scope.manager.subSceneLoader.update(sceneNode);
-                sceneNode.visible = true;
-                --scope.sceneWorker.doingCount;
-                callback(nextIdx);
+            if (materialData.specular !== undefined) {
+                materialParameters.specular = materialData.specular;
             }
-        }, function (a, b) {
-            return a.distance - b.distance;
-        });
+
+            if (materialData.shininess !== undefined) {
+                materialParameters.shininess = materialData.shininess;
+            }
+
+            material = new THREE.MeshPhongMaterial(materialParameters);
+            material.type = 'phong_cust_clip';
+            material.uniforms = CLOUD.ShaderMaterial.ShaderLib.phong_cust_clip.uniforms;
+            material.vertexShader = CLOUD.ShaderMaterial.ShaderLib.phong_cust_clip.vertexShader;
+            material.fragmentShader = CLOUD.ShaderMaterial.ShaderLib.phong_cust_clip.fragmentShader;
+        }
+
+        material.name = i;
+        this.cache.materials[i] = material;
+        materialParameters = null;
+    }
+
+};
+
+CLOUD.Model.prototype.parseSymbol = function (data) {
+    this.symbolReader = new CLOUD.Loader.SymbolReader(data);
+};
+
+CLOUD.Model.prototype.parseMpk = function (data) {
+    var mpkReader = new CLOUD.Loader.MPKReader(data);
+
+    if (mpkReader.header.blockId < this.mpkCount) {
+        this.mpkArray[mpkReader.header.blockId] = mpkReader;
+    }
+
+    mpkReader = null;
+};
+
+CLOUD.Model.prototype.parseUserId = function (data) {
+    this.userIdReader = new CLOUD.Loader.IdReader(data);
+};
+
+CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
+    var meshPool = this.manager.scene.meshPool;
+    var cacheGeometries = this.cache.geometries;
+    var material = this.cache.materials[item.materialId];
+
+    // itemParent存在, 表示读取symbol数据
+    var originalId = itemParent ? itemParent.originalId : item.originalId;
+    var userId = this.userIdReader.getString(originalId);
+    var idxUserId = this.userIdReader.getIndex(userId);
+
+    if (idxUserId !== originalId) {
+        CLOUD.Logger.log("error->", originalId);
+    }
+
+    var meshInfo;
+
+    if (item.type == 1) {
+        meshInfo = CLOUD.GeomUtil.getMeshNodeAttr(cacheGeometries, reader, item, this.mpkArray, itemParent);
+    } else if (item.type == 2) {
+        meshInfo = CLOUD.GeomUtil.getMeshNodeAttrOfCube(cacheGeometries, reader, item, itemParent);
+    } else if (item.type == 3) {
+        meshInfo = CLOUD.GeomUtil.getMeshNodeAttrOfPipe(cacheGeometries, reader, item, itemParent);
+    } else if (item.type == 4) {
+        meshInfo = CLOUD.GeomUtil.getMeshNodeAttrOfBox(cacheGeometries, reader, item, itemParent);
+    }
+
+    if (!meshInfo) {
+        return;
+    }
+
+    if (this.cache.cells[cellId][meshInfo.nodeId]) {
+        CLOUD.Logger.log("nodeId:" + meshInfo.nodeId + " exist");
+    }
+
+    this.cache.cells[cellId][meshInfo.nodeId] = {
+        nodeId: meshInfo.nodeId,
+        userId: userId,
+        meshId: meshInfo.meshId,
+        matrix: meshInfo.matrix,
+        materialId: item.materialId
+    };
+
+    var geometry = cacheGeometries[meshInfo.meshId];
+    var meshNode = meshPool.get({
+        nodeId: meshInfo.nodeId,
+        userId: userId,
+        geometry: geometry,
+        matrix: meshInfo.matrix,
+        material: material
+    });
+
+    meshInfo = null;
+
+    if (!meshNode) {
+        CLOUD.Logger.log("the pool is full !!!");
     }
 };
 
+CLOUD.Model.prototype.readSymbol = function (id, cellId, itemParent) {
+
+    if (this.symbolReader == null) {
+        return;
+    }
+
+    var symbolCount = this.symbolReader.header.symbolCount;
+
+    if (id >= 0 && id < symbolCount) {
+        var symbolCurrent = this.symbolReader.getSymbol(id);
+
+        for (var i = symbolCurrent.itemIndex; i < symbolCurrent.itemCount; ++i) {
+            var item = this.symbolReader.getItem(i);
+
+            if (item.type == 0) {
+                continue;
+            }
+
+            this.readMesh(this.symbolReader, cellId, item, itemParent);
+        }
+    }
+};
+
+CLOUD.Model.prototype.prepare = function (camera, clearPool) {
+
+    var sceneCount = this.sceneArray ? this.sceneArray.length : 0;
+
+    if (sceneCount < 1) {
+        return;
+    }
+
+    var sceneReader = this.sceneArray[0];
+
+    if (!sceneReader) {
+        CLOUD.Logger.log("Empty scene");
+        return;
+    }
+
+    CLOUD.Logger.time("prepareScene");
+
+    var cellCount = 0;
+
+    // FRUSTUM Querying Cost < 1 ms
+    // console.time("frustum");
+    if (CLOUD.GlobalData.DisableOctant) {
+        cellCount = sceneReader.header.cellCount;
+    } else {
+
+        if (!(this.octreeRootNode && this.octreeRootNodeI) ) {
+            CLOUD.Logger.log("octree load is not finish!");
+            return;
+        }
+
+        this.visibleOctant.length = 0;
+
+        //If inner scene contains camera, prioritize inner cells, else prioritize outer cells
+        var frustum = this.manager.getWorldFrustum(camera, true);
+        var cameraPos = camera.position;
+        var bCameraOutsideScene = cameraPos.x < this.octreeRootNodeI.min.x || cameraPos.x > this.octreeRootNodeI.max.x ||
+            cameraPos.y < this.octreeRootNodeI.min.y || cameraPos.y > this.octreeRootNodeI.max.y ||
+            cameraPos.z < this.octreeRootNodeI.min.z || cameraPos.z > this.octreeRootNodeI.max.z;
+        var depth = CLOUD.GlobalData.OctantDepth; // traverse till depth arrived.
+        // draw bounding of outer layer for test.
+        this.manager.updateOctreeBox(this.octreeRootNode);
+
+        var depthCriteria = CLOUD.GlobalData.MaximumDepth * 0.7;
+        var target = camera.target;
+        var camDir = new THREE.Vector3(target.x - cameraPos.x, target.y - cameraPos.y, target.z - cameraPos.z );
+        camDir.normalize();
+        var octantSize = new THREE.Vector3();
+
+        if (bCameraOutsideScene) {
+            // Outer cell only
+            this.octreeRootNode.intersectFrustumWithPriority(frustum, depth, cameraPos, camDir, false, depthCriteria, this.visibleOctant);
+            CLOUD.Logger.log("Outer: ", this.visibleOctant.length);
+        } else {
+            // Inner cell should get higher priority than outer, while generally the pool is large enough in this case.
+            this.octreeRootNodeI.intersectFrustumWithPriority(frustum, depth, cameraPos, camDir, true, depthCriteria, this.visibleOctant);
+            CLOUD.Logger.log("Inner: ", this.visibleOctant.length);
+            this.octreeRootNode.intersectFrustumWithPriority(frustum, depth, cameraPos, camDir, true, depthCriteria, this.visibleOctant);
+        }
+
+        //CLOUD.Logger.log("visibleOctant", visibleOctant.join(','));
+        cellCount = this.visibleOctant.length;
+        CLOUD.Logger.log("Total Octant Count: ", this.visibleOctant.length);
+    }
+
+    if (cellCount === 0) return;
+    var meshPool = this.manager.scene.meshPool;
+
+    // begin sort
+    if (!CLOUD.GlobalData.DisableOctant ) {
+        this.visibleOctant.sort(function (a, b) {
+            if(!bCameraOutsideScene) {
+                // special case: promote octant which contains camera
+                var bCameraOutsideOctantA = cameraPos.x < a.min.x || cameraPos.x > a.max.x ||
+                    cameraPos.y < a.min.y || cameraPos.y > a.max.y ||
+                    cameraPos.z < a.min.z || cameraPos.z > a.max.z;
+                if(!bCameraOutsideOctantA) {
+                    return -1;
+                }
+
+                var bCameraOutsideOctantB = cameraPos.x < b.min.x || cameraPos.x > b.max.x ||
+                    cameraPos.y < b.min.y || cameraPos.y > b.max.y ||
+                    cameraPos.z < b.min.z || cameraPos.z > b.max.z;
+
+                if(!bCameraOutsideOctantB) {
+                    return 1;
+                }
+            }
+            if (a.priority > b.priority) {
+                //  sort a to a lower index than b, i.e. a comes first.
+                return -1;
+            } else if (a.priority < b.priority) {
+                return 1;
+            }
+            // same priority
+            return 0;
+        });
+    }
+    //end of simple prioritized algorithm
+    // console.timeEnd("frustum");
+    // END OF FRUSTUM Querying Cost < 1 ms
+
+    if (clearPool) {
+        meshPool.clear();
+    }
+
+    // var cacheGeometry = this.cache.geometries;
+
+    for (var i = 0; i < cellCount; ++i) {
+
+        var cellId;
+
+        if (CLOUD.GlobalData.DisableOctant) {
+            cellId = i;
+        } else {
+            cellId = this.visibleOctant[i].octantId;
+        }
+
+        if (this.cache.cells[cellId]) {
+
+            for (var id in this.cache.cells[cellId]) {
+                var nodeId = this.cache.cells[cellId][id].nodeId;
+                var userId = this.cache.cells[cellId][id].userId;
+                var meshId = this.cache.cells[cellId][id].meshId;
+                var matrix = this.cache.cells[cellId][id].matrix;
+                var materialId = this.cache.cells[cellId][id].materialId;
+                var geometry = this.cache.geometries[meshId];
+                var material = this.cache.materials[materialId];
+                var meshNode = meshPool.get({
+                    nodeId: nodeId,
+                    userId: userId,
+                    geometry: geometry,
+                    matrix: matrix,
+                    material: material
+                });
+
+                if (!meshNode) {
+                    continue;
+                }
+
+            }
+
+        } else {
+
+            // 缓存node数据
+
+            if (!this.cache.cells[cellId]) {
+                this.cache.cells[cellId] = {};
+            }
+
+            var cell = sceneReader.getCell(cellId);
+            for (var j = cell.itemIndex; j < cell.itemCount; ++j) {
+
+                var item = sceneReader.getItem(j);
+
+                if (item == undefined) {
+                    continue;
+                }
+
+                if (item.type == 0) {
+                    var matrixParent = sceneReader.getMatrix(item.matrixId).matrix;
+                    var itemParent = {
+                        matrix : matrixParent,
+                        ItemId : item.ItemId,
+                        originalId: item.originalId
+                    };
+                    this.readSymbol(item.attrIndex, cellId, itemParent);
+                } else {
+                    this.readMesh(sceneReader, cellId, item);
+                }
+            }
+
+        }
+    }
+
+
+    CLOUD.Logger.log("mesh count:", meshPool.counter);
+    CLOUD.Logger.timeEnd("prepareScene");
+};
+
+CLOUD.Model.prototype.clearCells = function () {
+    this.cache.cells = {};
+};
 /**
  * @author Liwei.Ma
  */
+
 CLOUD.ModelManager = function () {
 
-    THREE.LoadingManager.call(this);
-    //this.onStart = function () { console.log("start"); };
-    //this.onLoad = function () { console.log("load"); }
-    //this.onProgress = function () { console.log("progress"); }
-    this.onError = function () {
-        console.log("error");
-    };
+    // THREE.LoadingManager.call(this);
 
     this.scene = new CLOUD.Scene();
 
-    this.headLamp = new THREE.DirectionalLight(0xB7B7CE, 0.8);
-    this.assistLamp = new THREE.DirectionalLight(0x333333, 0.8);
-
-    var hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
-    //hemiLight.color.setHSL( 1, 1, 1 );
-    //hemiLight.groundColor.setHSL( 0.5, 0.5, 0.5 );
-    //hemiLight.position.set( 0, -500, -500 );
-    this.scene.add(hemiLight);
-    this.scene.add(this.headLamp);
-    this.scene.add(this.assistLamp);
-
-    // Loaders
-    this.mpkLoader = new CLOUD.MpkLoader();
-    this.sceneLoader = new CLOUD.SceneLoader(this, true);
-    this.boxLoader = new CLOUD.SceneBoxLoader(this, true);
-    this.subSceneLoader = new CLOUD.SubSceneLoader(this, true);
-
-    this.clients = {};
-
-    this.vertexCount = 0;
-    this.triangleCount = 0;
-
-    this.loading = false;
-
-    this.lightOffset = new THREE.Vector3(-1, -1, -1);
-    this.lightOffset.normalize();
+    this.crossOrigin = true;
+    this.models = {};
 };
 
-CLOUD.ModelManager.prototype = Object.create(THREE.LoadingManager.prototype);
-
-CLOUD.ModelManager.prototype.constructor = CLOUD.ModelManager;
+// CLOUD.ModelManager.prototype = Object.create(THREE.LoadingManager.prototype);
+//
+// CLOUD.ModelManager.prototype.constructor = CLOUD.ModelManager;
 
 CLOUD.ModelManager.prototype.destroy = function () {
 
     this.scene.destroy();
 
-    for (var name in this.clients) {
-        this.clients[name].destroy();
+    for (var name in this.models) {
+        this.models[name].destroy();
     }
-    this.clients = {};
 
-    this.vertexCount = 0;
-    this.triangleCount = 0;
-
-    CLOUD.PrimitiveCount.vertexCount = 0;
-    CLOUD.PrimitiveCount.triangleCount = 0;
+    this.models = {};
 };
 
-CLOUD.ModelManager.prototype.updateLights = function (camera) {
+CLOUD.ModelManager.prototype.prepareScene = function (camera) {
 
-    var headLamp = this.headLamp;
-    headLamp.position.copy(camera.getWorldDirection()).multiplyScalar(-1);
-    headLamp.updateMatrixWorld(true);
+    var clearPool = true;
+    var counter = 0;
 
-    var assistLamp = this.assistLamp;
-    assistLamp.position.copy(headLamp.position).add(this.lightOffset).normalize();
-    assistLamp.updateMatrixWorld();
+    for(var id in this.models) {
+
+        if (this.models.hasOwnProperty(id)) {
+
+            if (counter > 1) {
+                clearPool = false;
+            }
+
+            counter++;
+
+            var model = this.models[id];
+            model.prepare(camera, clearPool);
+        }
+    }
+
 };
 
-CLOUD.ModelManager.prototype.prepareScene = function (camera, renderId, ignoreLoad) {
+CLOUD.ModelManager.prototype.clearScene = function () {
 
-    // update scene
-    //this.scene.prepareSceneBox(camera);
+    for(var id in this.models) {
 
-    this.scene.prepareScene(camera);
+        if (this.models.hasOwnProperty(id)) {
 
-    //var geometriesSize = 0;
-    //geometriesSize += CLOUD.PrimitiveCount.vertexCount * 24; // 字节 4 * 3 * 2 (vertex + normal)
-    //geometriesSize += CLOUD.PrimitiveCount.triangleCount * 12; // 字节 4 * 3
+            var model = this.models[id];
+            model.clearCells();
 
-    //console.log("2-0", geometriesSize);
+        }
+    }
 
-    //if (geometriesSize  < CLOUD.GlobalData.GPUMemoryBudget) {
-    this.prepareResource(renderId, !ignoreLoad);
-    //}
+};
+
+CLOUD.ModelManager.prototype.prepareResource = function (renderId, load) {
+
 };
 
 CLOUD.ModelManager.prototype.loadBuidingOutside = function (camera) {
 
-    this.scene.prepareOutside(camera);
-    CLOUD.GlobalData.MaxLoadSceneCount = 120;
-    this.prepareResource(0, true);
-    CLOUD.GlobalData.MaxLoadSceneCount = 40;
-};
-
-CLOUD.ModelManager.prototype.collectionGarbage = function () {
-
-    if (CLOUD.GlobalData.GarbageCollection) {
-        this.scene.collectionGarbage();
-    }
 };
 
 CLOUD.ModelManager.prototype.getGlobalTransform = function () {
     return this.scene.rootNode.matrix;
 };
 
-// load index
-CLOUD.ModelManager.prototype.loadIndex = function (parameters, callback) {
-
-    var scope = this;
-
-    // get from cache
-    var client = this.clients[parameters.databagId];
-    if (client === undefined) {
-        client = new CLOUD.Client(this, parameters.serverUrl, parameters.databagId);
-
-        if (scope.onUpdateViewer) {
-            client.setTaskFinishedCallback(function () {
-                scope.onUpdateViewer();
-            });
-        }
-
-        this.clients[parameters.databagId] = client;
-    } else {
-        return client;
-    }
-
-    var count = 0;
-    for (var name in this.clients) {
-        count++;
-    }
-    client.slave = count > 1;
-
-    // var sceneLoader = this.sceneLoader;
-
-    var idxLoader = new CLOUD.IndexLoader(true, this);
-    idxLoader.load(client, function () {
-        callback(client);
-    });
-
-    return client;
-};
-
 /**
-* @param parameters {databagId, serverUrl, debug}
-*/
+ * @param parameters {databagId, serverUrl, debug}
+ */
 CLOUD.ModelManager.prototype.load = function (parameters) {
 
-    var scope = this;
+    // get from cache
+    var model = this.models[parameters.databagId];
 
-    var scene = this.scene;
+    if (model === undefined) {
 
-    return this.loadIndex(parameters, function (client) {
+        model = new CLOUD.Model(this, parameters.serverUrl, parameters.databagId);
 
-        scope.loading = true;
-        var defaultSceneId = client.index.metadata.scenes[0];
-
-        if (defaultSceneId === undefined) {
-            scope.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_EMPTYSCENE });
-            return;
-        }
-
-        if (parameters.byBox) {
-            scope.boxLoader.load(defaultSceneId, scene, client, function (result) {});
-        } else {
-
-            scope.sceneLoader.load(defaultSceneId, scene, client, true, function (result, count) {
-
-                if (count == 0) {
-                    scope.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_EMPTYSCENE });
-                    return;
-                }
-
-                scope.loadLinks(result, client);
-
-                if (!scene.innerBoundingBox.empty()) {
-                    //
-                    var worldBox = scene.worldBoundingBox();
-                    scene.innerBoundingBox.max.y = worldBox.max.y;
-                    scene.innerBoundingBox.min.y = worldBox.min.y;
-
-                    //var clr = 0xff;
-                    //var boxNode = new CLOUD.BBoxNode(scene.innerBoundingBox, clr);
-                    //scene.add(boxNode);
-                }
-            });
-        }
-    });
-};
-
-/**
-* @param parameters {scene, databagId, serverUrl, debug}
-*/
-CLOUD.ModelManager.prototype.loadLinks = function (result, client) {
-    var scope = this;
-    var sceneLoader = this.sceneLoader;
-
-    client.linkSceneIdx = -1;
-
-    var loadLinkedScenes = function loadLinkedScenes(result) {
-
-        client.linkSceneIdx++;
-        var linkScenes = client.index.metadata.linkScenes;
-
-        if (linkScenes == undefined || linkScenes.length < 1) {
-            scope.loading = false;
-            scope.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_COMPLETE });
-            return;
-        }
-
-        if (client.linkSceneIdx < linkScenes.length) {
-            var sceneId = linkScenes[client.linkSceneIdx];
-            //console.log("Linked scene: " + sceneId);
-            sceneLoader.load(sceneId, scope.scene, client, true, loadLinkedScenes);
-        } else {
-            scope.loading = false;
-            scope.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_COMPLETE });
-        }
-    };
-
-    loadLinkedScenes(result);
-};
-
-CLOUD.ModelManager.prototype.loadMpk = function (mpkId, client, callback) {
-    var mpkLoader = this.mpkLoader;
-    var mpkIdx = client.mkpIndex.items[mpkId];
-
-    if (!mpkIdx) {
-        console.log("missing mpk " + mpkId);
-        callback();
-        return;
+        this.models[parameters.databagId] = model;
     }
-    // Reuse if possible.
-    if (mpkIdx.status) {
-        if (mpkIdx.status == CLOUD.MPKSTATUS.LOADED) {
-            callback();
-            return;
-        }
-
-        if (mpkIdx.status == CLOUD.MPKSTATUS.LOADING) {
-            mpkIdx.addEventListener("ON_MPK_LOADED", function () {
-                callback();
-            });
-            return;
-        }
+    else {
+        return model;
     }
 
-    THREE.EventDispatcher.prototype.apply(mpkIdx);
-    mpkIdx.status = CLOUD.MPKSTATUS.LOADING;
+    model.load();
 
-    var scope = this;
-    // multi-threading o3dgc decoding, disable it by default, revisit this when performance turning.
-    // "CLOUD.MpkLoader.prototype.load" get tested only for non "parameters.binaryData" situation.
-    var useWorker = CLOUD.GlobalData.UseMpkWorker && typeof window.Worker === "function";
-    mpkLoader.load(mpkId, mpkIdx, client, function (mesh) {
-
-        scope.vertexCount += mesh.getAttribute("position").count;
-        scope.triangleCount += mesh.getIndex().count / 3;
-        //if (vertexCount >= CLOUD.GlobalData.MaxVertex ||
-        //    triangleCount >= CLOUD.GlobalData.MaxTriangle) {
-        //    resource.bOutOfLimitation = true;
-        //}
-        client.cache.geometries[mesh.name] = mesh;
-    }, function () {
-        mpkIdx.status = CLOUD.MPKSTATUS.LOADED;
-        callback();
-        mpkIdx.dispatchEvent({ type: "ON_MPK_LOADED" });
-        mpkIdx._listeners = {};
-        mpkIdx.items = null;
-    }, useWorker);
+    return model;
 };
 
-CLOUD.ModelManager.prototype.prepareResource = function (renderId, load) {
+// 跨域设置
+CLOUD.ModelManager.prototype.setCrossOrigin = function (crossOrigin) {
+    this.crossOrigin = crossOrigin;
+};
 
-    //if (!CLOUD.GlobalData.DynamicRelease || this.loading)
-    //    return;
+CLOUD.ModelManager.prototype.getMatrixWorldOfRootNode = function () {
+    return this.scene.getMatrixWorldOfRootNode();
+};
 
-    for (var ii in this.clients) {
-        var client = this.clients[ii];
-        client.processSceneTasks(renderId, load);
-        //client.purgeUnusedResource();
+// CLOUD.ModelManager.prototype.getMatrixWorldInverseForOriginalCamera = function (camera) {
+//
+//     var rootMatrixWorld = this.scene.getMatrixWorldOfRootNode();
+//     var matrixWorldInverse = new THREE.Matrix4();
+//
+//     // rootNode.matrixWorld * oriCamera.matrixWorld = camera.matrixWorld
+//     matrixWorldInverse.getInverse(rootMatrixWorld);
+//     matrixWorldInverse.multiply(camera.matrixWorld);
+//     matrixWorldInverse.getInverse(matrixWorldInverse);
+//
+//     return matrixWorldInverse;
+// };
+
+// 获取场景变换前的相机对应的Frustum
+CLOUD.ModelManager.prototype.getWorldFrustum = function (camera, transform) {
+
+    var matrixWorldInverse = new THREE.Matrix4();
+    var frustum = new THREE.Frustum();
+
+    if (transform) {
+
+        matrixWorldInverse.getInverse(camera.matrixWorld);
+        frustum.setFromMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, matrixWorldInverse));
+
+    } else {
+
+        var worldCamera = camera.clone();
+        var targetPost = camera.target;
+        // 计算场景变换后的相机位置和目标点的距离
+        var distancePost = targetPost.clone().sub(camera.position).length();
+        // 获得场景 root node 变换矩阵
+        var matrixWorldRoot = this.getMatrixWorldOfRootNode();
+        // 逆矩阵
+        var matrixInverseRoot = new THREE.Matrix4();
+        matrixInverseRoot.getInverse(matrixWorldRoot);
+
+        // 抽取旋转矩阵
+        var matrixRotation = new THREE.Matrix4();
+        matrixRotation.extractRotation(matrixWorldRoot);
+        var quaternion = new THREE.Quaternion();
+        quaternion.setFromRotationMatrix(matrixRotation);
+        quaternion.inverse();// 反转
+
+        // 计算场景变换前的相机位置
+        worldCamera.position.applyMatrix4(matrixInverseRoot);
+
+        // 计算场景变换前的目标位置
+        var targetPre = targetPost.clone();
+        targetPre.applyMatrix4(matrixInverseRoot);
+
+        // 计算场景变换前的相机方向
+        // var dirPre = camera.getWorldDirection();
+        // dirPre.applyQuaternion(quaternion).normalize();
+        var dirPre = targetPre.clone().sub(worldCamera.position);
+
+        // 计算场景变换前的相机位置和目标点的距离
+        var distancePre = dirPre.length();
+
+        dirPre.normalize();
+
+        // 计算场景变换前的相机 near 和 far
+        var scaleCoe = distancePre / distancePost;
+        // worldCamera.near = camera.near * scaleCoe;
+        worldCamera.far = camera.far * scaleCoe;
+
+        // 计算场景变换前的相机up和realUp
+        // var up = camera.position.clone().add(camera.up);
+        // up.applyMatrix4(inverseMatrix).sub(worldCamera.position).normalize();
+        // var realUp = camera.position.clone().add(camera.realUp);
+        // realUp.applyMatrix4(inverseMatrix).sub(worldCamera.position).normalize();
+        // worldCamera.up.copy(up);
+        // worldCamera.realUp.copy(realUp);
+        worldCamera.up.applyQuaternion(quaternion).normalize();
+        worldCamera.realUp.applyQuaternion(quaternion).normalize();
+        worldCamera.updateProjectionMatrix();
+        worldCamera.updateMatrixWorld();
+
+        matrixWorldInverse.getInverse(worldCamera.matrixWorld);
+        frustum.setFromMatrix(new THREE.Matrix4().multiplyMatrices(worldCamera.projectionMatrix, matrixWorldInverse));
+
+        worldCamera = null;
     }
+
+    return frustum;
+};
+
+CLOUD.ModelManager.prototype.updateOctreeBox = function (rootNode) {
+
+    this.scene.updateOctreeBox(rootNode);
+
 };
 
 THREE.EventDispatcher.prototype.apply(CLOUD.ModelManager.prototype);
-
-// handleViewHouseEvent
-CLOUD.EditorManager = function () {
-
-    this.editor = null;
-
-    this.editors = {};
-
-    this.animationDuration = 500; // 500毫秒
-    this.animationFrameTime = 13; // 周期性执行或调用函数之间的时间间隔，以毫秒计
-    this.enableAnimation = false; // 是否允许动画
-    this.isUpdateRenderList = true; // 是否更新渲染列表
-
-    this.movePad = null;
-
-    var scope = this;
-    var _canMouseMoveOperation = false; // 是否可以进行mouseMove相关操作
-
-    function touchmove(event) {
-        scope.editor.touchmove(event);
-    }
-
-    function touchstart(event) {
-        scope.editor.touchstart(event);
-    }
-
-    function touchend(event) {
-        scope.editor.touchend(event);
-    }
-
-    function onKeyDown(event) {
-        scope.editor.onKeyDown(event);
-    }
-
-    function onKeyUp(event) {
-        scope.editor.onKeyUp(event);
-    }
-
-    function onMouseWheel(event) {
-        scope.editor.onMouseWheel(event);
-    }
-
-    function onMouseDown(event) {
-
-        // 每次按下鼠标激活canvas
-        setFocuse();
-
-        _canMouseMoveOperation = true;
-        scope.isUpdateRenderList = false;
-
-        var isAnimating = scope.isAnimating();
-
-        // 判断是否在动画中, 若是动画中，不响应事件
-        if (isAnimating) return;
-
-        scope.editor.onMouseDown(event);
-    }
-
-    function onMouseMove(event) {
-
-        var isAnimating = scope.isAnimating();
-
-        // 判断是否在动画中, 若是动画中，不响应事件
-        if (isAnimating) return;
-
-        // 其它交互
-        if (_canMouseMoveOperation) {
-            // 不更新渲染列表
-            scope.isUpdateRenderList = false;
-            scope.editor.onMouseMove(event);
-        }
-    }
-
-    function onMouseUp(event) {
-
-        var isAnimating = scope.isAnimating();
-
-        // 只要存在up事件，允许更新渲染列表
-        scope.isUpdateRenderList = true;
-
-        var isCanMouseMove = _canMouseMoveOperation;
-        // 只要存在up事件，就将其置为false
-        _canMouseMoveOperation = false;
-
-        // 判断是否在动画中, 若是动画中，不响应事件
-        if (isAnimating) return;
-
-        if (isCanMouseMove) {
-            // 其它交互
-            scope.editor.onMouseUp(event);
-        }
-    }
-
-    function onMouseDoubleClick(event) {
-        scope.editor.onMouseDoubleClick(event);
-    }
-
-    function setFocuse() {
-        // 设置焦点
-        var dom = scope.editor.getDomElement();
-        if (dom) {
-            var canvas = dom.querySelector("#cloud-main-canvas");
-            if (canvas) canvas.focus();
-        }
-    }
-
-    // 返回鼠标运动状态
-    this.isMouseMoving = function () {
-
-        return _canMouseMoveOperation;
-    };
-
-    this.registerDomEventListeners = function (domElement) {
-
-        domElement.addEventListener('contextmenu', function (event) {
-            event.preventDefault();
-        }, false);
-        domElement.addEventListener('mousedown', onMouseDown, false);
-        domElement.addEventListener('mousewheel', onMouseWheel, false);
-        domElement.addEventListener('DOMMouseScroll', onMouseWheel, false); // firefox
-        domElement.addEventListener('dblclick', onMouseDoubleClick, false);
-
-        // 注册在document上会影响dbgUI的resize事件
-        window.addEventListener('mousemove', onMouseMove, false);
-        window.addEventListener('mouseup', onMouseUp, false);
-
-        domElement.addEventListener('touchstart', touchstart, false);
-        domElement.addEventListener('touchend', touchend, false);
-        domElement.addEventListener('touchmove', touchmove, false);
-
-        //window.addEventListener( 'keydown', onKeyDown, false );
-        //window.addEventListener( 'keyup', onKeyUp, false );
-        domElement.addEventListener('keydown', onKeyDown, false);
-        domElement.addEventListener('keyup', onKeyUp, false);
-
-        setFocuse();
-    };
-
-    this.unregisterDomEventListeners = function (domElement) {
-
-        domElement.removeEventListener('contextmenu', function (event) {
-            event.preventDefault();
-        }, false);
-        domElement.removeEventListener('mousedown', onMouseDown, false);
-        domElement.removeEventListener('mousewheel', onMouseWheel, false);
-        domElement.removeEventListener('DOMMouseScroll', onMouseWheel, false); // firefox
-        domElement.removeEventListener('dblclick', onMouseDoubleClick, false);
-
-        // 注册在document上会影响dbgUI的resize事件
-        window.removeEventListener('mousemove', onMouseMove, false);
-        window.removeEventListener('mouseup', onMouseUp, false);
-
-        domElement.removeEventListener('touchstart', touchstart, false);
-        domElement.removeEventListener('touchend', touchend, false);
-        domElement.removeEventListener('touchmove', touchmove, false);
-
-        //window.removeEventListener( 'keydown', onKeyDown, false );
-        //window.removeEventListener( 'keyup', onKeyUp, false );
-        domElement.removeEventListener('keydown', onKeyDown, false);
-        domElement.removeEventListener('keyup', onKeyUp, false);
-    };
-};
-
-CLOUD.EditorManager.prototype = {
-
-    constructor: CLOUD.EditorManager,
-
-    destroy: function destroy() {
-
-        this.editor = null;
-        for (var name in this.editors) {
-            var editor = this.editors[name];
-            editor.destroy();
-        }
-        this.editors = {};
-    },
-
-    setEditor: function setEditor(newEditor, slaveEditor) {
-
-        if (this.editor !== null) {
-            if (this.editor == this.editors['orbitEditor']) {
-                //this.movePad.hideOverlay();
-            }
-            this.editor.onExistEditor();
-        }
-
-        if (slaveEditor) newEditor.slaveEditor = slaveEditor;
-
-        if (newEditor == this.editors['orbitEditor']) {
-            //this.movePad.showOverlay();
-        }
-
-        this.editor = newEditor;
-    },
-
-    setPickMode: function setPickMode(viewer) {
-        var scope = this;
-
-        var pickEditor = this.editors["pickEditor"];
-
-        if (pickEditor === undefined) {
-
-            pickEditor = new CLOUD.PickEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
-            pickEditor.onObjectSelected = function (intersect, doubleClick) {
-                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect, click: doubleClick ? 2 : 1 });
-            };
-            this.editors["pickEditor"] = pickEditor;
-        }
-
-        scope.setEditor(pickEditor);
-    },
-
-    getOrbitEditor: function getOrbitEditor(viewer) {
-
-        var orbitEditor = this.editors["orbitEditor"];
-        if (orbitEditor === undefined) {
-            orbitEditor = new CLOUD.OrbitEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
-            this.editors["orbitEditor"] = orbitEditor;
-            if (this.movePad == null) {
-                //this.movePad = new CLOUD.MovePad(viewer);
-            }
-        }
-
-        return orbitEditor;
-    },
-
-    getRectPickEditor: function getRectPickEditor(viewer) {
-
-        var rectPickEditor = this.editors["rectPickEditor"];
-        if (rectPickEditor === undefined) {
-
-            rectPickEditor = new CLOUD.RectPickEditor(this.getOrbitEditor(viewer), function (intersect, doubleClick) {
-                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect, click: doubleClick ? 2 : 1 });
-            });
-            rectPickEditor.onUpdateUI = function (obj) {
-                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_UPDATE_SELECTION_UI, data: obj });
-            };
-            this.editors["rectPickEditor"] = rectPickEditor;
-        }
-
-        return rectPickEditor;
-    },
-
-    setRectPickMode: function setRectPickMode(viewer, orbitBySelection) {
-        var scope = this;
-
-        var orbitEditor = this.getOrbitEditor(viewer);
-        var rectPickEditor = this.getRectPickEditor(viewer);
-
-        orbitEditor.orbitBySelection = orbitBySelection || false;
-        scope.setEditor(rectPickEditor, orbitEditor);
-    },
-
-    setRectZoomMode: function setRectZoomMode(viewer) {
-        var scope = this;
-
-        var editor = this.editors["rectZoomEditor"];
-        if (editor === undefined) {
-            editor = new CLOUD.RectZoomEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
-            editor.onUpdateUI = function (obj) {
-                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_UPDATE_SELECTION_UI, data: obj });
-            };
-            this.editors["rectZoomEditor"] = editor;
-        }
-
-        scope.setEditor(editor);
-    },
-
-    setOrbitMode: function setOrbitMode(viewer) {
-        var scope = this;
-
-        var orbitEditor = this.getOrbitEditor(viewer);
-
-        scope.setEditor(orbitEditor);
-    },
-
-    setZoomMode: function setZoomMode(viewer) {
-        var scope = this;
-
-        var zoomEditor = this.editors["zoomEditor"];
-        if (zoomEditor === undefined) {
-            zoomEditor = new CLOUD.ZoomEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
-            this.editors["zoomEditor"] = zoomEditor;
-        }
-
-        scope.setEditor(zoomEditor);
-    },
-
-    setPanMode: function setPanMode(viewer) {
-        var scope = this;
-
-        var panEditor = this.editors["panEditor"];
-        if (panEditor === undefined) {
-            panEditor = new CLOUD.PanEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
-            this.editors["panEditor"] = panEditor;
-        }
-
-        scope.setEditor(panEditor);
-    },
-
-    setClipPlanesMode: function setClipPlanesMode(viewer) {
-        var scope = this;
-
-        var clipPlanes = this.editors["clipPlanesEditor"];
-        if (clipPlanes === undefined) {
-            clipPlanes = new CLOUD.ClipPlanesEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement, function (intersect, doubleClick) {
-                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect, click: doubleClick ? 2 : 1 });
-            });
-            clipPlanes.onUpdateUI = function (obj) {
-                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_UPDATE_SELECTION_UI, data: obj });
-            };
-            this.editors["clipPlanesEditor"] = clipPlanes;
-            clipPlanes.update(viewer.camera);
-        }
-
-        scope.setEditor(clipPlanes);
-    },
-
-    setFlyMode: function setFlyMode(bShowControlPanel, viewer) {
-        var scope = this;
-
-        var flyEditor = this.editors["flyEditor"];
-        if (flyEditor === undefined) {
-            flyEditor = new CLOUD.FlyEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
-            this.editors["flyEditor"] = flyEditor;
-        }
-
-        var rectPickEditor = this.getRectPickEditor(viewer);
-
-        scope.setEditor(rectPickEditor, flyEditor);
-        flyEditor.showControlPanel(bShowControlPanel);
-        flyEditor.activate();
-    },
-
-    isFlyMode: function isFlyMode() {
-        if (this.editor === this.editors["flyEditor"]) {
-            return true;
-        }
-
-        return false;
-    },
-
-    zoomIn: function zoomIn(factor, viewer) {
-        //if(factor === undefined){
-        //    factor = viewer.camera.zoom * 1.1;
-        //}
-
-        // 缩放时，改变相机缩放因子zoom，就会改变相机FOV，从而造成模型显示变形
-        // 思路：保持相机FOV和目标点位置不变，调整相机位置达到缩放的目的
-        //this.camera.setZoom(factor);
-
-        // 放大，factor > 0
-        if (factor === undefined) {
-            factor = 0.1;
-        }
-
-        if (factor < 0) {
-            factor = 0;
-        }
-
-        viewer.cameraEditor.zoom(factor);
-    },
-
-    zoomOut: function zoomOut(factor, viewer) {
-
-        //if(factor === undefined){
-        //    factor = viewer.camera.zoom * 0.9;
-        //}
-        //if(factor < 0.28){
-        //    factor = 0.28;
-        //}
-
-        // 缩放时，改变相机缩放因子zoom，就会改变相机FOV，从而造成模型显示变形
-        // 思路：保持相机FOV和目标点位置不变，调整相机位置达到缩放的目的
-        //this.camera.setZoom(factor);
-
-        if (factor === undefined) {
-            factor = 0.1;
-        }
-
-        if (factor > 0) {
-            factor *= -1;
-        } else {
-            factor = 0;
-        }
-
-        // 缩小，factor < 0
-        viewer.cameraEditor.zoom(factor);
-    },
-
-    zoomAll: function zoomAll(viewer, margin, ratio) {
-        var box = viewer.getScene().worldBoundingBox();
-        var target = viewer.camera.zoomToBBox(box, margin, ratio);
-        viewer.cameraEditor.updateCamera(target);
-
-        viewer.render();
-    },
-
-    isAnimating: function isAnimating() {
-        return this.enableAnimation && this.animator && this.animator.isPlaying();
-    },
-
-    setStandardView: function setStandardView(stdView, viewer, margin, callback) {
-
-        var camera = viewer.camera;
-
-        if (this.enableAnimation) {
-
-            if (!this.animator) {
-                this.animator = new CLOUD.CameraAnimator();
-            }
-
-            this.animator.setDuration(this.animationDuration);
-            this.animator.setFrameTime(this.animationFrameTime);
-            this.animator.setStandardView(stdView, viewer, margin, callback);
-        } else {
-
-            var box = viewer.getScene().worldBoundingBox();
-            var target = camera.setStandardView(stdView, box); // 设置观察视图
-
-            // fit all
-            target = viewer.camera.zoomToBBox(box, margin);
-            viewer.cameraEditor.updateCamera(target);
-            viewer.render();
-
-            // 是否回调
-            callback && callback();
-
-            camera.up.copy(THREE.Object3D.DefaultUp); // 渲染完成后才可以恢复相机up方向
-        }
-    },
-
-    setTopView: function setTopView(viewer, box, margin, ratio) {
-
-        var camera = viewer.camera;
-        var worldBox = viewer.getScene().worldBoundingBox();
-        var target = camera.setStandardView(CLOUD.EnumStandardView.ISO, worldBox); // 设置观察视图
-
-        if (box) {
-            // fit all
-            target = camera.zoomToBBox(box, margin, ratio);
-        } else {
-            target = camera.zoomToBBox(worldBox, margin, ratio);
-        }
-
-        viewer.cameraEditor.updateCamera(target);
-        viewer.render();
-
-        camera.up.copy(THREE.Object3D.DefaultUp); // 渲染完成后才可以恢复相机up方向
-    }
-};
-
 CLOUD.ClipWidget = function (plane, center) {
     THREE.Object3D.call(this);
 
-    this.uniforms = CloudShaderLib.phong_cust_clip.uniforms;
+    this.uniforms = CLOUD.ShaderMaterial.ShaderLib.phong_cust_clip.uniforms;
 
     this.uniforms.vClipPlane.value[0] = plane.clone();
 
@@ -19338,24 +20037,24 @@ CLOUD.ClipWidget = function (plane, center) {
     var unitY = new THREE.Vector3(0, 1, 0);
 
     this.onUpdateClipPlane = function (enabled, clipplane, m) {
-        CloudShaderLib.base_cust_clip.uniforms.iClipPlane.value = enabled;
+        CLOUD.ShaderMaterial.ShaderLib.base_cust_clip.uniforms.iClipPlane.value = enabled;
         if (clipplane !== undefined) {
-            CloudShaderLib.base_cust_clip.uniforms.vClipPlane.value[0] = clipplane.clone();
+            CLOUD.ShaderMaterial.ShaderLib.base_cust_clip.uniforms.vClipPlane.value[0] = clipplane.clone();
         }
         if (m !== undefined) {
-            CloudShaderLib.base_cust_clip.uniforms.vClipPlane.value[0].applyMatrix4(m);
+            CLOUD.ShaderMaterial.ShaderLib.base_cust_clip.uniforms.vClipPlane.value[0].applyMatrix4(m);
         }
-    };
+    }
 
     this.enable = function (enable, visible) {
         this.visible = visible;
         this.uniforms.iClipPlane.value = enable ? 1 : 0;
 
         this.onUpdateClipPlane(this.isEnabled());
-    };
+    }
     this.isEnabled = function () {
         return this.uniforms.iClipPlane.value == 1;
-    };
+    }
     this.horizon = function (enable) {
         if (enable) {
             this.quaternion.setFromAxisAngle(unitX, -halfPi);
@@ -19365,7 +20064,7 @@ CLOUD.ClipWidget = function (plane, center) {
             this.position.copy(this.center);
         }
         this.recaculateClipplane();
-    };
+    }
     this.update = function (camera) {
         coord = this.coord;
 
@@ -19379,7 +20078,7 @@ CLOUD.ClipWidget = function (plane, center) {
 
         scale = worldPosition.distanceTo(camPosition) / 6 * this.size;
         coord.scale.set(scale, scale, scale);
-    };
+    }
 
     this.recaculateClipplane = function () {
         this.updateMatrix();
@@ -19390,7 +20089,7 @@ CLOUD.ClipWidget = function (plane, center) {
         this.uniforms.vClipPlane.value[0].applyMatrix4(m);
 
         this.onUpdateClipPlane(this.isEnabled(), this.clipplane, m);
-    };
+    }
     this.position.copy(this.center);
     this.recaculateClipplane();
 
@@ -19410,7 +20109,7 @@ CLOUD.ClipWidget = function (plane, center) {
         tmpClipplane.w -= dist;
 
         this.onUpdateClipPlane(this.isEnabled(), tmpClipplane);
-    };
+    }
 
     var rotXOld = 0;
     this.rotX = function (rot) {
@@ -19424,7 +20123,7 @@ CLOUD.ClipWidget = function (plane, center) {
         this.quaternion.multiply(tempQuaternion);
 
         this.recaculateClipplane();
-    };
+    }
 
     var rotYOld = 0;
     this.rotY = function (rot) {
@@ -19438,7 +20137,7 @@ CLOUD.ClipWidget = function (plane, center) {
         this.quaternion.multiply(tempQuaternion);
 
         this.recaculateClipplane();
-    };
+    }
 
     this.snap = function (mouse, camera) {
         this.raycaster.setFromCamera(mouse, camera);
@@ -19480,7 +20179,8 @@ CLOUD.ClipWidget = function (plane, center) {
     };
 
     this.onMouseDown = function (event) {
-        if (this.axis !== null) {}
+        if (this.axis !== null) {
+        }
         return true;
     };
 
@@ -19488,7 +20188,7 @@ CLOUD.ClipWidget = function (plane, center) {
         this.snap(mouse, camera);
     };
 
-    this.hitTest = function (ray) {
+    this.hitTest = function(ray){
         var plane = new THREE.Plane();
         var v4 = this.uniforms.vClipPlane.value[0];
         plane.setComponents(v4.x, v4.y, v4.z, v4.w);
@@ -19500,6 +20200,9 @@ CLOUD.ClipWidget = function (plane, center) {
 CLOUD.ClipWidget.prototype = Object.create(THREE.Object3D.prototype);
 CLOUD.ClipWidget.prototype.constructor = CLOUD.ClipWidget;
 
+
+
+
 CLOUD.ClipEditor = function (object, scene, domElement) {
     CLOUD.OrbitEditor.call(this, object, scene, domElement);
 
@@ -19507,7 +20210,7 @@ CLOUD.ClipEditor = function (object, scene, domElement) {
     this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, PAN: THREE.MOUSE.MIDDLE, ZOOM: THREE.MOUSE.RIGHT };
 
     this.toggle = function (enable, visible) {
-        if (CloudShaderLib === undefined) {
+        if (CLOUD.ShaderMaterial.ShaderLib === undefined) {
             return;
         }
 
@@ -19515,7 +20218,7 @@ CLOUD.ClipEditor = function (object, scene, domElement) {
     };
 
     this.visible = function (enable) {
-        if (CloudShaderLib === undefined) {
+        if (CLOUD.ShaderMaterial.ShaderLib === undefined) {
             return;
         }
 
@@ -19523,7 +20226,7 @@ CLOUD.ClipEditor = function (object, scene, domElement) {
     };
 
     this.horizon = function (enable) {
-        if (CloudShaderLib === undefined) {
+        if (CLOUD.ShaderMaterial.ShaderLib === undefined) {
             return;
         }
 
@@ -19531,7 +20234,7 @@ CLOUD.ClipEditor = function (object, scene, domElement) {
     };
 
     this.set = function (offset) {
-        if (CloudShaderLib === undefined) {
+        if (CLOUD.ShaderMaterial.ShaderLib === undefined) {
             return;
         }
 
@@ -19539,7 +20242,7 @@ CLOUD.ClipEditor = function (object, scene, domElement) {
     };
 
     this.rotX = function (rot) {
-        if (CloudShaderLib === undefined) {
+        if (CLOUD.ShaderMaterial.ShaderLib === undefined) {
             return;
         }
 
@@ -19547,7 +20250,7 @@ CLOUD.ClipEditor = function (object, scene, domElement) {
     };
 
     this.rotY = function (rot) {
-        if (CloudShaderLib === undefined) {
+        if (CLOUD.ShaderMaterial.ShaderLib === undefined) {
             return;
         }
 
@@ -19555,12 +20258,13 @@ CLOUD.ClipEditor = function (object, scene, domElement) {
     };
 
     this.update = function (camera) {
-        if (clipWidget === undefined) return;
+        if (clipWidget === undefined)
+            return;
         clipWidget.update(camera);
     };
 
     this.backup = function () {
-        if (CloudShaderLib === undefined) {
+        if (CLOUD.ShaderMaterial.ShaderLib === undefined) {
             return null;
         }
 
@@ -19568,12 +20272,12 @@ CLOUD.ClipEditor = function (object, scene, domElement) {
     };
 
     this.restore = function (status, offset, rotx, roty) {
-        if (CloudShaderLib === undefined) {
+        if (CLOUD.ShaderMaterial.ShaderLib === undefined) {
             return;
         }
 
         return clipWidget.restore(status, offset, rotx, roty);
-    };
+    }
 };
 CLOUD.ClipEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
 CLOUD.ClipEditor.prototype.constructor = CLOUD.ClipEditor;
@@ -19612,7 +20316,6 @@ CLOUD.ClipEditor.prototype.onMouseMove = function ( event ) {
 	camera_scope.process(event.clientX, event.clientY);
 };
 */
-
 CLOUD.ClipPlanes = function (size, center) {
     THREE.Object3D.call(this);
 
@@ -19634,7 +20337,7 @@ CLOUD.ClipPlanes = function (size, center) {
 
     this.planeOffset = new Array(6);
 
-    this.uniforms = CloudShaderLib.phong_cust_clip.uniforms;
+    this.uniforms = CLOUD.ShaderMaterial.ShaderLib.phong_cust_clip.uniforms;
 
     this.clipplanes = null;
 
@@ -19650,21 +20353,32 @@ CLOUD.ClipPlanes = function (size, center) {
         return planeNormal;
     };
 
-    this.planeMaterial = new THREE.MeshPhongMaterial({ opacity: 0.3, transparent: true, side: THREE.DoubleSide, color: 0x6699cc });
-    this.planeHighLightMatrial = new THREE.MeshPhongMaterial({ opacity: 0.3, transparent: true, side: THREE.DoubleSide, color: 0x00FF80 });
+    this.planeMaterial = new THREE.MeshPhongMaterial({
+        opacity: 0.3,
+        transparent: true,
+        side: THREE.DoubleSide,
+        color: 0x6699cc
+    });
+    this.planeHighLightMatrial = new THREE.MeshPhongMaterial({
+        opacity: 0.3,
+        transparent: true,
+        side: THREE.DoubleSide,
+        color: 0x00FF80
+    });
     this.initPlaneModel = function (face) {
         var index = Math.floor(face / 2);
         var mod = face % 2;
 
-        var width = index == 0 ? this.cubeSize.z : this.cubeSize.x;
-        var height = index == 1 ? this.cubeSize.z : this.cubeSize.y;
+        var width = (index == 0 ? this.cubeSize.z : this.cubeSize.x);
+        var height = (index == 1) ? this.cubeSize.z : this.cubeSize.y;
 
         var plane = new THREE.PlaneGeometry(width, height);
         var planeMesh = new THREE.Mesh(plane, this.planeMaterial.clone());
         planeMesh.name = faceName[face];
         planeMesh.customTag = true;
         planeMesh.position.setComponent(index, Math.pow(-1, mod) * this.cubeSize.getComponent(index) * 0.5);
-        if (index == 0) planeMesh.rotation.y = Math.pow(-1, mod) * Math.PI * 0.5;else if (index == 1) planeMesh.rotation.x = Math.pow(-1, mod) * Math.PI * 0.5;
+        if (index == 0) planeMesh.rotation.y = Math.pow(-1, mod) * Math.PI * 0.5;
+        else if (index == 1) planeMesh.rotation.x = Math.pow(-1, mod) * Math.PI * 0.5;
         //else if (index == 2 && mod == 0) planeMesh.rotation.x = Math.PI;
 
         this.add(planeMesh);
@@ -19679,7 +20393,7 @@ CLOUD.ClipPlanes = function (size, center) {
         return this.uniforms.iClipPlane.value == 0 ? false : true;
     };
 
-    var ClipPlanesInfo = function ClipPlanesInfo(enable, visible, rotatable, calculation, planeOffset, position, scale, quaternion, cubeSize, center) {
+    ClipPlanesInfo = function (enable, visible, rotatable, calculation, planeOffset, position, scale, quaternion, cubeSize, center) {
         this.enable = enable;
         this.visible = visible;
         this.rotatable = rotatable;
@@ -19693,7 +20407,8 @@ CLOUD.ClipPlanes = function (size, center) {
     };
 
     this.store = function () {
-        return new ClipPlanesInfo(this.uniforms.iClipPlane.value ? true : false, this.visible, this.rotatable, this.calculation, this.planeOffset, this.position.clone(), this.scale.clone(), this.quaternion.clone(), this.cubeSize.clone(), this.center.clone());
+        return new ClipPlanesInfo(this.uniforms.iClipPlane.value ? true : false, this.visible, this.rotatable, this.calculation, this.planeOffset, this.position.clone(), this.scale.clone(), this.quaternion.clone(),
+            this.cubeSize.clone(), this.center.clone());
     };
 
     this.restore = function (info) {
@@ -19772,7 +20487,8 @@ CLOUD.ClipPlanes = function (size, center) {
             this.planeOffset[face] -= offset;
             offset = size - this.planeOffset[face];
             this.planeOffset[face] = size;
-        } else if (mod == 1 && this.planeOffset[face] < -size) {
+        }
+        else if (mod == 1 && this.planeOffset[face] < -size) {
             this.planeOffset[face] -= offset;
             offset = -size - this.planeOffset[face];
             this.planeOffset[face] = -size;
@@ -19786,7 +20502,7 @@ CLOUD.ClipPlanes = function (size, center) {
             centerOffset.add(deltaOffset);
         }
 
-        var scale = 1 + centerOffset.getComponent(index) / this.cubeSize.getComponent(index);
+        var scale = 1 + (centerOffset.getComponent(index) / this.cubeSize.getComponent(index));
         if (scale > 0.0 && scale < 2.0) {
             this.scale.setComponent(index, scale);
             var tempClipPlane = this.uniforms.vClipPlane.value[face].clone();
@@ -19796,12 +20512,14 @@ CLOUD.ClipPlanes = function (size, center) {
             var offsetVector = new THREE.Vector3(tempNormal.x * deltaOffset, tempNormal.y * deltaOffset, tempNormal.z * deltaOffset);
             if (face % 2 == 1) {
                 this.position.sub(offsetVector.multiplyScalar(0.5));
-            } else {
+            }
+            else {
                 this.position.add(offsetVector.multiplyScalar(0.5));
             }
 
             this.update();
-        } else {
+        }
+        else {
             this.planeOffset[face] -= offset;
         }
     };
@@ -19825,12 +20543,14 @@ CLOUD.ClipPlanes = function (size, center) {
     };
 
     this.highLight = function () {
-        if (this.selectIndex == null) return;
+        if (this.selectIndex == null)
+            return;
         this.children[this.selectIndex].material = this.planeHighLightMatrial.clone();
     };
 
     this.cancelHighLight = function () {
-        if (this.selectIndex == null) return;
+        if (this.selectIndex == null)
+            return;
         this.children[this.selectIndex].material = this.planeMaterial.clone();
         this.selectIndex = null;
     };
@@ -19855,20 +20575,21 @@ CLOUD.ClipPlanes.prototype.hitTest = function (raycaster) {
         minSign = ray.direction.dot(plane.normal) < 0;
     }
 
-    return { sign: minSign, distance: minDistance };
+    return {sign: minSign, distance: minDistance};
 };
 
-CLOUD.ClipPlanes.prototype.raycast = function () {
+CLOUD.ClipPlanes.prototype.raycast = (function () {
     return function (raycaster, intersects) {
         var planeIntersects = [];
         var selectPlane;
         for (var i = 0, l = this.children.length; i < l; i++) {
-            CLOUD.intersectObject(this.children[i], raycaster, planeIntersects, true);
+            intersectObject(this.children[i], raycaster, planeIntersects, true);
             if (planeIntersects.length > 0) {
                 if (!selectPlane) {
                     selectPlane = planeIntersects.pop();
                     this.selectIndex = i;
-                } else {
+                }
+                else {
                     var plane = planeIntersects.pop();
                     if (plane.distance < selectPlane.distance) {
                         selectPlane = plane;
@@ -19878,12 +20599,12 @@ CLOUD.ClipPlanes.prototype.raycast = function () {
             }
         }
 
-        if (!selectPlane) this.selectIndex = null;
+        if (!selectPlane)
+            this.selectIndex = null;
 
         return false;
     };
-}();
-
+}());
 CLOUD.ClipPlanesEditor = function (object, scene, domElement, onSelectionChanged) {
     CLOUD.OrbitEditor.call(this, object, scene, domElement);
 
@@ -19900,10 +20621,9 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement, onSelectionChanged
 
     this.frustum = new THREE.Frustum();
 
-    this.intersectPoint = null;
     this.selectIndex = null;
-    this.normal = null;
-    this.plane = null;
+
+    this.planeDistance = 0;
 
     this.offsetSpeed = 0.02;
 
@@ -19913,7 +20633,7 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement, onSelectionChanged
     });
 
     this.toggle = function (enable, visible) {
-        if (CloudShaderLib === undefined) {
+        if (CLOUD.ShaderMaterial.ShaderLib === undefined) {
             return;
         }
 
@@ -19921,7 +20641,7 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement, onSelectionChanged
     };
 
     this.visible = function (enable) {
-        if (CloudShaderLib === undefined) {
+        if (CLOUD.ShaderMaterial.ShaderLib === undefined) {
             return;
         }
 
@@ -19929,7 +20649,7 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement, onSelectionChanged
     };
 
     this.rotatable = function (enable) {
-        if (CloudShaderLib === undefined) {
+        if (CLOUD.ShaderMaterial.ShaderLib === undefined) {
             return;
         }
 
@@ -19937,7 +20657,7 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement, onSelectionChanged
     };
 
     this.store = function () {
-        if (CloudShaderLib === undefined) {
+        if (CLOUD.ShaderMaterial.ShaderLib === undefined) {
             return;
         }
 
@@ -19945,7 +20665,7 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement, onSelectionChanged
     };
 
     this.restore = function (clipPlanesInfo) {
-        if (CloudShaderLib === undefined) {
+        if (CLOUD.ShaderMaterial.ShaderLib === undefined) {
             return;
         }
 
@@ -19953,11 +20673,60 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement, onSelectionChanged
     };
 
     this.reset = function () {
-        if (CloudShaderLib === undefined) {
+        if (CLOUD.ShaderMaterial.ShaderLib === undefined) {
             return;
         }
 
         clipPlanes.reset();
+    };
+
+    this.pointToScreen = function (point) {
+        var camera = this.cameraEditor.camera;
+        var viewProjMatrix = new THREE.Matrix4();
+        viewProjMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+
+        var point4 = new THREE.Vector4(point.x, point.y, point.z, 1.0);
+        point4.applyMatrix4(viewProjMatrix);
+
+        var screen = new THREE.Vector2();
+        screen.x = (point4.x / point4.w + 1.0) / 2;
+        screen.y = 1 - (point4.y / point4.w + 1.0) / 2;
+
+        var dim = this.cameraEditor.getContainerDimensions();
+
+        screen.x = screen.x * dim.width + dim.left;
+        screen.y = screen.y * dim.height + dim.top;
+
+        return screen;
+    };
+
+    this.getPlaneDistanceInScreen = function () {
+        if (this.selectIndex == null) return null;
+
+        if (this.selectIndex < 2) {
+            var right = clipPlanes.center.clone();
+            var left = clipPlanes.center.clone();
+
+            right.x -= clipPlanes.cubeSize.x;
+            left.x += clipPlanes.cubeSize.x;
+
+            var rightScreen = this.pointToScreen(right);
+            var leftScreen = this.pointToScreen(left);
+
+            return rightScreen.x - leftScreen.x;
+        }
+        else {
+            var top = clipPlanes.center.clone();
+            var bottom = clipPlanes.center.clone();
+
+            bottom.y -= clipPlanes.cubeSize.y;
+            top.y += clipPlanes.cubeSize.y;
+
+            var bottomScreen = this.pointToScreen(bottom);
+            var topScreen = this.pointToScreen(top);
+
+            return bottomScreen.y - topScreen.y;
+        }
     };
 
     this.getPickPoint = function (cx, cy) {
@@ -19966,8 +20735,8 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement, onSelectionChanged
         var canvasX = cx - canvasContainer.left;
         var canvasY = cy - canvasContainer.top;
         // 规范化到[-1, 1]
-        var normalizedX = canvasX / canvasContainer.width * 2.0 - 1.0;
-        var normalizedY = (canvasContainer.height - canvasY) / canvasContainer.height * 2.0 - 1.0;
+        var normalizedX = (canvasX / canvasContainer.width) * 2.0 - 1.0;
+        var normalizedY = ((canvasContainer.height - canvasY) / canvasContainer.height) * 2.0 - 1.0;
 
         var raycaster = new CLOUD.Raycaster();
         raycaster.setFromCamera(new THREE.Vector2(normalizedX, normalizedY), this.cameraEditor.object);
@@ -19988,45 +20757,43 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement, onSelectionChanged
         return clipPlanes.rotatable;
     };
 
-    this.getPlane = function () {
-        this.normal = clipPlanes.uniforms.vClipPlane.value[this.selectIndex].clone();
-        //this.normal = this.cameraEditor.object.getWorldDirection().negate();
-
-        var plane = clipPlanes.uniforms.vClipPlane.value[(this.selectIndex + 2) % 6].clone();
-        var normal = new THREE.Vector3(plane.x, plane.y, plane.z);
-        plane = new THREE.Plane();
-        plane.setFromNormalAndCoplanarPoint(normal, this.intersectPoint);
-        return plane;
-    };
-
     this.offset = function (offset) {
-        if (this.selectIndex % 2 == 1) {
-            clipPlanes.offset(this.selectIndex, -offset * this.offsetSpeed);
-        } else {
-            clipPlanes.offset(this.selectIndex, offset * this.offsetSpeed);
+        var index = Math.floor(this.selectIndex / 2);
+        if (this.selectIndex <= 3) {
+            clipPlanes.offset(this.selectIndex, -offset * clipPlanes.cubeSize.getComponent(index) * 2);
+        }
+        else if (this.selectIndex % 2 == 1) {
+            clipPlanes.offset(this.selectIndex, -offset * clipPlanes.cubeSize.getComponent(index) * 2);
+        }
+        else {
+            clipPlanes.offset(this.selectIndex, offset * clipPlanes.cubeSize.getComponent(index) * 2);
         }
     };
 
     this.rotate = function (cx, cy) {
         if (this.selectIndex == 2 || this.selectIndex == 3) {
             clipPlanes.rotX(cy / 180 * Math.PI * 0.1);
-        } else {
+        }
+        else {
             clipPlanes.rotY(cx / 180 * Math.PI * 0.1);
         }
     };
 
     this.update = function (camera) {
-        if (clipPlanes === undefined) return;
+        if (clipPlanes === undefined)
+            return;
         clipPlanes.update(camera);
     };
 
     this.cancelHighLight = function () {
-        if (clipPlanes === undefined) return;
+        if (clipPlanes === undefined)
+            return;
         clipPlanes.cancelHighLight();
     };
 
     this.highLight = function () {
-        if (clipPlanes === undefined) return;
+        if (clipPlanes === undefined)
+            return;
         clipPlanes.highLight();
     };
 };
@@ -20046,6 +20813,7 @@ CLOUD.ClipPlanesEditor.prototype.updateFrustum = function (updateUI) {
         var tmp1 = x1;
         x1 = x2;
         x2 = tmp1;
+
     }
 
     if (y1 > y2) {
@@ -20053,9 +20821,11 @@ CLOUD.ClipPlanesEditor.prototype.updateFrustum = function (updateUI) {
         var tmp2 = y1;
         y1 = y2;
         y2 = tmp2;
+
     }
 
-    if (x2 - x1 == 0 || y2 - y1 == 0) return false;
+    if (x2 - x1 == 0 || y2 - y1 == 0)
+        return false;
 
     var helper = this.cameraEditor;
     var dim = helper.getContainerDimensions();
@@ -20063,7 +20833,7 @@ CLOUD.ClipPlanesEditor.prototype.updateFrustum = function (updateUI) {
     helper.computeFrustum(x1, x2, y1, y2, this.frustum, dim);
 
     if (updateUI) {
-        this.onUpdateUI({ visible: true, dir: this.startPt.x < this.endPt.x, left: x1 - dim.left, top: y1 - dim.top, width: x2 - x1, height: y2 - y1 });
+        this.onUpdateUI({visible: true, dir: this.startPt.x < this.endPt.x, left: (x1 - dim.left), top: (y1 - dim.top), width: (x2 - x1), height: (y2 - y1)});
     }
 
     return true;
@@ -20073,32 +20843,34 @@ CLOUD.ClipPlanesEditor.prototype.processMouseDown = function (event) {
     this.startPt.set(event.clientX, event.clientY);
 
     if (!this.enablePick && event.button === THREE.MOUSE.LEFT) {
-        this.intersectPoint = this.cameraEditor.getTrackingPoint(event.clientX, event.clientY);
+        this.cameraEditor.getTrackingPoint(event.clientX, event.clientY);
         this.selectIndex = this.getSelectIndex();
+
+        this.planeDistance = this.getPlaneDistanceInScreen();
     }
 
     if (this.selectIndex != null) {
-        this.plane = this.getPlane();
         this.highLight();
         this.cameraEditor.viewer.editorManager.isUpdateRenderList = true;
         this.cameraEditor.update(true);
-    } else {
+    }
+    else {
         CLOUD.OrbitEditor.prototype.processMouseDown.call(this, event);
     }
 };
 
 CLOUD.ClipPlanesEditor.prototype.processMouseUp = function (event) {
-    this.intersectPoint = null;
     this.selectIndex = null;
-    this.normal = null;
-    this.plane = null;
+
+    this.planeDistance = 0;
 
     if (this.enablePick && event.button === THREE.MOUSE.LEFT) {
-        this.onUpdateUI({ visible: false });
+        this.onUpdateUI({visible: false});
 
         if (this.startPt.x == event.clientX && this.startPt.y == event.clientY) {
             this.pickHelper.click(event);
-        } else {
+        }
+        else {
             var allowRectPick = event.shiftKey || event.ctrlKey || event.altKey;
             if (allowRectPick) {
 
@@ -20112,9 +20884,11 @@ CLOUD.ClipPlanesEditor.prototype.processMouseUp = function (event) {
 
                 if (event.ctrlKey) {
                     state = CLOUD.OPSELECTIONTYPE.Add;
-                } else if (event.altKey) {
+                }
+                else if (event.altKey) {
                     state = CLOUD.OPSELECTIONTYPE.Remove;
                 }
+
 
                 var scope = this;
                 this.scene.pickByReck(this.frustum, state, function () {
@@ -20136,6 +20910,7 @@ CLOUD.ClipPlanesEditor.prototype.processMouseUp = function (event) {
     return true;
 };
 
+
 CLOUD.ClipPlanesEditor.prototype.processMouseMove = function (event) {
     var allowRectPick = event.shiftKey || event.ctrlKey || event.altKey;
     if (allowRectPick && event.button === THREE.MOUSE.LEFT) {
@@ -20146,22 +20921,98 @@ CLOUD.ClipPlanesEditor.prototype.processMouseMove = function (event) {
 
     if (this.selectIndex != null) {
         if (!this.isRotate()) {
-            var point = this.getPickPoint(event.clientX, event.clientY);
-            var dir = new THREE.Vector3();
-            dir.subVectors(point, this.intersectPoint);
-            this.offset(dir.dot(this.normal) * dir.length());
-            this.intersectPoint = point;
-        } else {
+            var delta = 0;
+            if (this.selectIndex < 2) {
+                delta = event.clientX - this.startPt.x;
+            }
+            else {
+                delta = event.clientY - this.startPt.y;
+            }
+
+            this.offset(delta / this.planeDistance);
+            this.startPt.set(event.clientX, event.clientY);
+        }
+        else {
             this.rotate(event.clientX - this.startPt.x, event.clientY - this.startPt.y);
             this.startPt.set(event.clientX, event.clientY);
         }
         this.cameraEditor.update(true);
-    } else {
+    }
+    else {
         CLOUD.OrbitEditor.prototype.processMouseMove.call(this, event);
     }
 };
 
-CLOUD.ClipPlaneService = function (viewer) {
+CLOUD.ClipPlanesEditor.prototype.touchstart = function (event) {
+    event.preventDefault();
+
+    this.startPt.set(event.touches[0].clientX, event.touches[0].clientY);
+    if (!this.enablePick) {
+        this.cameraEditor.getTrackingPoint(event.touches[0].clientX, event.touches[0].clientY);
+        this.selectIndex = this.getSelectIndex();
+        this.planeDistance = this.getPlaneDistanceInScreen();
+    }
+
+    if (this.selectIndex != null) {
+        this.highLight();
+        this.cameraEditor.viewer.editorManager.isUpdateRenderList = true;
+        this.cameraEditor.update(true);
+    }
+    else {
+        this.cameraEditor.touchStartHandler(event);
+    }
+};
+
+CLOUD.ClipPlanesEditor.prototype.touchmove = function (event) {
+    event.preventDefault();
+
+    if (this.selectIndex != null) {
+        if (!this.isRotate()) {
+            var delta = 0;
+            if (this.selectIndex < 2) {
+                delta = event.touches[0].clientX - this.startPt.x;
+            }
+            else {
+                delta = event.touches[0].clientY - this.startPt.y;
+            }
+
+            this.offset(delta / this.planeDistance);
+            this.startPt.set(event.touches[0].clientX, event.touches[0].clientY);
+        }
+        else {
+            this.rotate(event.touches[0].clientX - this.startPt.x, event.touches[0].clientY - this.startPt.y);
+            this.startPt.set(event.touches[0].clientX, event.touches[0].clientY);
+        }
+        this.cameraEditor.update(true);
+    }
+    else {
+        this.cameraEditor.touchMoveHandler(event);
+    }
+};
+
+CLOUD.ClipPlanesEditor.prototype.touchend = function (event) {
+    event.preventDefault();
+
+    this.selectIndex = null;
+    this.planeDistance = 0;
+
+    if (this.enablePick) {
+        this.onUpdateUI({visible: false});
+
+        if (this.startPt.x == event.touches[0].clientX && this.startPt.y == event.touches[0].clientY) {
+            this.pickHelper.click(event);
+        }
+    }
+
+    this.cameraEditor.touchEndHandler(event);
+
+    this.cameraEditor.viewer.editorManager.isUpdateRenderList = true;
+    this.cancelHighLight();
+    this.cameraEditor.update(true);
+
+    return true;
+};
+CLOUD.ClipPlaneService = function(viewer) {
     this.viewer = viewer;
 };
 
@@ -20169,11 +21020,12 @@ CLOUD.ClipPlaneService.prototype = {
 
     construtor: CLOUD.ClipPlaneService,
 
-    destroy: function destroy() {
+    destroy: function() {
         this.viewer = null;
     },
 
-    update: function update(camera) {
+
+    update: function(camera) {
 
         var viewer = this.viewer;
         var clipEditor = viewer.editorManager.editors["clipEditor"];
@@ -20188,8 +21040,8 @@ CLOUD.ClipPlaneService.prototype = {
             viewer.render();
         }
     },
-
-    getClipEditor: function getClipEditor() {
+    
+    getClipEditor: function() {
 
         var viewer = this.viewer;
         var clipEditor = viewer.editorManager.editors["clipEditor"];
@@ -20203,7 +21055,7 @@ CLOUD.ClipPlaneService.prototype = {
         return clipEditor;
     },
 
-    getClipPlanesEditor: function getClipPlanesEditor() {
+    getClipPlanesEditor: function() {
 
         var viewer = this.viewer;
         var clipPlanesEditor = viewer.editorManager.editors["clipPlanesEditor"];
@@ -20218,609 +21070,177 @@ CLOUD.ClipPlaneService.prototype = {
     },
 
     // 关闭/开启切面功能，同时设置可见性
-    clipToggle: function clipToggle(enable, visible) {
+    clipToggle: function(enable, visible) {
 
         var viewer = this.viewer;
         var clipEditor = this.getClipEditor();
         clipEditor.toggle(enable, visible);
+
     },
 
     // 显示/隐藏切面
-    clipVisible: function clipVisible(enable) {
+    clipVisible: function(enable) {
 
         var clipEditor = this.getClipEditor();
         clipEditor.visible(enable);
+
     },
 
     // 设置切面为水平/竖直模式
     // 这是一个辅助函数，是对下面旋转功能的封装，保存/恢复状态不需记录/设定
-    clipHorizon: function clipHorizon(enable) {
+    clipHorizon: function(enable) {
 
         var clipEditor = this.getClipEditor();
         clipEditor.horizon(enable);
+
     },
 
     // 沿切面局部坐标移动切面(Z轴)
-    clipSetPlane: function clipSetPlane(offset) {
+    clipSetPlane: function(offset) {
 
         var clipEditor = this.getClipEditor();
 
         clipEditor.set(offset);
+
     },
 
     // 以切面局部坐标X轴为轴旋转切面
-    clipRotPlaneX: function clipRotPlaneX(rot) {
+    clipRotPlaneX: function(rot) {
 
         var clipEditor = this.getClipEditor();
         clipEditor.rotX(rot);
+
     },
 
     // 以切面局部坐标Y轴为轴旋转切面
-    clipRotPlaneY: function clipRotPlaneY(rot) {
+    clipRotPlaneY: function(rot) {
 
         var clipEditor = this.getClipEditor();
         clipEditor.rotY(rot);
+
     },
 
     // 保存切面状态，切面的位置及旋转状态数据的Object
     // 为减少依赖切面开启、可见状态未包含
-    backupClipplane: function backupClipplane() {
+    backupClipplane: function() {
 
         var clipEditor = this.getClipEditor();
         return clipEditor.backup();
+
     },
 
     // 恢复切面状态
     // 输入之前从backupClipplane保存的切面状态对象status，以及界面记录的偏移offset、X+Y轴选转量rotx+roty
     // 注意：offset+rotx+roty是界面状态，内部仅作初始值记录，界面更改后用新值与旧值计算增量控制切面
-    restoreClipplane: function restoreClipplane(status, offset, rotx, roty) {
+    restoreClipplane: function(status, offset, rotx, roty) {
 
         var clipEditor = this.getClipEditor();
         clipEditor.restore(status, offset, rotx, roty);
+
     },
 
-    clipPlanesToggle: function clipPlanesToggle(enable, visible) {
+
+    clipPlanesToggle: function(enable, visible) {
 
         var viewer = this.viewer;
         var clipPlanesEditor = this.getClipPlanesEditor();
         clipPlanesEditor.toggle(enable, visible);
+
     },
 
     // 显示/隐藏切面
-    clipPlanesVisible: function clipPlanesVisible(enable) {
+    clipPlanesVisible: function(enable) {
 
         var clipPlanesEditor = this.getClipPlanesEditor();
         clipPlanesEditor.visible(enable);
+
     },
 
-    clipPlanesRotatable: function clipPlanesRotatable(enable) {
+    clipPlanesRotatable: function(enable) {
 
         var clipPlanesEditor = this.getClipPlanesEditor();
         clipPlanesEditor.rotatable(enable);
+
     },
 
-    clipPlanesEnablePick: function clipPlanesEnablePick(enable) {
+    clipPlanesEnablePick : function (enable) {
         var clipPlanesEditor = this.getClipPlanesEditor();
         clipPlanesEditor.enablePick = enable;
     },
-
-    saveState: function saveState() {
+    
+    saveState: function() {
 
         var clipPlanesEditor = this.getClipPlanesEditor();
         return clipPlanesEditor.store();
+
     },
 
-    loadState: function loadState(info) {
+    loadState: function(info) {
 
         var clipPlanesEditor = this.getClipPlanesEditor();
         clipPlanesEditor.restore(info);
+
     },
 
-    clipPlanesReset: function clipPlanesReset() {
+    clipPlanesReset: function() {
 
         var clipPlanesEditor = this.getClipPlanesEditor();
         clipPlanesEditor.reset();
-    }
-};
 
-CLOUD.ExtensionHelper = function (viewer) {
-
-    this.viewer = viewer;
-    this.annotationHelper = null;
-    this.markerHelper = null;
-    this.miniMapHelper = null;
-};
-
-CLOUD.ExtensionHelper.prototype = {
-
-    constructor: CLOUD.ExtensionHelper,
-
-    destroy: function destroy() {
-
-        // TODO: clear other resources.
-        if (this.annotationHelper) {
-            this.annotationHelper.destroy();
-            this.annotationHelper = null;
-        }
-
-        if (this.markerHelper) {
-            this.markerHelper.destroy();
-            this.markerHelper = null;
-        }
-
-        if (this.miniMapHelper) {
-            this.miniMapHelper.destroy();
-            this.miniMapHelper = null;
-        }
-
-        this.viewer = null;
     },
-
-    // ------------------ 批注 API -- S ------------------ //
-
-    // 是否存在批注
-    hasAnnotations: function hasAnnotations() {
-
-        if (this.annotationHelper) {
-
-            return this.annotationHelper.hasAnnotations();
-        }
-
-        return false;
-    },
-
-    // 初始化批注
-    initAnnotation: function initAnnotation() {
-
-        if (!this.annotationHelper) {
-
-            this.annotationHelper = new CLOUD.Extensions.AnnotationHelper(this.viewer);
-        }
-
-        this.annotationHelper.initAnnotation();
-    },
-
-    // 卸载批注资源
-    uninitAnnotation: function uninitAnnotation() {
-
-        if (this.annotationHelper) {
-            this.annotationHelper.uninitAnnotation();
-        }
-    },
-
-    // 设置批注背景色
-    setAnnotationBackgroundColor: function setAnnotationBackgroundColor(startColor, stopColor) {
-
-        if (this.annotationHelper) {
-            this.annotationHelper.setAnnotationBackgroundColor(startColor, stopColor);
-        }
-    },
-
-    // 开始批注编辑
-    editAnnotationBegin: function editAnnotationBegin() {
-
-        if (!this.annotationHelper) {
-
-            this.annotationHelper = new CLOUD.Extensions.AnnotationHelper(this.viewer);
-        }
-
-        this.annotationHelper.editAnnotationBegin();
-    },
-
-    // 完成批注编辑
-    editAnnotationEnd: function editAnnotationEnd() {
-
-        if (this.annotationHelper) {
-            this.annotationHelper.editAnnotationEnd();
-        }
-    },
-
-    // 设置批注类型
-    setAnnotationType: function setAnnotationType(type) {
-
-        if (this.annotationHelper) {
-            this.annotationHelper.setAnnotationType(type);
-        }
-    },
-
-    // 设置批注风格
-    setAnnotationStyle: function setAnnotationStyle(style) {
-
-        if (this.annotationHelper) {
-            this.annotationHelper.setAnnotationStyle(style);
-        }
-    },
-
-    // 加载批注列表
-    loadAnnotations: function loadAnnotations(annotations) {
-
-        if (!this.annotationHelper) {
-
-            this.annotationHelper = new CLOUD.Extensions.AnnotationHelper(this.viewer);
-        }
-
-        this.annotationHelper.loadAnnotations(annotations);
-    },
-
-    // 获得批注对象列表
-    getAnnotationInfoList: function getAnnotationInfoList() {
-
-        if (this.annotationHelper) {
-            return this.annotationHelper.getAnnotationInfoList();
-        }
-
-        return null;
-    },
-
-    // resize
-    resizeAnnotations: function resizeAnnotations() {
-
-        if (this.annotationHelper) {
-            this.annotationHelper.resizeAnnotations();
-        }
-    },
-
-    // render
-    renderAnnotations: function renderAnnotations() {
-
-        if (this.annotationHelper) {
-            this.annotationHelper.renderAnnotations();
-        }
-    },
-
-    // 截屏 base64格式png图片
-    captureAnnotationsScreenSnapshot: function captureAnnotationsScreenSnapshot() {
-
-        if (this.annotationHelper) {
-            return this.annotationHelper.captureAnnotationsScreenSnapshot();
-        }
-
-        return null;
-    },
-
-    // ------------------ 批注 API -- E ------------------ //
-
-    // ------------------ 标记 API -- S ------------------ //
-    // 初始化Marker
-    initMarkerEditor: function initMarkerEditor() {
-
-        if (!this.markerHelper) {
-            this.markerHelper = new CLOUD.Extensions.MarkerHelper(this.viewer);
-        }
-
-        this.markerHelper.initMarkerEditor();
-    },
-
-    // 卸载Marker
-    uninitMarkerEditor: function uninitMarkerEditor() {
-
-        if (this.markerHelper) {
-            this.markerHelper.uninitMarkerEditor();
-        }
-    },
-
-    // zoom到合适的大小
-    zoomToSelectedMarkers: function zoomToSelectedMarkers() {
-
-        if (this.markerHelper) {
-            this.markerHelper.zoomToSelectedMarkers();
-        }
-    },
-
-    // 加载标记
-    loadMarkers: function loadMarkers(markerInfoList) {
-
-        if (!this.markerHelper) {
-            this.markerHelper = new CLOUD.Extensions.MarkerHelper(this.viewer);
-        }
-
-        if (this.markerHelper) {
-            this.markerHelper.loadMarkers(markerInfoList);
-        }
-    },
-
-    // 加载标记
-    loadMarkersFromIntersect: function loadMarkersFromIntersect(intersect, shapeType, state) {
-
-        if (!this.markerHelper) {
-            this.markerHelper = new CLOUD.Extensions.MarkerHelper(this.viewer);
-        }
-
-        if (this.markerHelper) {
-            this.markerHelper.loadMarkersFromIntersect(intersect, shapeType, state);
-        }
-    },
-
-    // 获得标记列表
-    getMarkerInfoList: function getMarkerInfoList() {
-
-        if (this.markerHelper) {
-            return this.markerHelper.getMarkerInfoList();
-        }
-
-        return null;
-    },
-
-    resizeMarkers: function resizeMarkers() {
-
-        if (this.markerHelper) {
-            this.markerHelper.resizeMarkers();
-        }
-    },
-
-    renderMarkers: function renderMarkers() {
-
-        if (this.markerHelper) {
-            this.markerHelper.renderMarkers();
-        }
-    },
-
-    // 根据id选择marker
-    selectMarkerById: function selectMarkerById(id) {
-
-        if (this.markerHelper) {
-            this.markerHelper.selectMarkerById(id);
-        }
-    },
-
-    getMarkersBoundingBox: function getMarkersBoundingBox() {
-
-        if (this.markerHelper) {
-            return this.markerHelper.getMarkersBoundingBox();
-        }
-
-        return null;
-    },
-
-    // 设置marker click 回调
-    setMarkerClickCallback: function setMarkerClickCallback(callback) {
-
-        if (!this.markerHelper) {
-            this.markerHelper = new CLOUD.Extensions.MarkerHelper(this.viewer);
-        }
-
-        this.markerHelper.setMarkerClickCallback(callback);
-    },
-
-    // ------------------ 小地图API -- S ------------------ //
-    createMiniMap: function createMiniMap(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid) {
-
-        if (!this.miniMapHelper) {
-            this.miniMapHelper = new CLOUD.Extensions.MiniMapHelper(this.viewer);
-        }
-
-        this.miniMapHelper.createMiniMap(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid);
-    },
-
-    destroyMiniMap: function destroyMiniMap(name) {
-
-        if (this.miniMapHelper) {
-            this.miniMapHelper.destroyMiniMap(name);
-        }
-    },
-
-    destroyAllMiniMap: function destroyAllMiniMap() {
-
-        if (this.miniMapHelper) {
-            this.miniMapHelper.destroyAllMiniMap();
-        }
-    },
-
-    removeMiniMap: function removeMiniMap(name) {
-
-        if (this.miniMapHelper) {
-            this.miniMapHelper.removeMiniMap(name);
-        }
-    },
-
-    appendMiniMap: function appendMiniMap(name) {
-
-        if (this.miniMapHelper) {
-            this.miniMapHelper.appendMiniMap(name);
-        }
-    },
-
-    getMiniMaps: function getMiniMaps() {
-
-        if (this.miniMapHelper) {
-            return this.miniMapHelper.getMiniMaps();
-        }
-
-        return null;
-    },
-
-    getMiniMap: function getMiniMap(name) {
-
-        if (this.miniMapHelper) {
-
-            return this.miniMapHelper.getMiniMap(name);
-        }
-
-        return null;
-    },
-
-    // 绘制小地图
-    renderMiniMap: function renderMiniMap() {
-
-        if (this.miniMapHelper) {
-            this.miniMapHelper.renderMiniMap();
-        }
-    },
-
-    // 设置平面图
-    setFloorPlaneData: function setFloorPlaneData(jsonObj) {
-
-        if (!this.miniMapHelper) {
-            this.miniMapHelper = new CLOUD.Extensions.MiniMapHelper(this.viewer);
-        }
-
-        this.miniMapHelper.setFloorPlaneData(jsonObj);
-    },
-
-    generateFloorPlane: function generateFloorPlane(name, changeView) {
-
-        if (this.miniMapHelper) {
-            this.miniMapHelper.generateFloorPlane(name, changeView);
-        }
-    },
-
-    // 设置轴网数据
-    setAxisGridData: function setAxisGridData(jsonObj, level) {
-
-        if (!this.miniMapHelper) {
-            this.miniMapHelper = new CLOUD.Extensions.MiniMapHelper(this.viewer);
-        }
-
-        this.miniMapHelper.setAxisGridData(jsonObj, level);
-    },
-
-    generateAxisGrid: function generateAxisGrid(name) {
-        if (this.miniMapHelper) {
-            this.miniMapHelper.generateAxisGrid(name);
-        }
-    },
-
-    // 是否显示隐藏轴网
-    showAxisGrid: function showAxisGrid(name, show) {
-
-        if (this.miniMapHelper) {
-            this.miniMapHelper.showAxisGrid(name, show);
-        }
-    },
-
-    enableAxisGridEvent: function enableAxisGridEvent(name, enable) {
-
-        if (this.miniMapHelper) {
-            this.miniMapHelper.enableAxisGridEvent(name, enable);
-        }
-    },
-
-    enableMiniMapCameraNode: function enableMiniMapCameraNode(name, enable) {
-
-        if (this.miniMapHelper) {
-            this.miniMapHelper.enableMiniMapCameraNode(name, enable);
-        }
-    },
-
-    flyBypAxisGridNumber: function flyBypAxisGridNumber(name, abcName, numeralName) {
-
-        if (this.miniMapHelper) {
-            this.miniMapHelper.flyBypAxisGridNumber(name, abcName, numeralName);
-        }
-    },
-
-    getDefaultMiniMap: function getDefaultMiniMap() {
-
-        if (this.miniMapHelper) {
-            return this.miniMapHelper.defaultMiniMap;
-        }
-
-        return null;
-    },
-
-    // ------------------ 小地图API -- E ------------------ //
-
-    // 扩展功能的 resize
-    resizeExtensions: function resizeExtensions() {
-
-        this.resizeMarkers();
-        this.resizeAnnotations();
-    },
-
-    // 扩展功能的 render
-    renderExtensions: function renderExtensions() {
-
-        // 刷新小地图
-        this.renderMiniMap();
-        // 刷新标记点
-        this.renderMarkers();
-        // 刷新批注
-        this.renderAnnotations();
-    }
-};
-
+}
 CLOUD.Viewer = function () {
+    "use strict";
 
     this.domElement = null;
     this.camera = null;
     this.renderer = null;
 
+    // 增量绘制
     this.requestRenderCount = 0;
+    this.requestRenderMaxCount = 10000;
     this.rendering = false;
-    this.renderIterator = 0;
-
+    this.incrementRenderHandle = 0;
     this.incrementRenderEnabled = true; // 启用增量绘制
-    this.updateRenderListEnabled = true; // 是否启用渲染队列更新
 
-    this.modelManager = new CLOUD.ModelManager();
-    this.extensionHelper = new CLOUD.ExtensionHelper(this);
-    this.Services = {};
+    this.callbacks = {};
+    this.services = {};
 
     this.tmpBox = new THREE.Box3();
-    var scope = this;
 
-    this.enableCameraNearFar = false; // 允许动态计算裁剪面
+    this.enableCameraNearFar = true; // 允许动态计算裁剪面
     this.currentHomeView = CLOUD.EnumStandardView.ISO; // home视图设置
 
-    function initializeView() {
-
-        //scope.setViewHouseVisibility(true);
-
-        scope.zoomAll();
-        // run once
-        scope.modelManager.removeEventListener(CLOUD.EVENTS.ON_LOAD_START, initializeView);
-    }
-
-    scope.modelManager.addEventListener(CLOUD.EVENTS.ON_LOAD_START, initializeView);
-
+    this.modelManager = new CLOUD.ModelManager();
     this.editorManager = new CLOUD.EditorManager();
 
     this.isRecalculationPlanes = false;
     this.calculationPlanesBind = this.calculationPlanes.bind(this);
-
-    this.callbacks = {};
-
     this.addRenderFinishedCallback(this.calculationPlanesBind);
 
-    //this.isMobile = 0;
-    //var u = navigator.userAgent;
-    //if (u.indexOf('Android') > -1) {
-    //    this.isMobile = 1;
-    //} else if (u.indexOf('iPhone') > -1) {
-    //    this.isMobile = 2;
-    //} else if (u.indexOf('Windows Phone') > -1) {
-    //    this.isMobile = 3;
-    //} else {
-    //
-
-
-    //}
 };
 
 CLOUD.Viewer.prototype = {
 
     constructor: CLOUD.Viewer,
 
-    destroy: function destroy() {
-
+    destroy: function () {
         this.removeAllCallbacks();
-
         this.editorManager.unregisterDomEventListeners(this.domElement);
-
         this.domElement.removeChild(this.domElement.childNodes[0]);
 
-        this.extensionHelper.destroy();
-
-        for (var id in this.Services) {
-            var service = this.Services[id];
+        for (var id in this.services) {
+            var service = this.services[id];
             service.destroy();
         }
-        this.Services = {};
 
+        this.services = {};
         this.editorManager.destroy();
-
-        this.renderer.destroy();
         this.modelManager.destroy();
+
+        if (this.renderer.destroy) {
+            this.renderer.destroy();
+        }
 
         this.renderer = null;
         this.modelManager = null;
@@ -20829,7 +21249,7 @@ CLOUD.Viewer.prototype = {
 
     // ------ 注册自定义回调函数 S -------------- //
     // 注册回调函数
-    addCallbacks: function addCallbacks(type, callback) {
+    addCallbacks: function (type, callback) {
 
         var list = this.callbacks[type];
 
@@ -20844,7 +21264,7 @@ CLOUD.Viewer.prototype = {
     },
 
     // 取消注册
-    removeCallbacks: function removeCallbacks(type, callback) {
+    removeCallbacks: function (type, callback) {
 
         var list = this.callbacks[type];
 
@@ -20860,7 +21280,7 @@ CLOUD.Viewer.prototype = {
     },
 
     // 取消所有注册
-    removeAllCallbacks: function removeAllCallbacks() {
+    removeAllCallbacks: function () {
 
         for (var type in this.callbacks) {
 
@@ -20880,7 +21300,7 @@ CLOUD.Viewer.prototype = {
     },
 
     // 响应render
-    onCallbacks: function onCallbacks(type) {
+    onCallbacks: function (type) {
 
         var list = this.callbacks[type];
 
@@ -20898,77 +21318,193 @@ CLOUD.Viewer.prototype = {
     // ------ 管理外部插件的render S -------------- //
 
     // 注册render回调函数
-    addRenderCallback: function addRenderCallback(callback) {
+    addRenderCallback: function (callback) {
         this.addCallbacks("render", callback);
     },
 
     // 取消注册
-    removeRenderCallback: function removeRenderCallback(callback) {
+    removeRenderCallback: function (callback) {
         this.removeCallbacks("render", callback);
     },
 
     // 响应render Finished
-    onRenderCallback: function onRenderCallback() {
+    onRenderCallback: function () {
         this.onCallbacks("render");
     },
 
     // 注册render Finished回调函数
-    addRenderFinishedCallback: function addRenderFinishedCallback(callback) {
+    addRenderFinishedCallback: function (callback) {
         this.addCallbacks("renderFinished", callback);
     },
 
     // 取消注册
-    removeRenderFinishedCallback: function removeRenderFinishedCallback(callback) {
+    removeRenderFinishedCallback: function (callback) {
         this.removeCallbacks("renderFinished", callback);
     },
 
     // 响应render Finished
-    onRenderFinishedCallback: function onRenderFinishedCallback() {
+    onRenderFinishedCallback: function () {
         this.onCallbacks("renderFinished");
     },
 
     // ------ 管理外部插件的render E -------------- //
 
-    getScene: function getScene() {
-        return this.modelManager.scene;
-    },
+    init: function (domElement) {
 
-    setIncrementRenderEnabled: function setIncrementRenderEnabled(enable) {
-        this.incrementRenderEnabled = enable;
-    },
+        console.log("Web3D: " + CLOUD.Version);
 
-    // 设置每帧的最大耗时
-    setLimitFrameTime: function setLimitFrameTime(limitTime) {
+        var scope = this;
+
+        this.domElement = domElement;
+
+        var settings = {alpha: true, preserveDrawingBuffer: true, antialias: true};
+
+        //if (!CLOUD.GlobalData.disableAntialias)
+        //    settings.antialias = true;
+
+        var canvas;
+
+        try {
+            canvas = document.createElement('canvas');
+            var webglContext = canvas.getContext('webgl', settings) || canvas.getContext('experimental-webgl', settings);
+            if (!webglContext)
+                settings.antialias = false;
+        } catch (e) {
+            return false;
+        }
+
+        // settings.canvas = canvas;
+
+        CLOUD.GeomUtil.initializeUnitInstances();
+
+        this.incrementRenderer = new THREE.WebGLIncrementRenderer(settings);
+        this.webGLRenderer = new THREE.WebGLRenderer(settings);
+
         if (this.incrementRenderEnabled) {
 
-            if (limitTime <= 0) {
-                limitTime = 30;
+            // Renderer
+            this.renderer = this.incrementRenderer;
+            this.renderer.setRenderTicket(0);
+
+        } else {
+            // Renderer
+            this.renderer = new THREE.WebGLRenderer(settings);
+        }
+
+        // window.innerWidth, window.innerHeight
+        var viewportWidth = domElement.offsetWidth;
+        var viewportHeight = domElement.offsetHeight;
+
+        this.initRenderer();
+
+        // Camera
+        this.camera = new CLOUD.Camera(viewportWidth, viewportHeight, 45, 0.1, CLOUD.GlobalData.SceneSize * 20.0);
+        var camera = this.camera;
+        this.cameraEditor = new CLOUD.CameraEditor(this, camera, domElement, function () {
+            scope.render();
+        });
+
+        this.goToInitialView();
+        this.setPickMode();
+
+        // Register Events
+        this.editorManager.registerDomEventListeners(this.domElement);
+        this.modelManager.onUpdateViewer = function () {
+            scope.render(true);
+        };
+
+        //this.editorManager.registerDomEventListeners(canvas);
+        return true;
+    },
+
+    render: function () {
+
+        // console.time("viewer.render");
+
+        var scope = this;
+        var camera = this.camera;
+        var scene = this.getScene();
+
+        // 增量绘制
+        if (this.incrementRenderEnabled && scope.renderer.IncrementRender) {
+
+            ++this.requestRenderCount;
+
+            if (this.requestRenderCount > this.requestRenderMaxCount)
+                this.requestRenderCount = 0;
+
+            if (this.rendering) {
+                return;
             }
 
-            CLOUD.GlobalData.LimitFrameTime = limitTime;
-        }
-    },
+            this.rendering = true;
 
-    // 限制帧率
-    limitFrameRate: function limitFrameRate(frameRate) {
+            this.calculateNearFar();
 
-        if (this.incrementRenderEnabled) {
-
-            if (frameRate <= 0) {
-                frameRate = 4;
+            for (var sid in this.services) {
+                var service = this.services[sid];
+                service.update(camera);
             }
 
-            CLOUD.GlobalData.LimitFrameTime = 1000 / frameRate;
+            scene.updateLights(camera);
+
+            var isUpdateRenderList = this.editorManager.isUpdateRenderList;
+
+            if (isUpdateRenderList) {
+                this.modelManager.prepareScene(camera);
+            }
+
+            this.renderer.resetIncrementRender();// 重置增量绘制状态
+            this.renderer.setObjectListUpdateState(isUpdateRenderList);// 设置更新状态
+            this.renderer.setFilterObject(scene.filter);// 设置过滤对象
+
+            function incrementRender(callId, autoClear) {
+
+                var renderId = callId;
+
+                return function () {
+
+                    var renderer = scope.renderer;
+                    renderer.autoClear = autoClear;
+
+                    var isFinished = renderer.IncrementRender(scene, camera);
+
+                    if (isFinished) {
+                        scope.rendering = false;
+
+                        if (renderId !== scope.requestRenderCount) {
+                            scope.render();
+                        } else {
+                            // 结束后回调函数
+                            scope.onRenderFinishedCallback();
+                        }
+
+                    } else {
+                        scope.incrementRenderHandle = requestAnimationFrame(incrementRender(renderId, false));
+                    }
+
+                }
+            }
+
+            this.incrementRenderHandle = requestAnimationFrame(incrementRender(scope.requestRenderCount, true));
+
+            this.onRenderCallback();
+
+        } else { // 正常绘制
+
+            this.calculateNearFar();
+            scene.updateLights(camera);
+            this.modelManager.prepareScene(camera);
+            this.renderer.render(scene, camera);
+            this.onRenderCallback();
+            this.onRenderFinishedCallback();// 结束后回调函数
+
         }
+
+        // console.timeEnd("viewer.render");
     },
 
-    resetIncrementRender: function resetIncrementRender() {
-        if (this.incrementRenderEnabled) {
-            this.renderer.resetIncrementRender();
-        }
-    },
-
-    calculateNearFar: function calculateNearFar() {
+    calculateNearFar: function () {
 
         var scene = this.getScene();
 
@@ -20984,229 +21520,124 @@ CLOUD.Viewer.prototype = {
 
             var newPos = position.clone().sub(target);
             var length = newPos.length();
+
             if (this.camera.inside || !this.enableCameraNearFar) {
                 ////CLOUD.GlobalData.SceneSize * 20.0
                 this.camera.setNearFar(0.1, 20000.0);
             } else {
                 var delta = 0.001;
-                var Znear = (length * length + length * delta) / ((1 << 24) * delta);
+                var zNear = (length * length + length * delta) / ((1 << 24) * delta);
                 ////CLOUD.GlobalData.SceneSize * 10.0
 
-                this.camera.setNearFar(Znear, length + 10000.0);
+                this.camera.setNearFar(zNear, length + 10000.0);
             }
         }
     },
 
-    render: function render(ignoreLoad) {
-
-        ++this.requestRenderCount;
-
-        if (this.requestRenderCount > 10000) this.requestRenderCount = 0;
-
-        //console.log(this.requestRenderCount);
-
-        if (this.rendering) {
-            return;
-        }
-
-        this.rendering = true;
-
-        if (ignoreLoad) this.renderIterator += 1;else this.renderIterator = 1;
-        //console.log(this.requestRenderCount);
-
-        var scope = this;
-        var camera = this.camera;
-
-        // 重置增量绘制状态
-        this.resetIncrementRender();
-
-        for (var sid in this.Services) {
-            var service = this.Services[sid];
-            service.update(camera);
-        }
-
-        this.modelManager.updateLights(camera);
-
-        // 启用渲染队列更新
-        if (scope.updateRenderListEnabled //&& !scope.editorManager.isFlyMode()
-        ) {
-                // 设置更新状态
-                scope.renderer.setObjectListUpdateState(scope.editorManager.isUpdateRenderList);
-                if (scope.editorManager.isUpdateRenderList) {
-
-                    if (CLOUD.GlobalData.ByTargetDistance) ignoreLoad = false;
-                    //console.time("prepare");
-                    this.modelManager.prepareScene(camera, this.requestRenderCount, ignoreLoad && this.renderIterator > 2);
-                    this.calculateNearFar();
-                    //console.timeEnd("prepare");
-
-                    CLOUD.GlobalData.ByTargetDistance = false;
-                    CLOUD.GlobalData.MaxLoadSceneCount = 40;
-                }
-            } else {
-            this.modelManager.prepareScene(camera, this.requestRenderCount, ignoreLoad);
-            this.calculateNearFar();
-        }
-
-        var scene = this.getScene();
-        // 设置过滤对象
-        scope.renderer.setFilterObject(scene.filter);
-
-        function incrementRender(callId, autoClear) {
-
-            var renderId = callId;
-
-            return function () {
-
-                var renderer = scope.renderer;
-                renderer.autoClear = autoClear;
-
-                //console.time("Render"+renderId);
-                var isRenderFinish = renderer.IncrementRender(scene, camera);
-                //console.timeEnd("Render" + renderId);
-
-                if (!isRenderFinish && renderId == scope.requestRenderCount) {
-
-                    //console.log("  :" + renderId);
-                    requestAnimationFrame(incrementRender(renderId, false));
-                } else {
-
-                    scope.rendering = false;
-
-                    if (renderId != scope.requestRenderCount) {
-                        scope.render(true);
-                    } else {
-                        //console.time("gc" + renderId);
-                        //scope.modelManager.collectionGarbage();
-                        //console.timeEnd("gc" + renderId);
-
-                        //scope.renderViewHouse();
-
-                        // 结束后回调函数
-                        scope.onRenderFinishedCallback();
-                    }
-                }
-            };
-        }
-
-        // 增量绘制
-        if (scope.incrementRenderEnabled && scope.renderer.IncrementRender) {
-
-            requestAnimationFrame(incrementRender(scope.requestRenderCount, true));
-        } else {
-            // 正常绘制
-
-            scope.renderer.autoClear = true;
-            scope.renderer.render(scene, camera);
-            scope.rendering = false;
-
-            // 结束后回调函数
-            scope.onRenderFinishedCallback();
-        }
-
-        scope.onRenderCallback();
-
-        // 刷新扩展绘制
-        this.extensionHelper.renderExtensions();
-    },
-
-    resize: function resize(width, height) {
+    resize: function (width, height) {
         this.camera.setSize(width, height);
         this.camera.updateProjectionMatrix();
-
         this.renderer.setSize(width, height);
-
-        this.resizeFlyCross(); // 重设fly模式下十字光标位置
-
-        this.extensionHelper.resizeExtensions();
-
+        this.editorManager.resize();
         this.render();
     },
 
-    init: function init(domElement) {
+    // 设置图片资源的路径。默认在“images/”
+    setImageResPath: function (path) {
+        CLOUD.GlobalData.TextureResRoot = path;
+    },
 
-        console.log("Web3D: " + CLOUD.Version);
+    getScene: function () {
+        return this.modelManager.scene;
+    },
 
-        this.domElement = domElement;
-        // window.innerWidth, window.innerHeight
-        var viewportWidth = domElement.offsetWidth;
-        var viewportHeight = domElement.offsetHeight;
+    // 初始化renderer
+    initRenderer: function () {
 
-        var settings = { alpha: true, preserveDrawingBuffer: true, antialias: true };
-        //if (!CLOUD.GlobalData.disableAntialias)
-        //    settings.antialias = true;
-        try {
-            var canvas = document.createElement('canvas');
-            var webglContext = canvas.getContext('webgl', settings) || canvas.getContext('experimental-webgl', settings);
-            if (!webglContext) settings.antialias = false;
-        } catch (e) {
-            return false;
-        }
+        var viewportWidth = this.domElement.offsetWidth;
+        var viewportHeight = this.domElement.offsetHeight;
 
-        CLOUD.GeomUtil.initializeUnitInstances();
-        // Renderer
-        this.renderer = new THREE.WebGLIncrementRenderer(settings);
-        var renderer = this.renderer;
-        renderer.setRenderTicket(0);
-
-        renderer.setClearColor(0x000000, 0);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(viewportWidth, viewportHeight);
+        this.renderer.setClearColor(0x000000, 0);
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setSize(viewportWidth, viewportHeight);
 
         // Added by xmh begin 允许获得焦点，
         // 将键盘事件注册到父容器（之前注册到window上会存在各种联动问题），鼠标点击父容器，激活canvas
-        //renderer.domElement.tabIndex = 0;
-        renderer.domElement.setAttribute('tabindex', '0');
-        renderer.domElement.setAttribute('id', 'cloud-main-canvas');
+        this.renderer.domElement.setAttribute('tabindex', '0');
+        this.renderer.domElement.setAttribute('id', 'cloud-main-canvas');
         // Added by xmh end
 
-        domElement.appendChild(renderer.domElement);
-
-        // 判断是否定义了IncrementRender
-        if (this.renderer.IncrementRender === undefined) {
-            console.warn('THREE.WebGLIncrementRenderer.IncrementRender: undefined!');
-        }
-
-        // Camera
-        //var camera = new CLOUD.Camera(viewportWidth, viewportHeight, 45, 0.01, CLOUD.GlobalData.SceneSize * 20, -CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
-        var camera = new CLOUD.Camera(viewportWidth, viewportHeight, 45, 0.1, CLOUD.GlobalData.SceneSize * 20.0, -CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
-        this.camera = camera;
-
-        var scope = this;
-        this.cameraEditor = new CLOUD.CameraEditor(this, camera, domElement, function () {
-            scope.render();
-            //scope.onRenderCallback();
-        });
-
-        //this.lookAt(new THREE.Vector3(-CLOUD.GlobalData.SceneSize * 0.5, CLOUD.GlobalData.SceneSize * 0.3, CLOUD.GlobalData.SceneSize), new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 1, 0));
-        this.goToInitialView();
-        this.setPickMode();
-
-        // Register Events
-        this.editorManager.registerDomEventListeners(this.domElement);
-
-        this.modelManager.onUpdateViewer = function () {
-            scope.render(true);
-            //scope.onRenderCallback();
-        };
-
-        //this.editorManager.registerDomEventListeners(canvas);
-        return true;
+        this.domElement.appendChild(this.renderer.domElement);
     },
 
-    registerDomEventListeners: function registerDomEventListeners() {
+    setIncrementRenderEnabled: function (enable) {
+
+        this.incrementRenderEnabled = enable;
+
+        if (this.domElement) {
+
+            this.renderer.domElement.removeAttribute('tabindex');
+            this.renderer.domElement.removeAttribute('id');
+            this.domElement.removeChild(this.renderer.domElement);
+
+            if (enable) {
+                this.renderer = this.incrementRenderer;
+                this.renderer.setRenderTicket(0);
+                this.rendering = false;
+                this.requestRenderCount = 0;
+                // this.editorManager.isUpdateRenderList = true;
+
+            } else {
+
+                if (this.incrementRenderHandle > 0) {
+                    cancelAnimationFrame(this.incrementRenderHandle);
+                }
+
+                this.renderer = this.webGLRenderer;
+            }
+
+            this.initRenderer(this.domElement);
+        }
+    },
+
+    // 设置每帧的最大耗时
+    setLimitFrameTime: function (limitTime) {
+        if (this.incrementRenderEnabled) {
+
+            if (limitTime <= 0) {
+                limitTime = 30;
+            }
+
+            CLOUD.GlobalData.LimitFrameTime = limitTime;
+        }
+    },
+
+    // 限制帧率
+    limitFrameRate: function (frameRate) {
+
+        if (this.incrementRenderEnabled) {
+
+            if (frameRate <= 0) {
+                frameRate = 4;
+            }
+
+            CLOUD.GlobalData.LimitFrameTime = 1000 / frameRate;
+        }
+    },
+
+    registerDomEventListeners: function () {
         if (this.domElement) {
             this.editorManager.registerDomEventListeners(this.domElement);
         }
     },
 
-    unregisterDomEventListeners: function unregisterDomEventListeners() {
+    unregisterDomEventListeners: function () {
         if (this.domElement) {
             this.editorManager.unregisterDomEventListeners(this.domElement);
         }
     },
 
-    registerEventListener: function registerEventListener(type, callback) {
+    registerEventListener: function (type, callback) {
         this.modelManager.addEventListener(type, callback);
     },
 
@@ -21214,159 +21645,121 @@ CLOUD.Viewer.prototype = {
      * Load all
      * @return the databag client.
      */
-    load: function load(databagId, serverUrl, debug, byBox) {
-
+    load: function (databagId, serverUrl, debug, byBox) {
         var scope = this;
+
         if (debug) {
             CLOUD.GlobalData.ShowSubSceneBox = true;
             CLOUD.GlobalData.ShowCellBox = false;
         }
 
-        return scope.modelManager.load({ databagId: databagId, serverUrl: serverUrl, debug: debug, byBox: byBox });
+        return scope.modelManager.load({databagId: databagId, serverUrl: serverUrl, debug: debug, byBox: byBox});
     },
 
-    unloadAll: function unloadAll() {
-
+    unloadAll: function () {
         this.renderer.destroy();
         this.modelManager.destroy();
+
     },
 
-    clearAll: function clearAll() {
-
+    clearAll: function () {
         this.getScene().clearAll();
-    },
-
-    loadOutside: function loadOutside() {
-
-        this.modelManager.loadBuidingOutside(this.camera);
-    },
-
-    /**
-     * Load databag index only
-     * callback is called when loading is finished.
-     */
-    loadIndex: function loadIndex(databagId, serverUrl, debug, callback) {
-        var scope = this;
-        if (debug) {
-            CLOUD.GlobalData.ShowSubSceneBox = true;
-            CLOUD.GlobalData.ShowCellBox = false;
-        }
-
-        scope.modelManager.loadIndex({ databagId: databagId, serverUrl: serverUrl, debug: debug }, callback);
     },
 
     /**
      * show or hide scene by databag client.
      */
-    showScene: function showScene(client, bVisibles) {
+    showScene: function (client, bVisibles) {
         this.getScene().showSceneNodes(client, bVisibles);
     },
 
-    setEditorDefault: function setEditorDefault() {
+    setEditorDefault: function () {
         this.setPickMode();
     },
 
-    setPickMode: function setPickMode(orbitBySelection) {
+    setPickMode: function (orbitBySelection) {
         this.editorManager.setRectPickMode(this, orbitBySelection);
         //this.editorManager.setPickMode(this);
     },
-    setRectPickMode: function setRectPickMode(orbitBySelection) {
+
+    setRectPickMode: function (orbitBySelection) {
         this.editorManager.setRectPickMode(this, orbitBySelection);
     },
-    setRectZoomMode: function setRectZoomMode() {
+
+    setRectZoomMode: function () {
         this.editorManager.setRectZoomMode(this);
     },
-    setOrbitMode: function setOrbitMode() {
+
+    setOrbitMode: function () {
         this.editorManager.setOrbitMode(this);
     },
 
-    setZoomMode: function setZoomMode() {
+    setZoomMode: function () {
         this.editorManager.setZoomMode(this);
     },
 
-    setPanMode: function setPanMode() {
+    setPanMode: function () {
         this.editorManager.setPanMode(this);
     },
 
-    setFlyMode: function setFlyMode(bShowControlPanel) {
+    setFlyMode: function (bShowControlPanel) {
         this.editorManager.setFlyMode(bShowControlPanel, this);
     },
 
-    setClipPlanesMode: function setClipPlanesMode() {
+    setClipPlanesMode: function () {
         this.editorManager.setClipPlanesMode(this);
     },
 
     // 锁定Z轴
-    lockAxisZ: function lockAxisZ(isLock) {
+    lockAxisZ: function (isLock) {
 
         if (this.cameraEditor) {
             this.cameraEditor.lockAxisZ(isLock);
         }
     },
 
-    resizeFlyCross: function resizeFlyCross() {
-        if (this.editorManager && this.editorManager.editor === this.editorManager.flyEditor) {
-            this.editorManager.flyEditor.resize();
-        }
-    },
-
-    zoomIn: function zoomIn(factor) {
+    zoomIn: function (factor) {
         this.editorManager.zoomIn(factor, this);
     },
 
-    zoomOut: function zoomOut(factor) {
+    zoomOut: function (factor) {
         this.editorManager.zoomOut(factor, this);
     },
 
-    zoomAll: function zoomAll(margin, ratio) {
-        margin = margin || -0.05;
-        this.editorManager.zoomAll(this, margin, ratio);
+    zoomAll: function (margin, ratio) {
+        var box = this.getScene().worldBoundingBox();
+        this.editorManager.zoomToBBox(this, box, margin, ratio);
     },
 
-    zoomToBuilding: function zoomToBuilding(margin, ratio) {
+    zoomToBuilding: function (margin, ratio) {
+        var box = viewer.getScene().innerBoundingBox;
 
-        var box = this.getScene().innerBoundingBox;
         if (box.empty()) {
             this.zoomAll();
         } else {
-            var target = this.camera.zoomToBBox(box, margin, ratio);
-
-            this.cameraEditor.updateCamera(target);
-
-            this.loadOutside();
+            this.editorManager.zoomToBBox(this, box, margin, ratio);
         }
     },
 
-    zoomToSelection: function zoomToSelection(margin, ratio) {
-
+    zoomToSelection: function (margin, ratio) {
         var box = this.renderer.computeSelectionBBox();
+
         if (box == null || box.empty()) {
             box = this.getScene().worldBoundingBox();
-            margin = margin || -0.05; // give bounding box a margin 0.05 by default.
-        } else {
-            margin = margin || 0.05; // give bounding box a margin 0.05 by default.
         }
-        var target = this.camera.zoomToBBox(box, margin, ratio);
-        this.cameraEditor.updateCamera(target, true);
-        CLOUD.GlobalData.ByTargetDistance = true;
-        this.render();
+
+        this.editorManager.zoomToBBox(this, box, margin, ratio);
     },
 
-    zoomToBBox: function zoomToBBox(box, margin, ratio) {
-
-        margin = margin || -0.05;
+    zoomToBBox: function (box, margin, ratio) {
 
         if (!box) {
             box = this.getScene().worldBoundingBox();
         } else {
-            box.applyMatrix4(this.getScene().rootNode.matrix);
+            box.applyMatrix4(this.getScene().getMatrixOfRootNode());
         }
 
-        var target = this.camera.zoomToBBox(box, margin, ratio);
-        this.cameraEditor.updateCamera(target, true);
-
-        CLOUD.GlobalData.ByTargetDistance = true;
-        this.render();
+        this.editorManager.zoomToBBox(this, box, margin, ratio);
     },
 
     /**
@@ -21377,40 +21770,31 @@ CLOUD.Viewer.prototype = {
      * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
      * @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
      */
-    zoomToBBoxByDirection: function zoomToBBoxByDirection(box, direction, margin, ratio) {
-
-        margin = margin || -0.05;
+    zoomToBBoxByDirection: function (box, direction, margin, ratio) {
 
         if (!direction) {
-
             this.zoomToBBox(box, margin, ratio);
             return;
         }
 
         if (direction && box) {
-
             var zoomBox = box.clone();
             var refPoint = zoomBox.center().clone().add(direction);
 
-            zoomBox.applyMatrix4(this.getScene().rootNode.matrix);
-            refPoint.applyMatrix4(this.getScene().rootNode.matrix);
+            zoomBox.applyMatrix4(this.getScene().getMatrixOfRootNode());
+            refPoint.applyMatrix4(this.getScene().getMatrixOfRootNode());
 
             var newDirection = refPoint.clone().sub(zoomBox.center());
-            var target;
 
             if (newDirection.length() > 0.0001) {
                 newDirection.normalize();
-                // 先调整相机up方向,使得一直朝上
-                this.camera.realUp.copy(THREE.Object3D.DefaultUp);
-                target = this.camera.zoomToBBox(zoomBox, margin, ratio, newDirection);
+                viewer.camera.realUp.copy(THREE.Object3D.DefaultUp);// 先调整相机up方向,使得一直朝上
+                this.editorManager.zoomToBBox(this, zoomBox, margin, ratio, newDirection);
             } else {
-                target = this.camera.zoomToBBox(zoomBox, margin, ratio);
+                this.editorManager.zoomToBBox(this, zoomBox, margin, ratio);
             }
-
-            this.cameraEditor.updateCamera(target);
-            CLOUD.GlobalData.ByTargetDistance = true;
-            this.render();
         }
+
     },
 
     /**
@@ -21421,60 +21805,34 @@ CLOUD.Viewer.prototype = {
      * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
      * @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
      */
-    zoomToBBoxWithOuterBox: function zoomToBBoxWithOuterBox(box, outerBox, margin, ratio) {
-
-        margin = margin || -0.05;
+    zoomToBBoxWithOuterBox: function (box, outerBox, margin, ratio) {
 
         if (!outerBox) {
-
             this.zoomToBBox(box, margin, ratio);
             return;
         }
 
         if (outerBox && box) {
-
             var zoomBox = box.clone();
             var refPoint = outerBox.center();
 
-            zoomBox.applyMatrix4(this.getScene().rootNode.matrix);
-            refPoint.applyMatrix4(this.getScene().rootNode.matrix);
+            zoomBox.applyMatrix4(this.getScene().getMatrixOfRootNode());
+            refPoint.applyMatrix4(this.getScene().getMatrixOfRootNode());
 
             var newDirection = refPoint.clone().sub(zoomBox.center());
-            var target;
 
             if (newDirection.length() > 0.0001) {
                 newDirection.normalize();
-
-                // 先调整相机up方向,使得一直朝上
-                this.camera.realUp.copy(THREE.Object3D.DefaultUp);
-                target = this.camera.zoomToBBox(zoomBox, margin, ratio, newDirection);
+                this.camera.realUp.copy(THREE.Object3D.DefaultUp);// 先调整相机up方向,使得一直朝上
+                this.editorManager.zoomToBBox(this, zoomBox, margin, ratio, newDirection);
             } else {
-                target = this.camera.zoomToBBox(zoomBox, margin, ratio);
+                this.editorManager.zoomToBBox(this, zoomBox, margin, ratio);
             }
 
-            this.cameraEditor.updateCamera(target);
-            CLOUD.GlobalData.ByTargetDistance = true;
-            this.render();
         }
     },
 
-    setStandardView: function setStandardView(stdView, margin, callback) {
-        margin = margin || -0.05;
-        this.editorManager.setStandardView(stdView, this, margin, callback);
-    },
-
-    setTopView: function setTopView(box, margin, ratio) {
-        margin = margin || 0.05;
-        ratio = ratio || 1.0;
-
-        if (box) {
-            box.applyMatrix4(this.getScene().rootNode.matrix);
-        }
-
-        this.editorManager.setTopView(this, box, margin, ratio);
-    },
-
-    lookAt: function lookAt(position, target, up) {
+    lookAt: function (position, target, up) {
         var dir = new THREE.Vector3();
         dir.subVectors(target, position);
 
@@ -21484,21 +21842,21 @@ CLOUD.Viewer.prototype = {
     },
 
     // transform
-    transformCamera: function transformCamera(camera) {
+    transformCamera: function (camera) {
         return CLOUD.CameraUtil.transformCamera(camera, this.modelManager.scene);
     },
 
-    getCamera: function getCamera() {
+    getCamera: function () {
         return this.cameraEditor.getCameraInfo();
     },
 
-    setCamera: function setCamera(jsonStr) {
+    setCamera: function (jsonStr) {
         var camInfo = CLOUD.CameraUtil.parseCameraInfo(jsonStr);
         this.lookAt(camInfo.position, camInfo.target, camInfo.up);
     },
 
     // 获得render buffer的数据
-    getRenderBufferScreenShot: function getRenderBufferScreenShot(backgroundClr) {
+    getRenderBufferScreenShot: function (backgroundClr) {
 
         // 在高分屏上toDataURL直接获得图片数据比实际的图片大
         var dataUrl = this.renderer.domElement.toDataURL("image/png");
@@ -21508,14 +21866,13 @@ CLOUD.Viewer.prototype = {
         var w = canvasWidth / pixelRatio;
         var h = canvasHeight / pixelRatio;
 
-        if (!w || !h) return dataUrl;
+        if (!w || !h)
+            return dataUrl;
 
-        var nw,
-            nh,
-            nx = 0,
+        var nw, nh, nx = 0,
             ny = 0;
 
-        if (w > h || canvasWidth / canvasHeight < w / h) {
+        if (w > h || (canvasWidth / canvasHeight < w / h)) {
             nw = w;
             nh = canvasHeight / canvasWidth * w;
             ny = h / 2 - nh / 2;
@@ -21545,124 +21902,67 @@ CLOUD.Viewer.prototype = {
         return newURL;
     },
 
-    canvas2image: function canvas2image(backgroundClr) {
+    canvas2image: function (backgroundClr) {
 
-        var dataUrl = null;
-
-        if (this.extensionHelper.hasAnnotations()) {
-
-            // 在批注模式，底图已经锁定，不用调用render
-            dataUrl = this.extensionHelper.captureAnnotationsScreenSnapshot();
-            //this.render();
-        } else {
-
-            dataUrl = this.getRenderBufferScreenShot(backgroundClr);
-            // 在chrome中多调用几次，会出现图片显示不正常（显示空白，原因是转换的值变得不正常了），
-            // 每次获得截图后，缓存数据貌似被清除了
-            // 所以在每次调用后render一次
-            this.render();
-        }
+        var dataUrl = this.getRenderBufferScreenShot(backgroundClr);
+        // 在chrome中多调用几次，会出现图片显示不正常（显示空白，原因是转换的值变得不正常了），
+        // 每次获得截图后，缓存数据貌似被清除了
+        // 所以在每次调用后render一次
+        this.render();
 
         return dataUrl;
     },
 
-    getFilters: function getFilters() {
+    getFilters: function () {
         return this.getScene().filter;
     },
 
-    disableLoD: function disableLoD(force) {
-        if (force) {
-            CLOUD.GlobalData.SubSceneVisibleLOD = 1000000;
-            CLOUD.GlobalData.CellVisibleLOD = 1000000;
-        } else {
-            CLOUD.GlobalData.SubSceneVisibleLOD = 1000;
-            CLOUD.GlobalData.CellVisibleLOD = 1000;
-        }
-        this.enableCameraNearFar = false;
-    },
-
-    adjustSceneLoD: function adjustSceneLoD(sceneIds) {
-        var len = sceneIds.length;
-        var totalVisibleCount = 0;
-
-        var totalCount = 0;
-        if (len > 0) {
-            var clients = this.modelManager.clients;
-            for (var name in clients) {
-                var nodeCounter = clients[name].index.sceneNodeCounter;
-                if (nodeCounter) {
-                    for (var ii = 0; ii < len; ++ii) {
-                        var count = nodeCounter[sceneIds[ii]];
-                        if (count !== undefined) totalCount += count;
-                    }
-                }
-            }
-        }
-
-        this.enableCameraNearFar = false;
-        if (totalCount == 0) {
-            CLOUD.GlobalData.SubSceneVisibleLOD = 10;
-            CLOUD.GlobalData.CellVisibleLOD = 15;
-        } else if (totalCount < 10000) {
-            CLOUD.GlobalData.SubSceneVisibleLOD = 200;
-            CLOUD.GlobalData.CellVisibleLOD = 200;
-            CLOUD.GlobalData.ScreenCullLOD = 0.0001;
-            CLOUD.GlobalData.GarbageCollection = false;
-        } else if (totalCount < 100000) {
-            CLOUD.GlobalData.SubSceneVisibleLOD = 100;
-            CLOUD.GlobalData.CellVisibleLOD = 150;
-            CLOUD.GlobalData.ScreenCullLOD = 0.0001;
-            CLOUD.GlobalData.GarbageCollection = false;
-        } else if (totalCount < 200000) {
-            CLOUD.GlobalData.SubSceneVisibleLOD = 50;
-            CLOUD.GlobalData.CellVisibleLOD = 100;
-            CLOUD.GlobalData.ScreenCullLOD = 0.0002;
-            CLOUD.GlobalData.GarbageCollection = true;
-        } else {
-            CLOUD.GlobalData.SubSceneVisibleLOD = 10;
-            CLOUD.GlobalData.CellVisibleLOD = 15;
-            CLOUD.GlobalData.ScreenCullLOD = 0.0002;
-            CLOUD.GlobalData.GarbageCollection = true;
-
-            this.enableCameraNearFar = true;
-        }
-    },
-
     // 允许双击半透明
-    enableTranslucentByDClick: function enableTranslucentByDClick(enable) {
+    enableTranslucentByDClick: function (enable) {
         CLOUD.GlobalData.EnableDemolishByDClick = enable;
     },
 
     // 禁止旋转
-    disableRotate: function disableRotate(disable) {
+    disableRotate: function (disable) {
 
         if (this.cameraEditor) {
             this.cameraEditor.disableRotate(disable);
         }
     },
 
-    // 设置初始视角
-    setInitialViewType: function setInitialViewType(viewType) {
+    setStandardView: function (stdView, margin, callback) {
+        margin = margin || -0.05;
+        this.editorManager.setStandardView(stdView, this, margin, callback);
+    },
 
+    setTopView: function (box, margin, ratio) {
+        margin = margin || 0.05;
+        ratio = ratio || 1.0;
+
+        if (box) {
+            box.applyMatrix4(this.getScene().rootNode.matrix);
+        }
+
+        this.editorManager.setTopView(this, box, margin, ratio);
+    },
+
+    // 设置初始视角
+    setInitialViewType: function (viewType) {
         this.initialView = viewType;
     },
 
     // 切换到初始视图
-    goToInitialView: function goToInitialView() {
-
+    goToInitialView: function () {
         var target;
 
         if (!this.initialView) {
-
             target = new THREE.Vector3(0, 0, 0);
-
             var position = new THREE.Vector3(-CLOUD.GlobalData.SceneSize * 0.5, CLOUD.GlobalData.SceneSize * 0.3, CLOUD.GlobalData.SceneSize);
             var up = new THREE.Vector3(0, 1, 0);
             var dir = new THREE.Vector3();
             dir.subVectors(target, position);
             this.camera.LookAt(target, dir, up);
         } else {
-
             target = this.camera.setStandardView(this.initialView);
         }
 
@@ -21671,193 +21971,20 @@ CLOUD.Viewer.prototype = {
     },
 
     // 设置home视图类型
-    setHomeViewType: function setHomeViewType(viewType) {
+    setHomeViewType: function (viewType) {
+
         this.currentHomeView = viewType;
     },
 
     // 进入home视图
-    goToHomeView: function goToHomeView(margin) {
-
+    goToHomeView: function (margin) {
         this.setStandardView(this.currentHomeView, margin);
     },
 
-    // ------------------ 小地图API -- S ------------------ //
-    createMiniMap: function createMiniMap(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid) {
+    calculationPlanes: function () {
 
-        this.extensionHelper.createMiniMap(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid);
-    },
-
-    destroyMiniMap: function destroyMiniMap(name) {
-
-        this.extensionHelper.destroyMiniMap(name);
-    },
-
-    removeMiniMap: function removeMiniMap(name) {
-
-        this.extensionHelper.removeMiniMap(name);
-    },
-
-    appendMiniMap: function appendMiniMap(name) {
-
-        this.extensionHelper.appendMiniMap(name);
-    },
-
-    getMiniMap: function getMiniMap(name) {
-
-        return this.extensionHelper.getMiniMap(name);
-    },
-
-    // 设置平面图
-    setFloorPlaneData: function setFloorPlaneData(jsonObj) {
-
-        this.extensionHelper.setFloorPlaneData(jsonObj);
-    },
-
-    generateFloorPlane: function generateFloorPlane(name, changeView) {
-        this.extensionHelper.generateFloorPlane(name, changeView);
-    },
-
-    // 设置轴网数据
-    setAxisGridData: function setAxisGridData(jsonObj, level) {
-
-        this.extensionHelper.setAxisGridData(jsonObj, level);
-    },
-
-    generateAxisGrid: function generateAxisGrid(name) {
-        this.extensionHelper.generateAxisGrid(name);
-    },
-
-    // 是否显示隐藏轴网
-    showAxisGrid: function showAxisGrid(name, show) {
-
-        this.extensionHelper.showAxisGrid(name, show);
-    },
-
-    enableAxisGridEvent: function enableAxisGridEvent(name, enable) {
-
-        this.extensionHelper.enableAxisGridEvent(name, enable);
-    },
-
-    enableMiniMapCameraNode: function enableMiniMapCameraNode(name, enable) {
-
-        this.extensionHelper.enableMiniMapCameraNode(name, enable);
-    },
-
-    flyBypAxisGridNumber: function flyBypAxisGridNumber(name, abcName, numeralName) {
-
-        this.extensionHelper.flyBypAxisGridNumber(name, abcName, numeralName);
-    },
-
-    // ------------------ 小地图API -- E ------------------ //
-
-    // ------------------ 标记 API -- S ------------------ //
-
-    // 设置标记模式，已废弃
-    setMarkerMode: function setMarkerMode() {},
-
-    closeMarkerMode: function closeMarkerMode() {
-        this.extensionHelper.uninitMarkerEditor();
-    },
-
-    // 开始编辑，已废弃
-    editMarkerBegin: function editMarkerBegin() {},
-
-    // 结束编辑，已废弃
-    editMarkerEnd: function editMarkerEnd() {},
-
-    // 设置标记状态，已废弃
-    setMarkerState: function setMarkerState(state) {},
-
-    // 加载标记
-    loadMarkers: function loadMarkers(markerInfoList) {
-        this.extensionHelper.loadMarkers(markerInfoList);
-    },
-
-    // 加载标记
-    loadMarkersFromIntersect: function loadMarkersFromIntersect(intersect, shapeType, state) {
-        this.extensionHelper.loadMarkersFromIntersect(intersect, shapeType, state);
-    },
-
-    // 获得标记列表
-    getMarkerInfoList: function getMarkerInfoList() {
-        return this.extensionHelper.getMarkerInfoList();
-    },
-
-    // zoom到合适的大小
-    zoomToSelectedMarkers: function zoomToSelectedMarkers() {
-        this.extensionHelper.zoomToSelectedMarkers();
-    },
-
-    // 通过id选中某个标记
-    selectMarkerById: function selectMarkerById(id) {
-
-        this.extensionHelper.selectMarkerById(id);
-    },
-
-    // 设置marker click callback
-    setMarkerClickCallback: function setMarkerClickCallback(callback) {
-
-        this.extensionHelper.setMarkerClickCallback(callback);
-    },
-
-    // ------------------ 标记 API -- E ------------------ //
-
-    // ------------------ 批注 API -- S ------------------ //
-
-    // 进入批注模式，已废弃
-    setCommentMode: function setCommentMode() {},
-
-    exitCommentMode: function exitCommentMode() {
-
-        this.extensionHelper.uninitAnnotation();
-    },
-
-    // 设置背景
-    setCommentBackgroundColor: function setCommentBackgroundColor(startColor, stopColor) {
-
-        this.extensionHelper.setAnnotationBackgroundColor(startColor, stopColor);
-    },
-
-    // 开始编辑批注
-    editCommentBegin: function editCommentBegin() {
-
-        this.extensionHelper.editAnnotationBegin();
-    },
-
-    // 结束编辑批注
-    editCommentEnd: function editCommentEnd() {
-
-        this.extensionHelper.editAnnotationEnd();
-    },
-
-    // 设置批注图形类型
-    setCommentType: function setCommentType(type) {
-
-        this.extensionHelper.setAnnotationType(type);
-    },
-
-    // 设置批注图形风格
-    setCommentStyle: function setCommentStyle(style) {
-
-        this.extensionHelper.setAnnotationStyle(style);
-    },
-
-    // 加载批注
-    loadComments: function loadComments(annotations) {
-
-        this.extensionHelper.loadAnnotations(annotations);
-    },
-
-    // 获得批注对象列表
-    getCommentInfoList: function getCommentInfoList() {
-
-        return this.extensionHelper.getAnnotationInfoList();
-    },
-
-    calculationPlanes: function calculationPlanes() {
         if (this.isRecalculationPlanes) {
             this.isRecalculationPlanes = false;
-
             var scene = this.getScene();
             var box = this.renderer.computeRenderObjectsBox();
             scene.getClipPlanes().calculationPlanes(box.size(), box.center());
@@ -21865,11 +21992,17 @@ CLOUD.Viewer.prototype = {
         }
     },
 
-    recalculationPlanes: function recalculationPlanes() {
+    recalculationPlanes: function () {
         this.isRecalculationPlanes = true;
+    },
+
+    setOctantDepth: function (depth) {
+        CLOUD.GlobalData.OctantDepth = depth;
+    },
+
+    resizePool: function (size) {
+        CLOUD.GlobalData.maxObjectNumInPool = size;
+        this.getScene().resizePool();
     }
 
-    // ------------------ 批注 API -- E ------------------ //
 };
-
-// export default CLOUD;
