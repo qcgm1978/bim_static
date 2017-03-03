@@ -259,6 +259,7 @@ var Login = {
 	init() {
 		//事件绑定
 		Login.bindEvent();
+		Login.checkSSO();
 		//是否自动登录
 		Login.isAutoLogin();
 
@@ -267,7 +268,6 @@ var Login = {
 			//验证登录
 			this.checkLogin();
 		}
-		Login.checkSSO();
 	},
 
 	//万达系统登陆后,然后在本项目中自动登录
