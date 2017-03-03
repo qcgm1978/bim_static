@@ -259,15 +259,101 @@ var Login = {
 	init() {
 		//事件绑定
 		Login.bindEvent();
-		//是否自动登录
-		Login.isAutoLogin();
+		
+		if(Login.isSSO())
+		{
+			Login.checkSSO();
+		}
+		else
+		{
+			//是否自动登录
+			Login.isAutoLogin();
+		}
+
 
 		//谷歌下验证登录
 		if (navigator.userAgent.indexOf("QtWebEngine/5.7.0") <= -1) {
 			//验证登录
 			this.checkLogin();
 		}
+	},
 
+	isSSO : function(){
+		var OUTSSO_AuthNum   = Login.getCookie("OUTSSO_AuthNum");
+
+		var AuthUser_LoginId = Login.getCookie("AuthUser_LoginId");
+		var AuthUser_AuthNum = Login.getCookie("AuthUser_AuthNum");
+		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken");
+		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC");
+		var AuthUser_Signature = Login.getCookie("AuthUser_Signature");
+
+		console.log("OUTSSO_AuthNum:",OUTSSO_AuthNum);
+		console.log("AuthUser_AuthNum:",AuthUser_AuthNum);
+		console.log("AuthUser_AuthToken:",AuthUser_AuthToken);
+		console.log("AuthUser_AuthMAC:",AuthUser_AuthMAC);
+		console.log("AuthUser_Signature:",AuthUser_Signature);
+		try
+		{
+			if(AuthUser_AuthToken == undefined)
+			{
+				return false;
+			}
+			if(AuthUser_Signature == undefined)
+			{
+				return false;
+			}
+			if(AuthUser_AuthNum.length>5 && AuthUser_AuthToken.length>5 && AuthUser_AuthMAC.length>5 && OUTSSO_AuthNum==undefined && AuthUser_Signature.length>5)
+			{
+				return true;
+			}
+		}
+		catch(e)
+		{
+			return false;
+		}
+	},
+
+	getSSO : function(){
+		var AuthUser_AuthNum = Login.getCookie("AuthUser_AuthNum");
+		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken");
+		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC");
+
+		Login.delCookie("AuthUser_loginId");
+		Login.delCookie("AuthUser_loginInfo");
+		Login.delCookie("AuthUser_Signature");
+		Login.delCookie("wd_sso_user");
+		return {"AuthUser_AuthNum":AuthUser_AuthNum,"AuthUser_AuthToken":AuthUser_AuthToken,"AuthUser_AuthMAC":AuthUser_AuthMAC};		
+	},
+
+	//万达系统登陆后,然后在本项目中自动登录
+	//万达用户跳转到总发包系统的登录条件：
+	//OUTSSO_AuthNum为空; AuthUser_AuthNum,AuthUser_AuthToken,AuthUser_AuthMAC有值; wd_sso_user不为空
+	checkSSO : function(){
+		var url = "/platform/login/inner";
+		var SSO = Login.getSSO();
+		$.ajax({
+			url:url,
+			type :"post",
+			dataType:"json",
+			contentType: "application/json",
+			data : JSON.stringify(SSO),
+			success:function(data){
+				var obj,p,i;
+				if(data.code==0)
+				{
+					for(i=0;i<data.data.length;i++)
+					{
+						obj = data.data[i];
+						for (var p in obj) 
+						{
+							Login.setCookie(p, obj[p]);
+						}				
+					}
+					Login.signIn();
+				}
+			}
+		});
+		
 	},
 
 	clearCookie() {
