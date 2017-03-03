@@ -267,22 +267,37 @@ var Login = {
 			//验证登录
 			this.checkLogin();
 		}
-
+		Login.checkSSO();
 	},
 
 	//万达系统登陆后,然后在本项目中自动登录
+	//万达用户跳转到总发包系统的登录条件：
+	//OUTSSO_AuthNum为空; AuthUser_AuthNum,AuthUser_AuthToken,AuthUser_AuthMAC有值; wd_sso_user不为空
 	checkSSO : function(){
-		var AuthUser_LoginId   = Login.getCookie("AuthUser_LoginId");
-		var AuthUser_LoginInfo = Login.getCookie("AuthUser_LoginInfo");
+		var OUTSSO_AuthNum   = Login.getCookie("OUTSSO_AuthNum");
 
 		var AuthUser_AuthNum = Login.getCookie("AuthUser_AuthNum");
 		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken");
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC");
+		var wd_sso_user = Login.getCookie("wd_sso_user");
+
+		console.log("OUTSSO_AuthNum:",OUTSSO_AuthNum);
+		console.log("AuthUser_AuthNum:",AuthUser_AuthNum);
+		console.log("AuthUser_AuthToken:",AuthUser_AuthToken);
+		console.log("AuthUser_AuthMAC:",AuthUser_AuthMAC);
+		console.log("wd_sso_user:",wd_sso_user);
 
 		var url = "/platform/login/inner?AuthUser_AuthNum={AuthUser_AuthNum}&AuthUser_AuthToken={AuthUser_AuthToken}&AuthUser_AuthMAC={AuthUser_AuthMAC}";
 
-
-		if(AuthUser_LoginId != undefined && AuthUser_LoginInfo!=undefined && AuthUser_AuthToken == undefined)
+		if(AuthUser_AuthToken==undefined)
+		{
+			return;
+		}
+		if(wd_sso_user == undefined)
+		{
+			return;
+		}
+		if(AuthUser_AuthNum.length>5 && AuthUser_AuthToken.length>5 && AuthUser_AuthMAC.length>5 && OUTSSO_AuthNum==undefined && wd_sso_user.length>5)
 		{
 			url = url.replace("{AuthUser_AuthNum}",AuthUser_AuthNum);
 			url = url.replace("{AuthUser_AuthToken}",AuthUser_AuthToken);
