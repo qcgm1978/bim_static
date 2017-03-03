@@ -61,8 +61,18 @@ App.Services.System.ResourceAttrManagerTopbar=Backbone.View.extend({
 			width: 300,
 			height: 100,
 			isConfirm: false,
-			isAlert: false,
+			isAlert: true,
 			message: dialogHtml,
+			okCallback: function() {
+				var deleteArr = [];
+				var models = App.Services.SystemCollection.ResourceCollection.models;
+				_.each(models,function(model, index) {
+					// model.destroy();
+					console.log(model);
+					console.log(index);
+				});
+				
+			}
 		})
 	},
 	bindTimeFun(){//绑定开始和结束时间的点击事件

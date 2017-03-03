@@ -55,5 +55,19 @@ App.Services.SystemCollection = {
              }
 		}
 	})),
-
+	ResourceCollection:new(Backbone.Collection.extend({
+		model:Backbone.Model.extend({
+			defaults:function(){
+				return {
+					fileName:''
+				}
+			}
+		}),
+		urlType:"resourceList",
+		parse(response){
+			if(response.code == 0){
+				return response.data;
+			}
+		}
+	}))
 }

@@ -26,21 +26,21 @@ App.Services.System=Backbone.View.extend({
 		//	$container.append(tabs.workflow.tab);
     //
 		//}
-		console.log("Auth",Auth);
+		// console.log("Auth",Auth);
 		if (Auth.extendedAttribute) {
 			$container.append(tabs.extendedAttribute.tab);
 		}
-		if (!Auth.announcementAttribute) {//公告管理标签
+		if (Auth.announcementAttribute) {//公告管理标签
 			$container.append(tabs.announcementAttribute.tab);
 		}
-		if (!Auth.feedbackAttribute) {//反馈管理标签
+		if (Auth.feedbackAttribute) {//反馈管理标签
 			$container.append(tabs.feedbackAttribute.tab);
 		}
-		if (!Auth.resourceAttribute) {//资源管理标签
+		if (Auth.resourceAttribute) {//资源管理标签
 			$container.append(tabs.resourceAttribute.tab);
 		}
 
-		this.$(".serviceNav .item").eq(4).trigger("click");
+		this.$(".serviceNav .item").eq(0).trigger("click");
 
 		return this;
 	},
