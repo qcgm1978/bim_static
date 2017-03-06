@@ -71,6 +71,15 @@ var Login = {
 			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=" + Login.doMain + ";path=/";
 	},
 
+	//删除cookie
+	delCook: function(name) {
+		var exp = new Date();
+		exp.setTime(exp.getTime() - 1);
+		var cval = this.getCookie(name);
+		if (cval != null)
+			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=" + Login.doMain + ";path=/";
+	},
+
 	//cookie名称
 	cookieNames: function(cookies) {
 
@@ -286,12 +295,8 @@ var Login = {
 		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken");
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC");
 		var AuthUser_Signature = Login.getCookie("AuthUser_Signature");
-
-		console.log("OUTSSO_AuthNum:",OUTSSO_AuthNum);
-		console.log("AuthUser_AuthNum:",AuthUser_AuthNum);
-		console.log("AuthUser_AuthToken:",AuthUser_AuthToken);
-		console.log("AuthUser_AuthMAC:",AuthUser_AuthMAC);
-		console.log("AuthUser_Signature:",AuthUser_Signature);
+		var AuthUser_LoginId = Login.getCookie("AuthUser_LoginId");
+		
 		try
 		{
 			if(AuthUser_AuthToken == undefined)
@@ -318,11 +323,16 @@ var Login = {
 		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken");
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC");
 
-		Login.delCookie("AuthUser_loginId");
-		Login.delCookie("AuthUser_loginInfo");
-		Login.delCookie("AuthUser_Signature");
-		Login.delCookie("wd_sso_user");
-		return {"AuthUser_AuthNum":AuthUser_AuthNum,"AuthUser_AuthToken":AuthUser_AuthToken,"AuthUser_AuthMAC":AuthUser_AuthMAC};		
+		Login.delCook("AuthUser_loginId");
+		Login.delCook("AuthUser_loginInfo");
+		Login.delCook("AuthUser_Signature");
+		Login.delCook("wd_sso_user");
+
+		return {
+		"AuthUser_AuthNum":AuthUser_AuthNum,
+		"AuthUser_AuthToken":AuthUser_AuthToken,
+		"AuthUser_AuthMAC":AuthUser_AuthMAC
+		};
 	},
 
 	//万达系统登陆后,然后在本项目中自动登录
@@ -347,9 +357,10 @@ var Login = {
 						for (var p in obj) 
 						{
 							Login.setCookie(p, obj[p]);
+							console.log(p,obj[p]);
 						}				
 					}
-					Login.signIn();
+					Login.getUserInfo();
 				}
 			}
 		});
