@@ -295,12 +295,15 @@ var Login = {
 		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken");
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC");
 		var AuthUser_Signature = Login.getCookie("AuthUser_Signature");
+		var AuthUser_LoginId = Login.getCookie("AuthUser_LoginId");
 
 		console.log("OUTSSO_AuthNum:",OUTSSO_AuthNum);
 		console.log("AuthUser_AuthNum:",AuthUser_AuthNum);
 		console.log("AuthUser_AuthToken:",AuthUser_AuthToken);
 		console.log("AuthUser_AuthMAC:",AuthUser_AuthMAC);
 		console.log("AuthUser_Signature:",AuthUser_Signature);
+		console.log("AuthUser_LoginId:",AuthUser_LoginId);
+		
 		try
 		{
 			if(AuthUser_AuthToken == undefined)
