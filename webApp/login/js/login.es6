@@ -326,13 +326,18 @@ var Login = {
 		var AuthUser_AuthNum = Login.getCookie("AuthUser_AuthNum");
 		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken");
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC");
-
+		var AuthUser_LoginId = Login.getCookie("AuthUser_LoginId");
 		Login.delCook("AuthUser_loginId");
 		Login.delCook("AuthUser_loginInfo");
 		Login.delCook("AuthUser_Signature");
 		Login.delCook("wd_sso_user");
 
-		return {"AuthUser_AuthNum":AuthUser_AuthNum,"AuthUser_AuthToken":AuthUser_AuthToken,"AuthUser_AuthMAC":AuthUser_AuthMAC};		
+		return {
+		"AuthUser_AuthNum":AuthUser_AuthNum,
+		"AuthUser_AuthToken":AuthUser_AuthToken,
+		"AuthUser_AuthMAC":AuthUser_AuthMAC,
+		"AuthUser_LoginId":AuthUser_LoginId
+		};		
 	},
 
 	//万达系统登陆后,然后在本项目中自动登录
