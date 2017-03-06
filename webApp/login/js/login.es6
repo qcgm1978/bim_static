@@ -351,15 +351,11 @@ var Login = {
 				var obj,p,i;
 				if(data.code==0)
 				{
-					for(i=0;i<data.data.length;i++)
+					obj = data.data;
+					for (var p in obj) 
 					{
-						obj = data.data[i];
-						for (var p in obj) 
-						{
-							Login.setCookie(p, obj[p]);
-							console.log(p,obj[p]);
-						}				
-					}
+						Login.setCookie(p, obj[p]);
+					}				
 					Login.getUserInfo();
 				}
 			}
