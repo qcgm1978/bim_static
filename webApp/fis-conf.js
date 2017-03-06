@@ -100,6 +100,10 @@ fis.match('/static/dist/services/services.css', {
 fis.match('userAdmin/tpls/**.html', {
   release: "/static/dist/tpls/$0"
 });
+//backStage 后台管理页面
+fis.match('backStage/tpls/**.html', {
+  release: "/static/dist/tpls/$0"
+});
 //首页主体
 fis.match('bodyContent/tpls/**.html', {
   //useHash:true,
@@ -291,6 +295,21 @@ fis.match('/userAdmin/**.{css,less}', {
 fis.match('/static/dist/userAdmin/userAdmin.css', {
   //useHash:true,
   release: '/static/dist/userAdmin/userAdmin.css'
+});
+//backStage 后台管理页面
+fis.match('/backStage/**.{js,es6}', {
+  packTo: '/static/dist/backStage/backStage.js'
+});
+fis.match('/static/dist/backStage/backStage.js', {
+  //useHash:true,
+  release: '/static/dist/backStage/backStage.js'
+});
+fis.match('/backStage/**.{css,less}', {
+  packTo: '/static/dist/backStage/backStage.css'
+});
+fis.match('/static/dist/backStage/backStage.css', {
+  //useHash:true,
+  release: '/static/dist/backStage/backStage.css'
 });
 //bodyContent
 fis.match('/bodyContent/**.{less,css}', {

@@ -1,0 +1,110 @@
+.backStageListBox{
+	width: 1024px;
+	height: 100%;
+	margin: 0 auto;
+	padding: 20px;
+	ul li{
+		width: 100%;
+		height: 36px;
+		line-height: 36px;
+		font-size: 14px;
+		a{
+			color: #333;
+		}
+	}
+}
+.setPermissions{
+	width: 100%;
+	height: 100%;
+	padding-top: 16px;
+	position: relative;
+	& div{
+		box-sizing: border-box;
+	}
+	.setPermissionsTab{
+		width: 100%;
+		height: 38px;
+	    background-color: #eee;
+	    border: 1px solid #ccc;
+	    border-width: 1px 0px;
+	    position: absolute;
+	    top: 16px;
+	    left: 0;
+	    padding: 8px 0 0 20px;
+	    z-index: 10;
+        & li{
+        	border-top: 2px solid #eee;
+    	    float: left;
+    	    line-height: 27px;
+    	    height: 29px;
+    	    width: 98px;
+    	    text-align: center;
+    	    cursor: pointer;
+    	    &.selected{
+    	    	border: 1px #ccc solid;
+    	    	border-top: 2px solid #006ecf;
+    	    	border-bottom-color: #fff;
+    	    	background-color: #fff;
+    	    }
+        }
+	}
+	.downContent{
+		width: 100%;
+	    height: 100%;
+	    padding-top: 36px;
+    	&>div{
+    		width: 100%;
+    		height: 100%;
+			padding: 20px 20px 50px 20px;
+			position: relative;
+    		display: none;
+    		a{
+    		    text-decoration: none;
+    		    display: inline-block;
+    		    cursor: pointer;
+    		    border: 1px solid #ccc;
+    		    color: #333;
+    		    width: 100px;
+    		    height: 30px;
+    		    font-size: 14px;
+    		    line-height: 30px;
+    		    text-align: center;
+    			z-index: 10;
+    		    &:hover{
+    		    	color: #333;
+    		    }
+    		    i{
+    		    	display: inline-block;
+    		    	width: 14px;
+    		    	height: 14px;
+    		    	margin: 0 8px 0 0;
+    		    	position: relative;
+    		    	top: 2px;
+    		    }
+    		}
+    		#addViewUserBtn{
+    			position: absolute;
+    			left: 20px;
+    			top: 20px;
+    		}
+    		#deleteViewUserBtn{
+    			position: absolute;
+    			left: 140px;
+    			top: 20px;
+    		}
+    		.nullViewUserList{
+				position: fixed;
+				width: 280px;
+				height: 30px;
+				line-height: 30px;
+				left: 0;
+				right: 0;
+				top: 0;
+				bottom: 0;
+				margin: auto;
+				font-size: 16px;
+				color: #333;
+			}
+    	}
+	}
+}
