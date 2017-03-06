@@ -296,13 +296,6 @@ var Login = {
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC");
 		var AuthUser_Signature = Login.getCookie("AuthUser_Signature");
 		var AuthUser_LoginId = Login.getCookie("AuthUser_LoginId");
-
-		console.log("OUTSSO_AuthNum:",OUTSSO_AuthNum);
-		console.log("AuthUser_AuthNum:",AuthUser_AuthNum);
-		console.log("AuthUser_AuthToken:",AuthUser_AuthToken);
-		console.log("AuthUser_AuthMAC:",AuthUser_AuthMAC);
-		console.log("AuthUser_Signature:",AuthUser_Signature);
-		console.log("AuthUser_LoginId:",AuthUser_LoginId);
 		
 		try
 		{
@@ -364,6 +357,7 @@ var Login = {
 						for (var p in obj) 
 						{
 							Login.setCookie(p, obj[p]);
+							console.log(p,obj[p]);
 						}				
 					}
 					Login.getUserInfo();
