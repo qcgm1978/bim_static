@@ -366,7 +366,7 @@ var Login = {
 							Login.setCookie(p, obj[p]);
 						}				
 					}
-					Login.signIn();
+					Login.getUserInfo();
 				}
 			}
 		});
