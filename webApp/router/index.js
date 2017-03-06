@@ -26,9 +26,30 @@ var AppRoute = Backbone.Router.extend({
 		"post/detail/:id": 'postDetail',
 		'suggest':'suggest',
 		'userAdmin':'userAdmin',
+		'backStage':'backStage',
+		'backStage/setPermissions':'setPermissions',
 		'BIMperformance':'BIMperformances',                /*BIM性能测试,非用户使用*/
 		'BIMperformance/:id/:versionId':'BIMperformance',   /*BIM性能测试,非用户使用*/
 		'meeting':'meeting' 
+	},
+	//start 后台管理页面的路由方法
+	backStage:function(){
+		if (this.reset() == false) {
+			return;
+		}
+		_.require('/static/dist/backStage/backStage.css');
+		_.require('/static/dist/backStage/backStage.js');
+		App.backStage.init();
+		$("#pageLoading").hide();
+	},
+	setPermissions:function(){
+		if (this.reset() == false) {
+			return;
+		}
+		_.require('/static/dist/backStage/backStage.css');
+		_.require('/static/dist/backStage/backStage.js');
+		App.backStage.setPermissionsInit();
+		$("#pageLoading").hide();
 	},
 	//start 添加浏览用户的路由方法
 	userAdmin:function(){
