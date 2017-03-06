@@ -1204,6 +1204,8 @@
 			})
 			var _url = ourl + '/doc/' + this.Settings.projectId + '/' + this.Settings.projectVersionId + '?' + _this.Settings.token_cookie + '&modelId=';
 			viewer.on("click", function(model) {
+				console.log("MODEL",model);
+				console.log(model.intersect.axisGridInfo.position);
 				var _userId = model.intersect.userId || "",
 					_axisObj = model.intersect.axisGridInfo || {},
 					_boundingBox=model.intersect.worldBoundingBox,
