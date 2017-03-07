@@ -100,7 +100,17 @@
             <div class="dialogAlertBox_header">
                 <a href="javascript:;" class="closeDialog" id="closeDialog"></a>
             </div>
-            <div class="dialogAlertBox_content"></div>
+            <div class="dialogAlertBox_content">
+                <h1>演示账号申请流程</h1>
+                <p>“BIM演示系统”是万达集团部署的，用于展示BIM总发包管理平台操作功能的模拟系统。主要目的用于向广大万达集团合作伙伴提供模拟操作环境，以熟悉万达集团BIM总发包管理平台的功能及操作。</p>
+                <p>“BIM演示系统”的登录权限由万达集团统一控制，如各合作伙伴有登录演示系统熟悉操作的需要，可通过电子邮件的方式联系与贵方对接的万达集团内部业务部门进行申请，并统一开通。账号开通后15日内有效期，过期后自动失效。</p>
+                <p class="center">欢迎大家使用并提出您的宝贵意见！</p>
+                <p class="center">万达集团业务部门演示系统账号开通申请邮箱</p>
+                <p class="center">设计总包人员请联系万达商业地产设计中心，邮箱地址：liwanshun@wanda.com.cn</p>
+                <p class="center">工程总包人员请联系万达商业地产成本部，邮箱地址：bimocc@wanda.com.cn</p>
+                <p class="center">监理及第三发实测实量单位人员请联系质量监管中心，邮箱地址：zhijianzhongxin@wanda.com.cn</p>
+                <p class="center downLoad"><a href="javascript:;" id="downLoad" data-id="static/dist/login/down/BIM演示系统账号申请表.docx">下载BIM演示系统的账号申请表</a></p>
+            </div>
             <div class="dialogAlertBox_footer">
                 <button id="openDemoPage">确定</button>
             </div>
@@ -120,6 +130,10 @@
                 var openDemoPage = $("#openDemoPage");
                 var bodyBgDialog = $("#bodyBgDialog");
                 var dialogAlertBox = $("#dialogAlertBox");
+                $('#downLoad').on('click',function(){
+                    var id=$(this).data('id');
+                    window.open(id,'_blank');
+                })
                 if(host.indexOf("demo")>0){
                     login_demo.hide();
                     return;
