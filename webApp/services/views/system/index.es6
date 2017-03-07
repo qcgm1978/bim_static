@@ -36,7 +36,7 @@ App.Services.System=Backbone.View.extend({
 		if (Auth.feedbackAttribute) {//反馈管理标签
 			$container.append(tabs.feedbackAttribute.tab);
 		}
-		if (!Auth.resourceAttribute) {//资源管理标签
+		if (Auth.resourceAttribute) {//资源管理标签
 			$container.append(tabs.resourceAttribute.tab);
 		}
 
