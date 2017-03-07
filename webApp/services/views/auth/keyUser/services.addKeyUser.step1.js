@@ -21,7 +21,7 @@ App.Services.step1 = Backbone.View.extend({
       $.ajax({
         url: "platform//auth/user?name="+name
       }).done(function(data){
-        console.log(data);
+        // console.log(data);
         if(data.code == 0){
           var items = data.data, str = "";
 
