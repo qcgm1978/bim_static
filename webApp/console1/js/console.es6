@@ -554,6 +554,53 @@ App.Console = {
         $("#p13").val($(this).children('option:selected').attr("versionid"));
       });
     });
+    $.ajax({//获取默认项目列表的请求方法
+      url: "platform/project/module/create"
+    }).done(function(data) {
+      var items = data.data,
+        str = '';
+      $.each(items, function(i, item) {
+        console.log(item)
+        str += '<option subType="'+item.subType+'" openTime="'+item.openTime+'" delistingDate="'+item.delistingDate+'" region="'+item.region+'" province="'+item.province+'" designUnit="'+item.designUnit+'" projectType="'+item.projectType+'" estateType="'+item.estateType+'" value="' + item.id + '">' + item.name + '</option>';
+      });
+      $('#s00').html("<option value='' selected>请选择</option>" + str);
+      // .change(function() {
+      //         $("#p13").val($(this).children('option:selected').attr("versionid"));
+      //       });
+    });
+    //项目名称输入变化
+    $("#famTitle").change(function(event){
+      if(this.value !== ""){
+        $('#s00').prop('disabled', 'disabled');
+      }else{
+        $('#s00').prop('disabled', '');
+      }
+    })
+    $("#s00").change(function(event){
+      if(this.value !== ""){
+        $('#famTitle').attr('readonly', 'readonly');
+        $("#s01").val($(this).children('option:selected').attr("subType"));
+        $("#projectModel").val($(this).children('option:selected').attr("estateType"));
+        $("#projectFormat").val($(this).children('option:selected').attr("projectType"));
+        if($(this).children('option:selected').attr("designUnit")!="null"){
+          $("#launchDepartment").val($(this).children('option:selected').attr("designUnit"))
+        }
+        for(var i=0,len=$("#province").find("option").length-1;i<=len;i++){
+          if($($("#province").find("option")[i]).text() == $(this).children('option:selected').attr("province")){
+            $("#province").val($($("#province").find("option")[i]).val());
+          }
+        }
+        for(var i=0,len=$("#adminZone").find("option").length-1;i<=len;i++){
+          if($($("#adminZone").find("option")[0]).text() == $(this).children('option:selected').attr("region")){
+            $("#adminZone").val($($("#adminZone").find("option")[i]).val());
+          }
+        }
+        $("#delistDate").val($(this).children('option:selected').attr("delistingDate"));
+        $("#openDate").val($(this).children('option:selected').attr("openTime"));
+      }else{
+        $('#famTitle').prop('readonly', '');
+      }
+    })
     //6.1
     this.fn['6.1'] = function() {
       self.twoApply(1, 's02', 's03', 9);
@@ -648,6 +695,7 @@ App.Console = {
         return;
       }
       var data = {
+        id:$("#s00").val()==""?0:$("#s00").val(),
         type: 3,
         projectNo: $("#number").val().trim(),
         name: $("#famTitle").val().trim(),
