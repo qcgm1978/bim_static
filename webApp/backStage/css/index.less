@@ -18,9 +18,6 @@
 	height: 100%;
 	padding-top: 16px;
 	position: relative;
-	& div{
-		box-sizing: border-box;
-	}
 	.setPermissionsTab{
 		width: 100%;
 		height: 38px;
@@ -52,116 +49,132 @@
 		width: 100%;
 	    height: 100%;
 	    padding-top: 36px;
-    	&>div{
-    		width: 100%;
-    		height: 100%;
-			padding:20px;
-			position: relative;
-    		display: none;
-            .setPermissionsListBox,.viewListHeaderBox,.viewListBodyBox{
+        .setPermissionsBox{
+            width: 100%;
+            height: 100%;
+            padding:20px;
+            display: none;
+            .setPermissionsPublicBox{
                 width: 100%;
                 height: 100%;
-            }
-    		a{
-    		    text-decoration: none;
-    		    display: inline-block;
-    		    cursor: pointer;
-    		    border: 1px solid #ccc;
-    		    color: #333;
-    		    width: 100px;
-    		    height: 30px;
-    		    font-size: 14px;
-    		    line-height: 30px;
-    		    text-align: center;
-    			z-index: 10;
-    		    &:hover{
-    		    	color: #333;
-    		    }
-    		    i{
-    		    	display: inline-block;
-    		    	width: 14px;
-    		    	height: 14px;
-    		    	margin: 0 8px 0 0;
-    		    	position: relative;
-    		    	top: 2px;
-    		    }
-    		}
-    		#addViewUserBtn{
-    			position: absolute;
-    			left: 20px;
-    			top: 20px;
-    		}
-    		#deleteViewUserBtn{
-    			position: absolute;
-    			left: 140px;
-    			top: 20px;
-    		}
-    		.nullViewUserList{
-				position: fixed;
-				width: 280px;
-				height: 30px;
-				line-height: 30px;
-				left: 0;
-				right: 0;
-				top: 0;
-				bottom: 0;
-				margin: auto;
-				font-size: 16px;
-				color: #333;
-			}
-            .viewListBox{
-                width: 100%;
-                height: 100%;
-                padding-top: 50px;
                 position: relative;
-                table{
-                  width: 100%;
-                  height: 100%;
-                  border: #ccc solid 1px;
-                  td{
-                    text-align: center;
-                    border-left: 1px #ccc solid;
-                    height: 40px;
-                  }
-                    td:nth-child(1) {
-                        width: 4%;
-                    }
-                    td:nth-child(2) {
-                        width: 48%;
-                    }
-                    td:nth-child(3) {
-                        width: 48%;
-                    }
-                }
-                
-                .viewListHeaderBox{
+                .viewHeaderBox{
+                    width: 100%;
+                    height: 30px;
                     position: absolute;
-                    height: 40px;
                     left: 0;
-                    top: 50px;
-                    background: #eee;
-                    table{
-                        border-bottom: 0;
+                    top: 0;
+                    z-index: 10;
+                    a{
+                        text-decoration: none;
+                        display: inline-block;
+                        cursor: pointer;
+                        border: 1px solid #ccc;
+                        color: #333;
+                        width: 100px;
+                        height: 30px;
+                        font-size: 14px;
+                        line-height: 30px;
+                        text-align: center;
+                        z-index: 10;
+                        &:hover{
+                         color: #333;
+                        }
+                        i{
+                         display: inline-block;
+                         width: 14px;
+                         height: 14px;
+                         margin: 0 8px 0 0;
+                         position: relative;
+                         top: 2px;
+                        }
                     }
                 }
-                .viewListBodyBox{
+                .viewListBox{
+                    width: 100%;
+                    height: 100%;
+                    position: relative;
                     padding-top: 40px;
-                    overflow: hidden;
-                    .viewListBodyScrollBox{
-                        height: auto;
+                    table{
+                        width: 100%;
+                        height: 100%;
+                        border: #ccc solid 1px;
+                        td{
+                            text-align: center;
+                            border-left: 1px #ccc solid;
+                            height: 40px;
+                        }
+                        td:nth-child(1) {
+                            width: 4%;
+                        }
+                        td:nth-child(2) {
+                            width: 48%;
+                        }
+                        td:nth-child(3) {
+                            width: 48%;
+                        }
                     }
-                    td{
-                        border-bottom: 1px #ccc solid;
+                    .viewListHeaderBox{
+                        width: 100%;
+                        height: 40px;
+                        position: absolute;
+                        left: 0;
+                        top: 40px;
+                        background: #eee;
+                    }
+                    .viewListBodyBox{
+                        width: 100%;
+                        height: 100%;
+                        padding-top: 40px;
+                        .scrollBox{
+                            width: 100%;
+                            height: auto;
+                            tr td{
+                                border-bottom: 1px #ccc solid;   
+                            }
+                            tr:nth-last-child(1){
+                                td{
+                                    border-bottom:0;   
+                                }
+                            }
+                        }
                     }
                 }
             }
-    	}
+        }
 	}
 }
-.deleteClass {
-    .content{
-        text-align: center;
-        height: 100px;
-        line-height: 100px;
+.setPermissionsAlert{
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    .alertInfo{
+        width: 100%;
+        height: 32px;
+        line-height: 32px;
+        margin-top: 60px;
+        padding-left: 40px;
+        float: left;
+    }
+    .alertInfo:before {
+        content: '';
+        position: absolute;
+        background: transparent url(/static/dist/images/services/images/service_ico.png) 0 0 no-repeat;
+        vertical-align: middle;
+        width: 32px;
+        height: 32px;
+        background-position: 0 -300px;
+        left: 42px;
+        top: 70px;
+    }
+    .confirm{
+        width: 100%;
+        height: 30px;
+        line-height: 30px;
+        float: left;
+        margin-top: 30px;
+        #servicesCancel{
+            margin-left: 16px;
+        }
     }
 }

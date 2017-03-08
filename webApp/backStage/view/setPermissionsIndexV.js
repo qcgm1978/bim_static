@@ -1,36 +1,24 @@
 App.backStage.SetPermissionsIndexV = Backbone.View.extend({
 	el:$("#contains"),
 	template:_.templateUrl("/backStage/tpls/setPermissions/setPermissions.html"),
-	events: {
- 		"click #headerUlTab li": "switchTab",
- 	},
+	events:{
+		"click #headerUlTab li":"headerUlTabFun",//tab切换的效果
+	},
 	render:function(){
 		this.$el.html(this.template());
-		$("#headerUlTab").find("li").eq(0).addClass("selected");
-		$("#downViewShowBox > div").eq(0).css("display","block");
-		var PublicDomV = new App.backStage.PublicDomV();
-		var viewStandardPattern = this.$(".viewStandardPattern");
-		viewStandardPattern.empty();
-		viewStandardPattern.append(PublicDomV.render().el);
+		this.loadInitHandle();//初始化执行的方法
 		return this;
 	},
-	switchTab:function(event){//tab切换的方法
-		var target = $(event.target);
-		var downViewShowBox = this.$("#downViewShowBox");
-		if(!target.hasClass('selected')){
-			target.siblings().removeClass('selected').end().addClass('selected');
-			var PublicDomV = new App.backStage.PublicDomV();
-			if(target.data('type') == "viewStandardPattern"){
-				var viewStandardPattern = this.$(".viewStandardPattern");
-				downViewShowBox.find("div.viewStandardPattern").siblings().css("display","none").end().css("display","block");
-				viewStandardPattern.empty();
-				viewStandardPattern.append(PublicDomV.render({tabType:"model"}).el);
-			}else if(target.data('type') == "viewFamilyLibrary"){
-				var viewFamilyLibrary = this.$(".viewFamilyLibrary");
-				downViewShowBox.find("div.viewFamilyLibrary").siblings().css("display","none").end().css("display","block");
-				viewFamilyLibrary.empty();
-				viewFamilyLibrary.append(PublicDomV.render({tabType:"family"}).el);
-			}
-		}
+	loadInitHandle:function(){//初始化执行的方法
+		this.$("#headerUlTab li").eq(0).trigger("click");
 	},
+	headerUlTabFun:function(event){//tab切换的效果 并且加载公用的添加按钮和删除按钮
+		var target = $(event.target);
+		var tabType = target.data("type");
+		var downViewShowBox = $("#downViewShowBox");
+		target.addClass("selected").siblings().removeClass("selected");
+		downViewShowBox.find("."+tabType).css("display","block").siblings().css("display","none");
+		var PublicBoxV = new App.backStage.SetPermissionsIndexV.PublicBoxV({model:tabType});
+		downViewShowBox.find("."+tabType).html(PublicBoxV.render().el);
+	}
 })

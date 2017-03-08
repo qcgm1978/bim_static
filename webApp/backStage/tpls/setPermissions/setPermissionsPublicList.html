@@ -1,11 +1,5 @@
-<table>
-	<% if(obj.listData.length>0) {%>
-		<% _.each(obj.listData,function(item){%>
-			<tr>
-				<td><input type="checkBox" name="checkItem" class="checkItem"></td>
-				<td><%= item.departmentName %></td>
-				<td><%= item.departmentOfficer %></td>
-			</tr>
-		<%})%>
-	<%}%>
-</table>
+<% if(obj.item) {%>
+<td data-deleteId="<%= item.departmentId %>"><input type="checkBox" name="checkItem" class="checkItem"></td>
+<td><%= item.departmentName %></td>
+<td><%= item.departmentOfficer %></td>
+<%}%>
