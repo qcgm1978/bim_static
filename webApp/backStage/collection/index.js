@@ -18,10 +18,28 @@ App.backStage = {
 				}
 			}
 		}),
-		urlType: "",
+		urlType: "getPrefixsList",
 		parse(response) {
 			if (response.code == 0) {
-                 return response.data.items;
+                 // return response.data.items;
+                 var listData = [{
+					departmentId:1,
+					departmentName:"商业地产-商业地产学院",
+					departmentOfficer:"李某、王某"
+				},{
+					departmentId:2,
+					departmentName:"商业地产-商业地产学院",
+					departmentOfficer:"李某、王某"
+				},{
+					departmentId:3,
+					departmentName:"商业地产-商业地产学院",
+					departmentOfficer:"李某、王某"
+				},{
+					departmentId:4,
+					departmentName:"商业地产-商业地产学院",
+					departmentOfficer:"李某、王某"
+				}]
+                 return listData;
              }
 		}
 	})),

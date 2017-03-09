@@ -5,7 +5,8 @@ App.backStage.SetPermissionsIndexV.PublicListBoxV = Backbone.View.extend({
 		"click .checkItem": "checkItemFun",
 	},
 	render:function(){
-		this.$el.html(this.template({item:this.model}));
+		var model = this.model.toJSON();
+		this.$el.html(this.template({item:model}));
 		return this;
 	},
 	checkItemFun(){//点击列表的单个复选框的方法

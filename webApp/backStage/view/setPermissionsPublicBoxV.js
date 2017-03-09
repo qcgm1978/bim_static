@@ -4,7 +4,8 @@ App.backStage.SetPermissionsIndexV.PublicBoxV = Backbone.View.extend({
 	template:_.templateUrl("/backStage/tpls/setPermissions/setPermissionsPublicBox.html"),
 	events:{
 		"click .allCheck": "allCheckFun",//全选的方法
-		"click #deleteViewUserBtn": "deleteBtnFun",//删除按钮的方法
+		"click #addViewUserBtn": "addViewUserBtnFun",//添加部门按钮的方法
+		"click #deleteViewUserBtn": "deleteBtnFun",//删除部门按钮的方法
 	},
 	initialize() {//初始化
 		this.listenTo(App.backStage.GetListCollection, "add", this.addOne);
@@ -18,33 +19,28 @@ App.backStage.SetPermissionsIndexV.PublicBoxV = Backbone.View.extend({
 	},
 	getListHandle:function(){//获取当前tab下的列表的方法
 		// //重置
-		// App.Services.SystemCollection.CategoryCollection.reset();
-		// //获取数据
-		// App.Services.SystemCollection.CategoryCollection.fetch({
-		// 	success:function(models,data){
-		// 		this.$(".textSum .count").text(data.data.items.length);
-		// 	}
-		// });
 		App.backStage.GetListCollection.reset();
-		var listData = [{
-			departmentId:1,
-			departmentName:"商业地产-商业地产学院",
-			departmentOfficer:"李某、王某"
-		},{
-			departmentId:2,
-			departmentName:"商业地产-商业地产学院",
-			departmentOfficer:"李某、王某"
-		},{
-			departmentId:3,
-			departmentName:"商业地产-商业地产学院",
-			departmentOfficer:"李某、王某"
-		}];
-		App.backStage.GetListCollection.push(listData);
+		//获取数据
+		App.backStage.GetListCollection.fetch({
+			success:function(models,data){
+				// console.log("models",models);
+				// console.log("data",data);
+			}
+		});
+		// if(this.model == "viewStandardPattern"){
+			
+		// }else if (this.model == "viewFamilyLibrary") {
+			
+		// }
+		// App.backStage.GetListCollection.reset();
+		// App.backStage.GetListCollection.push(listData);
 	},
 	addOne:function(model){//每一条数据 进行处理
+		var PublicListBoxV = new App.backStage.SetPermissionsIndexV.PublicListBoxV({
+			model:model
+		});
 		this.$("#tbodyDom").find(".loading").remove();
-		var model = model.toJSON();
-		var PublicListBoxV = new App.backStage.SetPermissionsIndexV.PublicListBoxV({model:model});
+		console.log("PublicListBoxV",PublicListBoxV.render().el)
 		this.$("#tbodyDom").append(PublicListBoxV.render().el);
 		//滚动条
 		App.Comm.initScroll(this.$(".scrollBox"), "y");
@@ -106,4 +102,7 @@ App.backStage.SetPermissionsIndexV.PublicBoxV = Backbone.View.extend({
 	 		deleteAlertDialog.close();
 	 	})
 	},
+	addViewUserBtnFun:function(){//添加部门按钮的方法
+		
+	}
 })
