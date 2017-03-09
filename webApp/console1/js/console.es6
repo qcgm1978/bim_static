@@ -560,8 +560,7 @@ App.Console = {
       var items = data.data,
         str = '';
       $.each(items, function(i, item) {
-        console.log(item)
-        str += '<option subType="'+item.subType+'" openTime="'+item.openTime+'" delistingDate="'+item.delistingDate+'" region="'+item.region+'" province="'+item.province+'" designUnit="'+item.designUnit+'" projectType="'+item.projectType+'" estateType="'+item.estateType+'" value="' + item.id + '">' + item.name + '</option>';
+        str += '<option subType="'+item.subType+'" projectNo="'+item.projectNo+'" openTime="'+item.openTime+'" delistingDate="'+item.delistingDate+'" region="'+item.region+'" province="'+item.province+'" designUnit="'+item.designUnit+'" projectType="'+item.projectType+'" estateType="'+item.estateType+'" value="' + item.id + '">' + item.name + '</option>';
       });
       $('#s00').html("<option value='' selected>请选择</option>" + str);
       // .change(function() {
@@ -582,6 +581,7 @@ App.Console = {
         $("#s01").val($(this).children('option:selected').attr("subType"));
         $("#projectModel").val($(this).children('option:selected').attr("estateType"));
         $("#projectFormat").val($(this).children('option:selected').attr("projectType"));
+        $("#number").val($(this).children('option:selected').attr("projectNo")).prop('readonly', 'readonly');
         if($(this).children('option:selected').attr("designUnit")!="null"){
           $("#launchDepartment").val($(this).children('option:selected').attr("designUnit"))
         }
@@ -599,6 +599,7 @@ App.Console = {
         $("#openDate").val($(this).children('option:selected').attr("openTime"));
       }else{
         $('#famTitle').prop('readonly', '');
+        $('#number').prop('readonly', '');
       }
     })
     //6.1
