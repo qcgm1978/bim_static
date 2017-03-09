@@ -104,7 +104,7 @@ App.backStage.SetPermissionsIndexV.PublicBoxV = Backbone.View.extend({
 	},
 	addViewUserBtnFun:function(){//添加部门按钮的方法
 		App.backStage.maskWindow = new App.Comm.modules.Dialog({title:'',width:600,height:500,isConfirm:false});
-		var AddDepartmentV = new App.backStage.SetPermissionsIndexV.AddDepartmentV();
+		var AddDepartmentV = new App.backStage.AddDepartmentV();
 		$('.mod-dialog .wrapper').html(AddDepartmentV.render().el);
 		$('.keyU .title').show();
 		$('.keyU .search').hide();

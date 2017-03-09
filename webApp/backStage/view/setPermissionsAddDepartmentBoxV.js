@@ -1,4 +1,4 @@
-App.backStage.SetPermissionsIndexV.AddDepartmentV = Backbone.View.extend({
+App.backStage.AddDepartmentV = Backbone.View.extend({
 	tagName: "div",
 	className: "backStageWindow",
 	template: _.templateUrl("/backStage/tpls/setPermissions/setPermissionsPublicDepartmentBox.html"),
