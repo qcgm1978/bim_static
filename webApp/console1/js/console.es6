@@ -699,7 +699,7 @@ App.Console = {
         id:$("#s00").val()==""?0:$("#s00").val(),
         type: 3,
         projectNo: $("#number").val().trim(),
-        name: $("#famTitle").val().trim(),
+        name: $("#s00").val()==""?$("#famTitle").val().trim():$("#s00 option:selected").html().trim(),
         province: $("#province option:selected").html().trim(),
         subType: $("#s01").val().trim(), //项目类型
         estateType: $("#projectModel").val().trim(), // 项目模式
