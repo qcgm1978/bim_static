@@ -560,7 +560,6 @@ App.Console = {
       var items = data.data,
         str = '';
       $.each(items, function(i, item) {
-        console.log(item)
         str += '<option subType="'+item.subType+'" projectNo="'+item.projectNo+'" openTime="'+item.openTime+'" delistingDate="'+item.delistingDate+'" region="'+item.region+'" province="'+item.province+'" designUnit="'+item.designUnit+'" projectType="'+item.projectType+'" estateType="'+item.estateType+'" value="' + item.id + '">' + item.name + '</option>';
       });
       $('#s00').html("<option value='' selected>请选择</option>" + str);
