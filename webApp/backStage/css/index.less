@@ -178,3 +178,227 @@
         }
     }
 }
+.backStageWindow{
+    width: 600px;
+    height: 545px;
+    background-color: #ffffff;
+    .toselected > p > span {
+        background: #A8DBFD;
+    }
+    .title {
+        font-size: 12px;
+        color: #9f9f9f;
+        line-height: 23px;
+        height: 24px;
+    }
+    .windowClose {
+        position: relative;
+        float: right;
+        width: 49px;
+        height: 49px;
+        z-index: 10;
+        cursor: pointer;
+        &:before {
+            content: '';
+            top: 17px;
+            left: 17px;
+            width: 15px;
+            height: 15px;
+            background: url(/static/dist/images/services/images/service_ico.png) 0 -360px no-repeat;
+            position: absolute;
+        }
+    }
+    h1 {
+        height: 50px;
+        line-height: 49px;
+        border-bottom: 1px solid #e6e6e6;
+        font-size: 16px;
+        padding-left: 24px;
+        color: #333333;
+    }
+    .windowSubmit {
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+        background-color: #0572d0;
+        color: #ffffff;
+        width: 80px;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+        cursor: pointer;
+    }
+    .partition {
+        height: 40px;
+        display: none;
+        border: 1px solid #ccc;
+        margin: 10px 20px 0px;
+        font-size: 14px;
+        a {
+            line-height: 40px;
+            float: left;
+            color: #333;
+            text-decoration: none;
+            width: 33%;
+            span {
+                display: inline-block;
+                width: 16px;
+                position: relative;
+                top: 2px;
+                left: 0px;
+                height: 16px;
+                margin: 0px 4px 0 12px;
+                border-radius: 100%;
+                border: 1px solid #ccc;
+                text-align: center;
+                i {
+                    display: none;
+                    width: 6px;
+                    position: absolute;
+                    top: 4px;
+                    left: 4px;
+                    height: 6px;
+                    border-radius: 100%;
+                    background: #1C84E3;
+                }
+            }
+        }
+        a.active i {
+            display: block;
+        }
+    }
+    .pdX20 {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    .leftWindow li,.rightWindow li {
+        padding-left: 23px;
+        cursor: pointer;
+    }
+    .leftWindow > div > li,.rightWindow > div > li {
+        padding-left: 12px;
+    }
+    .leftWindow p,.rightWindow p {
+        word-break: keep-all;
+        white-space: nowrap;
+        font-size: 12px;
+        color: #999;
+        background: #ffffff;
+        height: 25px;
+        padding-bottom: 4px;
+        cursor: pointer;
+    }
+    .leftWindow p.shut i, .rightWindow p.shut i {
+        display: inline-block;
+        width: 20px;
+        height: 18px;
+        background: url(/static/dist/images/services/images/service_ico.png) 0 -99px no-repeat;
+    }
+    .leftWindow p i, .rightWindow p i {
+        position: relative;
+        top: 6px;
+    }
+    .leftWindow ul.shut, .rightWindow ul.shut {
+        display: none;
+    }
+    .leftWindow p.open i, .rightWindow p.open i {
+        display: inline-block;
+        left: -3px;
+        width: 20px;
+        height: 18px;
+        background: url(/static/dist/images/services/images/service_ico.png) 0 -79px no-repeat;
+    }
+    .rightWindow li{
+        position: relative;
+    }
+    .rightWindow li p {
+        background: transparent;
+        cursor: auto;
+    }
+    .rightWindow li:hover {
+        background: #A8DBFD;
+    }
+    .rightWindow li .delete {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 50px;
+        z-index: 2;
+        display: none;
+    }
+    .rightWindow li:hover .delete {
+        display: block;
+        &:after {
+            content: "";
+            position: absolute;
+            width: 17px;
+            height: 13px;
+            right: 10px;
+            top: 5px;
+            background: transparent url(/static/dist/images/services/images/service_ico.png) 0 -280px no-repeat;
+        }
+    }
+    .keyU {
+        width: 100%;
+        height: 312px;
+        & > div {
+            margin-top: 20px;
+            float: left;
+            width: 240px;
+            height: 100%;
+            overflow: hidden;
+            border-bottom: 1px solid #ccc;
+            .search {
+                width: 240px;
+                height: 30px;
+                border: 1px solid #ccc;
+                position: relative;
+                margin-bottom: 12px;
+            }
+            p.title {
+                padding-left: 10px;
+                color: #999;
+                height: 30px;
+                background: #eee;
+                margin-bottom: 12px;
+                font-family: "Microsoft Yahei";
+                font-size: 14px;
+                line-height: 30px;
+            }
+            &>ul {
+                border: 1px solid #ccc;
+                height: 270px;
+                overflow-y: auto;
+            }
+        }
+        a {
+            display: block;
+            float: left;
+            width: 60px;
+            height: 30px;
+            margin: 90px 10px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            line-height: 30px;
+            color: #666;
+            font-weight: 100;
+            font-family: "Microsoft Yahei";
+            cursor: pointer;
+            i {
+                color: #85B80D;
+                font-size: 14px;
+                margin: 0 4px 0 7px;
+                &:hover{
+                    text-decoration: none;
+                }
+            }
+            &:hover{
+                text-decoration: none;
+            }
+        }
+    }
+    .none {
+        display: none;
+    }
+}
