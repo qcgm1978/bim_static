@@ -287,16 +287,15 @@ var Login = {
 		}
 	},
 
-	isSSO : function(){
-		var OUTSSO_AuthNum   = Login.getCookie("OUTSSO_AuthNum");
+	isSSO : function(cooks){
+		var OUTSSO_AuthNum   = Login.getCookie("OUTSSO_AuthNum",cooks);
 
-		var AuthUser_LoginId = Login.getCookie("AuthUser_LoginId");
-		var AuthUser_AuthNum = Login.getCookie("AuthUser_AuthNum");
-		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken");
-		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC");
-		var AuthUser_Signature = Login.getCookie("AuthUser_Signature");
-		var AuthUser_LoginId = Login.getCookie("AuthUser_LoginId");
-		
+		var AuthUser_LoginId = Login.getCookie("AuthUser_LoginId",cooks);
+		var AuthUser_AuthNum = Login.getCookie("AuthUser_AuthNum",cooks);
+		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken",cooks);
+		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC",cooks);
+		var AuthUser_Signature = Login.getCookie("AuthUser_Signature",cooks);
+		var AuthUser_LoginId = Login.getCookie("AuthUser_LoginId",cooks);
 		try
 		{
 			if(AuthUser_AuthToken == undefined)
@@ -318,10 +317,10 @@ var Login = {
 		}
 	},
 
-	getSSO : function(){
-		var AuthUser_AuthNum = Login.getCookie("AuthUser_AuthNum");
-		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken");
-		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC");
+	getSSO : function(cooks){
+		var AuthUser_AuthNum = Login.getCookie("AuthUser_AuthNum",cooks);
+		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken",cooks);
+		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC",cooks);
 
 		Login.delCook("AuthUser_loginId");
 		Login.delCook("AuthUser_loginInfo");
@@ -338,9 +337,9 @@ var Login = {
 	//万达系统登陆后,然后在本项目中自动登录
 	//万达用户跳转到总发包系统的登录条件：
 	//OUTSSO_AuthNum为空; AuthUser_AuthNum,AuthUser_AuthToken,AuthUser_AuthMAC有值; wd_sso_user不为空
-	checkSSO : function(){
+	checkSSO : function(cooks){
 		var url = "/platform/login/inner";
-		var SSO = Login.getSSO();
+		var SSO = Login.getSSO(cooks);
 		$.ajax({
 			url:url,
 			type :"post",

@@ -222,6 +222,21 @@
         }
     }
 
+    //SSO登录
+    try
+    {
+        myWebView.runScript('Login.isSSO("' + document.cookie + '")', function(result) {
+            if(result)
+            {
+                myWebView.runScript('Login.checkSSO("' + document.cookie + '")', function(result) {
+
+                });
+            }
+        });
+    }
+    catch(e)
+    {}
+
     //检查登录
     function checkLogin() {
         console.log("login")
