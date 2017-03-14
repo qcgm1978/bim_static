@@ -60,7 +60,7 @@ App.backStage.AddDepartmentStandard_3 = Backbone.View.extend({
                   data.shut = true;
                   data.canLoad = true;
                   str += "<li>" +
-                    "<p class='shut mulu" + "' data-id='" + data['orgId'] + "' data-canLoad='" + (data['hasChildren'] || data['hasUser'] ? true : false) + "'><i ></i><span class='isspan'>" + data['name'] + "</span></p>" +
+                    "<p class='shut mulu" + "' data-id='" + data['orgId'] + "' data-outer='" + data['outer'] + "' data-name='" + data['name']  + "' data-canLoad='" + (data['hasChildren'] || data['hasUser'] ? true : false) + "'><i ></i><span class='isspan'>" + data['name'] + "</span></p>" +
                     "<ul class='shut'></ul>" +
                     "</li>";
                 });

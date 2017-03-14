@@ -1,12 +1,12 @@
 App.backStage.SetPermissionsIndexV.PublicListBoxV = Backbone.View.extend({
-	el:"tr",
+	tagName:'div',
+	className:'scrollBox',
 	template:_.templateUrl("/backStage/tpls/setPermissions/setPermissionsPublicList.html"),
 	events:{
 		"click .checkItem": "checkItemFun",
 	},
-	render:function(){
-		var model = this.model.toJSON();
-		this.$el.html(this.template({item:model}));
+	render:function(items){
+		this.$el.html(this.template({items:items}));
 		return this;
 	},
 	checkItemFun(){//点击列表的单个复选框的方法

@@ -3,7 +3,7 @@ App.userAdmin.DeleteUserAdminListDialogV = Backbone.View.extend({
 		deleteId:''
 	},
 	template:_.templateUrl("/userAdmin/tpls/deleteViewUserDialog.html"),
-	tarName:'div',
+	tagName:'div',
 	className:'deleteViewUserBox',
 	events: {
  		"click .deleteBtn": "deleteUserAdminFun",

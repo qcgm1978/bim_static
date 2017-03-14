@@ -1,5 +1,5 @@
 var App = App || {};
-App.backStage.AddDepartmentStandard_1 = Backbone.View.extend({
+App.backStage.AddDepartmentStandard_2 = Backbone.View.extend({
   tagName: 'div',
   className: 'step1',
   template: _.templateUrl("/backStage/tpls/setPermissions/setPermissionsPublicDepartmentBox_1.html"),
@@ -15,7 +15,7 @@ App.backStage.AddDepartmentStandard_1 = Backbone.View.extend({
       this.$el.addClass('step1in3');
     } else if (typeof name == 'string') {
       $.ajax({
-        url: "platform/workforgcon?name=" + name
+        url: "platform//auth/user?name=" + name
       }).done(function(data) {
         if (data.code == 0) {
           var items = data.data,
@@ -87,6 +87,7 @@ App.backStage.AddDepartmentStandard_1 = Backbone.View.extend({
                 _.each(r.data.org, function(data) {
                   data.shut = true;
                   data.canLoad = true;
+                  //<%= data[i]['child'] && data[i]['child'][0]=='string'?'lastLayer':''%>
                   str += "<li>" +
                     "<p class='shut mulu" + "' data-id='" + data['orgId'] + "' data-name='" + data['name'] + "' data-outer='" + data['outer'] + "' data-canLoad='" + (data['hasChildren'] || data['hasUser'] ? true : false) + "'><i ></i><span class='isspan'>" + data['name'] + "</span></p>" +
                     "<ul class='shut'></ul>" +

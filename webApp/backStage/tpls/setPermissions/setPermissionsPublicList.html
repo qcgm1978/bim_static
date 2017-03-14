@@ -1,5 +1,16 @@
-<% if(obj.item) {%>
-<td data-deleteId="<%= item.departmentId %>"><input type="checkBox" name="checkItem" class="checkItem"></td>
-<td><%= item.departmentName %></td>
-<td><%= item.departmentOfficer %></td>
-<%}%>
+<table>
+	<% if(obj.items.length>0){%>
+		<% _.each(obj.items,function(item){%>
+			<tr>
+				<td data-deleteId="<%= item.id %>"><input type="checkBox" name="checkItem" class="checkItem"></td>
+				<td><%= item.orgname %></td>
+			</tr>
+		<% }) %>
+	<%}else{%>
+		<tr>
+			<td></td>
+			<td>没有数据</td>
+		</tr>
+	<%}%>
+</table>
+

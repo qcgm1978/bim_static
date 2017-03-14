@@ -348,6 +348,9 @@ App.API = {
 		deleteViewUserPrefix:"platform/testuser/prefix",//删除用户前缀的地址
 
 		relLink:"platform/relLink",//获取链接地址的接口
+		getWorkforgconList:"platform/workforgcon",//获取添加的族库和标准模型库的列表的接口
+		addWorkforgcon:"platform/workforgcon",//添加的族库和标准模型库的列表的接口
+		deleteWorkforgcon:"platform/workforgcon",//删除族库和标准模型库的列表的接口
 
 	},
 
