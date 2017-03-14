@@ -7,7 +7,7 @@
         </tr>
         <tr>
             <td>
-                <textarea name="" id="sugDescr" cols="30" rows="10" placeholder="请输入您的建议与反馈"></textarea>
+                <textarea name="" id="sugDescr" cols="30" rows="10" placeholder="请输入您的建议与反馈" maxlength="500"></textarea>
             </td>
         </tr>
         <tr>
@@ -15,7 +15,7 @@
                 <span class="label">附件</span>
                 <a href="javascript:;" class="alink upload">上传附件</a>
                 <form id="uploadSuggestForm" action="/platform/advice/feedback/upload" method="post" target="upload-iframe-suggest" enctype="multipart/form-data" encoding="multipart/form-data">
-                    <input id="inputSuggestFile" name="file" type="file" style="display: none"/>
+                    <input id="inputSuggestFile" name="file" type="file" style="display: none" onchange="return App.Services.SuggestView.checkFile(this)" />
                 </form>
                 <iframe id="uploadIframeSuggest" name="upload-iframe-suggest" border="0" width="0" height="0" style="width: 0;height: 0; display: none;"></iframe>
             </td>

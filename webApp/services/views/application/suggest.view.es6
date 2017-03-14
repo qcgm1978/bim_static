@@ -40,9 +40,26 @@ App.Services.SuggestView = {
         window.open('/platform/advice/feedback/download/'+id,'_blank');
     },
 
+    checkFile : function(_this){
+        console.log(_this.files[0].size/1024);
+        return false;
+    },
+
+    deleteFile : function(_this){
+        var id=$(_this).data('id');
+        $.ajax({
+            url : url,
+            type : "get",
+            dataType : "json",
+            success : function(json){
+
+            }
+        });
+    },
+
     afterUpload:function(res,_this){
         if(res.code==0){
-            _this.find('.attachList').append('<div><a data-id="'+res.data.attachmentId+'" href="javascript:;" onclick="App.Services.SuggestView.download(this);" class="alink listItem">'+res.data.attachmentName+'</a></div>');
+            _this.find('.attachList').append('<div><a data-id="'+res.data.attachmentId+'" href="javascript:;" onclick="App.Services.SuggestView.download(this);" class="alink listItem">'+res.data.attachmentName+'</a>&nbsp;&nbsp;<a href="javascript:;" onclick="App.Services.SuggestView.deleteFile(this)" >删除</a></div>');
         }
     },
 
