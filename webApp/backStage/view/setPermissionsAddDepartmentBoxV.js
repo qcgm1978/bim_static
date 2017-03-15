@@ -1,121 +1,330 @@
 App.backStage.AddDepartmentV = Backbone.View.extend({
 	tagName: "div",
-	className: "backStageWindow",
+	className: "moduleWindow",
 	template: _.templateUrl("/backStage/tpls/setPermissions/setPermissionsPublicDepartmentBox.html"),
+	selectTree: null,
+	selectedTree: null,
 	events: {
-		"click .windowClose": "close",
-		"click #select": "move",
-		"click .rightWindow .delete": "remove",
-		"click .confirm": 'confirm',
-		"click .search span": 'searchFun',
-		"click .search .closeicon"       : 'clear',
+		"click a[name='selectBtn']": "addOption",
+		"mouseover .ztree li a": "showDelete",
+		"mouseout .ztree li a": "hideDelete",
+		'click #grandBtn':'grand',
+		"click .searchBtn":"search",
+		"click .closeicon":"clearSearch",
+		"keyup #searchContent":"searchCli"
 	},
 	default:{
-		type:2
+		type:2,
+		ajaxArr:[]
 	},
+	isSearch : false,
 	render: function(type) {
-		this.$el.html(this.template());
 		this.default.type=type;
-		this.$el.find('.leftWindow').html(new App.backStage.AddDepartmentStandard_1({model:type}).render('step3').el);
-		this.$el.find('.leftWindow').append(new App.backStage.AddDepartmentStandard_3({model:type}).render().el);
-		App.backStage.loadData(App.backStage.Step1, '', function(r) {
-			if (r && !r.code && r.data) {
-				_.each(r.data.org, function(data, index) {
-					data.shut = true;
-					data.canLoad = true;
-				});
-				App.backStage.Step1.set(r.data.org);
-			}
-		});
-		App.backStage.loadData(App.backStage.Step3, '', function(r) {
-			if (r && !r.code && r.data) {
-				_.each(r.data.org, function(data, index) {
-					data.shut = true;
-					data.canLoad = true;
-				});
-				App.backStage.Step3.set(r.data.org);
-			}
-		});
+		this.default.ajaxArr=[];
+		this.$el.append(this.template());
 		return this;
 	},
-	//选择人到右边窗口
-	move: function() {
-		var str = '';
-		var $selected = this.$el.find('.toselected');
-		if (!$selected.length) {
-			return ''
+	//初始化部门成员数据、基于ztree树插件
+	initView: function(data) {
+		//缓存当前View实例对象
+		var _view = this;
+		//树插件初始化配置
+		_view.loadChildren(_view,false,null);
+		if(data !== "clearSearch"){
+			this.selectedTree = $.fn.zTree.init($("#selectedTree"), {
+				data:{
+					key:{
+						title:"tip"
+					}
+				},
+				edit:{
+					enable:true,
+					showRemoveBtn:true,
+					showRenameBtn:false
+				},
+				view: {
+					selectedMulti: false,
+					showLine: false,
+					showTitle:true,
+					nameIsHTML:true
+				}
+			}, []);
 		}
-		if(this.$el.find('.rightWindow div>li').length>=1){
-			alert("每次只能添加一个部门")
-			return;
-		}
-		var orgId = $selected.find('p').attr('data-id');
-		var orgName = $selected.find('p').attr('data-name');
-		var orgOuter = $selected.find('p').attr('data-outer');
-		if (_.contains(App.backStage.orgId, orgId.toString()) || _.contains(App.backStage.orgId, parseInt(orgId))) {
-			return '';
-		} else {
-			App.backStage.orgId.push(orgId);
-			App.backStage.orgName = orgName;
-			App.backStage.orgOuter = orgOuter;
-			var person = $selected.html();
-			$selected.removeClass('toselected');
-			this.$el.find('.rightWindow div').append($('<li><span class="delete"></span>' + person + '</li>'));
-		}
-		$('.rightWindow').siblings('p').text("已选部门 ( " + this.$el.find('.rightWindow div>li').length + "个 )");
 	},
-	//移除已选中的名单
-	remove: function(e) { //部门权限移除已选中的名单
-		var $li = $(e.target).parents('li');
-		var orgId = $li.find('p').attr('data-id');
-		App.backStage.editorgId = _.without(App.backStage.editorgId, parseInt(orgId), orgId.toString());
-		App.backStage.orgId = App.backStage.editorgId;
-		$('.rightWindow').siblings('p').text("已选部门 (0个 )");
-		$li.remove();
+	//搜索模块
+	search:function(e){
+		var _this = this, 
+			url,
+			content = $("#searchContent").val();
+		if(!content){return}
+		var uid=App.Comm.user('userId');
+		var treeNode = null,
+			setting = {
+				data:{
+					key:{
+						title:"tip"
+					}
+				},
+				callback: {
+					beforeDblClick:function(){
+						return true;
+					},
+					onDblClick: function(event, treeId, treeNode) {
+						if(!treeNode.userId && !treeNode.isParent){
+							_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
+						}else if(treeNode.userId){
+							_this.addOption();
+						}
+					}
+				},
+				view: {
+					selectedMulti: true,
+					nameIsHTML:true,
+					showLine: false,
+					showTitle:false
+				}
+			};
+
+		url=App.API.URL.searchUrl +"?name=" + content;  // 头像不对
+		$.ajax({
+			url:url,
+			type:"GET",
+			data:{},
+			success:function(res){
+				if(res.message==="success"){
+					var zNodes= res.data || [];
+					zNodes.forEach(function(i){
+						i.iconSkin='business';
+						i.name=i.name+'<i style="color:#999999;">（'+i.parentname+'）</i>';
+						i.nameN = i.name;
+						if(i.type == 1){
+							i.userId = i.id
+						}else{
+							i.orgId  = i.id
+						}
+					});
+					if(!treeNode){
+						_this.selectTree = $.fn.zTree.init($("#selectTree"), setting, zNodes);
+					}else{
+						_this.selectTree.addNodes(treeNode,zNodes);
+					}
+				}
+				clearMask();
+			}
+		});
 	},
-	//切换步骤页
-	confirm: function() {//编辑部门提交
-		if(!App.backStage.orgId[0]||!App.backStage.orgName){
+	//显示删除按钮
+	showDelete: function(e) {
+		$(e.currentTarget).find(".showDelete").show();
+	},
+	//隐藏删除按钮
+	hideDelete: function(e) {
+		$(e.currentTarget).find(".showDelete").hide();
+	},
+	//重置
+	clearSearch:function(e){
+		var ele = $(e.target);
+		ele.siblings("input").val("");
+		this.initView('clearSearch');
+	},
+	searchCli:function(e){
+		if(e.keyCode == 13){
+			this.search();
+		}
+	},
+	loadChildren:function(_this,outer,parentId,treeNode){
+		_this.$(".scrollWrap").mmhMask();
+		var url="fetchServicesMemberInnerList",
+			_getData={
+				uid:App.Comm.user('userId')
+			},
+			setting = {
+				data:{
+					key:{
+						title:"tip"
+					}
+				},
+				callback: {
+					beforeDblClick:function(){
+						return true;
+					},
+					onClick: function(event, treeId, treeNode) {
+						if(!treeNode.userId && !treeNode.isParent){
+							_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
+						}else if(treeNode.userId){
+							//_this.addOption();
+						}
+					}
+				},
+				view: {
+					selectedMulti: true,
+					nameIsHTML:true,
+					showLine: false,
+					showTitle:true
+				}
+			};
+		if(parentId){
+			_getData={
+				outer:outer,
+				includeUsers:true,
+				parentId:parentId
+			}
+			url='fetchServicesMemberInnerList';
+		}
+		App.Comm.ajax({
+			URLtype:url,
+			type:"get",
+			data:_getData
+		},function(res){
+			if(res.message==="success"){
+				_this.loadChildren2(_this,outer,parentId,treeNode,res.data.org);
+			}
+			clearMask();
+		}).fail(function(){
+			//失败回调
+			clearMask();
+		})
+	},
+	loadChildren2:function(_this,outer,parentId,treeNode,innerArr){
+		_this.$(".scrollWrap").mmhMask();
+		var url="fetchServicesMemberOuterList",
+			_getData={
+				uid:App.Comm.user('userId')
+			},
+			setting = {
+				data:{
+					key:{
+						title:"tip"
+					}
+				},
+				callback: {
+					beforeDblClick:function(){
+						return true;
+					},
+					onClick: function(event, treeId, treeNode) {
+						if(!treeNode.userId && !treeNode.isParent){
+							_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
+						}else if(treeNode.userId){
+							//_this.addOption();
+						}
+					}
+				},
+				view: {
+					selectedMulti: true,
+					nameIsHTML:true,
+					showLine: false,
+					showTitle:true
+				}
+			};
+		if(parentId){
+			_getData={
+				outer:outer,
+				includeUsers:true,
+				parentId:parentId
+			}
+			url='fetchServicesMemberOuterList';
+		}
+		App.Comm.ajax({
+			URLtype:url,
+			type:"get",
+			data:_getData
+		},function(res){
+			if(res.message==="success"){
+				var zNodes=[],
+					 _org=innerArr.concat(res.data.org)||innerArr.concat([]),
+					_user=res.data.user||[],
+					_newOrg=[];
+				if(url=='fetchServicesMemberOuterList'){
+					_org.forEach(function(i){
+						i.iconSkin='business';
+						i.tip= i.name+"("+i.namePath+")";
+						i.name=i.name+'<i style="color:#999999;">（'+i.namePath+'）</i>';
+					});
+					zNodes=_org.concat(_user);
+				}else{
+					_org.forEach(function(i){
+						i.iconSkin='business';
+						i.tip= i.name;
+						_newOrg.push(i);
+					});
+					zNodes=_newOrg.concat(_user);
+				}
+				zNodes.forEach(function(i){
+					i.tip= i.tip|| i.name;
+				})
+				if(!treeNode){
+					_this.selectTree = $.fn.zTree.init($("#selectTree"), setting, zNodes);
+				}else{
+					_this.selectTree.addNodes(treeNode,zNodes);
+				}
+			}
+			clearMask();
+		}).fail(function(){
+			//失败回调
+			clearMask();
+		})
+	},
+	filterAddOption:function(addedOptions,toBeAddOptions){//防止重复添加和添加成员和部门
+		var addArrs = [];
+		if(addedOptions.length>0){
+			for(var i=0,toBeAddOptionsLen=toBeAddOptions.length-1;i<=toBeAddOptionsLen;i++){
+				var flag=true;
+				for(var j=0,addedOptionsLen=addedOptions.length-1;j<=addedOptionsLen;j++){
+					if(addedOptions[j].tip == toBeAddOptions[i].tip){
+						flag=false;
+						break;
+					}
+				}
+				if(flag){
+					addArrs.push(toBeAddOptions[i]);
+				}
+			}
+			return addArrs;
+		}else{
+			return toBeAddOptions;
+		}
+	},
+	addOption: function() {//选择节点
+		var _this = this,
+			newNodesGet = _this.selectedTree.getNodes(),
+			nodes = _this.selectTree.getSelectedNodes();
+		if(nodes.length<=0) return;
+		_.each(nodes,function(n){
+			n.children=[];
+		})
+		var filterAddArrs = this.filterAddOption(newNodesGet,nodes);
+		_this.selectedTree.addNodes(null,filterAddArrs);
+	},
+	/**
+	 * 添加项目成员
+	 */
+	grand:function(){//选好成员之后点击确定执行的方法
+		var self = this;
+		var nodes=this.selectedTree.getNodes();
+		for(var i=0,len=nodes.length-1;i<=len;i++){
+			var moveObj={};
+			moveObj.orgid=nodes[i].orgId;
+			moveObj.orgname=nodes[i].namePath||nodes[i].nameN;
+			moveObj.type=self.default.type;
+			moveObj.outersite=nodes[i].outer?1:0;
+			self.default.ajaxArr.push(moveObj);
+		}
+		if(this.default.ajaxArr.length == 0){
 			alert("请选择一个部门")
 			return;
 		}
-		var self = this;
-		var datas = {
-			"orgid": App.backStage.orgId[0],
-		    "orgname":App.backStage.orgName,
-		    "type":this.default.type,
-		    "outersite":App.backStage.orgOuter=="true"?1:0
-		};
 		var dataObj = {
 			"URLtype": "addWorkforgcon",
 			"type": "POST",
 			"contentType": "application/json",
-			"data": JSON.stringify(datas)
+			"data": JSON.stringify(this.default.ajaxArr)
 		};
-		$('.leftWindow').addClass("services_loading");
 		App.Comm.ajax(dataObj, function(data) {
-			$('.leftWindow').removeClass("services_loading");
 			if (data.code == 0) {
-				$('.mod-dialog,.mod-dialog-masklayer').hide();
-				App.backStage.clearAll();
 				self.getListHandle();
+				App.backStage.maskWindow.close();
 			}
 		});
-	},
-	//关闭弹出层的方法
-	close: function() {
-		$('.mod-dialog,.mod-dialog-masklayer').hide();
-		App.backStage.clearAll();
-	},
-	searchFun:function(){//点击搜索执行的方法
-		var value=$('.search input').val().trim();
-		if(value){
-			this.$el.find('.leftWindow').html(new App.backStage.AddDepartmentStandard_1().render(value).el);
-		}
-	},
-	clear:function(){
-	  $('.search input').val('');
-	  this.$el.find('.leftWindow').html(new App.backStage.AddDepartmentStandard_1().render().el);
 	},
 	getListHandle: function() { //获取当前tab下的列表的方法
 		var _self = this;

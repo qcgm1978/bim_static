@@ -92,13 +92,13 @@ App.backStage.SetPermissionsIndexV.PublicBoxV = Backbone.View.extend({
 		})
 	},
 	addViewUserBtnFun: function() { //添加部门按钮的方法
-		new App.Comm.modules.Dialog({
-			title: '',
-			width: 600,
-			height: 500,
-			isConfirm: false
+		var memberManager=new App.backStage.AddDepartmentV().render(this.model == "viewStandardPattern" ? 2 : 1);
+		App.backStage.maskWindow=new App.Comm.modules.Dialog({
+			title:'添加成员/部门',
+			width:640,
+			isConfirm:false,
+			message:memberManager.el
 		});
-		var AddDepartmentV = new App.backStage.AddDepartmentV();
-		$('.mod-dialog .wrapper').html(AddDepartmentV.render(this.model == "viewStandardPattern" ? 2 : 1).el);
+		memberManager.initView();
 	},
 })

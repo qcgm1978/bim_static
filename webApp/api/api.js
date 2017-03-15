@@ -351,6 +351,7 @@ App.API = {
 		getWorkforgconList:"platform/workforgcon",//获取添加的族库和标准模型库的列表的接口
 		addWorkforgcon:"platform/workforgcon",//添加的族库和标准模型库的列表的接口
 		deleteWorkforgcon:"platform/workforgcon",//删除族库和标准模型库的列表的接口
+		searchUrl:"platform/auth/org/search",//搜索部门的接口
 
 	},
 
