@@ -1436,8 +1436,8 @@ CLOUD.GeomUtil = {
     },
 
     getMeshNodeAttr: function (cacheGeometries, sceneOrSymbolReader, item, mpkArray, itemParent) {
-        var matrix = sceneOrSymbolReader.getMatrix(item.matrixId).matrix;
-        var meshAttr = sceneOrSymbolReader.getMeshAttr(item.attrIndex);
+        var matrix = sceneOrSymbolReader.getMatrixInfo(item.matrixId).matrix.clone();
+        var meshAttr = sceneOrSymbolReader.getMeshAttrInfo(item.attrIndex);
         var nodeId = itemParent ? itemParent.ItemId + "_" + item.ItemId : item.ItemId;
         // var nodeId = matrixParent ? "symbol" + item.ItemId : item.ItemId;
         var meshId = meshAttr.meshId;
@@ -1448,7 +1448,7 @@ CLOUD.GeomUtil = {
             return null;
         }
 
-        var meshData = mpk.getMeshData(meshAttr.meshId);
+        var meshData = mpk.getMeshInfo(meshAttr.meshId);
 
         if (meshData == undefined) {
             console.log("empty mesh data");
@@ -1488,15 +1488,19 @@ CLOUD.GeomUtil = {
             matrix.multiplyMatrices(itemParent.matrix, matrix);
         }
 
-        return {nodeId: nodeId, meshId: meshId, matrix: matrix.clone()};
+        meshData = null;
+        mpk = null;
+        meshAttr = null;
+
+        return {nodeId: nodeId, meshId: meshId, matrix: matrix};
     },
 
-    getMeshNodeAttrOfCube: function (cacheGeometries, sceneOrSymbolReader, item, itemParent) {
-        var geomAttr = sceneOrSymbolReader.getGeomAttr(item.attrIndex);
-        var matrix = sceneOrSymbolReader.getMatrix(item.matrixId).matrix;
+    getMeshNodeAttrOfTube: function (cacheGeometries, sceneOrSymbolReader, item, itemParent) {
+        var geomAttr = sceneOrSymbolReader.getGeomInfo(item.attrIndex);
+        var matrix = sceneOrSymbolReader.getMatrixInfo(item.matrixId).matrix.clone();
         var nodeId = itemParent ? itemParent.ItemId + "_" + item.ItemId : item.ItemId;
         // var nodeId = matrixParent ? "symbol" + item.ItemId : item.ItemId;
-        var meshId = "Cube";
+        var meshId = "tube";
         var geometry = cacheGeometries[meshId];
 
         if (!geometry) {
@@ -1530,12 +1534,14 @@ CLOUD.GeomUtil = {
             matrix.multiplyMatrices(itemParent.matrix, matrix);
         }
 
-        return {nodeId: nodeId, meshId: meshId, matrix: matrix.clone()};
+        geomAttr = null;
+
+        return {nodeId: nodeId, meshId: meshId, matrix: matrix};
     },
 
     getMeshNodeAttrOfPipe: function (cacheGeometries, sceneOrSymbolReader, item, itemParent) {
-        var geomAttr = sceneOrSymbolReader.getGeomAttr(item.attrIndex);
-        var matrix = sceneOrSymbolReader.getMatrix(item.matrixId).matrix;
+        var geomAttr = sceneOrSymbolReader.getGeomInfo(item.attrIndex);
+        var matrix = sceneOrSymbolReader.getMatrixInfo(item.matrixId).matrix.clone();
         // var nodeId = matrixParent ? "symbol" + item.ItemId : item.ItemId;
         var nodeId = itemParent ? itemParent.ItemId + "_" + item.ItemId : item.ItemId;
         var meshId = "pipe";
@@ -1572,15 +1578,13 @@ CLOUD.GeomUtil = {
             matrix.multiplyMatrices(itemParent.matrix, matrix);
         }
 
-        return {
-            nodeId: nodeId,
-            meshId: meshId,
-            matrix: matrix.clone()
-        };
+        geomAttr = null;
+
+        return {nodeId: nodeId, meshId: meshId, matrix: matrix};
     },
 
     getMeshNodeAttrOfBox: function (cacheGeometries, sceneOrSymbolReader, item, itemParent) {
-        var matrix = sceneOrSymbolReader.getMatrix(item.matrixId).matrix;
+        var matrix = sceneOrSymbolReader.getMatrixInfo(item.matrixId).matrix.clone();
         var bBox = item.boundingBox;
         var boxSize = bBox.size();
         var boxCenter = bBox.center();
@@ -1602,11 +1606,7 @@ CLOUD.GeomUtil = {
             matrix.multiplyMatrices(itemParent.matrix, matrix);
         }
 
-        return {
-            nodeId: nodeId,
-            meshId: meshId,
-            matrix: matrix.clone()
-        };
+        return {nodeId: nodeId, meshId: meshId, matrix: matrix};
     }
 
 };
@@ -7455,7 +7455,7 @@ CLOUD.CameraAnimator = function () {
         startUp.normalize();
 
         // 2. 设置视图模式
-        var box = viewer.getScene().worldBoundingBox();
+        var box = viewer.getScene().getBoundingBox();
         var target = camera.setStandardView(stdView, box);
 
         // 3. 记录动画结束参数
@@ -8706,6 +8706,7 @@ CLOUD.MeshEx = function () {
     THREE.Mesh.call(this);
 
     this.type = 'MeshEx';
+
     this.matrixAutoUpdate = false; // disable auto update
     this.visible = false; // 使用这个状态标志，对于过滤是否有影响？
 
@@ -8723,9 +8724,7 @@ CLOUD.MeshEx.prototype.constructor = CLOUD.MeshEx;
 CLOUD.MeshEx.prototype.init = function (parameters) {
 
     if (parameters && parameters.parent) {
-
         parameters.parent.add(this);
-
     }
 
 };
@@ -8734,10 +8733,6 @@ CLOUD.MeshEx.prototype.init = function (parameters) {
  * Spawn an object
  */
 CLOUD.MeshEx.prototype.spawn = function (parameters) {
-
-    // if (parameters.meshId !== undefined) {
-    //     this.name = parameters.meshId;
-    // }
 
     if (parameters.userId !== undefined) {
         this.name = parameters.userId;
@@ -9387,6 +9382,7 @@ CLOUD.Camera = function (width, height, fov, near, far) {
 
     this.realUp = this.up.clone(); //
     this.target = new THREE.Vector3();
+    this.dirty = false;
 
     this.positionPlane = new THREE.Plane();
     this.projScreenMatrix = new THREE.Matrix4();
@@ -9846,7 +9842,7 @@ CLOUD.Scene = function () {
     this.clipWidget = null;
     this.clipPlanes = null;
 
-    this.innerBoundingBox = new THREE.Box3();
+    this.boundingBoxInner = new THREE.Box3();
 
     // console.time("ObjectPool");
     this.meshPool = new CLOUD.ObjectPool(CLOUD.MeshEx, CLOUD.GlobalData.maxObjectNumInPool);
@@ -9878,14 +9874,14 @@ CLOUD.Scene.prototype.resizePool = function () {
 };
 
 CLOUD.Scene.prototype.clearAll = function () {
-
     this.filter.clear();
     this.autoUpdate = false;
     this.rootNode.children = [];
     this.rootNode.boundingBox = null;
 };
 
-CLOUD.Scene.prototype.worldBoundingBox = function () {
+// 获得场景 root node 包围盒(场景变换后)
+CLOUD.Scene.prototype.getBoundingBox = function () {
     var box = new THREE.Box3();
 
     return function () {
@@ -9896,18 +9892,28 @@ CLOUD.Scene.prototype.worldBoundingBox = function () {
 
 }();
 
+// 获得场景 root node 包围盒(场景变换前)
+CLOUD.Scene.prototype.getBoundingBoxWorld = function () {
+    return this.rootNode.boundingBox;
+};
+
+// 获得场景 root node 包围盒(变换后的构件包围盒)
+CLOUD.Scene.prototype.getBoundingBoxInnner = function () {
+    return this.boundingBoxInner;
+};
+
 // 获得场景 root node 变换矩阵
-CLOUD.Scene.prototype.getMatrixOfRootNode = function () {
+CLOUD.Scene.prototype.getMatrixGlobal = function () {
     return this.rootNode.matrix;
 };
 
 // 获得场景 root node 变换矩阵
-CLOUD.Scene.prototype.getMatrixWorldOfRootNode = function () {
+CLOUD.Scene.prototype.getMatrixWorldGlobal = function () {
     return this.rootNode.matrixWorld;
 };
 
 // 获得场景 root node 旋转角度(Euler)
-CLOUD.Scene.prototype.getRotationOfRootNode = function () {
+CLOUD.Scene.prototype.getRotationGlobal = function () {
 
     if (this.rootNode.matrix) {
 
@@ -9918,16 +9924,6 @@ CLOUD.Scene.prototype.getRotationOfRootNode = function () {
         rotation.setFromRotationMatrix( rotMat );
 
         return rotation;
-    }
-
-    return null;
-};
-
-// 获得场景 root node 包围盒
-CLOUD.Scene.prototype.getBoundingBoxOfRootNode = function () {
-
-    if (this.rootNode.boundingBox) {
-        return this.rootNode.boundingBox;
     }
 
     return null;
@@ -9971,7 +9967,7 @@ CLOUD.Scene.prototype.getTrackingPointFromBoundingBox = function (direction, ray
     if (!this.rootNode.boundingBox) return null;
 
     var position = ray.origin;
-    var box = this.worldBoundingBox();
+    var box = this.getBoundingBox();
     var maxLen = 0;
 
     var corners = [
@@ -10134,6 +10130,25 @@ CLOUD.Scene.prototype.getClipPlanes = function(){
     return this.clipPlanes;
 };
 
+CLOUD.Scene.prototype.hitTest = function (mouse, camera) {
+
+    var ray = this.raycaster;
+    ray.setFromCamera(mouse, camera);
+
+    var intersects =  this.hitTestClipPlane(ray.ray, ray.intersectObjects(this.children, true));
+    intersects =  this.hitTestClipPlanes(ray, intersects);
+
+    if (intersects.length < 1) {
+        return null;
+    }
+
+    intersects.sort(function (a, b) {
+        return a.distance - b.distance;
+    });
+
+    return intersects[0].point;
+};
+
 CLOUD.Scene.prototype.hitTestClipPlane = function (ray, intersects) {
 
     if (this.clipWidget && this.clipWidget.isEnabled()) {
@@ -10196,7 +10211,7 @@ CLOUD.Scene.prototype.hitTestPosition = function (mouse, camera, callback) {
         // modified 2016-5-3  begin
         // 如果没有选中构件，绕场景中心旋转
         if (this.rootNode.boundingBox ) {
-            var bBox = this.worldBoundingBox();
+            var bBox = this.getBoundingBox();
             var pivot = bBox.center();
 
             // 如果没有选中构件，绕场景中心旋转
@@ -10218,175 +10233,6 @@ CLOUD.Scene.prototype.hitTestPosition = function (mouse, camera, callback) {
     callback(intersects[0].point);
     //console.timeEnd("hitTest");
 };
-
-CLOUD.Scene.prototype.pickByRect = function () {
-
-    var sphere = new THREE.Sphere();
-    var box = new THREE.Box3();
-
-    var INTERSECTION_STATE = {
-        IS_Leave:0,
-        IS_Intersection:1,
-        IS_Contains : 2
-    };
-
-    function intersectObjectBySphere(frustum, object) {
-
-        var geometry = object.geometry;
-        if (geometry.boundingSphere === null) geometry.computeBoundingSphere();
-
-        sphere.copy(geometry.boundingSphere);
-        sphere.applyMatrix4(object.matrixWorld);
-
-        var planes = frustum.planes;
-        var center = sphere.center;
-        var negRadius = -sphere.radius;
-
-        var nCount = 0;
-        for (var i = 0; i < 6; i++) {
-
-            var distance = planes[i].distanceToPoint(center);
-
-            if (distance < negRadius) {
-
-                return INTERSECTION_STATE.IS_Leave;
-
-            }
-            else if (distance >= sphere.radius) {
-                ++nCount;
-            }
-
-            
-        }
-
-        return nCount == 6 ? INTERSECTION_STATE.IS_Contains : INTERSECTION_STATE.IS_Intersection;
-    }
-
-    var p1 = new THREE.Vector3(),
-        p2 = new THREE.Vector3();
-
-    function intersectBox(frustum, box) {
-
-        var nCount = 0;
-        var planes = frustum.planes;
-
-        for (var i = 0; i < 6 ; i++) {
-
-            var plane = planes[i];
-
-            p1.x = plane.normal.x > 0 ? box.min.x : box.max.x;
-            p2.x = plane.normal.x > 0 ? box.max.x : box.min.x;
-            p1.y = plane.normal.y > 0 ? box.min.y : box.max.y;
-            p2.y = plane.normal.y > 0 ? box.max.y : box.min.y;
-            p1.z = plane.normal.z > 0 ? box.min.z : box.max.z;
-            p2.z = plane.normal.z > 0 ? box.max.z : box.min.z;
-
-            var d1 = plane.distanceToPoint(p1);
-            var d2 = plane.distanceToPoint(p2);
-
-            // if both outside plane, no intersection
-
-            if (d1 < 0 && d2 < 0) {
-
-                return INTERSECTION_STATE.IS_Leave;
-
-            }
-            else if (d1 * d2 >= 0) {
-                ++nCount;
-            }           
-        }
-
-        return nCount == 6 ? INTERSECTION_STATE.IS_Contains : INTERSECTION_STATE.IS_Intersection;
-    }
-
-    function intersectObjectByBox(frustum, object) {
-
-        if (object.boundingBox && !(object instanceof THREE.Mesh)) {
-             box.copy(object.boundingBox);          
-        }
-        else {
-            var geometry = object.geometry;
-
-            if (geometry.boundingBox === null)
-                geometry.computeBoundingBox();
-
-            box.copy(geometry.boundingBox);
-        }
-
-        box.applyMatrix4(object.matrixWorld);
-
-        return intersectBox(frustum, box);
-    }
-
-    return function (frustum, selectState, callback) {
-
-        var scope = this;
-
-        if (selectState === CLOUD.OPSELECTIONTYPE.Clear)
-            scope.filter.setSelectedIds();
-
-        var count = 0;
-
-        function frustumTest(node) {
-
-            if (node instanceof CLOUD.Group) {
-                if (node.fileId && scope.filter.hasFileFilter(node.fileId))
-                    return;
-            }
-
-            if (node.worldBoundingBox) {
-
-                if (intersectBox(frustum, node.worldBoundingBox) === INTERSECTION_STATE.IS_Leave) {
-                    return;
-                }
-
-            }
-
-            if (node.userData) {
-                var state = intersectObjectByBox(frustum, node);
-                if (state === INTERSECTION_STATE.IS_Contains) {
-
-                    if (scope.filter.isVisible(node) && scope.filter.isSelectable(node)) {
-
-                        if (selectState === CLOUD.OPSELECTIONTYPE.Remove) {
-                            scope.filter.removeSelectedId(node.name);                            
-                        }
-                        else {
-                            scope.filter.addSelectedId(node.name, node.userData);
-                        }
-                        ++count;
-                    }
-
-                }
-                else {
-                    return;
-                }
-            }
-
-            var children = node.children;
-            if (!children)
-                return;
-
-            for (var i = 0, l = children.length; i < l; i++) {
-                var child = children[i];
-                if (child.visible) {
-                    frustumTest(child);
-                }
-            }
-        }
-
-        var children = this.rootNode.children;
-        for (var i = 0, l = children.length; i < l; i++) {
-            var child = children[i];
-            if (child.visible) {
-                frustumTest(child);
-            }
-        }
-
-        callback();
-    }
-
-}();
 
 CLOUD.Scene.prototype.isPickable = function (node) {
     return this.filter.isVisible(node) && this.filter.isSelectable(node);
@@ -10434,24 +10280,174 @@ CLOUD.Scene.prototype.pick = function (mouse, camera, callback) {
    callback(null);
 };
 
-CLOUD.Scene.prototype.hitTest = function (mouse, camera) {
+CLOUD.Scene.prototype.pickByRect = function () {
 
-    var ray = this.raycaster;
-    ray.setFromCamera(mouse, camera);
+    var sphere = new THREE.Sphere();
+    var box = new THREE.Box3();
 
-    var intersects =  this.hitTestClipPlane(ray.ray, ray.intersectObjects(this.children, true));
-    intersects =  this.hitTestClipPlanes(ray, intersects);
+    var INTERSECTION_STATE = {
+        IS_Leave:0,
+        IS_Intersection:1,
+        IS_Contains : 2
+    };
 
-    if (intersects.length < 1) {
-        return null;
+    function intersectObjectBySphere(frustum, object) {
+
+        var geometry = object.geometry;
+        if (geometry.boundingSphere === null) geometry.computeBoundingSphere();
+
+        sphere.copy(geometry.boundingSphere);
+        sphere.applyMatrix4(object.matrixWorld);
+
+        var planes = frustum.planes;
+        var center = sphere.center;
+        var negRadius = -sphere.radius;
+
+        var nCount = 0;
+        for (var i = 0; i < 6; i++) {
+
+            var distance = planes[i].distanceToPoint(center);
+
+            if (distance < negRadius) {
+
+                return INTERSECTION_STATE.IS_Leave;
+
+            }
+            else if (distance >= sphere.radius) {
+                ++nCount;
+            }
+
+
+        }
+
+        return nCount == 6 ? INTERSECTION_STATE.IS_Contains : INTERSECTION_STATE.IS_Intersection;
     }
 
-    intersects.sort(function (a, b) {
-        return a.distance - b.distance;
-    });
+    var p1 = new THREE.Vector3(),
+        p2 = new THREE.Vector3();
 
-    return intersects[0].point;
-};
+    function intersectBox(frustum, box) {
+
+        var nCount = 0;
+        var planes = frustum.planes;
+
+        for (var i = 0; i < 6 ; i++) {
+
+            var plane = planes[i];
+
+            p1.x = plane.normal.x > 0 ? box.min.x : box.max.x;
+            p2.x = plane.normal.x > 0 ? box.max.x : box.min.x;
+            p1.y = plane.normal.y > 0 ? box.min.y : box.max.y;
+            p2.y = plane.normal.y > 0 ? box.max.y : box.min.y;
+            p1.z = plane.normal.z > 0 ? box.min.z : box.max.z;
+            p2.z = plane.normal.z > 0 ? box.max.z : box.min.z;
+
+            var d1 = plane.distanceToPoint(p1);
+            var d2 = plane.distanceToPoint(p2);
+
+            // if both outside plane, no intersection
+
+            if (d1 < 0 && d2 < 0) {
+
+                return INTERSECTION_STATE.IS_Leave;
+
+            }
+            else if (d1 * d2 >= 0) {
+                ++nCount;
+            }
+        }
+
+        return nCount == 6 ? INTERSECTION_STATE.IS_Contains : INTERSECTION_STATE.IS_Intersection;
+    }
+
+    function intersectObjectByBox(frustum, object) {
+
+        if (object.boundingBox && !(object instanceof THREE.Mesh)) {
+            box.copy(object.boundingBox);
+        }
+        else {
+            var geometry = object.geometry;
+
+            if (geometry.boundingBox === null)
+                geometry.computeBoundingBox();
+
+            box.copy(geometry.boundingBox);
+        }
+
+        box.applyMatrix4(object.matrixWorld);
+
+        return intersectBox(frustum, box);
+    }
+
+    return function (frustum, selectState, callback) {
+
+        var scope = this;
+
+        if (selectState === CLOUD.OPSELECTIONTYPE.Clear)
+            scope.filter.setSelectedIds();
+
+        var count = 0;
+
+        function frustumTest(node) {
+
+            if (node instanceof CLOUD.Group) {
+                if (node.fileId && scope.filter.hasFileFilter(node.fileId))
+                    return;
+            }
+
+            if (node.worldBoundingBox) {
+
+                if (intersectBox(frustum, node.worldBoundingBox) === INTERSECTION_STATE.IS_Leave) {
+                    return;
+                }
+
+            }
+
+            if (node.userData) {
+                var state = intersectObjectByBox(frustum, node);
+                if (state === INTERSECTION_STATE.IS_Contains) {
+
+                    if (scope.filter.isVisible(node) && scope.filter.isSelectable(node)) {
+
+                        if (selectState === CLOUD.OPSELECTIONTYPE.Remove) {
+                            scope.filter.removeSelectedId(node.name);
+                        }
+                        else {
+                            scope.filter.addSelectedId(node.name, node.userData);
+                        }
+                        ++count;
+                    }
+
+                }
+                else {
+                    return;
+                }
+            }
+
+            var children = node.children;
+            if (!children)
+                return;
+
+            for (var i = 0, l = children.length; i < l; i++) {
+                var child = children[i];
+                if (child.visible) {
+                    frustumTest(child);
+                }
+            }
+        }
+
+        var children = this.rootNode.children;
+        for (var i = 0, l = children.length; i < l; i++) {
+            var child = children[i];
+            if (child.visible) {
+                frustumTest(child);
+            }
+        }
+
+        callback();
+    }
+
+}();
 
 CLOUD.Scene.prototype.traverseIf = function (callback) {
 
@@ -10486,6 +10482,20 @@ CLOUD.Scene.prototype.findSceneNode = function (sceneId) {
         var child = children[i];
         if (sceneId == child.sceneId) {
             return child;
+        }
+    }
+
+    return null;
+};
+
+CLOUD.Scene.prototype.getNodeById = function (id) {
+    var children = this.rootNode.children;
+
+    for (var i = 0, l = children.length; i < l; i++) {
+        var node = children[i];
+
+        if (id === node.name) {
+            return node;
         }
     }
 
@@ -10616,7 +10626,7 @@ CLOUD.Scene.prototype.updateOctreeBox = function (rootNode) {
 
         if(groupBox.children.length === 0) {
 
-            // var rootNodeMatrix = this.getMatrixWorldOfRootNode();
+            // var rootNodeMatrix = this.getMatrixWorldGlobal();
             // groupBox.matrixWorld.copy(rootNodeMatrix);
 
             var box = new THREE.Box3(rootNode.min, rootNode.max);
@@ -10751,8 +10761,6 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     this.viewer = viewer;
     this.camera = camera;
     this.domElement = domElement;
-
-    this.cameraDirty = true;
 
     // Set to false to disable this control
     this.enabled = true;
@@ -11123,7 +11131,6 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             this.needUpdateRenderList(updateRenderList);
         }
 
-
         onChange();
     };
 
@@ -11378,7 +11385,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     };
 
     this.dirtyCamera = function (dirty) {
-        this.cameraDirty = dirty;
+        this.camera.dirty = dirty;
     };
 
     this.clamp = function (value, min, max) {
@@ -12230,7 +12237,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         }
         else {
             var scene = scope.viewer.getScene();
-            var center = scene.worldBoundingBox().center();
+            var center = scene.getBoundingBox().center();
             scope.pivotBall.position.copy(center);
             scope.pivotCenter.position.copy(center);
 
@@ -12448,7 +12455,7 @@ CLOUD.PickHelper.prototype = {
 
         // 注意：不确定相对坐标位置是否被其他模块使用，暂时先采用新的变量来保存世界坐标下的位置及包围盒
         // 最好是在求交点的时候，包围盒就和位置一起进行坐标变换, 就可以免除这里的计算了
-        var sceneMatrix = this.scene.getMatrixOfRootNode();
+        var sceneMatrix = this.scene.getMatrixGlobal();
 
         // 获得世界坐标下的位置
         intersect.worldPosition = CLOUD.GeomUtil.toMeshWorldPosition(intersect.point, sceneMatrix);
@@ -12817,6 +12824,22 @@ CLOUD.RectPickEditor = function (slaveEditor, onSelectionChanged) {
     this.pickHelper = new CLOUD.PickHelper(slaveEditor.scene, slaveEditor.cameraEditor, function (select, doubleClick) {
         scope.onObjectSelected(select, doubleClick);
     });
+
+    this.timeId = null;
+    this.longTapFlag = false;
+
+    this.selectPad = new CLOUD.SelectPad(this);
+
+    var scope = this;
+
+    this.longTap = function () {
+        scope.longTapFlag = true;
+        console.log("long tap");
+
+        if (scope.selectPad) {
+            scope.selectPad.showOverlay(scope.startPt);
+        }
+    };
 };
 
 
@@ -12990,12 +13013,25 @@ CLOUD.RectPickEditor.prototype.touchstart = function (event) {
     this.startPt.set(event.touches[0].clientX, event.touches[0].clientY);
 
     camera_scope.touchstart(event);
+
+    if (this.timeId) {
+        clearTimeout(this.timeId);
+    }
+
+    var scope = this;
+    scope.timeId = setTimeout(scope.longTap, 400);
+
+    this.selectPad.hideOverlay();
 };
 
 CLOUD.RectPickEditor.prototype.touchmove = function (event) {
     var scope = this;
     var camera_scope = this.slaveEditor;
     if (camera_scope.enabled === false) return;
+
+    if (this.timeId) {
+        clearTimeout(this.timeId);
+    }
 
     event.preventDefault();
     event.stopPropagation();
@@ -13008,6 +13044,15 @@ CLOUD.RectPickEditor.prototype.touchend = function (event) {
     if (camera_scope.enabled === false) return;
 
     camera_scope.touchend(event);
+
+    if (this.timeId) {
+        clearTimeout(this.timeId);
+    }
+
+    if (this.longTapFlag) {
+        this.longTapFlag = false;
+        event.preventDefault();
+    }
 };
 CLOUD.ZoomEditor = function ( object, scene, domElement ) {
 	CLOUD.OrbitEditor.call( this,  object, scene, domElement );
@@ -14015,7 +14060,7 @@ CLOUD.FlyEditor.prototype = {
         var target = this.cameraEditor.camera.target;
         var eye = target.clone().sub(position);
 
-        this.cameraEditor.cameraDirty = true;
+        this.cameraEditor.dirtyCamera(true);
 
         // 前进
         if (this.moveState & this.MoveDirection.FORWARD) {
@@ -14108,7 +14153,7 @@ CLOUD.FlyEditor.prototype = {
         // 刷新
         this.cameraEditor.flyOnWorld();
 
-        this.cameraEditor.cameraDirty = false;
+        this.cameraEditor.dirtyCamera(false);
     },
 
     // 前进
@@ -14706,7 +14751,7 @@ CLOUD.EditorManager.prototype = {
 
         } else {
 
-            var box = viewer.getScene().worldBoundingBox();
+            var box = viewer.getScene().getBoundingBox();
             camera.setStandardView(stdView, box); // 设置观察视图
 
             // fit all
@@ -14722,7 +14767,7 @@ CLOUD.EditorManager.prototype = {
     setTopView: function(viewer, box, margin, ratio) {
 
         var camera = viewer.camera;
-        var worldBox = viewer.getScene().worldBoundingBox();
+        var worldBox = viewer.getScene().getBoundingBox();
         var target = camera.setStandardView(CLOUD.EnumStandardView.ISO, worldBox); // 设置观察视图
 
         if (box) {
@@ -14742,6 +14787,141 @@ CLOUD.EditorManager.prototype = {
             this.editor.resize();
         }
     }
+};
+CLOUD.SelectPad = function (editor) {
+    this.editor = editor;
+    this.dim = editor.slaveEditor.cameraEditor.getContainerDimensions();
+
+    this.pad = null;
+    this.padSize = 96;
+
+    this.startPt = new THREE.Vector2();
+    this.position = new THREE.Vector2();
+
+    var scope = this;
+
+    this.init = function () {
+        window.addEventListener('resize', this.padInitBind, false);
+        this.pad = document.createElement("div");
+
+        this.padInit();
+
+        var viewport = document.getElementById('viewport');
+        viewport.appendChild(this.pad);
+
+        this.addEventListener();
+    };
+
+    this.addEventListener = function () {
+        this.pad.addEventListener('touchstart', this.padOnTouchStartBind, false);
+        this.pad.addEventListener('touchmove', this.padOnTouchMoveBind, false);
+        this.pad.addEventListener('touchend', this.padOnTouchEndBind, false);
+        //window.addEventListener('touchend', this.padOnTouchEndBind, false);
+    };
+
+    this.padInit = function () {
+        // var viewport = document.getElementById('viewport');
+        // var width = viewport.clientWidth;
+        // var height = viewport.clientHeight;
+        // var size = width > height ? height : width;
+
+        if (this.pad != null) {
+            this.pad.style.backgroundImage = "url(images/selectPad.png)";
+            this.pad.style.backgroundSize = '100%';
+            this.pad.style.position = 'absolute';
+            this.pad.style.width = this.padSize.toString() + 'px';
+            this.pad.style.height = this.padSize.toString() + 'px';
+            this.pad.style.display = 'none';
+        }
+    };
+
+    this.showOverlay = function (position) {
+        this.position = position;
+
+        this.pad.style.left = this.position.x.toString() + 'px';
+        this.pad.style.top = (this.position.y - this.dim.top).toString() + 'px';
+
+        this.pad.style.display = '';
+
+        this.pick();
+    };
+
+    this.hideOverlay = function () {
+        this.pad.style.display = 'none';
+    };
+
+    this.pick = function () {
+        var screenX = this.position.x;
+        var screenY = this.position.y;
+
+        var cameraEditor = this.editor.slaveEditor.cameraEditor;
+        var pickHelper = this.editor.pickHelper;
+
+        var mouse = cameraEditor.mapWindowToViewport(screenX, screenY);
+        this.editor.slaveEditor.scene.pick(mouse, cameraEditor.camera, function (intersect) {
+            if (!intersect) {
+                if (pickHelper.filter.setSelectedIds()) {
+                    cameraEditor.updateView(true);
+                }
+                pickHelper.onObjectSelected(null, false);
+                return;
+            }
+
+            var userId = intersect.userId;
+            pickHelper.intersectToWorld(intersect);
+
+            pickHelper.filter.setSelectedIds();
+            if (pickHelper.filter.addSelectedId(userId, intersect.object.userData, true)) {
+                pickHelper.onObjectSelected(intersect, false);
+            }
+            else {
+                pickHelper.onObjectSelected(null, false);
+            }
+            cameraEditor.updateView(true);
+        });
+    };
+
+    this.onTouchStart = function (event) {
+        if (event.touches.length == 1) {
+            event.stopPropagation();
+            this.startPt.set(event.touches[0].clientX, event.touches[0].clientY);
+            //requestAnimationFrame(step);
+        }
+    };
+
+    this.onTouchMove = function (event) {
+        if (event.touches.length == 1) {
+            event.stopPropagation();
+            event.preventDefault();
+
+            var deltaX = event.touches[0].clientX - this.startPt.x;
+            var deltaY = event.touches[0].clientY - this.startPt.y;
+
+            this.position.x += deltaX;
+            this.position.y += deltaY;
+
+            this.pad.style.left = this.position.x.toString() + 'px';
+            this.pad.style.top = (this.position.y - this.dim.top).toString() + 'px';
+
+            this.startPt.set(event.touches[0].clientX, event.touches[0].clientY);
+
+            this.pick();
+        }
+    };
+
+    this.onTouchEnd = function () {
+        event.stopPropagation();
+        //this.padInit();
+        //cancelAnimationFrame(step);
+    };
+
+    this.padInitBind = this.padInit.bind(this);
+
+    this.padOnTouchStartBind = this.onTouchStart.bind(this);
+    this.padOnTouchEndBind = this.onTouchEnd.bind(this);
+    this.padOnTouchMoveBind = this.onTouchMove.bind(this);
+
+    this.init();
 };
 /*global ArrayBuffer, Uint32Array, Int32Array, Float32Array, Int8Array, Uint8Array, window, performance, Console*/
 
@@ -17826,6 +18006,7 @@ CLOUD.Loader.IdReader = function( buffer ) {
             var buf = new Uint8Array( this.idBuffer, this.size * index_id, this.size );
             return String.fromCharCode.apply( null, buf );
         }
+        return undefined;
     };
 
     this.getIndex = function ( string_id ) {
@@ -19207,6 +19388,7 @@ CLOUD.Model = function (manager, serverUrl, databagId, texturePath) {
 
     this.taskCount = 0;
     this.maxTaskCount = 4;
+    this.containsCamera = false;
 };
 
 CLOUD.Model.prototype = Object.create(THREE.LoadingManager.prototype);
@@ -19287,11 +19469,11 @@ CLOUD.Model.prototype.load = function () {
 
     // load spatial index
     var octreeLoader = this.octreeLoader;
-    octreeLoader.load(this.octreeUrl('o'), function (rootNode) {
+    octreeLoader.load(this.octreeUrl('O'), function (rootNode) {
         scope.octreeRootNode = rootNode;
         CLOUD.Logger.log("octreeLoader outer layer.");
     });
-    octreeLoader.load(this.octreeUrl('i'), function (rootNode) {
+    octreeLoader.load(this.octreeUrl('I'), function (rootNode) {
         scope.octreeRootNodeI = rootNode;
         CLOUD.Logger.log("octreeLoader inner layer.");
     });
@@ -19333,8 +19515,8 @@ CLOUD.Model.prototype.userIdUrl = function () {
 };
 
 CLOUD.Model.prototype.octreeUrl = function (idx) {
-    idx = idx || 'o';
-    return this.serverUrl + this.databagId + "/scene/index_" + idx;
+    idx = idx || 'O';
+    return this.serverUrl + this.databagId + "/scene/index" + idx +"_js";
 };
 
 CLOUD.Model.prototype.symbolUrl = function () {
@@ -19454,6 +19636,14 @@ CLOUD.Model.prototype.parseUserId = function (data) {
     this.userIdReader = new CLOUD.Loader.IdReader(data);
 };
 
+/**
+ * 读取数据，构造mesh node
+ *
+ * @param {Object} reader - sceneReader or symbolReader ： 如果 itemParent === null或undefined 为sceneReader， 否则为 symbolReader
+ * @param {Int} cellId - 八叉树单元ID
+ * @param {Object} item - 数据项
+ * @param {Object} itemParent - 父节点参数项 {matrix : xxx, ItemId : xxx, originalId: xxx},
+ */
 CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
     var meshPool = this.manager.scene.meshPool;
     var cacheGeometries = this.cache.geometries;
@@ -19465,7 +19655,7 @@ CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
     var idxUserId = this.userIdReader.getIndex(userId);
 
     if (idxUserId !== originalId) {
-        CLOUD.Logger.log("error->", originalId);
+        CLOUD.Logger.log("read userId error->", originalId);
     }
 
     var meshInfo;
@@ -19473,7 +19663,7 @@ CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
     if (item.type == 1) {
         meshInfo = CLOUD.GeomUtil.getMeshNodeAttr(cacheGeometries, reader, item, this.mpkArray, itemParent);
     } else if (item.type == 2) {
-        meshInfo = CLOUD.GeomUtil.getMeshNodeAttrOfCube(cacheGeometries, reader, item, itemParent);
+        meshInfo = CLOUD.GeomUtil.getMeshNodeAttrOfTube(cacheGeometries, reader, item, itemParent);
     } else if (item.type == 3) {
         meshInfo = CLOUD.GeomUtil.getMeshNodeAttrOfPipe(cacheGeometries, reader, item, itemParent);
     } else if (item.type == 4) {
@@ -19488,11 +19678,13 @@ CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
         CLOUD.Logger.log("nodeId:" + meshInfo.nodeId + " exist");
     }
 
+    var matrixCache = meshInfo.matrix.clone();
+
     this.cache.cells[cellId][meshInfo.nodeId] = {
         nodeId: meshInfo.nodeId,
         userId: userId,
         meshId: meshInfo.meshId,
-        matrix: meshInfo.matrix,
+        matrix: matrixCache,
         materialId: item.materialId
     };
 
@@ -19501,7 +19693,7 @@ CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
         nodeId: meshInfo.nodeId,
         userId: userId,
         geometry: geometry,
-        matrix: meshInfo.matrix,
+        matrix: matrixCache,
         material: material
     });
 
@@ -19521,10 +19713,10 @@ CLOUD.Model.prototype.readSymbol = function (id, cellId, itemParent) {
     var symbolCount = this.symbolReader.header.symbolCount;
 
     if (id >= 0 && id < symbolCount) {
-        var symbolCurrent = this.symbolReader.getSymbol(id);
+        var symbolCurrent = this.symbolReader.getSymbolInfo(id);
 
         for (var i = symbolCurrent.itemIndex; i < symbolCurrent.itemCount; ++i) {
-            var item = this.symbolReader.getItem(i);
+            var item = this.symbolReader.getItemInfo(i);
 
             if (item.type == 0) {
                 continue;
@@ -19540,6 +19732,13 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
     var sceneCount = this.sceneArray ? this.sceneArray.length : 0;
 
     if (sceneCount < 1) {
+        return;
+    }
+
+    // VAAS-100: Mesh and Other resource loading does not sync with reading process,
+    // here do scene prepare after all of them loaded.
+    // TODO: on-demand loading resource like mesh package, scene and material etc.
+    if(this.taskCount < this.maxTaskCount) {
         return;
     }
 
@@ -19570,9 +19769,6 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
         //If inner scene contains camera, prioritize inner cells, else prioritize outer cells
         var frustum = this.manager.getWorldFrustum(camera, true);
         var cameraPos = camera.position;
-        var bCameraOutsideScene = cameraPos.x < this.octreeRootNodeI.min.x || cameraPos.x > this.octreeRootNodeI.max.x ||
-            cameraPos.y < this.octreeRootNodeI.min.y || cameraPos.y > this.octreeRootNodeI.max.y ||
-            cameraPos.z < this.octreeRootNodeI.min.z || cameraPos.z > this.octreeRootNodeI.max.z;
         var depth = CLOUD.GlobalData.OctantDepth; // traverse till depth arrived.
         // draw bounding of outer layer for test.
         this.manager.updateOctreeBox(this.octreeRootNode);
@@ -19583,17 +19779,16 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
         camDir.normalize();
         var octantSize = new THREE.Vector3();
 
-        if (bCameraOutsideScene) {
+        if (this.containsCamera) {
+                // Inner cell should get higher priority than outer, while generally the pool is large enough in this case.
+                this.octreeRootNodeI.intersectFrustumWithPriority(frustum, depth, cameraPos, camDir, true, depthCriteria, this.visibleOctant);
+                CLOUD.Logger.log("Inner: ", this.visibleOctant.length);
+                this.octreeRootNode.intersectFrustumWithPriority(frustum, depth, cameraPos, camDir, true, depthCriteria, this.visibleOctant);
+        }else {
             // Outer cell only
             this.octreeRootNode.intersectFrustumWithPriority(frustum, depth, cameraPos, camDir, false, depthCriteria, this.visibleOctant);
             CLOUD.Logger.log("Outer: ", this.visibleOctant.length);
-        } else {
-            // Inner cell should get higher priority than outer, while generally the pool is large enough in this case.
-            this.octreeRootNodeI.intersectFrustumWithPriority(frustum, depth, cameraPos, camDir, true, depthCriteria, this.visibleOctant);
-            CLOUD.Logger.log("Inner: ", this.visibleOctant.length);
-            this.octreeRootNode.intersectFrustumWithPriority(frustum, depth, cameraPos, camDir, true, depthCriteria, this.visibleOctant);
         }
-
         //CLOUD.Logger.log("visibleOctant", visibleOctant.join(','));
         cellCount = this.visibleOctant.length;
         CLOUD.Logger.log("Total Octant Count: ", this.visibleOctant.length);
@@ -19605,7 +19800,7 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
     // begin sort
     if (!CLOUD.GlobalData.DisableOctant ) {
         this.visibleOctant.sort(function (a, b) {
-            if(!bCameraOutsideScene) {
+            if(this.containsCamera) {
                 // special case: promote octant which contains camera
                 var bCameraOutsideOctantA = cameraPos.x < a.min.x || cameraPos.x > a.max.x ||
                     cameraPos.y < a.min.y || cameraPos.y > a.max.y ||
@@ -19684,23 +19879,24 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
                 this.cache.cells[cellId] = {};
             }
 
-            var cell = sceneReader.getCell(cellId);
+            var cell = sceneReader.getCellInfo(cellId);
             for (var j = cell.itemIndex; j < cell.itemCount; ++j) {
 
-                var item = sceneReader.getItem(j);
+                var item = sceneReader.getItemInfo(j);
 
                 if (item == undefined) {
                     continue;
                 }
 
                 if (item.type == 0) {
-                    var matrixParent = sceneReader.getMatrix(item.matrixId).matrix;
+                    var matrixParent = sceneReader.getMatrixInfo(item.matrixId).matrix.clone();
                     var itemParent = {
                         matrix : matrixParent,
                         ItemId : item.ItemId,
                         originalId: item.originalId
                     };
                     this.readSymbol(item.attrIndex, cellId, itemParent);
+                    itemParent = null;
                 } else {
                     this.readMesh(sceneReader, cellId, item);
                 }
@@ -19729,8 +19925,34 @@ CLOUD.ModelManager = function () {
 
     this.crossOrigin = true;
     this.models = {};
+
+    // Does camera locate inside the scene bound scope
+    this.containsCamera = false;
 };
 
+CLOUD.ModelManager.prototype.calculateCameraModelRelation = function (cameraPos) {
+
+    // if one of models contains camera, then camera is inside the model.
+    var contains = false;
+    for(var id in this.models) {
+        if (this.models.hasOwnProperty(id)) {
+            var model = this.models[id];
+            if(model.octreeRootNodeI === null) {
+                continue;
+            }
+            if(cameraPos.x < model.octreeRootNodeI.min.x || cameraPos.x > model.octreeRootNodeI.max.x ||
+                cameraPos.y < model.octreeRootNodeI.min.y || cameraPos.y > model.octreeRootNodeI.max.y ||
+                cameraPos.z < model.octreeRootNodeI.min.z || cameraPos.z > model.octreeRootNodeI.max.z) {
+                // camera is outside of model's bound box
+                model.containsCamera = false;
+            } else {
+                model.containsCamera = true;
+            }
+        }
+        contains = contains || model.containsCamera;
+    }
+    this.containsCamera = contains;
+};
 // CLOUD.ModelManager.prototype = Object.create(THREE.LoadingManager.prototype);
 //
 // CLOUD.ModelManager.prototype.constructor = CLOUD.ModelManager;
@@ -19822,13 +20044,13 @@ CLOUD.ModelManager.prototype.setCrossOrigin = function (crossOrigin) {
     this.crossOrigin = crossOrigin;
 };
 
-CLOUD.ModelManager.prototype.getMatrixWorldOfRootNode = function () {
-    return this.scene.getMatrixWorldOfRootNode();
+CLOUD.ModelManager.prototype.getMatrixWorldGlobal = function () {
+    return this.scene.getMatrixWorldGlobal();
 };
 
 // CLOUD.ModelManager.prototype.getMatrixWorldInverseForOriginalCamera = function (camera) {
 //
-//     var rootMatrixWorld = this.scene.getMatrixWorldOfRootNode();
+//     var rootMatrixWorld = this.scene.getMatrixWorldGlobal();
 //     var matrixWorldInverse = new THREE.Matrix4();
 //
 //     // rootNode.matrixWorld * oriCamera.matrixWorld = camera.matrixWorld
@@ -19857,7 +20079,7 @@ CLOUD.ModelManager.prototype.getWorldFrustum = function (camera, transform) {
         // 计算场景变换后的相机位置和目标点的距离
         var distancePost = targetPost.clone().sub(camera.position).length();
         // 获得场景 root node 变换矩阵
-        var matrixWorldRoot = this.getMatrixWorldOfRootNode();
+        var matrixWorldRoot = this.getMatrixWorldGlobal();
         // 逆矩阵
         var matrixInverseRoot = new THREE.Matrix4();
         matrixInverseRoot.getInverse(matrixWorldRoot);
@@ -21224,29 +21446,6 @@ CLOUD.Viewer.prototype = {
 
     constructor: CLOUD.Viewer,
 
-    destroy: function () {
-        this.removeAllCallbacks();
-        this.editorManager.unregisterDomEventListeners(this.domElement);
-        this.domElement.removeChild(this.domElement.childNodes[0]);
-
-        for (var id in this.services) {
-            var service = this.services[id];
-            service.destroy();
-        }
-
-        this.services = {};
-        this.editorManager.destroy();
-        this.modelManager.destroy();
-
-        if (this.renderer.destroy) {
-            this.renderer.destroy();
-        }
-
-        this.renderer = null;
-        this.modelManager = null;
-        this.editorManager = null;
-    },
-
     // ------ 注册自定义回调函数 S -------------- //
     // 注册回调函数
     addCallbacks: function (type, callback) {
@@ -21349,14 +21548,36 @@ CLOUD.Viewer.prototype = {
 
     // ------ 管理外部插件的render E -------------- //
 
+    destroy: function () {
+        this.removeAllCallbacks();
+        this.editorManager.unregisterDomEventListeners(this.domElement);
+        this.domElement.removeChild(this.domElement.childNodes[0]);
+        this.domElement = null;
+
+        for (var id in this.services) {
+            var service = this.services[id];
+            service.destroy();
+        }
+
+        this.services = {};
+        this.editorManager.destroy();
+        this.modelManager.destroy();
+
+        if (this.renderer.destroy) {
+            this.renderer.destroy();
+        }
+
+        this.renderer = null;
+        this.modelManager = null;
+        this.editorManager = null;
+    },
+
     init: function (domElement) {
 
         console.log("Web3D: " + CLOUD.Version);
 
         var scope = this;
-
         this.domElement = domElement;
-
         var settings = {alpha: true, preserveDrawingBuffer: true, antialias: true};
 
         //if (!CLOUD.GlobalData.disableAntialias)
@@ -21381,7 +21602,6 @@ CLOUD.Viewer.prototype = {
         this.webGLRenderer = new THREE.WebGLRenderer(settings);
 
         if (this.incrementRenderEnabled) {
-
             // Renderer
             this.renderer = this.incrementRenderer;
             this.renderer.setRenderTicket(0);
@@ -21439,6 +21659,9 @@ CLOUD.Viewer.prototype = {
 
             this.rendering = true;
 
+            // update camera's inner/outer status, both "calculateNearFar" and "prepareScene" will use this info.
+            this.modelManager.calculateCameraModelRelation(camera.position);
+
             this.calculateNearFar();
 
             for (var sid in this.services) {
@@ -21466,6 +21689,10 @@ CLOUD.Viewer.prototype = {
 
                     var renderer = scope.renderer;
                     renderer.autoClear = autoClear;
+
+                    // if (scope.incrementRenderHandle > 0) {
+                    //     cancelAnimationFrame(scope.incrementRenderHandle);
+                    // }
 
                     var isFinished = renderer.IncrementRender(scene, camera);
 
@@ -21507,13 +21734,14 @@ CLOUD.Viewer.prototype = {
     calculateNearFar: function () {
 
         var scene = this.getScene();
+        var boundingBox = scene.getBoundingBoxWorld();
 
         // reducing z-fighting by dynamically adjust near/far
-        if (scene.rootNode.boundingBox != null) {
+        if (boundingBox != null) {
 
             var box = this.tmpBox;
-            box.copy(scene.rootNode.boundingBox);
-            box.applyMatrix4(scene.rootNode.matrix);
+            box.copy(boundingBox);
+            box.applyMatrix4(scene.getMatrixGlobal());
 
             var target = box.center();
             var position = this.camera.position;
@@ -21521,7 +21749,9 @@ CLOUD.Viewer.prototype = {
             var newPos = position.clone().sub(target);
             var length = newPos.length();
 
-            if (this.camera.inside || !this.enableCameraNearFar) {
+            // camera.inside = scene.getBoundingBoxInnner().containsPoint(camera.position);
+
+            if (this.modelManager.containsCamera || !this.enableCameraNearFar) {
                 ////CLOUD.GlobalData.SceneSize * 20.0
                 this.camera.setNearFar(0.1, 20000.0);
             } else {
@@ -21539,6 +21769,7 @@ CLOUD.Viewer.prototype = {
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);
         this.editorManager.resize();
+        this.onCallbacks("resize");
         this.render();
     },
 
@@ -21598,6 +21829,22 @@ CLOUD.Viewer.prototype = {
 
             this.initRenderer(this.domElement);
         }
+    },
+
+    // 清除状态
+    clearIncrementRender: function () {
+
+        if (this.incrementRenderEnabled) {
+
+            if (this.incrementRenderHandle > 0) {
+                cancelAnimationFrame(this.incrementRenderHandle);
+            }
+
+            this.rendering = false;
+            this.requestRenderCount = 0;
+            this.renderer.setRenderTicket(0);
+        }
+
     },
 
     // 设置每帧的最大耗时
@@ -21727,12 +21974,12 @@ CLOUD.Viewer.prototype = {
     },
 
     zoomAll: function (margin, ratio) {
-        var box = this.getScene().worldBoundingBox();
+        var box = this.getScene().getBoundingBox();
         this.editorManager.zoomToBBox(this, box, margin, ratio);
     },
 
     zoomToBuilding: function (margin, ratio) {
-        var box = viewer.getScene().innerBoundingBox;
+        var box = viewer.getScene().boundingBoxInner;
 
         if (box.empty()) {
             this.zoomAll();
@@ -21745,7 +21992,7 @@ CLOUD.Viewer.prototype = {
         var box = this.renderer.computeSelectionBBox();
 
         if (box == null || box.empty()) {
-            box = this.getScene().worldBoundingBox();
+            box = this.getScene().getBoundingBox();
         }
 
         this.editorManager.zoomToBBox(this, box, margin, ratio);
@@ -21754,9 +22001,9 @@ CLOUD.Viewer.prototype = {
     zoomToBBox: function (box, margin, ratio) {
 
         if (!box) {
-            box = this.getScene().worldBoundingBox();
+            box = this.getScene().getBoundingBox();
         } else {
-            box.applyMatrix4(this.getScene().getMatrixOfRootNode());
+            box.applyMatrix4(this.getScene().getMatrixGlobal());
         }
 
         this.editorManager.zoomToBBox(this, box, margin, ratio);
@@ -21781,8 +22028,8 @@ CLOUD.Viewer.prototype = {
             var zoomBox = box.clone();
             var refPoint = zoomBox.center().clone().add(direction);
 
-            zoomBox.applyMatrix4(this.getScene().getMatrixOfRootNode());
-            refPoint.applyMatrix4(this.getScene().getMatrixOfRootNode());
+            zoomBox.applyMatrix4(this.getScene().getMatrixGlobal());
+            refPoint.applyMatrix4(this.getScene().getMatrixGlobal());
 
             var newDirection = refPoint.clone().sub(zoomBox.center());
 
@@ -21816,8 +22063,8 @@ CLOUD.Viewer.prototype = {
             var zoomBox = box.clone();
             var refPoint = outerBox.center();
 
-            zoomBox.applyMatrix4(this.getScene().getMatrixOfRootNode());
-            refPoint.applyMatrix4(this.getScene().getMatrixOfRootNode());
+            zoomBox.applyMatrix4(this.getScene().getMatrixGlobal());
+            refPoint.applyMatrix4(this.getScene().getMatrixGlobal());
 
             var newDirection = refPoint.clone().sub(zoomBox.center());
 
