@@ -3,6 +3,7 @@ var AppRoute = Backbone.Router.extend({
 	routes: {
 		'': 'bodyContent',
 		'todo': 'todo',
+		'notice': 'notice',
 		'inbox': 'inbox',
 		'projects': 'projects',
 		'projects/:id/:versionId': 'project',
@@ -109,6 +110,16 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/todo/todo.css');
 		_.require('/static/dist/todo/todo.js');
 		App.Todo.init();
+	},
+	//公告
+	notice: function() {
+		if (this.reset() == false) {
+			return;
+		}
+		//加载css js
+		_.require('/static/dist/notice/notice.css');
+		_.require('/static/dist/notice/notice.js');
+		App.Notice.init();
 	},
 	//消息中心
 	inbox: function() {

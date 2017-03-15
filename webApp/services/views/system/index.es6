@@ -30,17 +30,17 @@ App.Services.System=Backbone.View.extend({
 		if (Auth.extendedAttribute) {
 			$container.append(tabs.extendedAttribute.tab);
 		}
-		if (Auth.announcementAttribute) {//公告管理标签
+		if (!Auth.announcementAttribute) {//公告管理标签
 			$container.append(tabs.announcementAttribute.tab);
 		}
 		if (Auth.feedbackAttribute) {//反馈管理标签
 			$container.append(tabs.feedbackAttribute.tab);
 		}
-		if (Auth.resourceAttribute) {//资源管理标签
+		if (!Auth.resourceAttribute) {//资源管理标签
 			$container.append(tabs.resourceAttribute.tab);
 		}
 
-		this.$(".serviceNav .item").eq(0).trigger("click");
+		this.$(".serviceNav .item").eq(2).trigger("click");
 
 		return this;
 	},
