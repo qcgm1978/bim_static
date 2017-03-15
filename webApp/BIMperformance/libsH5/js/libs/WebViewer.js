@@ -19469,11 +19469,11 @@ CLOUD.Model.prototype.load = function () {
 
     // load spatial index
     var octreeLoader = this.octreeLoader;
-    octreeLoader.load(this.octreeUrl('O'), function (rootNode) {
+    octreeLoader.load(this.octreeUrl('o'), function (rootNode) {
         scope.octreeRootNode = rootNode;
         CLOUD.Logger.log("octreeLoader outer layer.");
     });
-    octreeLoader.load(this.octreeUrl('I'), function (rootNode) {
+    octreeLoader.load(this.octreeUrl('i'), function (rootNode) {
         scope.octreeRootNodeI = rootNode;
         CLOUD.Logger.log("octreeLoader inner layer.");
     });
@@ -19515,8 +19515,8 @@ CLOUD.Model.prototype.userIdUrl = function () {
 };
 
 CLOUD.Model.prototype.octreeUrl = function (idx) {
-    idx = idx || 'O';
-    return this.serverUrl + this.databagId + "/scene/index" + idx +"_js";
+    idx = idx || 'o';
+    return this.serverUrl + this.databagId + "/scene/index_" + idx;
 };
 
 CLOUD.Model.prototype.symbolUrl = function () {
