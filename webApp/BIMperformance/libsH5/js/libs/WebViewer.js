@@ -2346,6 +2346,7 @@ CLOUD.RenderGroup = function () {
 
         for (; i < len; i++) {
 
+
             var renderItem = renderList[i];
             var object = renderItem.object;
             var material = renderItem.material;
@@ -14338,6 +14339,7 @@ CLOUD.EditorManager = function() {
     this.animationFrameTime = 13; // 周期性执行或调用函数之间的时间间隔，以毫秒计
     this.enableAnimation = true; // 是否允许动画
     this.isUpdateRenderList = true; // 是否更新渲染列表
+    this.cameraChange = false;
 
     this.movePad = null;
 
@@ -14365,7 +14367,9 @@ CLOUD.EditorManager = function() {
     }
 
     function onMouseWheel(event) {
+        scope.cameraChange = true;
         scope.editor.onMouseWheel(event);
+        // scope.cameraChange = false;
     }
 
     function onMouseDown(event) {
@@ -14395,6 +14399,7 @@ CLOUD.EditorManager = function() {
         if (_canMouseMoveOperation) {
             // 不更新渲染列表
             scope.isUpdateRenderList = false;
+            scope.cameraChange = true;
             scope.editor.onMouseMove(event);
         }
     }
@@ -14405,6 +14410,7 @@ CLOUD.EditorManager = function() {
 
         // 只要存在up事件，允许更新渲染列表
         scope.isUpdateRenderList = true;
+        // scope.cameraChange = false;
 
         var isCanMouseMove = _canMouseMoveOperation;
         // 只要存在up事件，就将其置为false
@@ -14806,7 +14812,8 @@ CLOUD.SelectPad = function (editor) {
 
         this.padInit();
 
-        var viewport = document.getElementById('viewport');
+        // var viewport = document.getElementById('viewport');
+        var viewport = this.editor.slaveEditor.domElement;
         viewport.appendChild(this.pad);
 
         this.addEventListener();
@@ -20113,7 +20120,7 @@ CLOUD.ModelManager.prototype.getWorldFrustum = function (camera, transform) {
         // worldCamera.near = camera.near * scaleCoe;
         worldCamera.far = camera.far * scaleCoe;
 
-        // 计算场景变换前的相机up和realUp
+        // 计算场景变换前的相机up和realUpw
         // var up = camera.position.clone().add(camera.up);
         // up.applyMatrix4(inverseMatrix).sub(worldCamera.position).normalize();
         // var realUp = camera.position.clone().add(camera.realUp);
@@ -21659,6 +21666,8 @@ CLOUD.Viewer.prototype = {
 
             this.rendering = true;
 
+            // var newCamera = camera.clone();
+
             // update camera's inner/outer status, both "calculateNearFar" and "prepareScene" will use this info.
             this.modelManager.calculateCameraModelRelation(camera.position);
 
@@ -21693,6 +21702,14 @@ CLOUD.Viewer.prototype = {
                     // if (scope.incrementRenderHandle > 0) {
                     //     cancelAnimationFrame(scope.incrementRenderHandle);
                     // }
+
+                    if (scope.editorManager.cameraChange) {
+                        scope.renderer.resetIncrementRender();// 重置增量绘制状态
+                        renderer.autoClear = true;
+                        scope.editorManager.cameraChange = false;
+                    } else {
+                        renderer.autoClear = autoClear;
+                    }
 
                     var isFinished = renderer.IncrementRender(scene, camera);
 
