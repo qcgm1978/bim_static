@@ -288,7 +288,7 @@ var Login = {
 	},
 
 	isSSO : function(cooks){
-
+		alert(cooks);
 		var OUTSSO_AuthNum   = Login.getCookie("OUTSSO_AuthNum",cooks);
 
 		var AuthUser_LoginId = Login.getCookie("AuthUser_LoginId",cooks);
