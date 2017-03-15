@@ -288,8 +288,9 @@ var Login = {
 	},
 
 	isSSO : function(cooks){
-		alert(cooks);
+		var bool;
 		var OUTSSO_AuthNum   = Login.getCookie("OUTSSO_AuthNum",cooks);
+		var isOuter   = Login.getCookie("isOuter",cooks);
 
 		var AuthUser_LoginId = Login.getCookie("AuthUser_LoginId",cooks);
 		var AuthUser_AuthNum = Login.getCookie("AuthUser_AuthNum",cooks);
@@ -299,6 +300,7 @@ var Login = {
 		var AuthUser_LoginId = Login.getCookie("AuthUser_LoginId",cooks);
 		try
 		{
+			bool = AuthUser_AuthNum.length>5 && AuthUser_AuthToken.length>5 && AuthUser_AuthMAC.length>5 && (OUTSSO_AuthNum==undefined || isOuter=="false") && AuthUser_Signature.length>5
 			if(AuthUser_AuthToken == undefined)
 			{
 				return false;
@@ -307,7 +309,7 @@ var Login = {
 			{
 				return false;
 			}
-			if(AuthUser_AuthNum.length>5 && AuthUser_AuthToken.length>5 && AuthUser_AuthMAC.length>5 && OUTSSO_AuthNum==undefined && AuthUser_Signature.length>5)
+			if(bool)
 			{
 				return true;
 			}
