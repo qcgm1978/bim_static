@@ -19523,7 +19523,7 @@ CLOUD.Model.prototype.userIdUrl = function () {
 
 CLOUD.Model.prototype.octreeUrl = function (idx) {
     idx = idx || 'o';
-    return this.serverUrl + this.databagId + "/scene/index_" + idx;
+    return this.serverUrl + "file/" + this.databagId + "/scene/index_" + idx; //add "file/" string by wuweiwei
 };
 
 CLOUD.Model.prototype.symbolUrl = function () {
