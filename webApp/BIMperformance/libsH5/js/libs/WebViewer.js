@@ -19396,6 +19396,7 @@ CLOUD.Model = function (manager, serverUrl, databagId, texturePath) {
     this.taskCount = 0;
     this.maxTaskCount = 4;
     this.containsCamera = false;
+    this.load_complete = false;
 };
 
 CLOUD.Model.prototype = Object.create(THREE.LoadingManager.prototype);
@@ -19409,7 +19410,9 @@ CLOUD.Model.prototype.load = function () {
         scope.taskCount++;
 
         if (scope.taskCount >= scope.maxTaskCount) {
+            this.load_complete = true;
             scope.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_COMPLETE});
+
         } else {
             var progress = {
                 total: scope.maxTaskCount,
@@ -19428,6 +19431,7 @@ CLOUD.Model.prototype.load = function () {
         scope.sceneArray = new Array(scope.sceneCount);
         scope.mpkArray = new Array(scope.mpkCount);
         scope.manager.scene.parseRootNode(cfg);
+        scope.load_complete = false;
 
         var sceneId = 0;
 
@@ -19745,7 +19749,7 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
     // VAAS-100: Mesh and Other resource loading does not sync with reading process,
     // here do scene prepare after all of them loaded.
     // TODO: on-demand loading resource like mesh package, scene and material etc.
-    if(this.taskCount < this.maxTaskCount) {
+    if(!this.load_complete) {
         return;
     }
 
