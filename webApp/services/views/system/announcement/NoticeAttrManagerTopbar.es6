@@ -37,7 +37,7 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 	},
 	stickNotice:function(){//点击置顶按钮的时候执行的方法
 		var noticeDom = $("#listDom tr.selectClass");
-		console.log("notcieState",notcieState);
+		// console.log("notcieState",notcieState);
 		// if(noticeDom.length>0){
 		// 	if(notcieState == "已发布"){
 		// 		console.log("noticeDom",noticeDom.length);

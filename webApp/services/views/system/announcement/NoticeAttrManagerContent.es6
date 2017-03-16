@@ -18,11 +18,9 @@ App.Services.NoticeAttrManagerContent = Backbone.View.extend({
 	getListHandle(parmer){//获取列表的方法
 		App.Services.SystemCollection.getListHandle();
 	},
-	itemClickHandle(event){
-		var editNotice = $("button.editNotice");
+	itemClickHandle(event){//disable
 		var deleteNotice = $("button.deleteNotice");
 		var publishNotice = $("button.publishNotice");
-		var previewNotice = $("button.previewNotice");
 		var stickNotice = $("button.stickNotice");
 		var cancelStickNotice = $("button.cancelStickNotice");
 		var withdrawNotice = $("button.withdrawNotice");

@@ -19410,7 +19410,7 @@ CLOUD.Model.prototype.load = function () {
         scope.taskCount++;
 
         if (scope.taskCount >= scope.maxTaskCount) {
-            this.load_complete = true;
+            scope.load_complete = true;
             scope.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_COMPLETE});
 
         } else {
@@ -19509,7 +19509,7 @@ CLOUD.Model.prototype.destroy = function () {
 };
 
 CLOUD.Model.prototype.projectUrl = function () {
-    return this.serverUrl + "config/" + this.databagId + "/config.json"; //add "file/" string by wuweiwei
+    return this.serverUrl + this.databagId + "/config.json";
 };
 
 CLOUD.Model.prototype.sceneUrl = function (idx) {
@@ -19527,7 +19527,7 @@ CLOUD.Model.prototype.userIdUrl = function () {
 
 CLOUD.Model.prototype.octreeUrl = function (idx) {
     idx = idx || 'o';
-    return this.serverUrl + "file/" + this.databagId + "/scene/index_" + idx; //add "file/" string by wuweiwei
+    return this.serverUrl + this.databagId + "/scene/index_" + idx;
 };
 
 CLOUD.Model.prototype.symbolUrl = function () {
@@ -22000,7 +22000,7 @@ CLOUD.Viewer.prototype = {
     },
 
     zoomToBuilding: function (margin, ratio) {
-        var box = viewer.getScene().boundingBoxInner;
+        var box = this.getScene().boundingBoxInner;
 
         if (box.empty()) {
             this.zoomAll();
