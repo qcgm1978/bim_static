@@ -1,5 +1,3 @@
-
-
 //系统 管理入口
 App.Services.System=Backbone.View.extend({
 
@@ -30,7 +28,7 @@ App.Services.System=Backbone.View.extend({
 		if (Auth.extendedAttribute) {
 			$container.append(tabs.extendedAttribute.tab);
 		}
-		if (Auth.announcementAttribute) {//公告管理标签
+		if (!Auth.announcementAttribute) {//公告管理标签
 			$container.append(tabs.announcementAttribute.tab);
 		}
 		if (Auth.feedbackAttribute) {//反馈管理标签
@@ -40,7 +38,7 @@ App.Services.System=Backbone.View.extend({
 			$container.append(tabs.resourceAttribute.tab);
 		}
 
-		this.$(".serviceNav .item").eq(0).trigger("click");
+		this.$(".serviceNav .item").eq(2).trigger("click");
 
 		return this;
 	},
@@ -61,7 +59,7 @@ App.Services.System=Backbone.View.extend({
 			viewer=new App.Services.System.ExtendAttrManager();
 		}else if (type=="announcement") {
 			//公告
-			viewer=new App.Services.System.AnnouncementAttrManager();
+			viewer=new App.Services.NoticeAttrManager();
 		}else if (type=="feedback") {
 			//反馈
 			viewer=new App.Services.System.FeedbackAttrManager();
