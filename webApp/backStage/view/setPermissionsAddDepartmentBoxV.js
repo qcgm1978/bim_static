@@ -95,8 +95,8 @@ App.backStage.AddDepartmentV = Backbone.View.extend({
 					var zNodes= res.data || [];
 					zNodes.forEach(function(i){
 						i.iconSkin='business';
-						i.name=i.name+'<i style="color:#999999;">（'+i.parentname+'）</i>';
 						i.nameN = i.name;
+						i.name=i.name+'<i style="color:#999999;">（'+i.parentname+'）</i>';
 						if(i.type == 1){
 							i.userId = i.id
 						}else{
@@ -292,8 +292,9 @@ App.backStage.AddDepartmentV = Backbone.View.extend({
 		_.each(nodes,function(n){
 			n.children=[];
 		})
-		var filterAddArrs = this.filterAddOption(newNodesGet,nodes);
-		_this.selectedTree.addNodes(null,filterAddArrs);
+		// var filterAddArrs = this.filterAddOption(newNodesGet,nodes);
+		// console.log(filterAddArrs);
+		_this.selectedTree.addNodes(null,nodes);
 	},
 	/**
 	 * 添加项目成员
@@ -301,6 +302,7 @@ App.backStage.AddDepartmentV = Backbone.View.extend({
 	grand:function(){//选好成员之后点击确定执行的方法
 		var self = this;
 		var nodes=this.selectedTree.getNodes();
+		self.default.ajaxArr=[];
 		for(var i=0,len=nodes.length-1;i<=len;i++){
 			var moveObj={};
 			moveObj.orgid=nodes[i].orgId;
@@ -313,12 +315,14 @@ App.backStage.AddDepartmentV = Backbone.View.extend({
 			alert("请选择一个部门")
 			return;
 		}
+
 		var dataObj = {
 			"URLtype": "addWorkforgcon",
 			"type": "POST",
 			"contentType": "application/json",
 			"data": JSON.stringify(this.default.ajaxArr)
 		};
+
 		App.Comm.ajax(dataObj, function(data) {
 			if (data.code == 0) {
 				self.getListHandle();
