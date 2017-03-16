@@ -19505,7 +19505,7 @@ CLOUD.Model.prototype.destroy = function () {
 };
 
 CLOUD.Model.prototype.projectUrl = function () {
-    return this.serverUrl + this.databagId + "/config.json";
+    return this.serverUrl + "config/" + this.databagId + "/config.json"; //add "file/" string by wuweiwei
 };
 
 CLOUD.Model.prototype.sceneUrl = function (idx) {
