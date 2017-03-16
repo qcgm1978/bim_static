@@ -1,10 +1,4 @@
 App.backStage = {
-	orgId : [],//暂存已被选关键用户的orgId数组
-	editorgId : [],//暂存被编辑的关键用户的orgId数组
-	uuid : '',//暂存被点击的关键用户信息的uid
-	clearAll: function(){//清空暂存的数据
-	  this.orgId = [];
-	},
 	init: function() { //后台管理的列表页面
 		$("#contains").empty();
 		var BackStageIndexV = new App.backStage.BackStageIndexV(); //渲染框架

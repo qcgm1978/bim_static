@@ -146,6 +146,10 @@ fis.match('todo/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
 });
+fis.match('notice/**.html', {
+  //useHash:true,
+  release: "/static/dist/tpls/$0"
+});
 fis.match('imbox/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
@@ -384,6 +388,23 @@ fis.match('/todo/**.{less,css}', {
 fis.match('/static/dist/todo/todo.css', {
   //useHash:true,
   release: '/static/dist/todo/todo.css'
+});
+// 公告
+fis.match('/notice/**.{js,es6}', {
+  //useHash:true,
+  packTo: '/static/dist/notice/notice.js'
+});
+fis.match('/static/dist/notice/notice.js', {
+  //useHash:true,
+  release: '/static/dist/notice/notice.js'
+});
+fis.match('/notice/**.{less,css}', {
+  //useHash:true,
+  packTo: '/static/dist/notice/notice.css'
+});
+fis.match('/static/dist/notice/notice.css', {
+  //useHash:true,
+  release: '/static/dist/notice/notice.css'
 });
 // 消息中心
 fis.match('/imbox/**.{js,es6}', {

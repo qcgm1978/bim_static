@@ -1,5 +1,4 @@
 App.Services.SystemCollection = {
-
 	//分类列表
 	CategoryCollection: new(Backbone.Collection.extend({
 		model: Backbone.Model.extend({
@@ -69,5 +68,33 @@ App.Services.SystemCollection = {
 				return response.data;
 			}
 		}
-	}))
+	})),
+	NoticeCollection:new(Backbone.Collection.extend({
+		model:Backbone.Model.extend({
+			defaults:function(){
+				return {
+					title:''
+				}
+			}
+		}),
+		urlType:"getServersNoticeList",
+		parse(response){
+			if(response.code == 0){
+				return response.data;
+			}
+		}
+	})),
+	getListHandle(parmer){//获取列表的方法
+		var self = this;
+		var defaultData = {
+			searchName:''
+		};
+		var extendData = $.extend({},defaultData,parmer);
+		App.Services.SystemCollection.NoticeCollection.reset();
+		// App.Services.SystemCollection.fetch({
+		// 	data:extendData,
+		// 	success:function(){
+		// 	}
+		// })
+	},
 }
