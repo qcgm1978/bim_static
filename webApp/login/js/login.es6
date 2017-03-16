@@ -300,7 +300,7 @@ var Login = {
 		var AuthUser_LoginId = Login.getCookie("AuthUser_LoginId",cooks);
 		try
 		{
-			bool = AuthUser_AuthNum.length>5 && AuthUser_AuthToken.length>5 && AuthUser_AuthMAC.length>5 && (OUTSSO_AuthNum==undefined || isOuter=="false") && AuthUser_Signature.length>5
+			bool = AuthUser_AuthNum.length>5 && AuthUser_AuthToken.length>5 && AuthUser_AuthMAC.length>5 && (OUTSSO_AuthNum==undefined || isOuter=="false") && AuthUser_Signature.length>5;
 			if(AuthUser_AuthToken == undefined)
 			{
 				return false;
