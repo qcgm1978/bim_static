@@ -1,6 +1,7 @@
 App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 	default:{
-		timeout:0
+		timeout:0,
+		flag:true
 	},
 	tagName:'div',
 	className:"noticeTopbar",
@@ -60,75 +61,167 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 		});
 	},
 	editNotice(){//编辑公告的按钮方法
+		var _this = this;
 		var noticeDom = $("#listDom tr.selectClass");
-		var editType = noticeDom.find("td:eq(0)").data("edittype");
-		var noticeTitle = noticeDom.find("td:eq(0)").html();
-		var noticeLink = noticeDom.find("td:eq(1)").html();
-		var noticeTime = noticeDom.find("td:eq(2)").html();
-		if(editType == "link"){
-			var data = {
-				noticeTitle:noticeTitle,
-				noticeLink:noticeLink,
-				noticeTime:noticeTime
-			}
-			var NewLinkNotice = new App.Services.NoticeAttrManagerTopbarNewLinkNotice();
-			App.Services.SystemCollection.addLinkNoticeDialog = new App.Comm.modules.Dialog({
-			    title:"新建链接公告",
-			    width:600,
-			    height:150,
-			    isConfirm:false,
-			    isAlert:false,
-			    closeCallback:function(){},
-			    message:NewLinkNotice.render(data).el
-			});
+		var noticeid = noticeDom.find("td:eq(0)").data("noticeid");
+		var data = {
+			"id":noticeid
+		}
+		if(this.default.flag){
+			this.default.flag=false;
+			App.Comm.ajax({
+				URLtype:"getNotice",
+				data:JSON.stringify(data),
+				contentType:"application/json",
+			}).done(function(res){
+				if(res.code==0){
+					if(res.data.type == 1){
+						var NewLinkNotice = new App.Services.NoticeAttrManagerTopbarNewLinkNotice();
+						App.Services.SystemCollection.addLinkNoticeDialog = new App.Comm.modules.Dialog({
+						    title:"新建链接公告",
+						    width:600,
+						    height:150,
+						    isConfirm:false,
+						    isAlert:false,
+						    closeCallback:function(){},
+						    message:NewLinkNotice.render(res.data).el
+						});
+					}else if(res.data.type == 2){
+
+					}
+					_this.default.flag=true;
+				}
+			})
 		}
 	},
-	stickNotice:function(){//点击置顶按钮的时候执行的方法
+	deleteNotice(){//删除选中公告的方法
+		var _this = this;
+		var target = $(event.target);
 		var noticeDom = $("#listDom tr.selectClass");
-		// console.log("notcieState",notcieState);
-		// if(noticeDom.length>0){
-		// 	if(notcieState == "已发布"){
-		// 		console.log("noticeDom",noticeDom.length);
-		// 	}else{
-		// 		alert("只允许撤回已发布公告");
-		// 	}
-			
-		// }else{
-		// 	alert("请选择一条公告");
-		// }
+		var noticeid = noticeDom.find("td:eq(0)").data("noticeid");
+		var data = {
+			"id":noticeid
+		}
+		if(!target.hasClass("disable")){
+			if(this.default.flag){
+				this.default.flag=false;
+				App.Comm.ajax({
+					URLtype:"deleteNotice",
+					data:JSON.stringify(data),
+					type:"DELETE",
+					contentType:"application/json",
+				}).done(function(res){
+					if(res.code==0){
+						App.Services.SystemCollection.getListHandle();
+						target.add("disable");
+						_this.default.flag=true;
+					}
+				})
+			}
+		}
+	},
+	publishNotice(){//发布公告的方法
+		var _this = this;
+		var target = $(event.target);
+		var noticeDom = $("#listDom tr.selectClass");
+		var noticeid = noticeDom.find("td:eq(0)").data("noticeid");
+		var data = {
+			"id":noticeid
+		}
+		if(!target.hasClass("disable")){
+			if(this.default.flag){
+				this.default.flag=false;
+				App.Comm.ajax({
+					URLtype:"publishNotice",
+					data:JSON.stringify(data),
+					type:"PUT",
+					contentType:"application/json",
+				}).done(function(res){
+					if(res.code==0){
+						App.Services.SystemCollection.getListHandle();
+						target.add("disable");
+						_this.default.flag=true;
+					}
+				})
+			}
+		}
+	},
+	stickNotice:function(event){//点击置顶按钮的时候执行的方法
+		var _this = this;
+		var target = $(event.target);
+		var noticeDom = $("#listDom tr.selectClass");
+		var noticeid = noticeDom.find("td:eq(0)").data("noticeid");
+		var data = {
+			"id":noticeid
+		}
+		if(!target.hasClass("disable")){
+			if(this.default.flag){
+				this.default.flag=false;
+				App.Comm.ajax({
+					URLtype:"stickNotice",
+					data:JSON.stringify(data),
+					type:"PUT",
+					contentType:"application/json",
+				}).done(function(res){
+					if(res.code==0){
+						App.Services.SystemCollection.getListHandle();
+						target.add("disable");
+						_this.default.flag=true;
+					}
+				})
+			}
+		}
 	},
 	cancelStickNotice:function(){//取消置顶按钮方法
+		var _this = this;
+		var target = $(event.target);
 		var noticeDom = $("#listDom tr.selectClass");
-		var sticeState = noticeDom.find("td:eq(0)").data("sticeState");
-		if(this.publicFun()){
-			if(sticeState=="true"){
-				console.log("noticeDom",noticeDom.length);
-			}else{
-				alert("只允许撤回已发布公告");
+		var noticeid = noticeDom.find("td:eq(0)").data("noticeid");
+		var data = {
+				"id":noticeid
 			}
-		}else{
-			alert("请选择一条公告");
+		if(!target.hasClass("disable")){
+			if(this.default.flag){
+				this.default.flag=false;
+				App.Comm.ajax({
+					URLtype:"cancelStickNotice",
+					data:JSON.stringify(data),
+					type:"PUT",
+					contentType:"application/json",
+				}).done(function(res){
+					if(res.code==0){
+						App.Services.SystemCollection.getListHandle();
+						target.add("disable");
+						_this.default.flag=true;
+					}
+				})
+			}
 		}
 	},
 	withdrawNotice:function(){//点击撤回按钮的时候执行的方法
+		var _this = this;
+		var target = $(event.target);
 		var noticeDom = $("#listDom tr.selectClass");
-		var notcieState = noticeDom.find("td:eq(0)").data("publishState");
-		if(this.publicFun()){
-			if(notcieState == "已发布"){
-				console.log("noticeDom",noticeDom.length);
-			}else{
-				alert("只允许撤回已发布公告");
-			}
-		}else{
-			alert("请选择一条公告");
+		var noticeid = noticeDom.find("td:eq(0)").data("noticeid");
+		var data = {
+			"id":noticeid
 		}
-	},
-	publicFun:function(){//公用判断当前是否有选中的数据
-		var noticeDom = $("#listDom tr.selectClass");
-		if(noticeDom.length>0){
-			return true;
-		}else{
-			return false;
+		if(!target.hasClass("disable")){
+			if(this.default.flag){
+				this.default.flag=false;
+				App.Comm.ajax({
+					URLtype:"withdrawNotice",
+					data:JSON.stringify(data),
+					type:"PUT",
+					contentType:"application/json",
+				}).done(function(res){
+					if(res.code==0){
+						App.Services.SystemCollection.getListHandle();
+						target.add("disable");
+						_this.default.flag=true;
+					}
+				})
+			}
 		}
 	},
 });
