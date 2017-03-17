@@ -15,11 +15,12 @@ App.Suggest.containerView=Backbone.View.extend({
 	},
 
 	renderData(item){
+
         var _data=item.toJSON();
 		var _html=_.templateUrl('./suggest/tpls/list.html');
 		this.$('.commissionLists').html(_html({data:_data}));
         this.scrollFun();
-        /*this.$(".commissionListPagination").empty().pagination(_data.totalItemCount, {
+        this.$(".commissionListPagination").empty().pagination(_data.totalItemCount, {
              items_per_page:_data.pageItemCount,
              current_page:_data.pageIndex-1,
              num_edge_entries: 3, //边缘页数
@@ -30,7 +31,7 @@ App.Suggest.containerView=Backbone.View.extend({
              prev_text: "上一页",
              next_text: "下一页"
 
-         });*/
+         });
 	},
     scrollFun:function(){
         

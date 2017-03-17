@@ -12813,7 +12813,6 @@ CLOUD.RectPickEditor = function (slaveEditor, onSelectionChanged) {
 
     this.onObjectSelected = onSelectionChanged;
 
-
     this.startPt = new THREE.Vector2();
     this.endPt = new THREE.Vector2();
 
@@ -14383,7 +14382,10 @@ CLOUD.EditorManager = function() {
         var isAnimating = scope.isAnimating();
 
         // 判断是否在动画中, 若是动画中，不响应事件
-        if (isAnimating) return;
+        if (isAnimating) {
+            scope.cameraChange = false;
+            return;
+        }
 
         scope.editor.onMouseDown(event);
     }
@@ -14393,7 +14395,10 @@ CLOUD.EditorManager = function() {
         var isAnimating = scope.isAnimating();
 
         // 判断是否在动画中, 若是动画中，不响应事件
-        if (isAnimating) return;
+        if (isAnimating) {
+            scope.cameraChange = false;
+            return;
+        }
 
         // 其它交互
         if (_canMouseMoveOperation) {
@@ -14417,7 +14422,10 @@ CLOUD.EditorManager = function() {
         _canMouseMoveOperation = false;
 
         // 判断是否在动画中, 若是动画中，不响应事件
-        if (isAnimating) return;
+        if (isAnimating) {
+            scope.cameraChange = false;
+            return;
+        }
 
         if (isCanMouseMove) {
             // 其它交互
@@ -19409,16 +19417,27 @@ CLOUD.Model.prototype.load = function () {
     function onTaskFinished() {
         scope.taskCount++;
 
+        // if (scope.taskCount >= scope.maxTaskCount) {
+        //     scope.load_complete = true;
+        //     scope.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_COMPLETE});
+        //
+        // } else {
+        //     var progress = {
+        //         total: scope.maxTaskCount,
+        //         loaded: scope.taskCount
+        //     };
+        //     scope.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_PROGRESS, progress: progress});
+        // }
+
+        var progress = {
+            total: scope.maxTaskCount,
+            loaded: scope.taskCount
+        };
+        scope.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_PROGRESS, progress: progress});
+
         if (scope.taskCount >= scope.maxTaskCount) {
             scope.load_complete = true;
             scope.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_COMPLETE});
-
-        } else {
-            var progress = {
-                total: scope.maxTaskCount,
-                loaded: scope.taskCount
-            };
-            scope.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_PROGRESS, progress: progress});
         }
     }
 
@@ -19509,7 +19528,7 @@ CLOUD.Model.prototype.destroy = function () {
 };
 
 CLOUD.Model.prototype.projectUrl = function () {
-    return this.serverUrl + "config/" + this.databagId + "/config.json"; //modify by wuweiwei add "config/"
+    return this.serverUrl +"config/"+ this.databagId + "/config.json";
 };
 
 CLOUD.Model.prototype.sceneUrl = function (idx) {
@@ -19527,7 +19546,7 @@ CLOUD.Model.prototype.userIdUrl = function () {
 
 CLOUD.Model.prototype.octreeUrl = function (idx) {
     idx = idx || 'o';
-    return this.serverUrl + "file/" + this.databagId + "/scene/index_" + idx; //modify by wuweiwei add "file/"
+    return this.serverUrl +"file/"+ this.databagId + "/scene/index_" + idx;
 };
 
 CLOUD.Model.prototype.symbolUrl = function () {
@@ -21605,7 +21624,7 @@ CLOUD.Viewer.prototype = {
             return false;
         }
 
-        // settings.canvas = canvas;
+        settings.canvas = canvas;
 
         CLOUD.GeomUtil.initializeUnitInstances();
 
@@ -21626,7 +21645,7 @@ CLOUD.Viewer.prototype = {
         var viewportWidth = domElement.offsetWidth;
         var viewportHeight = domElement.offsetHeight;
 
-        this.initRenderer();
+        this.initRenderer(true);
 
         // Camera
         this.camera = new CLOUD.Camera(viewportWidth, viewportHeight, 45, 0.1, CLOUD.GlobalData.SceneSize * 20.0);
@@ -21717,6 +21736,8 @@ CLOUD.Viewer.prototype = {
 
                     var isFinished = renderer.IncrementRender(scene, camera);
 
+                    camera.dirty2 = false;
+
                     if (isFinished) {
                         scope.rendering = false;
 
@@ -21804,7 +21825,7 @@ CLOUD.Viewer.prototype = {
     },
 
     // 初始化renderer
-    initRenderer: function () {
+    initRenderer: function (first) {
 
         var viewportWidth = this.domElement.offsetWidth;
         var viewportHeight = this.domElement.offsetHeight;
@@ -21813,13 +21834,16 @@ CLOUD.Viewer.prototype = {
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(viewportWidth, viewportHeight);
 
-        // Added by xmh begin 允许获得焦点，
-        // 将键盘事件注册到父容器（之前注册到window上会存在各种联动问题），鼠标点击父容器，激活canvas
-        this.renderer.domElement.setAttribute('tabindex', '0');
-        this.renderer.domElement.setAttribute('id', 'cloud-main-canvas');
-        // Added by xmh end
+        if (first) {
 
-        this.domElement.appendChild(this.renderer.domElement);
+            // Added by xmh begin 允许获得焦点，
+            // 将键盘事件注册到父容器（之前注册到window上会存在各种联动问题），鼠标点击父容器，激活canvas
+            this.renderer.domElement.setAttribute('tabindex', '0');
+            this.renderer.domElement.setAttribute('id', 'cloud-main-canvas');
+            // Added by xmh end
+
+            this.domElement.appendChild(this.renderer.domElement);
+        }
     },
 
     setIncrementRenderEnabled: function (enable) {
@@ -21828,9 +21852,7 @@ CLOUD.Viewer.prototype = {
 
         if (this.domElement) {
 
-            this.renderer.domElement.removeAttribute('tabindex');
-            this.renderer.domElement.removeAttribute('id');
-            this.domElement.removeChild(this.renderer.domElement);
+
 
             if (enable) {
                 this.renderer = this.incrementRenderer;
@@ -21838,7 +21860,6 @@ CLOUD.Viewer.prototype = {
                 this.rendering = false;
                 this.requestRenderCount = 0;
                 // this.editorManager.isUpdateRenderList = true;
-
             } else {
 
                 if (this.incrementRenderHandle > 0) {
@@ -21848,7 +21869,7 @@ CLOUD.Viewer.prototype = {
                 this.renderer = this.webGLRenderer;
             }
 
-            this.initRenderer(this.domElement);
+            this.initRenderer(false);
         }
     },
 
