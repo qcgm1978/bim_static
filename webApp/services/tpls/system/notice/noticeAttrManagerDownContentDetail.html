@@ -1,3 +1,9 @@
-<td data-publishState="已发布" data-sticestate="true" data-withdrawstate="true" data-edittype="link"><%= title %></td>
-<td><%= time %></td>
-<td><%= status %></td>
+<td data-publishState="<%= status%>" data-sticestate="<%= orderType%>" data-edittype="<%= type%>"><%= title %></td>
+<td><%= publishTime %></td>
+<% if(status == 1){%>
+	<td>已发布</td>
+<%}else if(status == 2){%>
+	<td>已撤回</td>
+<%}else if(status == 3){%>
+	<td>未发布</td>
+<%} %>

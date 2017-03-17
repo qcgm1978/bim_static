@@ -3,9 +3,7 @@ App.Services.NoticeAttrManagerContentDetail = Backbone.View.extend({
 	className:"itemClick",
 	template:_.templateUrl("/services/tpls/system/notice/noticeAttrManagerDownContentDetail.html"),
 	render(){//渲染
-		// var data = this.model.toJSON();
-		var data = this.model;
-		this.$el.html(this.template(data));
+		this.$el.html(this.template(this.model));
 		return this;
 	},
 });
