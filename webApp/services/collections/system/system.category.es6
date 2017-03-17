@@ -84,17 +84,22 @@ App.Services.SystemCollection = {
 			}
 		}
 	})),
-	getListHandle(parmer){//获取列表的方法
+	getListHandle(parmer){//获取公告列表的方法
 		var self = this;
 		var defaultData = {
-			searchName:''
+			title:'',
+			status:'',
+			pageIndex:1,
+			pageItemCount:15,
 		};
 		var extendData = $.extend({},defaultData,parmer);
 		App.Services.SystemCollection.NoticeCollection.reset();
-		// App.Services.SystemCollection.fetch({
-		// 	data:extendData,
-		// 	success:function(){
-		// 	}
-		// })
+		App.Services.SystemCollection.NoticeCollection.fetch({
+			data:extendData,
+			success:function(response){
+				$("#listDom").find(".noDataTd").parent().remove();
+				return response.data;
+			}
+		})
 	},
 }
