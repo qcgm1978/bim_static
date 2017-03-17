@@ -11,14 +11,13 @@ App.Services.NoticeAttrManagerContent = Backbone.View.extend({
 	}, 
 	render(){//渲染
 		this.$el.html(this.template);
-		// this.addOne();
 		this.getListHandle();//获取公告列表的方法
 		return this;
 	},
 	getListHandle(){//获取公告列表的方法
 		App.Services.SystemCollection.getListHandle();
 	},
-	itemClickHandle(event){//disable
+	itemClickHandle(event){//点击列表选中一个公告执行的方法
 		var deleteNotice = $("button.deleteNotice");
 		var publishNotice = $("button.publishNotice");
 		var stickNotice = $("button.stickNotice");
@@ -47,6 +46,8 @@ App.Services.NoticeAttrManagerContent = Backbone.View.extend({
 			}
 			if(sticeState == "0"){
 				stickNotice.removeClass('disable');
+			}else if(sticeState == "1"){
+				cancelStickNotice.removeClass('disable');
 			}
 		}
 	},
