@@ -730,7 +730,7 @@
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();
-      viewer.adjustSceneLoD(obj.total);
+      //viewer.adjustSceneLoD(obj.total); 已废弃
       filter.removeFileFilter();
       $.each(obj.ids, function(i, id) {
         filter.addFileFilter(id)
