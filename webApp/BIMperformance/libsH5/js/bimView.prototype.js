@@ -67,6 +67,7 @@
       switch (_opt.type) { // 判断类型
         case "model":
           self.viewer = bimView.model.model(_opt, self);
+          self.annotationHelper3D= new CLOUD.Extensions.AnnotationHelper3D(self.viewer);
           break;
         case 'singleModel':
           self.viewer = bimView.model.singleModel(_opt);
@@ -624,12 +625,17 @@
       // 进入批注模式
       var self = this;
       var viewer = self.viewer;
+      if (!self.annotationHelper3D)
+      {
+        self.annotationHelper3D = new CLOUD.Extensions.AnnotationHelper3D(self.viewer);
+        viewer = self.annotationHelper3D;
+      }
       var modelBgColor = self._dom.bimBox.css('background-color');
       //收起属性页
       $('.slideBar .icon-caret-right').click();
       //还原颜色
       self._dom.bimBox.addClass('comment');
-      viewer.editCommentBegin();
+      self.annotationHelper3D.editAnnotationBegin() 
       //viewer.setCommentStyle({'stroke-color': 'red','fil-color':'red' });
 
       viewer.setCommentBackgroundColor(modelBgColor);
