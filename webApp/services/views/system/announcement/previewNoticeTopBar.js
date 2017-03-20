@@ -1,4 +1,4 @@
-App.Services.System.previewNoticeTopBar=Backbone.View.extend({
+App.Services.previewNoticeTopBar=Backbone.View.extend({
 	tagName:"div",
 	className:"previewNoticeTopBar",
 	template:_.templateUrl("/services/tpls/system/notice/previewNoticeTopBar.html",true),

@@ -63,7 +63,7 @@ App.Services = {
 		}
 	},
 	noticeInit(noticeId){//公告打开新页面预览
-		viewer = new App.Services.System.PreviewNotice();
+		viewer = new App.Services.PreviewNotice();
 		$("#contains").html(viewer.render(noticeId).el);
 		$("#pageLoading").hide();
 	},

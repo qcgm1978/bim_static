@@ -1,4 +1,4 @@
-App.Services.System.previewNoticeContent=Backbone.View.extend({
+App.Services.previewNoticeContent=Backbone.View.extend({
 	tagName:"div",
 	className:"previewNoticeContent",
 	template:_.templateUrl("/services/tpls/system/notice/previewNoticeContent.html"),

@@ -1,9 +1,8 @@
-App.Services.System.PreviewNotice=Backbone.View.extend({
+App.Services.PreviewNotice=Backbone.View.extend({
 	tagName:"div",
 	className:"previewNoticeBox",
 	render(noticeId){
-		this.$el.html(new App.Services.System.previewNoticeTopBar().render().el);
-		
+		this.$el.html(new App.Services.previewNoticeTopBar().render().el);
 		this.getNoticeData(noticeId);//获取当前公告的信息方法
 		return this;
 	},
@@ -17,7 +16,7 @@ App.Services.System.PreviewNotice=Backbone.View.extend({
 			data:data,
 		}).done(function(res){
 			if(res.code==0){
-				_this.$el.append(new App.Services.System.previewNoticeContent({model:res}).render().el);
+				_this.$el.append(new App.Services.previewNoticeContent({model:res}).render().el);
 			}
 		})
 	}
