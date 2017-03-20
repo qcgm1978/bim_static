@@ -28,7 +28,6 @@ App.Services.NoticeAttrManagerContent = Backbone.View.extend({
 		var target = $(event.target).parent();
 		var publishState = target.find("td:eq(0)").data("publishstate");//当前公告是否发布
 		var sticeState = target.find("td:eq(0)").data("sticestate");//当前公告是否置顶
-		var withdrawState = target.find("td:eq(0)").data("withdrawstate");//当前公告是否撤回
 		target.siblings().removeClass('selectClass');
 		deleteNotice.addClass('disable');
 		publishNotice.addClass('disable');
@@ -36,6 +35,7 @@ App.Services.NoticeAttrManagerContent = Backbone.View.extend({
 		cancelStickNotice.addClass('disable');
 		editNotice.addClass('disable');
 		previewNotice.addClass('disable');
+		withdrawNotice.addClass('disable');
 		if(target.hasClass("selectClass")){
 			target.removeClass("selectClass");
 		}else{

@@ -20,6 +20,7 @@ var AppRoute = Backbone.Router.extend({
 		'console1/:type/:step': 'console1',
 		'services': 'services',
 		'services/:type': 'services',
+		'services/system/notice/:noticeId': 'previewNotice',
 		'services/:optionType/:projectModelId': 'servicesMappingRule',
 		'list/:id': 'list',
 		'bodyContent': 'bodyContent',
@@ -349,7 +350,17 @@ var AppRoute = Backbone.Router.extend({
 		}
 		window.Global.DemoEnv();
 	},
-
+	previewNotice:function(noticeId){//点击公告预览之后打开新页面
+		if (this.reset() == false) {
+			return;
+		}
+		$("#pageLoading").hide();
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".services").addClass('selected');
+		_.require('/static/dist/services/services.css');
+		_.require('/static/dist/services/services.js');
+		$("#bottomBar").hide(); //隐藏脚部
+		App.Services.noticeInit(noticeId);
+	},
 	initAuth:function(user){
 
 		$('.linkNavItem').off('click').on('click',function(){
