@@ -15,38 +15,12 @@ App.Notice.NoticeListView = Backbone.View.extend({
 	render:function(){
 		var self = this;
 		this.$el.html(this.template);
-		this.addOne();
-		// setTimeout(function(){
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	self.addOne();
-		// 	// self.bindScroll();
-		// },500)
+		App.Notice.loadData();
 		return this;
 	},
 	addOne:function(model){//一个一个的添加数据
 		//渲染单个view
-		var data = {
-			title:'这是一个测试的效果',
-			time:'2017-03-15'
-		}
-	    var view = new App.Notice.NoticeListDetailView({model:data});
+	    var view = new App.Notice.NoticeListDetailView({model:model});
 	    this.$el.find("tbody#listDomBox").append(view.render().el);
 	},
 	reset:function(){
@@ -76,6 +50,6 @@ App.Notice.NoticeListView = Backbone.View.extend({
 	    },400);
 	},
 	searchAjaxFun:function(targetVal){//最后执行提交搜索
-		App.Notice.loadData({searchName:targetVal});
+		App.Notice.loadData({title:targetVal});
 	}
 })

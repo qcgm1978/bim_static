@@ -34,7 +34,7 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 	    },400);
 	},
 	searchAjaxFun:function(targetVal){//最后执行提交搜索
-		App.Services.SystemCollection.getListHandle({searchName:targetVal});
+		App.Services.SystemCollection.getListHandle({title:targetVal});
 	},
 	newTextNotice(){//添加文本公告
 		var NewTextNotice = new App.Services.NoticeAttrManagerTopbarNewTextNotice();

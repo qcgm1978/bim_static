@@ -39,8 +39,7 @@ App.Services.NoticeAttrManagerTopbarNewLinkNotice = Backbone.View.extend({
 		var noticeLinkVal = $("#noticeLink").val();
 		var noticeTimeVal = $("#noticeTime").val();
 		var match = /^((https|http|ftp|rtsp|mms)?:\/\/)?([\w\-]+(\.[\w\-]+)*\/)*[\w\-]+(\.[\w\-]+)*\/?(\?([\w\-\.,@?^=%&:\/~\+#]*)+)?/;
-		var dataObjAdd = {},
-			dataObjEdit = {},
+		var dataObj = {},
 			linkUrl="",
 			status=(saveOrPublish=="publishBtn")?1:3;
 		if(noticeTitleVal==""){
@@ -60,25 +59,21 @@ App.Services.NoticeAttrManagerTopbarNewLinkNotice = Backbone.View.extend({
 			alert("发布时间不能为空！");
 			return;
 		}
+		dataObj.title = noticeTitleVal;
+		dataObj.href = noticeLinkVal;
+		dataObj.publishTime = noticeTimeVal;
+		dataObj.status = status;
 		if(this.default.edit){
-			dataObjEdit.title = noticeTitleVal;
-			dataObjEdit.href = noticeLinkVal;
-			dataObjEdit.publishTime = noticeTimeVal;
-			dataObjEdit.content = $("#hideVal").data("content");
-			dataObjEdit.department = $("#hideVal").data("department");
-			dataObjEdit.type = $("#hideVal").data("type");
-			dataObjEdit.id = $("#hideVal").data("id");
-			dataObjEdit.status = status;
+			var hideVal = $("#hideVal");
+			dataObj.content =hideVal.attr("data-editcontent");
+			dataObj.department =hideVal.attr("data-editdepartment");
+			dataObj.type = hideVal.attr("data-edittype");
+			dataObj.id = hideVal.attr("data-editid");
 		}else{
-			dataObjAdd.title = noticeTitleVal;
-			dataObjAdd.href = noticeLinkVal;
-			dataObjAdd.publishTime = noticeTimeVal;
-			dataObjAdd.content = "";
-			dataObjAdd.department = "";
-			dataObjAdd.type = 1;
-			dataObjAdd.status = status;
+			dataObj.content = "";
+			dataObj.department = "";
+			dataObj.type = 1;
 		}
-		var dataObj = this.default.edit?dataObjEdit:dataObjAdd;
 		var linkUrl = this.default.edit?"editNotice":"addLinkNotice";
 		if(!target.hasClass("disable")){
 			if(this.default.flag){
