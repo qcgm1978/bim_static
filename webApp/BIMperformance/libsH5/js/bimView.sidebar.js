@@ -302,7 +302,11 @@
     comment:function(isSelected,viewer){ 
       var self = this;
       self.el._dom.sidebar.find('#comment').show().siblings().hide();
-      isSelected ? self.el._dom.sidebar.addClass('open') && viewer.commentInit() : self.el._dom.sidebar.removeClass('open');
+      if (!self.annotationHelper3D)
+      {
+        self.annotationHelper3D = new CLOUD.Extensions.AnnotationHelper3D(self.viewer);
+      }
+      isSelected ? self.el._dom.sidebar.addClass('open') && self.annotationHelper3D.initAnnotation() : self.el._dom.sidebar.removeClass('open');
     },
     selected:function(isSelected,viewer){
       var self = this;

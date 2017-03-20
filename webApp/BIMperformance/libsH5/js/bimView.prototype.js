@@ -638,7 +638,7 @@
       self.annotationHelper3D.editAnnotationBegin() 
       //viewer.setCommentStyle({'stroke-color': 'red','fil-color':'red' });
 
-      viewer.setCommentBackgroundColor(modelBgColor);
+      viewer.setAnnotationBackgroundColor(modelBgColor);
       if (data) {
         var newList = [];
         $.each(data.list, function(i, item) {
@@ -646,7 +646,7 @@
         });
         viewer.loadComments(newList);
       }
-      viewer.setCommentType("0");
+      viewer.setAnnotationType("0");
       bimView.model.comment(self._dom.bimBox);
     },
     commentEnd: function() {
