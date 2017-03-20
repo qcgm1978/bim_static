@@ -37,15 +37,15 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 		App.Services.SystemCollection.getListHandle({searchName:targetVal});
 	},
 	newTextNotice(){//添加文本公告
-		var NewLinkNotice = new App.Services.NoticeAttrManagerTopbarNewTextNotice();
-		App.Services.SystemCollection.addLinkNoticeDialog = new App.Comm.modules.Dialog({
-		    title:"新建链接公告",
+		var NewTextNotice = new App.Services.NoticeAttrManagerTopbarNewTextNotice();
+		App.Services.SystemCollection.addTextNoticeDialog = new App.Comm.modules.Dialog({
+		    title:"新建文本公告",
 		    width:600,
-		    height:500,
+		    height:600,
 		    isConfirm:false,
 		    isAlert:false,
 		    closeCallback:function(){},
-		    message:NewLinkNotice.render("").el
+		    message:NewTextNotice.render("").el
 		});
 	},
 	newLinkNotice:function(){//添加链接公告
@@ -71,8 +71,7 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 			this.default.flag=false;
 			App.Comm.ajax({
 				URLtype:"getNotice",
-				data:JSON.stringify(data),
-				contentType:"application/json",
+				data:data,
 			}).done(function(res){
 				if(res.code==0){
 					if(res.data.type == 1){

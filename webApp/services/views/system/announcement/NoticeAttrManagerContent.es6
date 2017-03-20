@@ -19,6 +19,8 @@ App.Services.NoticeAttrManagerContent = Backbone.View.extend({
 	},
 	itemClickHandle(event){//点击列表选中一个公告执行的方法
 		var deleteNotice = $("button.deleteNotice");
+		var editNotice = $("button.editNotice");
+		var previewNotice = $("button.previewNotice");
 		var publishNotice = $("button.publishNotice");
 		var stickNotice = $("button.stickNotice");
 		var cancelStickNotice = $("button.cancelStickNotice");
@@ -32,10 +34,14 @@ App.Services.NoticeAttrManagerContent = Backbone.View.extend({
 		publishNotice.addClass('disable');
 		stickNotice.addClass('disable');
 		cancelStickNotice.addClass('disable');
+		editNotice.addClass('disable');
+		previewNotice.addClass('disable');
 		if(target.hasClass("selectClass")){
 			target.removeClass("selectClass");
 		}else{
 			target.addClass("selectClass");
+			editNotice.removeClass('disable');
+			previewNotice.removeClass('disable');
 			if(publishState == "1"){
 				withdrawNotice.removeClass('disable');
 			}else if(publishState == "2"){

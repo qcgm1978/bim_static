@@ -1,7 +1,7 @@
-App.Services.NoticeAttrManagerTopbarNewLinkNotice = Backbone.View.extend({
+App.Services.NoticeAttrManagerTopbarNewTextNotice = Backbone.View.extend({
 	tagName:'div',
-	className:"newLinkNoticeDialog",
-	template:_.templateUrl("/services/tpls/system/notice/newLinkNotice.html"),
+	className:"newTextNoticeDialog",
+	template:_.templateUrl("/services/tpls/system/notice/newTextNotice.html"),
 	events:{
 		"click #publishBtn":"publicAjaxHandle",
 		"click #saveBtn":"publicAjaxHandle",
@@ -26,7 +26,19 @@ App.Services.NoticeAttrManagerTopbarNewLinkNotice = Backbone.View.extend({
 			this.default.edit=true;
 		}
 		this.$el.html(this.template(data));
+		this.editInit();//初始化富文本编辑器
 		return this;
+	},
+	editInit(){//初始化富文本编辑器
+		//实例化编辑器
+	    var um = UM.getEditor('myEditor',{
+		    toolbar:['bold', 'italic', 'underline', 'fontfamily', 'fontsize', 'justifyleft', 'justifycenter', 'justifyright', 'forecolor', 'backcolor', 'image'],
+		    initialFrameWidth:200,//宽度
+		    initialFrameHeight:100,//高度
+		    dropFileEnabled:false,//点击文件是否可以拖拽改变大小
+		    imageScaleEnabled:false,//是否可以拖拽改变图片大小
+		    pasteImageEnabled:false,//是否可以拖拽上传图片
+		});
 	},
 	cancelBtn(){//取消按钮的方法
 		App.Services.SystemCollection.addLinkNoticeDialog.close();
