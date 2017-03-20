@@ -46,7 +46,13 @@ App.BodyContent.control = {
             type: 1,
             userId: App.Comm.user('userId')
         });
-        this.loadData(this.proCollection);
+        var data = {
+            title:"",
+            status:1,
+            pageIndex:1,
+            pageItemCount:30
+        }
+        this.loadData(this.proCollection,data);
 
         //切换 计划开始 结束
         $(".conMonth .conHeader span").on("click", function() {
@@ -219,10 +225,10 @@ App.BodyContent.control = {
 
     proCollection: new(Backbone.Collection.extend({
         model: App.BodyContent.model,
-        urlType: "fetchBodyContentProclamation",
+        urlType: "getServersNoticeList",
         parse: function(response) {
             if (response.message == "success") {
-                return response.data;
+                return response.data.items;
             }
         }
     })),

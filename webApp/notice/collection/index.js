@@ -26,7 +26,7 @@ App.Notice = {
 		var self = this;
 		var defaultData = {
 			title:'',
-			status:'',
+			status:1,
 			pageIndex:1,
 			pageItemCount:15,
 		};

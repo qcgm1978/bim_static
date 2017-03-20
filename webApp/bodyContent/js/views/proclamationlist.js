@@ -21,6 +21,7 @@ App.BodyContent.proclamationList = Backbone.View.extend({
     },
     //数据加载
     addOne:function(item){
+        item = item.toJSON();
         this._items++;
         if($('#layoutPost').height()-70<this._items*30){
             return
