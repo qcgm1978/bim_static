@@ -1,7 +1,13 @@
 <td class="tableContent">
-	<a href="#post/detail/<%= id %>"target="_blank" title="<%= title %>" data-pid='<%= id %>'>
-		<%= title %>
-	</a>
+	<%if(type == 1){%>
+		<a href="<%=href %>" target="_blank" title="<%= title %>" data-pid='<%= id %>'>
+			<%= title %>
+		</a>
+	<%}else if(type==2){%>
+		<a href="#post/detail/<%= id %>" target="_blank" title="<%= title %>" data-pid='<%= id %>'>
+			<%= title %>
+		</a>
+	<%}%>
 	<% if(1 == 1) {%>
 		<span class="new"></span>
 	<%}%>

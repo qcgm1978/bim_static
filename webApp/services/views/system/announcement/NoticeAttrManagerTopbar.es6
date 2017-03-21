@@ -161,31 +161,13 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 		var target = $(event.target);
 		var noticeDom = $("#listDom tr.selectClass");
 		var noticeid = noticeDom.find("td:eq(0)").data("noticeid");
-		window.open("#services/system/notice/"+noticeid,"about:blank");   
-		// var _this = this;
-		// var target = $(event.target);
-		// var noticeDom = $("#listDom tr.selectClass");
-		// var noticeid = noticeDom.find("td:eq(0)").data("noticeid");
-		// var data = {
-		// 	"id":noticeid
-		// }
-		// if(!target.hasClass("disable")){
-		// 	if(this.default.flag){
-		// 		this.default.flag=false;
-		// 		App.Comm.ajax({
-		// 			URLtype:"publishNotice",
-		// 			data:JSON.stringify(data),
-		// 			type:"PUT",
-		// 			contentType:"application/json",
-		// 		}).done(function(res){
-		// 			if(res.code==0){
-		// 				App.Services.SystemCollection.getListHandle();
-		// 				target.add("disable");
-		// 				_this.default.flag=true;
-		// 			}
-		// 		})
-		// 	}
-		// }
+		var edittype = noticeDom.find("td:eq(0)").data("edittype");
+		if(edittype == 1){
+			var href = noticeDom.find("td:eq(0)").data("href");
+			window.open(href,"about:blank");
+		}else if(edittype == 2){
+			window.open("#services/system/notice/"+noticeid,"about:blank");   
+		}
 	},
 	stickNotice:function(event){//点击置顶按钮的时候执行的方法
 		var _this = this;
