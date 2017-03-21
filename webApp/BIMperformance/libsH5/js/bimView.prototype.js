@@ -4,6 +4,14 @@
 'use strict';
 (function($) {
   bimView.prototype = {
+    getAnnotationObject : function(viewer){
+      var self = this;
+      if (!self.annotationHelper3D)
+      {
+        self.annotationHelper3D = new CLOUD.Extensions.AnnotationHelper3D(self.viewer||viewer);
+      }
+      return self.annotationHelper3D;
+    },
     on: function(event, fn) { //订阅
       this.subscribers[event] ? this.subscribers[event].push(fn) : (this.subscribers[event] = []) && this.subscribers[event].push(fn);
       return '{"event":"' + event + '","fn":"' + (this.subscribers[event].length - 1) + '"}';
@@ -638,7 +646,7 @@
       self.annotationHelper3D.editAnnotationBegin() 
       //viewer.setCommentStyle({'stroke-color': 'red','fil-color':'red' });
 
-      viewer.setCommentBackgroundColor(modelBgColor);
+      viewer.setAnnotationBackgroundColor(modelBgColor);
       if (data) {
         var newList = [];
         $.each(data.list, function(i, item) {
@@ -646,7 +654,7 @@
         });
         viewer.loadComments(newList);
       }
-      viewer.setCommentType("0");
+      viewer.setAnnotationType("0");
       bimView.model.comment(self._dom.bimBox);
     },
     commentEnd: function() {
@@ -707,7 +715,7 @@
     exitComment: function() {
       var self = this;
       var viewer = self.viewer;
-      viewer.exitCommentMode();
+      self.getAnnotationObject().uninitAnnotation();
     },
     // 模型过滤器
     filter: function(obj, callback) {
@@ -977,6 +985,7 @@
     },
     commentInit: function() {
       console.log($('#comment'))
+      this.getAnnotationObject().initAnnotation();
     }
   }
 })($);

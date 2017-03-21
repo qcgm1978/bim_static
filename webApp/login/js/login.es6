@@ -298,6 +298,12 @@ var Login = {
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC",cooks);
 		var AuthUser_Signature = Login.getCookie("AuthUser_Signature",cooks);
 		var AuthUser_LoginId = Login.getCookie("AuthUser_LoginId",cooks);
+
+		console.log("AuthUser_AuthNum:",AuthUser_AuthNum);
+		console.log("AuthUser_AuthToken:",AuthUser_AuthToken);
+		console.log("AuthUser_AuthMAC:",AuthUser_AuthMAC);
+		console.log("AuthUser_Signature:",AuthUser_Signature);
+		
 		try
 		{
 			bool = AuthUser_AuthNum.length>5 && AuthUser_AuthToken.length>5 && AuthUser_AuthMAC.length>5 && AuthUser_Signature.length>5;
