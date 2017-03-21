@@ -428,6 +428,7 @@ var AppRoute = Backbone.Router.extend({
 		}
 
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
+
 		_.require('/static/dist/BIMperformance/libsH5.js');
 		_.require('/static/dist/BIMperformance/projects.css');
 		_.require('/static/dist/BIMperformance/projects.js');

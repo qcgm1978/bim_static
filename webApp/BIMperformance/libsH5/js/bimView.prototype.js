@@ -10,6 +10,7 @@
       {
         self.annotationHelper3D = new CLOUD.Extensions.AnnotationHelper3D(self.viewer||viewer);
       }
+      console.log(self.annotationHelper3D);
       return self.annotationHelper3D;
     },
     on: function(event, fn) { //订阅
@@ -631,30 +632,26 @@
     // 批注
     comment: function(data) {
       // 进入批注模式
+      console.log("批注：",data);
       var self = this;
       var viewer = self.viewer;
-      if (!self.annotationHelper3D)
-      {
-        self.annotationHelper3D = new CLOUD.Extensions.AnnotationHelper3D(self.viewer);
-        viewer = self.annotationHelper3D;
-      }
       var modelBgColor = self._dom.bimBox.css('background-color');
       //收起属性页
       $('.slideBar .icon-caret-right').click();
       //还原颜色
       self._dom.bimBox.addClass('comment');
-      self.annotationHelper3D.editAnnotationBegin() 
+      self.getAnnotationObject().editAnnotationBegin();
       //viewer.setCommentStyle({'stroke-color': 'red','fil-color':'red' });
 
-      viewer.setAnnotationBackgroundColor(modelBgColor);
+      self.getAnnotationObject().setAnnotationBackgroundColor(modelBgColor);
       if (data) {
         var newList = [];
         $.each(data.list, function(i, item) {
           newList.push(JSON.parse(window.atob(item)));
         });
-        viewer.loadComments(newList);
+        self.getAnnotationObject().loadAnnotations(newList);
       }
-      viewer.setAnnotationType("0");
+      self.getAnnotationObject().setAnnotationType("0");
       bimView.model.comment(self._dom.bimBox);
     },
     commentEnd: function() {
@@ -663,24 +660,24 @@
       var viewer = self.viewer;
       self._dom.bimBox.removeClass('comment');
       self._dom.bimBox.find('.commentBar').remove();
-      viewer.editCommentEnd();
+      self.getAnnotationObject().editAnnotationEnd();
       self.rotateMouse();
     },
     setCommentType: function(type) {
       var self = this;
-      var viewer = self.viewer;
-      viewer.setCommentType(type);
+      // var viewer = self.viewer;
+      self.getAnnotationObject().setAnnotationType(type);
     },
     setCommentStyle: function(style) {
       var self = this;
-      var viewer = self.viewer;
-      viewer.setCommentStyle(style);
+      // var viewer = self.viewer;
+      self.getAnnotationObject().setAnnotationStyle(style);
     },
     saveComment: function() {
       // 保存批注
       var self = this;
       var viewer = self.viewer;
-      var list = viewer.getCommentInfoList();
+      var list = self.getAnnotationObject().getAnnotationInfoList();
       var newList = [];
       $.each(list, function(i, item) {
         newList.push(window.btoa(JSON.stringify(item)));
@@ -710,7 +707,7 @@
       self.fileFilter(data.filter.files);
       self.filter(data.filter.category);
       self.filter(data.filter.classCode, function() {});
-      viewer.loadComments(newList);
+      self.getAnnotationObject().loadAnnotations(newList);
     },
     exitComment: function() {
       var self = this;
@@ -941,7 +938,7 @@
           outline: 'none',
           position: 'relative'
         };
-      if (_opt.axisGrid) viewer.setAxisGridData(_opt.axisGrid)
+      //if (_opt.axisGrid) viewer.setAxisGridData(_opt.axisGrid) 注释 by wuweiwei
       viewer.createMiniMap(_opt.name, _el[0], _width, _height, _css, _opt.callbackCameraChanged, _opt.callbackMoveOnAxisGrid);
       viewer.enableAxisGridEvent(_opt.name, _opt.enable);
       viewer.generateAxisGrid(_opt.name);
@@ -983,9 +980,8 @@
       var viewer = this.viewer;
       viewer.setCamera(window.atob(json));
     },
-    commentInit: function() {
+    commentInit_: function() {
       console.log($('#comment'))
-      this.getAnnotationObject().initAnnotation();
     }
   }
 })($);
