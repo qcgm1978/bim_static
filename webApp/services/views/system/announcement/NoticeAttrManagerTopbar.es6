@@ -53,10 +53,24 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 		App.Services.SystemCollection.addTextNoticeDialog = new App.Comm.modules.Dialog({
 		    title:"新建文本公告",
 		    width:600,
-		    height:600,
+		    height:560,
 		    isConfirm:false,
 		    isAlert:false,
-		    closeCallback:function(){},
+		    closeCallback:function(){
+	    	    App.Services.SystemCollection.um.destroy();
+		    },
+    	    readyFn:function(){
+        	    //实例化编辑器
+        	    App.Services.SystemCollection.um = UM.getEditor('myEditor',{
+        	        toolbar:['bold', 'italic', 'underline', 'fontfamily', 'fontsize', 'justifyleft', 'justifycenter', 'justifyright', 'forecolor', 'backcolor', 'image'],
+        		    initialFrameWidth:"100%",//宽度
+        		    initialFrameHeight:320,//高度
+        		    dropFileEnabled:false,//点击文件是否可以拖拽改变大小
+        		    imageScaleEnabled:false,//是否可以拖拽改变图片大小
+        		    pasteImageEnabled:false,//是否可以拖拽上传图片
+        		    autoHeightEnabled:false,//是否自动延长
+        	    });
+    	    },
 		    message:NewTextNotice.render("").el
 		});
 	},
