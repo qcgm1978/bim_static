@@ -938,7 +938,7 @@
           outline: 'none',
           position: 'relative'
         };
-      if (_opt.axisGrid) viewer.setAxisGridData(_opt.axisGrid)
+      //if (_opt.axisGrid) viewer.setAxisGridData(_opt.axisGrid) 注释 by wuweiwei
       viewer.createMiniMap(_opt.name, _el[0], _width, _height, _css, _opt.callbackCameraChanged, _opt.callbackMoveOnAxisGrid);
       viewer.enableAxisGridEvent(_opt.name, _opt.enable);
       viewer.generateAxisGrid(_opt.name);
@@ -980,9 +980,8 @@
       var viewer = this.viewer;
       viewer.setCamera(window.atob(json));
     },
-    commentInit: function() {
+    commentInit_: function() {
       console.log($('#comment'))
-      this.getAnnotationObject().initAnnotation();
     }
   }
 })($);
