@@ -29,7 +29,7 @@ CLOUD.GlobalData = {
     MaximumDepth:0,
     TargetDistance:10000,
     DisableOctant:false,
-    DEBUG: true
+    DEBUG: false
 };
 
 CLOUD.EnumObjectLevel = {
@@ -1337,7 +1337,7 @@ CLOUD.GeomUtil = {
             }
         }
         else {
-            console.log("unknonw geometry!");
+            CLOUD.Logger.log("unknonw geometry!");
             return object;
         }
 
@@ -1444,14 +1444,14 @@ CLOUD.GeomUtil = {
         var mpk = mpkArray[meshAttr.blockId];
 
         if (!mpk) {
-            // console.log("empty mpk");
+            // CLOUD.Logger.log("empty mpk");
             return null;
         }
 
         var meshData = mpk.getMeshInfo(meshAttr.meshId);
 
         if (meshData == undefined) {
-            console.log("empty mesh data");
+            CLOUD.Logger.log("empty mesh data");
             return null;
         }
 
@@ -1464,7 +1464,7 @@ CLOUD.GeomUtil = {
             var normal = mpk.getNormalBuffer(meshAttr.meshId);
 
             if (positions == undefined || index == undefined || normal == undefined) {
-                console.log("empty mesh data");
+                CLOUD.Logger.log("empty mesh data");
                 return null;
             }
 
@@ -7118,7 +7118,7 @@ CLOUD.ShaderMaterial.ShaderLibs = {
 
 CLOUD.ShaderMaterial.ShaderLib = CLOUD.ShaderMaterial.ShaderLibs['r' + THREE.REVISION];
 if (CLOUD.ShaderMaterial.ShaderLib === undefined) {
-    console.log('custom clip not implemented for three.js r' + THREE.REVISION + ' yet!');
+    CLOUD.Logger.log('custom clip not implemented for three.js r' + THREE.REVISION + ' yet!');
 }
 
 CLOUD.Animation = function () {
@@ -7303,10 +7303,10 @@ CLOUD.Animation = function () {
         } else  if (tolerance < Math.abs(cosTheta)) {// start == -end (180度)
 
             //if ( tolerance > Math.abs( start.dot( unitZ )) ) {
-            //    //console.log("unitZ");
+            //    //CLOUD.Logger.log("unitZ");
             //    middle.crossVectors(start , unitZ).normalize();
             //} else {
-            //    //console.log("unitX");
+            //    //CLOUD.Logger.log("unitX");
             //    middle.crossVectors(start , unitX).normalize();
             //}
 
@@ -7328,7 +7328,7 @@ CLOUD.Animation = function () {
         } else { // start != abs(end)
 
             if (isconic ){
-                //console.log("[slerpInterpolate][isconic]");
+                //CLOUD.Logger.log("[slerpInterpolate][isconic]");
                 this.conicInterpolate(start, end, interp, percentage, islargeangle);
             } else {
                 THREE.Quaternion.slerp(startQuaternion, endQuaternion, slerpQuaternion, percentage);
@@ -8369,7 +8369,7 @@ CLOUD.Filter = function () {
             if (_selectionSet[object.name] !== undefined) {
 
                 if (!object.geometry) {
-                    console.log("empty geometry!");
+                    CLOUD.Logger.log("empty geometry!");
                     continue;
                 }
 
@@ -8407,7 +8407,7 @@ CLOUD.Filter = function () {
             }
 
             if (!object.geometry) {
-                console.log("empty geometry!");
+                CLOUD.Logger.log("empty geometry!");
                 continue;
             }
             if (object.geometry.boundingBox == null) {
@@ -8818,7 +8818,7 @@ CLOUD.ObjectPool.prototype.get = function (parameters) {
 
     if (this.counter >= this.size) {
 
-        // console.log("the pool is full");
+        // CLOUD.Logger.log("the pool is full");
 
     } else {
 
@@ -9845,10 +9845,10 @@ CLOUD.Scene = function () {
 
     this.boundingBoxInner = new THREE.Box3();
 
-    // console.time("ObjectPool");
+    // CLOUD.Logger.time("ObjectPool");
     this.meshPool = new CLOUD.ObjectPool(CLOUD.MeshEx, CLOUD.GlobalData.maxObjectNumInPool);
     this.meshPool.init({parent: this.rootNode});
-    // console.timeEnd("ObjectPool");
+    // CLOUD.Logger.timeEnd("ObjectPool");
 
     this.lightOffset = new THREE.Vector3(-1, -1, -1);
     this.lightOffset.normalize();
@@ -10200,7 +10200,7 @@ CLOUD.Scene.prototype.hitTestClipPlanes = function (ray, intersects) {
 // point == null if hit nothing.
 CLOUD.Scene.prototype.hitTestPosition = function (mouse, camera, callback) {
 
-    //console.time("hitTest");
+    //CLOUD.Logger.time("hitTest");
     var raycaster = this.raycaster;
     raycaster.setFromCamera(mouse, camera);
 
@@ -10223,7 +10223,7 @@ CLOUD.Scene.prototype.hitTestPosition = function (mouse, camera, callback) {
 
         //callback(null);
         // modified 2016-5-3  end
-        //console.timeEnd("hitTest");
+        //CLOUD.Logger.timeEnd("hitTest");
         return;
     }
 
@@ -10232,7 +10232,7 @@ CLOUD.Scene.prototype.hitTestPosition = function (mouse, camera, callback) {
     });
 
     callback(intersects[0].point);
-    //console.timeEnd("hitTest");
+    //CLOUD.Logger.timeEnd("hitTest");
 };
 
 CLOUD.Scene.prototype.isPickable = function (node) {
@@ -11011,7 +11011,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             pan.set(0, 0, 0);
 
             if (forceRender) {
-                //console.log("CameraEditor.forceRender");
+                //CLOUD.Logger.log("CameraEditor.forceRender");
                 if (updateRenderList !== undefined) {
                     this.needUpdateRenderList(updateRenderList);
                 }
@@ -11031,7 +11031,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                 if (lastPosition.distanceToSquared(this.camera.position) > EPS
                     || 8 * (1 - lastQuaternion.dot(this.camera.quaternion)) > EPS) {
 
-                    //console.log("CameraEditor.render");
+                    //CLOUD.Logger.log("CameraEditor.render");
                     onChange();
 
                     this.dirtyCamera(false);
@@ -11171,7 +11171,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         panOffset.multiplyScalar(-distance);
 
         pan.add(panOffset);
-        //console.log("Warning!");
+        //CLOUD.Logger.log("Warning!");
     };
 
     // pass in distance in world space to move up
@@ -11183,7 +11183,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         panOffset.multiplyScalar(distance);
 
         pan.add(panOffset);
-        //console.log("Warning!");
+        //CLOUD.Logger.log("Warning!");
     };
 
     // pass in x,y of change desired in pixel space,
@@ -11200,7 +11200,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             // half of the fov is center to top of screen
             targetDistance *= Math.tan((scope.camera.fov / 2) * Math.PI / 180.0);
 
-            //console.log(targetDistance);
+            //CLOUD.Logger.log(targetDistance);
             // we actually don't use screenWidth, since perspective camera is fixed to screen height
             scope.panLeft(2 * deltaX * targetDistance / element.clientHeight);
             scope.panUp(2 * deltaY * targetDistance / element.clientHeight);
@@ -11210,7 +11210,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             scope.panUp(deltaY * (scope.camera.top - scope.camera.bottom) / element.clientHeight);
         } else {
             // camera neither orthographic or perspective
-            console.warn('WARNING: CloudPickEditor.js encountered an unknown camera type - pan disabled.');
+            CLOUD.Logger.warn('WARNING: CloudPickEditor.js encountered an unknown camera type - pan disabled.');
         }
     };
 
@@ -11476,7 +11476,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             pan.set(0, 0, 0);
 
             if (forceRender) {
-                //console.log("CameraEditor.forceRender");
+                //CLOUD.Logger.log("CameraEditor.forceRender");
                 if (updateRenderList !== undefined) {
                     this.needUpdateRenderList(updateRenderList);
                 }
@@ -11492,7 +11492,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                 if (lastPosition.distanceToSquared(this.camera.position) > EPS
                     || 8 * (1 - lastQuaternion.dot(this.camera.quaternion)) > EPS) {
 
-                    //console.log("CameraEditor.render");
+                    //CLOUD.Logger.log("CameraEditor.render");
                     onChange();
 
                     this.dirtyCamera(false);
@@ -11678,10 +11678,10 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             if (dollyDelta.x == 0 && dollyDelta.y == 0)
                 return;
             if (dollyDelta.y > 0) {
-                //console.log("dollyOut");
+                //CLOUD.Logger.log("dollyOut");
                 scope.dollyOut();
             } else {
-                //console.log("dollyIn");
+                //CLOUD.Logger.log("dollyIn");
                 scope.dollyIn();
             }
 
@@ -11999,7 +11999,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                 // 如果没有取到点，说明上一次的点在相机背后，重新取点
                 if (!trackingPoint) {
 
-                    //console.log("trackingPoint === null");
+                    //CLOUD.Logger.log("trackingPoint === null");
                     trackingPoint = this.getTrackingPointFromBoundingBox(normEye, ray);
 
                 } else {
@@ -12010,7 +12010,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
                     if (dist < EPS) {
 
-                        //console.log("equal");
+                        //CLOUD.Logger.log("equal");
                         trackingPoint = this.getTrackingPointFromBoundingBox(normEye, ray);
                     }
                 }
@@ -12019,7 +12019,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             // 没有取到点，则取worldPoint
             if (!trackingPoint) {
 
-                console.log("tracking point is default!");
+                CLOUD.Logger.log("tracking point is default!");
                 trackingPoint = worldPoint;
             }
         }
@@ -12224,7 +12224,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     }
 
     function handleTouchStartRotate(event) {
-        //console.log( 'handleTouchStartRotate' );
+        //CLOUD.Logger.log( 'handleTouchStartRotate' );
 
         rotateStart.set(event.touches[0].clientX, event.touches[0].clientY);
 
@@ -12255,7 +12255,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     }
 
     function handleTouchStartDolly(event) {
-        //console.log( 'handleTouchStartDolly' );
+        //CLOUD.Logger.log( 'handleTouchStartDolly' );
 
         var dx = event.touches[0].clientX - event.touches[1].clientX;
         var dy = event.touches[0].clientY - event.touches[1].clientY;
@@ -12264,7 +12264,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     }
 
     function handleTouchStartPan(event) {
-        //console.log( 'handleTouchStartPan' );
+        //CLOUD.Logger.log( 'handleTouchStartPan' );
 
         var cx = (event.touches[0].clientX + event.touches[1].clientX) * 0.5;
         var cy = (event.touches[0].clientY + event.touches[1].clientY) * 0.5;
@@ -12272,7 +12272,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     }
 
     function handleTouchMoveRotate(event) {
-        //console.log( 'handleTouchMoveRotate' );
+        //CLOUD.Logger.log( 'handleTouchMoveRotate' );
 
         rotateEnd.set(event.touches[0].clientX, event.touches[0].clientY);
         rotateDelta.subVectors(rotateEnd, rotateStart);
@@ -12292,7 +12292,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     }
 
     function handleTouchMoveDolly(event) {
-        //console.log( 'handleTouchMoveDolly' );
+        //CLOUD.Logger.log( 'handleTouchMoveDolly' );
 
         var dx = event.touches[0].clientX - event.touches[1].clientX;
         var dy = event.touches[0].clientY - event.touches[1].clientY;
@@ -12320,7 +12320,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     }
 
     function handleTouchMovePan(event) {
-        //console.log( 'handleTouchMovePan' );
+        //CLOUD.Logger.log( 'handleTouchMovePan' );
 
         var cx = (event.touches[0].clientX + event.touches[1].clientX) * 0.5;
         var cy = (event.touches[0].clientY + event.touches[1].clientY) * 0.5;
@@ -12589,7 +12589,7 @@ CLOUD.OrbitEditor.prototype.processMouseMove = function (event) {
 
     event.preventDefault();
 
-    //console.log("[CloudOrbitEditor.onMouseMove][mouse.clientXY(" + event.clientX + "," + event.clientY + "),mouse.offsetXY(" + event.offsetX + "," + event.offsetY + ")]");
+    //CLOUD.Logger.log("[CloudOrbitEditor.onMouseMove][mouse.clientXY(" + event.clientX + "," + event.clientY + "),mouse.offsetXY(" + event.offsetX + "," + event.offsetY + ")]");
 
     // 当鼠标移动到其他元素上时，event.offsetX, event.offsetY获得的是鼠标在其他元素区域里的相对坐标，
     // 会造成模型跳变，所以传入event.clientX, event.clientY，根据当前父元素节点位置计算鼠标的真实偏移量
@@ -12834,7 +12834,7 @@ CLOUD.RectPickEditor = function (slaveEditor, onSelectionChanged) {
 
     this.longTap = function () {
         scope.longTapFlag = true;
-        console.log("long tap");
+        CLOUD.Logger.log("long tap");
 
         if (scope.selectPad) {
             scope.selectPad.showOverlay(scope.startPt);
@@ -13237,7 +13237,7 @@ CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
             var distZoom = wCenter.clone().sub(wCorner).length();
 
             //if (distZoom < zNear) {
-            //    //console.log("new dist", [newDist, near]);
+            //    //CLOUD.Logger.log("new dist", [newDist, near]);
             //    distZoom = zNear;
             //}
 
@@ -14129,7 +14129,7 @@ CLOUD.FlyEditor.prototype = {
             // 记录总仰角
             this.pitchDeltaTotal += this.deltaPitch;
 
-            //console.log(this.pitchDeltaTotal);
+            //CLOUD.Logger.log(this.pitchDeltaTotal);
 
             // 左右旋转
             this.goTurn(this.deltaYaw);
@@ -18166,7 +18166,7 @@ CLOUD.Loader.OctreeNode.prototype.intersectFrustum = function (frustum, visibleO
         }
     }
     //else {
-    //	console.log("Octant" + this.octantId + "culled!")
+    //	CLOUD.Logger.log("Octant" + this.octantId + "culled!")
     //}
 };
 
@@ -18209,7 +18209,7 @@ CLOUD.Loader.OctreeNode.prototype.intersectFrustumWithPriority
         }
     }
     //else {
-    //	console.log("Octant" + this.octantId + "culled!")
+    //	CLOUD.Logger.log("Octant" + this.octantId + "culled!")
     //}
 };
 
@@ -18243,7 +18243,7 @@ CLOUD.Loader.OctreeNode.prototype.findRadiusNeighborOctants = function (queryPoi
         }
     }
     //else {
-    //	console.log("Octant" + this.octantId + "culled!")
+    //	CLOUD.Logger.log("Octant" + this.octantId + "culled!")
     //}
 };
 
@@ -18421,7 +18421,7 @@ CLOUD.Loader.OctreeLoader.prototype = {
             }
             rootNode.setBounds(bounds);
             rootNode.getDepthDescending();
-            console.log("Maximum Depth:", CLOUD.GlobalData.MaximumDepth);
+            CLOUD.Logger.log("Maximum Depth:", CLOUD.GlobalData.MaximumDepth);
         }
 
         loader.setCrossOrigin(scope.manager.crossOrigin);
@@ -19410,7 +19410,7 @@ CLOUD.Model = function (manager, serverUrl, databagId, texturePath) {
 CLOUD.Model.prototype = Object.create(THREE.LoadingManager.prototype);
 CLOUD.Model.prototype.constructor = CLOUD.Model;
 
-CLOUD.Model.prototype.load = function () {
+CLOUD.Model.prototype.load = function (notifyProgress) {
 
     var scope = this;
 
@@ -19429,11 +19429,13 @@ CLOUD.Model.prototype.load = function () {
         //     scope.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_PROGRESS, progress: progress});
         // }
 
-        var progress = {
-            total: scope.maxTaskCount,
-            loaded: scope.taskCount
-        };
-        scope.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_PROGRESS, progress: progress});
+        if (notifyProgress) {
+            var progress = {
+                total: scope.maxTaskCount,
+                loaded: scope.taskCount
+            };
+            scope.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_PROGRESS, progress: progress});
+        }
 
         if (scope.taskCount >= scope.maxTaskCount) {
             scope.load_complete = true;
@@ -19452,6 +19454,11 @@ CLOUD.Model.prototype.load = function () {
         scope.manager.scene.parseRootNode(cfg);
         scope.load_complete = false;
 
+        if (scope.mpkCount > 0) {
+            scope.maxTaskCount += scope.mpkCount - 1;
+            // scope.maxTaskCount += scope.mpkCount;
+        }
+
         var sceneId = 0;
 
         scope.sceneLoader.load(scope.sceneUrl(sceneId), function (data) {
@@ -19463,11 +19470,6 @@ CLOUD.Model.prototype.load = function () {
 
             sceneReader = null;
             scope.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_START, sceneId: sceneId});
-
-            if (scope.mpkCount > 0) {
-                scope.maxTaskCount += scope.mpkCount - 1;
-                // scope.maxTaskCount += scope.mpkCount;
-            }
 
             for (var j = 0; j < scope.mpkCount; ++j) {
                 scope.meshLoader.load(scope.mpkUrl(j), function (data) {
@@ -19528,7 +19530,7 @@ CLOUD.Model.prototype.destroy = function () {
 };
 
 CLOUD.Model.prototype.projectUrl = function () {
-    return this.serverUrl +"config/"+ this.databagId + "/config.json";
+    return this.serverUrl + this.databagId + "/config.json";
 };
 
 CLOUD.Model.prototype.sceneUrl = function (idx) {
@@ -19546,7 +19548,7 @@ CLOUD.Model.prototype.userIdUrl = function () {
 
 CLOUD.Model.prototype.octreeUrl = function (idx) {
     idx = idx || 'o';
-    return this.serverUrl +"file/"+ this.databagId + "/scene/index_" + idx;
+    return this.serverUrl + this.databagId + "/scene/index_" + idx;
 };
 
 CLOUD.Model.prototype.symbolUrl = function () {
@@ -19682,11 +19684,14 @@ CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
     // itemParent存在, 表示读取symbol数据
     var originalId = itemParent ? itemParent.originalId : item.originalId;
     var userId = this.userIdReader.getString(originalId);
-    var idxUserId = this.userIdReader.getIndex(userId);
 
-    if (idxUserId !== originalId) {
-        CLOUD.Logger.log("read userId error->", originalId);
-    }
+    // Is this debugging code?
+    //var idxUserId = this.userIdReader.getIndex(userId);
+    //
+    //if (idxUserId !== originalId) {
+    //    CLOUD.Logger.log("read userId error->", originalId);
+    //}
+    // End of comment
 
     var meshInfo;
 
@@ -19784,7 +19789,7 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
     var cellCount = 0;
 
     // FRUSTUM Querying Cost < 1 ms
-    // console.time("frustum");
+    // CLOUD.Logger.time("frustum");
     if (CLOUD.GlobalData.DisableOctant) {
         cellCount = sceneReader.header.cellCount;
     } else {
@@ -19858,7 +19863,7 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
         });
     }
     //end of simple prioritized algorithm
-    // console.timeEnd("frustum");
+    // CLOUD.Logger.timeEnd("frustum");
     // END OF FRUSTUM Querying Cost < 1 ms
 
     if (clearPool) {
@@ -20064,7 +20069,7 @@ CLOUD.ModelManager.prototype.load = function (parameters) {
         return model;
     }
 
-    model.load();
+    model.load(parameters.notifyProgress);
 
     return model;
 };
@@ -21604,7 +21609,7 @@ CLOUD.Viewer.prototype = {
 
     init: function (domElement) {
 
-        console.log("Web3D: " + CLOUD.Version);
+        CLOUD.Logger.log("Web3D: " + CLOUD.Version);
 
         var scope = this;
         this.domElement = domElement;
@@ -21624,21 +21629,17 @@ CLOUD.Viewer.prototype = {
             return false;
         }
 
-        settings.canvas = canvas;
-
         CLOUD.GeomUtil.initializeUnitInstances();
 
+        settings.canvas = canvas;
         this.incrementRenderer = new THREE.WebGLIncrementRenderer(settings);
         this.webGLRenderer = new THREE.WebGLRenderer(settings);
 
         if (this.incrementRenderEnabled) {
-            // Renderer
             this.renderer = this.incrementRenderer;
             this.renderer.setRenderTicket(0);
-
         } else {
-            // Renderer
-            this.renderer = new THREE.WebGLRenderer(settings);
+            this.renderer = this.webGLRenderer;
         }
 
         // window.innerWidth, window.innerHeight
@@ -21669,8 +21670,7 @@ CLOUD.Viewer.prototype = {
 
     render: function () {
 
-        // console.time("viewer.render");
-
+        // CLOUD.Logger.time("viewer.render");
         var scope = this;
         var camera = this.camera;
         var scene = this.getScene();
@@ -21688,8 +21688,6 @@ CLOUD.Viewer.prototype = {
             }
 
             this.rendering = true;
-
-            // var newCamera = camera.clone();
 
             // update camera's inner/outer status, both "calculateNearFar" and "prepareScene" will use this info.
             this.modelManager.calculateCameraModelRelation(camera.position);
@@ -21736,8 +21734,6 @@ CLOUD.Viewer.prototype = {
 
                     var isFinished = renderer.IncrementRender(scene, camera);
 
-                    camera.dirty2 = false;
-
                     if (isFinished) {
                         scope.rendering = false;
 
@@ -21770,7 +21766,7 @@ CLOUD.Viewer.prototype = {
 
         }
 
-        // console.timeEnd("viewer.render");
+        // CLOUD.Logger.timeEnd("viewer.render");
     },
 
     calculateNearFar: function () {
@@ -21826,22 +21822,18 @@ CLOUD.Viewer.prototype = {
 
     // 初始化renderer
     initRenderer: function (first) {
-
         var viewportWidth = this.domElement.offsetWidth;
         var viewportHeight = this.domElement.offsetHeight;
-
         this.renderer.setClearColor(0x000000, 0);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(viewportWidth, viewportHeight);
 
         if (first) {
-
-            // Added by xmh begin 允许获得焦点，
-            // 将键盘事件注册到父容器（之前注册到window上会存在各种联动问题），鼠标点击父容器，激活canvas
+            // Added by xmh begin
+            // 允许获得焦点，将键盘事件注册到父容器（之前注册到window上会存在各种联动问题），鼠标点击父容器，激活canvas
             this.renderer.domElement.setAttribute('tabindex', '0');
             this.renderer.domElement.setAttribute('id', 'cloud-main-canvas');
             // Added by xmh end
-
             this.domElement.appendChild(this.renderer.domElement);
         }
     },
@@ -21851,8 +21843,6 @@ CLOUD.Viewer.prototype = {
         this.incrementRenderEnabled = enable;
 
         if (this.domElement) {
-
-
 
             if (enable) {
                 this.renderer = this.incrementRenderer;
@@ -21867,6 +21857,7 @@ CLOUD.Viewer.prototype = {
                 }
 
                 this.renderer = this.webGLRenderer;
+                // this.modelManager.clearScene();
             }
 
             this.initRenderer(false);
@@ -21934,21 +21925,19 @@ CLOUD.Viewer.prototype = {
      * Load all
      * @return the databag client.
      */
-    load: function (databagId, serverUrl, debug, byBox) {
-        var scope = this;
-
-        if (debug) {
-            CLOUD.GlobalData.ShowSubSceneBox = true;
-            CLOUD.GlobalData.ShowCellBox = false;
-        }
-
-        return scope.modelManager.load({databagId: databagId, serverUrl: serverUrl, debug: debug, byBox: byBox});
+    load: function (databagId, serverUrl, notifyProgress, debug) {
+        notifyProgress = notifyProgress || true;
+        return this.modelManager.load({
+            databagId: databagId,
+            serverUrl: serverUrl,
+            notifyProgress: notifyProgress,
+            debug: debug
+        });
     },
 
     unloadAll: function () {
         this.renderer.destroy();
         this.modelManager.destroy();
-
     },
 
     clearAll: function () {
