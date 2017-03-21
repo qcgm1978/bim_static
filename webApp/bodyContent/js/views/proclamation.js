@@ -11,7 +11,7 @@ App.BodyContent.proclamationView = Backbone .View.extend({
     template:_.templateUrl("/bodyContent/tpls/proclamation.html"),
 
     render : function(){
-        this.$el.html(this.template(this.model.toJSON()));
+        this.$el.html(this.template(this.model));
         return this;
     },
 

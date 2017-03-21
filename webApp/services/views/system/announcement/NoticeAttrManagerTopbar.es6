@@ -34,18 +34,30 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 	    },400);
 	},
 	searchAjaxFun:function(targetVal){//最后执行提交搜索
-		App.Services.SystemCollection.getListHandle({searchName:targetVal});
+		var status = 1;
+		if(targetVal == "已发布"){
+			status=1;
+			App.Services.SystemCollection.getListHandle({status:status});
+		}else if(targetVal == "已撤回"){
+			status=2;
+			App.Services.SystemCollection.getListHandle({status:status});
+		}else if(targetVal == "未发布"){
+			status=3;
+			App.Services.SystemCollection.getListHandle({status:status});
+		}else{
+			App.Services.SystemCollection.getListHandle({title:targetVal});
+		}
 	},
 	newTextNotice(){//添加文本公告
-		var NewLinkNotice = new App.Services.NoticeAttrManagerTopbarNewTextNotice();
-		App.Services.SystemCollection.addLinkNoticeDialog = new App.Comm.modules.Dialog({
-		    title:"新建链接公告",
+		var NewTextNotice = new App.Services.NoticeAttrManagerTopbarNewTextNotice();
+		App.Services.SystemCollection.addTextNoticeDialog = new App.Comm.modules.Dialog({
+		    title:"新建文本公告",
 		    width:600,
-		    height:500,
+		    height:600,
 		    isConfirm:false,
 		    isAlert:false,
 		    closeCallback:function(){},
-		    message:NewLinkNotice.render("").el
+		    message:NewTextNotice.render("").el
 		});
 	},
 	newLinkNotice:function(){//添加链接公告
@@ -71,8 +83,7 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 			this.default.flag=false;
 			App.Comm.ajax({
 				URLtype:"getNotice",
-				data:JSON.stringify(data),
-				contentType:"application/json",
+				data:data,
 			}).done(function(res){
 				if(res.code==0){
 					if(res.data.type == 1){
@@ -145,6 +156,36 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 				})
 			}
 		}
+	},
+	previewNotice(){//预览公告的方法
+		var target = $(event.target);
+		var noticeDom = $("#listDom tr.selectClass");
+		var noticeid = noticeDom.find("td:eq(0)").data("noticeid");
+		window.open("#services/system/notice/"+noticeid,"about:blank");   
+		// var _this = this;
+		// var target = $(event.target);
+		// var noticeDom = $("#listDom tr.selectClass");
+		// var noticeid = noticeDom.find("td:eq(0)").data("noticeid");
+		// var data = {
+		// 	"id":noticeid
+		// }
+		// if(!target.hasClass("disable")){
+		// 	if(this.default.flag){
+		// 		this.default.flag=false;
+		// 		App.Comm.ajax({
+		// 			URLtype:"publishNotice",
+		// 			data:JSON.stringify(data),
+		// 			type:"PUT",
+		// 			contentType:"application/json",
+		// 		}).done(function(res){
+		// 			if(res.code==0){
+		// 				App.Services.SystemCollection.getListHandle();
+		// 				target.add("disable");
+		// 				_this.default.flag=true;
+		// 			}
+		// 		})
+		// 	}
+		// }
 	},
 	stickNotice:function(event){//点击置顶按钮的时候执行的方法
 		var _this = this;

@@ -5,7 +5,7 @@ App.Notice = {
 	init: function() {
 		$("#pageLoading").hide();//隐藏加载
 		$("#contains").html(new App.Notice.NoticeListView().render().$el);
-		App.Notice.loadData();//初始化之后获取列表数据
+		// App.Notice.loadData();//初始化之后获取列表数据
 	},
 	NoticeCollection: new(Backbone.Collection.extend({
 		model: Backbone.Model.extend({
@@ -15,7 +15,7 @@ App.Notice = {
 				}
 			} 
 		}),  
-		urlType: "fetchNoticeData",
+		urlType: "getServersNoticeList",
 		parse: function(responese) {
 			if (responese.message == "success") {
 				return responese.data.items;
@@ -25,11 +25,24 @@ App.Notice = {
 	loadData:function(parme){//初始化之后获取列表数据
 		var self = this;
 		var defaultData = {
-			searchName:''
+			title:'',
+			status:1,
+			pageIndex:1,
+			pageItemCount:15,
 		};
 		var extendData = $.extend({},defaultData,parme);
-		console.log(extendData);
 		//数据重置
+		App.Notice.NoticeCollection.reset();
+		App.Notice.NoticeCollection.fetch({
+			data:extendData,
+			success:function(response){
+				$("#listDomBox").find(".noDataTd").parent().remove();
+				return response.data;
+			}
+		})
+
+
+		
 		// App.Notice.NoticeCollection.reset();
 		// App.Notice.NoticeCollection.fetch({
 		// 	data:extendData,

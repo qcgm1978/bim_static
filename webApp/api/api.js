@@ -358,7 +358,7 @@ App.API = {
 		cancelStickNotice:"platform/announce/cancelTop",//取消置顶公告的接口
 		withdrawNotice:"platform/announce/revocation",//已发布之后进行撤销的接口
 		deleteNotice:"platform/announce/del",//删除公告的接口
-		publishNotice:"platform/announce/del",//发布公告的接口
+		publishNotice:"platform/announce/publish",//发布公告的接口
 		getNotice:"platform/announce/toEdit",//获取公告的接口
 		editNotice:"platform/announce/edit",//编辑公告的接口
 		addLinkNotice:"platform/announce/add",//添加链接公告的接口

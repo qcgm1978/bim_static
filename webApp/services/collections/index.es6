@@ -62,7 +62,11 @@ App.Services = {
 			this.loadXW();
 		}
 	},
-
+	noticeInit(noticeId){//公告打开新页面预览
+		viewer = new App.Services.PreviewNotice();
+		$("#contains").html(viewer.render(noticeId).el);
+		$("#pageLoading").hide();
+	},
 	initEvent:function(){
 		$('.tileIcon').on('click',function(){
 			var name=$(this).attr('name');
