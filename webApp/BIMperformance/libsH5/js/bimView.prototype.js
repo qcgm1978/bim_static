@@ -4,6 +4,14 @@
 'use strict';
 (function($) {
   bimView.prototype = {
+    getAnnotationObject : function(viewer){
+      var self = this;
+      if (!self.annotationHelper3D)
+      {
+        self.annotationHelper3D = new CLOUD.Extensions.AnnotationHelper3D(self.viewer||viewer);
+      }
+      return self.annotationHelper3D;
+    },
     on: function(event, fn) { //订阅
       this.subscribers[event] ? this.subscribers[event].push(fn) : (this.subscribers[event] = []) && this.subscribers[event].push(fn);
       return '{"event":"' + event + '","fn":"' + (this.subscribers[event].length - 1) + '"}';
@@ -707,7 +715,7 @@
     exitComment: function() {
       var self = this;
       var viewer = self.viewer;
-      viewer.exitCommentMode();
+      self.getAnnotationObject().uninitAnnotation();
     },
     // 模型过滤器
     filter: function(obj, callback) {
@@ -977,6 +985,7 @@
     },
     commentInit: function() {
       console.log($('#comment'))
+      this.getAnnotationObject().initAnnotation();
     }
   }
 })($);
