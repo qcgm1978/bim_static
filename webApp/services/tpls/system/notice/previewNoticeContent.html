@@ -1,6 +1,10 @@
-<% console.log(obj.data) %>
-<% if(obj.data.type == 1){%>
-	链接公告
-<%}else{%>
-
-<%}%>
+<div class="wrapper">
+	<div class="title">
+		<span>
+			<%= obj.data.title %>
+			<p><%= obj.data.publishTime %> <b></b>  <%= obj.data.department %> <b></b></p>
+		</span>
+	</div>
+	<hr>
+	<div class="content"><%= obj.data.content %></div>
+</div>

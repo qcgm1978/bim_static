@@ -137,7 +137,6 @@ App.BodyContent.control = {
     },
 
     post: function(id) {
-
         $('#dataLoading').hide();
         $('#pageLoading').hide();
         $("#topBar li").hide();
@@ -155,7 +154,8 @@ App.BodyContent.control = {
 
     postDetailCollection: new(Backbone.Collection.extend({
         model: App.BodyContent.model,
-        urlType: "fetchBodyContentNotice",
+        // urlType: "fetchBodyContentNotice",
+        urlType: "getNotice",
         parse: function(response) {
             if (response.message == "success") {
                 return response.data;
