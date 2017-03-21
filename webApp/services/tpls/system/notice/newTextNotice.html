@@ -1,13 +1,19 @@
 <div class="newTextNitoceBox">
 	<label>标题：</label>
 	<div class="newTextInputBox">
-		<input type="text" value="" placeholder="请输入公告标题">
+		<input id="noticeTitle" type="text" value="<%=title%>" placeholder="请输入公告标题">
+	</div>
+</div>
+<div class="newTextNitoceBox">
+	<label>发布时间：</label>
+	<div class="newTextInputBox">
+		<input id="noticeTime" type="text" value="<%=publishTime%>" placeholder="请输发布时间">
 	</div>
 </div>
 <div class="newTextNitoceBox">
 	<label>部门：</label>
 	<div class="newTextInputBox">
-		<input type="text" value="" placeholder="请输入公告部门">
+		<input id="noticeDepartement" type="text" value="<%=department%>" placeholder="请输入公告部门">
 	</div>
 </div>
 <div class="newTextTextareaBox">
@@ -19,3 +25,4 @@
 	<button id="saveBtn">保存</button>
 	<button id="cancelBtn">取消</button>
 </div>
+<input type="text" id="hideVal" style="display: none;" data-noticeLink="<%=href%>" data-type="<%=type%>" data-id="<%=id%>">

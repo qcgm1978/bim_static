@@ -6,6 +6,7 @@ App.Services.NoticeAttrManagerTopbarNewTextNotice = Backbone.View.extend({
 		"click #publishBtn":"publicAjaxHandle",
 		"click #saveBtn":"publicAjaxHandle",
 		"click #cancelBtn":"cancelBtn",
+		"click #previewNotice":"previewNotice",
 	},
 	default:{
 		flag:true,
@@ -37,9 +38,8 @@ App.Services.NoticeAttrManagerTopbarNewTextNotice = Backbone.View.extend({
 		var target = $(event.target);
 		var saveOrPublish = target.attr("id");
 		var noticeTitleVal = $("#noticeTitle").val();
-		var noticeLinkVal = $("#noticeLink").val();
 		var noticeTimeVal = $("#noticeTime").val();
-		var match = /^((https|http|ftp|rtsp|mms)?:\/\/)?([\w\-]+(\.[\w\-]+)*\/)*[\w\-]+(\.[\w\-]+)*\/?(\?([\w\-\.,@?^=%&:\/~\+#]*)+)?/;
+		var noticeDepartementVal = $("#noticeDepartement").val();
 		var dataObjAdd = {},
 			dataObjEdit = {},
 			linkUrl="",
@@ -48,35 +48,22 @@ App.Services.NoticeAttrManagerTopbarNewTextNotice = Backbone.View.extend({
 			alert("公告标题不能为空！");
 			return;
 		}
-		if(noticeLinkVal==""){
-			alert("公告链接地址不能为空！");
-			return;
-		}else{
-			if(!match.test(noticeLinkVal)){
-				alert("公告链接地址不合法！");
-				return;
-			}
-		}
-		if(noticeTimeVal==""){
-			alert("发布时间不能为空！");
-			return;
-		}
 		if(this.default.edit){
 			dataObjEdit.title = noticeTitleVal;
-			dataObjEdit.href = noticeLinkVal;
+			dataObjEdit.department = noticeDepartementVal;
 			dataObjEdit.publishTime = noticeTimeVal;
-			dataObjEdit.content = $("#hideVal").data("content");
-			dataObjEdit.department = $("#hideVal").data("department");
+			dataObjEdit.content = App.Services.SystemCollection.um.getPlainTxt();
+			dataObjEdit.href = $("#hideVal").data("noticeLink");
 			dataObjEdit.type = $("#hideVal").data("type");
 			dataObjEdit.id = $("#hideVal").data("id");
 			dataObjEdit.status = status;
 		}else{
 			dataObjAdd.title = noticeTitleVal;
-			dataObjAdd.href = noticeLinkVal;
 			dataObjAdd.publishTime = noticeTimeVal;
-			dataObjAdd.content = "";
-			dataObjAdd.department = "";
-			dataObjAdd.type = 1;
+			dataObjAdd.department = noticeDepartementVal;
+			dataObjAdd.content = App.Services.SystemCollection.um.getPlainTxt();
+			dataObjAdd.href = "";
+			dataObjAdd.type = 2;
 			dataObjAdd.status = status;
 		}
 		var dataObj = this.default.edit?dataObjEdit:dataObjAdd;
@@ -91,12 +78,17 @@ App.Services.NoticeAttrManagerTopbarNewTextNotice = Backbone.View.extend({
 					contentType:"application/json",
 				}).done(function(res){
 					if(res.code==0){
-						App.Services.SystemCollection.addLinkNoticeDialog.close();
+						App.Services.SystemCollection.addTextNoticeDialog.close();
 						App.Services.SystemCollection.getListHandle();
+						App.Services.SystemCollection.um.destroy();
 						_this.default.flag=true;
 					}
 				})
 			}
 		}
+	},
+	previewNotice(){//添加文本公告内容
+		var noticeid = $("#hideVal").data("id");
+		window.open("#services/system/notice/"+noticeid,"about:blank");  
 	}
 })
