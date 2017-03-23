@@ -5324,14 +5324,13 @@ CLOUD.MiniMap = function (viewer) {
 
     // 获得主场景变换矩阵
     this.getMainSceneMatrix = function () {
-
-        return this.viewer.getScene().getRootNodeMatrix();
+        return this.viewer.getScene().getMatrixGlobal();
     };
 
     // 判断点是否在场景包围盒中
     this.containsPointInMainScene = function(point) {
 
-        var boundingBox = this.viewer.getScene().getRootNodeBoundingBox();
+        var boundingBox = this.viewer.getScene().getBoundingBoxWorld();
 
         if (boundingBox) {
             return boundingBox.containsPoint(point);
@@ -5510,7 +5509,7 @@ CLOUD.MiniMap = function (viewer) {
         if (!camera || !cameraEditor) return;
 
         var cameraPosition = camera.position;
-        var cameraTargetPosition = cameraEditor.target;
+        var cameraTargetPosition = camera.target;
         var sceneMatrix = this.getMainSceneMatrix();
         var inverseMatrix = new THREE.Matrix4();
         inverseMatrix.getInverse(sceneMatrix);
@@ -6336,15 +6335,7 @@ CLOUD.Extensions.MarkerEditor.prototype.deselectMarker = function () {
 
 // 获得主场景构件根节点变换矩阵
 CLOUD.Extensions.MarkerEditor.prototype.getSceneMatrix = function () {
-
-    var matrix = this.scene.getRootNodeMatrix();
-
-    if (!matrix) {
-
-        matrix = new THREE.Matrix4();
-    }
-
-    return matrix;
+    return this.scene.getMatrixGlobal();
 };
 
 // 获得主场景构件根节点变换矩阵的逆
@@ -11363,6 +11354,298 @@ CLOUD.Extensions.MarkerHelper.prototype = {
     }
 
 };
+
+CLOUD.Extensions.DwgHelper = function () {
+
+    this.dwgContainer = null;
+    this.annotationContainer = null;
+
+    this.defaultStyle = {
+        'stroke-width': 3,
+        'stroke-color': '#ff0000',
+        'stroke-opacity': 1.0,
+        'fill-color': '#ff0000',
+        'fill-opacity': 0.0,
+        'font-family': 'Arial',
+        'font-size': 16,
+        'font-style': '',
+        'font-weight': ''
+    };
+    this.isDblClickCloseCloud = true;
+};
+
+CLOUD.Extensions.DwgHelper.prototype = {
+
+    constructor: CLOUD.Extensions.DwgHelper,
+
+    destroy: function () {
+
+        this.uninitAnnotation();
+        this.editor = null;
+        this.dwgContainer = null;
+        this.annotationContainer = null;
+    },
+
+    // 设置DWG批注容器, 在使用批注功能前，需要先设置dom容器
+    setDomContainer: function (dwgContainer, annotationContainer) {
+
+        this.dwgContainer = dwgContainer;
+
+        if (annotationContainer){
+            this.annotationContainer = annotationContainer;
+        } else {
+            this.annotationContainer = dwgContainer;
+        }
+
+    },
+
+    // 初始化DWG批注
+    initAnnotation: function (beginEditCallback, endEditCallback) {
+
+        var scope = this;
+        var domElement = this.annotationContainer;
+
+        if (!this.editor) {
+
+            this.editor = new CLOUD.Extensions.AnnotationEditor2D(domElement);
+
+        } else {
+
+            // 设置父容器
+            this.editor.setDomContainer(domElement);
+        }
+
+        this.editor.enableDblClickCloseCloud(this.isDblClickCloseCloud);
+
+        if (!this.editor.isInitialized()) {
+
+            var callbacks = {
+                beginEditCallback: beginEditCallback,
+                endEditCallback: endEditCallback,
+                changeEditorModeCallback: function () {
+                    scope.uninitAnnotation();
+                }
+            };
+
+            this.editor.init(callbacks);
+            this.editor.setSvgZIndex();
+
+            callbacks = null;
+        }
+    },
+
+    // 卸载DWG批注资源
+    uninitAnnotation: function () {
+
+        if (this.editor && this.editor.isInitialized()) {
+
+            this.editor.uninit();
+        }
+    },
+
+    // 设置DWG背景色
+    setAnnotationBackgroundColor: function (startColor, stopColor) {
+
+        if (this.editor) {
+
+            this.editor.setBackgroundColor(startColor, stopColor);
+        }
+    },
+
+    // 开始编辑DWG批注
+    editAnnotationBegin: function (pointToCenter, beginEditCallback, endEditCallback) {
+
+        // 如果没有设置批注模式，则自动进入批注模式
+        this.initAnnotation(beginEditCallback, endEditCallback);
+
+        if (pointToCenter) {
+            this.editor.setAbsoluteBasePoint(pointToCenter);
+        }
+
+        this.editor.editBegin();
+    },
+
+    // 完成编辑DWG批注
+    editAnnotationEnd: function () {
+
+        if (this.editor) {
+
+            this.editor.editEnd();
+
+        }
+    },
+
+    // 设置DWG批注类型
+    setAnnotationType: function (type) {
+
+        if (this.editor) {
+
+            this.editor.setAnnotationType(type);
+
+        }
+    },
+
+    setAnnotationStyle: function (style, updateText) {
+
+        if (this.editor) {
+
+            for (var attr in style) {
+
+                if (attr in this.defaultStyle) {
+                    this.defaultStyle[attr] = style[attr];
+                }
+
+            }
+
+            this.editor.setAnnotationStyle(this.defaultStyle, updateText);
+
+        }
+    },
+
+    // 加载DWG批注
+    loadAnnotations: function (annotations, absBasePoint, beginEditCallback, endEditCallback) {
+
+        if (annotations) {
+
+            this.initAnnotation(beginEditCallback, endEditCallback);
+
+            if (absBasePoint) {
+                this.editor.setAbsoluteBasePoint(absBasePoint);
+            }
+
+            this.editor.loadAnnotations(annotations);
+        } else {
+            this.uninitAnnotation();
+        }
+    },
+
+    // 获得DWG批注对象列表
+    getAnnotationInfoList: function () {
+
+        if (this.editor) {
+
+            return this.editor.getAnnotationInfoList();
+
+        }
+
+        return null;
+    },
+
+    // resize
+    resizeAnnotations: function () {
+
+        if (this.editor && this.editor.isInitialized()) {
+
+            this.editor.onResize();
+
+        }
+    },
+
+    // 清除批注
+    clearAnnotations: function () {
+
+        if (this.editor && this.editor.isInitialized()) {
+
+            this.editor.onCameraChange();
+
+        }
+    },
+
+    // 特殊处理 - 是否允许双击关闭云图批注
+    enableDblClickCloseCloud: function(enable) {
+
+        this.isDblClickCloseCloud = enable;
+
+    },
+
+    // DWG截屏 base64格式png图片
+    captureAnnotationsScreenSnapshot: function (snapshotCallback) {
+
+        var scope = this;
+        var isInitialized = this.editor && this.editor.isInitialized();
+        var dwgDom = this.dwgContainer;
+
+        if (!dwgDom || !isInitialized) {
+
+            snapshotCallback(null);
+
+            return;
+        }
+
+        html2canvas(dwgDom, {
+            logging: true,
+            onrendered: function (canvas) {
+
+                var dataUrl = canvas.toDataURL("image/png");
+                dataUrl = scope.editor.getScreenSnapshot(dataUrl);
+                snapshotCallback(dataUrl);
+            }
+        });
+    },
+
+    // 截屏
+    canvas2image:function(snapshotCallback) {
+
+        // DWG不能直接返回截屏图片，故这种方式处理不了DWG，回调函数解决
+        //var snapshotCallback = function(dataUrl) {
+        //
+        //    var win = window.open();
+        //    var img = new Image();
+        //    img.onload = function () {
+        //        img.onload = null;
+        //        win.document.body.appendChild(img);
+        //    };
+        //    img.onerror = function () {
+        //        img.onerror = null;
+        //        if (console.log) {
+        //            console.log("Not loaded image from canvas.toDataURL");
+        //        } else {
+        //            alert("Not loaded image from canvas.toDataURL");
+        //        }
+        //    };
+        //
+        //    img.src = dataUrl;
+        //};
+
+        this.captureAnnotationsScreenSnapshot(snapshotCallback);
+    },
+
+    setAbsoluteBasePoint: function(point){
+
+        // 如果初始化，则自动初始化
+        this.initAnnotation();
+
+        if (point) {
+
+            this.editor.setAbsoluteBasePoint(point);
+
+        }
+    },
+
+    setScreenBasePoint: function(point){
+
+        // 如果初始化，则自动初始化
+        this.initAnnotation();
+
+        if (point) {
+
+            this.editor.setScreenBasePoint(point);
+
+        }
+    },
+
+    setZoomFactor: function(factorX, factorY){
+
+        factorY = factorY || factorX;
+
+        // 如果初始化，则自动初始化
+        this.initAnnotation();
+
+        this.editor.setZoomFactor(factorX, factorY);
+    }
+
+};
+
 CLOUD.Extensions.AnnotationHelper2D = function () {
 
     this.domContainer = null;

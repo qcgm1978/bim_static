@@ -1,5 +1,5 @@
 /**
- * @require /libsH5/js/bimView.js
+ * @require /BIMperformance/libsH5/js/bimView.js
  */
 'use strict';
 (function($) {
@@ -10,9 +10,18 @@
       {
         self.annotationHelper3D = new CLOUD.Extensions.AnnotationHelper3D(self.viewer||viewer);
       }
-      console.log(self.annotationHelper3D);
       return self.annotationHelper3D;
     },
+    
+    getMiniMapObject : function(viewer){
+      var self = this;
+      if (!self.MiniMapHelper)
+      {
+        self.MiniMapHelper = new CLOUD.Extensions.MiniMapHelper(self.viewer||viewer);
+      }
+      return self.MiniMapHelper;
+    },
+
     on: function(event, fn) { //订阅
       this.subscribers[event] ? this.subscribers[event].push(fn) : (this.subscribers[event] = []) && this.subscribers[event].push(fn);
       return '{"event":"' + event + '","fn":"' + (this.subscribers[event].length - 1) + '"}';
@@ -938,10 +947,11 @@
           outline: 'none',
           position: 'relative'
         };
-      //if (_opt.axisGrid) viewer.setAxisGridData(_opt.axisGrid) 注释 by wuweiwei
-      viewer.createMiniMap(_opt.name, _el[0], _width, _height, _css, _opt.callbackCameraChanged, _opt.callbackMoveOnAxisGrid);
-      viewer.enableAxisGridEvent(_opt.name, _opt.enable);
-      viewer.generateAxisGrid(_opt.name);
+      if (_opt.axisGrid) self.getMiniMapObject().setAxisGridData(_opt.axisGrid)
+      //viewer.createMiniMap(_opt.name, _el[0], _width, _height, _css, _opt.callbackCameraChanged, _opt.callbackMoveOnAxisGrid);
+      self.getMiniMapObject().createMiniMap(_opt.name, _el[0], _width, _height, _css, _opt.callbackCameraChanged, _opt.callbackMoveOnAxisGrid);
+      self.getMiniMapObject().enableAxisGridEvent(_opt.name, _opt.enable);
+      self.getMiniMapObject().generateAxisGrid(_opt.name);
     },
     setAxisGrid: function(name, x, y) {
       var viewer = this.viewer;
@@ -950,8 +960,8 @@
     setFloorMap: function(obj, name, flag) {
       // 设置小地图
       var viewer = this.viewer;
-      viewer.setFloorPlaneData(obj);
-      viewer.generateFloorPlane(name, flag);
+      this.getMiniMapObject().setFloorPlaneData(obj);
+      this.getMiniMapObject().generateFloorPlane(name, flag);
     },
     showAxisGrid: function(name) {
       var viewer = this.viewer;
@@ -980,7 +990,7 @@
       var viewer = this.viewer;
       viewer.setCamera(window.atob(json));
     },
-    commentInit_: function() {
+    commentInit: function() {
       console.log($('#comment'))
     }
   }

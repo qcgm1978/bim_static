@@ -424,7 +424,7 @@ var AppRoute = Backbone.Router.extend({
 	BIMperformance : function(id, versionId){
 
 		if (this.reset() == false) {
-			return;
+			//return;
 		}
 
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');

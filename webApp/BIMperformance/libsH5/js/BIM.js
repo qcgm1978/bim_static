@@ -1,5 +1,5 @@
 /**
- * @require /libsH5/js/bimView.js
+ * @require /BIMperformance/libsH5/js/bimView.js
  */
 'use strict';
 (function($) {
