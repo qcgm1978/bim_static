@@ -418,7 +418,7 @@ var CommProject = {
         if (!_.isArray(marks)) {
             marks = [marks];
         }
-        _viewer.viewer.setMarkerClickCallback(markerClick);
+        _viewer.getMakerObject().setMarkerClickCallback(markerClick);
         _viewer.loadMarkers(marks);
     },
 
