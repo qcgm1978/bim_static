@@ -19,7 +19,7 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 		"click .withdrawNotice":"withdrawNotice",
 	},
 	render(){//渲染
-		this.$el.html(this.template)
+		this.$el.html(this.template);
 		return this;
 	},
 	seachHandle(){
@@ -35,6 +35,7 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 	},
 	searchAjaxFun:function(targetVal){//最后执行提交搜索
 		var status = 1;
+		this.render();
 		if(targetVal == "已发布"){
 			status=1;
 			App.Services.SystemCollection.getListHandle({status:status});
@@ -52,11 +53,25 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 		var NewTextNotice = new App.Services.NoticeAttrManagerTopbarNewTextNotice();
 		App.Services.SystemCollection.addTextNoticeDialog = new App.Comm.modules.Dialog({
 		    title:"新建文本公告",
-		    width:600,
-		    height:600,
+		    width:800,
+		    height:560,
 		    isConfirm:false,
 		    isAlert:false,
-		    closeCallback:function(){},
+		    closeCallback:function(){
+	    	    App.Services.SystemCollection.um.destroy();
+		    },
+    	    readyFn:function(){
+        	    //实例化编辑器
+        	    App.Services.SystemCollection.um = UM.getEditor('myEditor',{
+        	        toolbar:['bold', 'italic', 'underline', 'fontfamily', 'fontsize', 'justifyleft', 'justifycenter', 'justifyright', 'forecolor', 'backcolor', 'image'],
+        		    initialFrameWidth:"100%",//宽度
+        		    initialFrameHeight:272,//高度
+        		    dropFileEnabled:false,//点击文件是否可以拖拽改变大小
+        		    imageScaleEnabled:false,//是否可以拖拽改变图片大小
+        		    pasteImageEnabled:false,//是否可以拖拽上传图片
+        		    autoHeightEnabled:false,//是否自动延长
+        	    });
+    	    },
 		    message:NewTextNotice.render("").el
 		});
 	},
@@ -98,7 +113,31 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 						    message:NewLinkNotice.render(res.data).el
 						});
 					}else if(res.data.type == 2){
-
+						var NewTextNotice = new App.Services.NoticeAttrManagerTopbarNewTextNotice();
+						App.Services.SystemCollection.addTextNoticeDialog = new App.Comm.modules.Dialog({
+						    title:"新建文本公告",
+						    width:800,
+						    height:560,
+						    isConfirm:false,
+						    isAlert:false,
+						    closeCallback:function(){
+					    	    App.Services.SystemCollection.um.destroy();
+						    },
+				    	    readyFn:function(){
+				        	    //实例化编辑器
+				        	    App.Services.SystemCollection.um = UM.getEditor('myEditor',{
+				        	        toolbar:['bold', 'italic', 'underline', 'fontfamily', 'fontsize', 'justifyleft', 'justifycenter', 'justifyright', 'forecolor', 'backcolor', 'image'],
+				        		    initialFrameWidth:"100%",//宽度
+				        		    initialFrameHeight:272,//高度
+				        		    dropFileEnabled:false,//点击文件是否可以拖拽改变大小
+				        		    imageScaleEnabled:false,//是否可以拖拽改变图片大小
+				        		    pasteImageEnabled:false,//是否可以拖拽上传图片
+				        		    autoHeightEnabled:false,//是否自动延长
+				        	    });
+				        	    App.Services.SystemCollection.um.setContent(res.data.content);
+				    	    },
+						    message:NewTextNotice.render(res.data).el
+						});
 					}
 					_this.default.flag=true;
 				}
@@ -113,6 +152,7 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 		var data = {
 			"id":noticeid
 		}
+		this.render();
 		if(!target.hasClass("disable")){
 			if(this.default.flag){
 				this.default.flag=false;
@@ -139,6 +179,7 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 		var data = {
 			"id":noticeid
 		}
+		this.render();
 		if(!target.hasClass("disable")){
 			if(this.default.flag){
 				this.default.flag=false;
@@ -177,6 +218,7 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 		var data = {
 			"id":noticeid
 		}
+		this.render();
 		if(!target.hasClass("disable")){
 			if(this.default.flag){
 				this.default.flag=false;
@@ -202,7 +244,8 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 		var noticeid = noticeDom.find("td:eq(0)").data("noticeid");
 		var data = {
 				"id":noticeid
-			}
+		}
+		this.render();
 		if(!target.hasClass("disable")){
 			if(this.default.flag){
 				this.default.flag=false;
@@ -229,6 +272,7 @@ App.Services.NoticeAttrManagerTopbar = Backbone.View.extend({
 		var data = {
 			"id":noticeid
 		}
+		this.render();
 		if(!target.hasClass("disable")){
 			if(this.default.flag){
 				this.default.flag=false;

@@ -52,6 +52,9 @@ fis.match('*.es6', {
   parser: fis.plugin('babel-6.x'),
   rExt: 'js'
 });
+fis.match('editer/**', {
+  release: "/static/dist/$0",
+});
 
 fis.match('**.{gif,png,jpg}', {
   //useHash:true,
