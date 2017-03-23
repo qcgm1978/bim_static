@@ -5325,13 +5325,13 @@ CLOUD.MiniMap = function (viewer) {
     // 获得主场景变换矩阵
     this.getMainSceneMatrix = function () {
 
-        return this.viewer.getScene().getRootNodeMatrix();
+        return this.viewer.getScene().getMatrixGlobal();
     };
 
     // 判断点是否在场景包围盒中
     this.containsPointInMainScene = function(point) {
 
-        var boundingBox = this.viewer.getScene().getRootNodeBoundingBox();
+        var boundingBox = this.viewer.getScene().getBoundingBoxWorld();
 
         if (boundingBox) {
             return boundingBox.containsPoint(point);
@@ -5510,7 +5510,7 @@ CLOUD.MiniMap = function (viewer) {
         if (!camera || !cameraEditor) return;
 
         var cameraPosition = camera.position;
-        var cameraTargetPosition = cameraEditor.target;
+        var cameraTargetPosition = camera.target;
         var sceneMatrix = this.getMainSceneMatrix();
         var inverseMatrix = new THREE.Matrix4();
         inverseMatrix.getInverse(sceneMatrix);
@@ -6337,7 +6337,7 @@ CLOUD.Extensions.MarkerEditor.prototype.deselectMarker = function () {
 // 获得主场景构件根节点变换矩阵
 CLOUD.Extensions.MarkerEditor.prototype.getSceneMatrix = function () {
 
-    var matrix = this.scene.getRootNodeMatrix();
+    var matrix = this.scene.getMatrixGlobal();
 
     if (!matrix) {
 

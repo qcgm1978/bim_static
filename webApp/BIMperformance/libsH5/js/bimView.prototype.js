@@ -17,7 +17,7 @@
       var self = this;
       if (!self.MiniMapHelper)
       {
-        self.MiniMapHelper = new CLOUD.Extensions.AnnotationHelper3D(self.viewer||viewer);
+        self.MiniMapHelper = new CLOUD.Extensions.MiniMapHelper(self.viewer||viewer);
       }
       return self.MiniMapHelper;
     },
@@ -947,10 +947,11 @@
           outline: 'none',
           position: 'relative'
         };
-      //if (_opt.axisGrid) viewer.setAxisGridData(_opt.axisGrid) 注释 by wuweiwei
-      viewer.createMiniMap(_opt.name, _el[0], _width, _height, _css, _opt.callbackCameraChanged, _opt.callbackMoveOnAxisGrid);
-      viewer.enableAxisGridEvent(_opt.name, _opt.enable);
-      viewer.generateAxisGrid(_opt.name);
+      if (_opt.axisGrid) self.getMiniMapObject().setAxisGridData(_opt.axisGrid)
+      //viewer.createMiniMap(_opt.name, _el[0], _width, _height, _css, _opt.callbackCameraChanged, _opt.callbackMoveOnAxisGrid);
+      self.getMiniMapObject().createMiniMap(_opt.name, _el[0], _width, _height, _css, _opt.callbackCameraChanged, _opt.callbackMoveOnAxisGrid);
+      self.getMiniMapObject().enableAxisGridEvent(_opt.name, _opt.enable);
+      self.getMiniMapObject().generateAxisGrid(_opt.name);
     },
     setAxisGrid: function(name, x, y) {
       var viewer = this.viewer;
@@ -959,8 +960,8 @@
     setFloorMap: function(obj, name, flag) {
       // 设置小地图
       var viewer = this.viewer;
-      viewer.setFloorPlaneData(obj);
-      viewer.generateFloorPlane(name, flag);
+      this.getMiniMapObject().setFloorPlaneData(obj);
+      this.getMiniMapObject().generateFloorPlane(name, flag);
     },
     showAxisGrid: function(name) {
       var viewer = this.viewer;
