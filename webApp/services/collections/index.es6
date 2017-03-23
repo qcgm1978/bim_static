@@ -41,7 +41,7 @@ App.Services = {
 			}else if(type == "more"){
 				viewer = new App.Services.More();
 				$(document.getElementsByTagName("body")[0]).html(viewer.render().el);
-				viewer.bindEvent();
+				// viewer.bindEvent();
 				return;
 			}
 
@@ -60,7 +60,12 @@ App.Services = {
 			$("#pageLoading").hide();
 			this.initEvent();
 			this.loadXW();
+			this.getResListHandle();//获取首页五条资源列表
 		}
+	},
+	getResListHandle(){//获取首页五条资源列表
+		var MoreIndex = new App.Services.MoreIndex();
+		$(".content").html(MoreIndex.render().el);
 	},
 	noticeInit(noticeId){//公告打开新页面预览
 		viewer = new App.Services.PreviewNotice();
@@ -75,10 +80,10 @@ App.Services = {
 			}
 		})
 
-		$('ul.resourceList a').on('click',function(){
-			var id=$(this).data('id');
-			window.open(id,'_blank');
-		})
+		// $('ul.resourceList a').on('click',function(){
+		// 	var id=$(this).data('id');
+		// 	window.open(id,'_blank');
+		// })
 	},
 
 	loadXW:function(){

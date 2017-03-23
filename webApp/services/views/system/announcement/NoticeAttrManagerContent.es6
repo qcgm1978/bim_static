@@ -38,16 +38,16 @@ App.Services.NoticeAttrManagerContent = Backbone.View.extend({
 			previewNotice.removeClass('disable');
 			if(publishState == "1"){
 				withdrawNotice.removeClass('disable');
+				if(sticeState == "0"){
+					stickNotice.removeClass('disable');
+				}else if(sticeState == "1"){
+					cancelStickNotice.removeClass('disable');
+				}
 			}else if(publishState == "2"){
 				publishNotice.removeClass('disable');
 			}else if(publishState == "3"){
 				deleteNotice.removeClass('disable');
 				publishNotice.removeClass('disable');
-			}
-			if(sticeState == "0" && publishState!="3"){
-				stickNotice.removeClass('disable');
-			}else if(sticeState == "1" && publishState!="3"){
-				cancelStickNotice.removeClass('disable');
 			}
 		}
 	},

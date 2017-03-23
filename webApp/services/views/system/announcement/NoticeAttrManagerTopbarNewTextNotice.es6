@@ -26,6 +26,8 @@ App.Services.NoticeAttrManagerTopbarNewTextNotice = Backbone.View.extend({
 		var data = $.extend({},defaultData,parmers);
 		if(parmers){
 			this.default.edit=true;
+		}else{
+			this.default.edit=false;
 		}
 		this.$el.html(this.template(data));
 		this.$('#noticeTime').datetimepicker({
@@ -67,6 +69,7 @@ App.Services.NoticeAttrManagerTopbarNewTextNotice = Backbone.View.extend({
 			dataObjEdit.type = $("#hideVal").data("type");
 			dataObjEdit.id = $("#hideVal").data("id");
 			dataObjEdit.status = status;
+			dataObjEdit.orderType = 0;
 		}else{
 			dataObjAdd.title = noticeTitleVal;
 			dataObjAdd.publishTime = noticeTimeVal;

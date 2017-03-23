@@ -367,8 +367,7 @@ App.API = {
 		saveResource:"platform/related/resources/save",//添加资源列表的接口
 		deleteResource:"platform/related/resources/delete",//添加资源列表的接口
 		searchResourceTypeList:"platform/related/resources/listType",//资源类型查询列表的接口
-
-
+		downloadResource:"platform/related/resources/download/{id}",//资源类型下载的接口
 
 	},
 
