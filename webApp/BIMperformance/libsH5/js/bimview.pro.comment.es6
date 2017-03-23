@@ -1,6 +1,6 @@
 /**
- * @require /libsH5/js/bimView.js
- * @require /libsH5/js/bimView.prototype.js
+ * @require /BIMperformance/libsH5/js/bimView.js
+ * @require /BIMperformance/libsH5/js/bimView.prototype.js
  */
 
 
@@ -2046,7 +2046,8 @@
 		var viewer = self.viewer;
 		self._dom.bimBox.removeClass('comment');
 		self._dom.bimBox.find('.commentBar').remove();
-		viewer.editCommentEnd();
+		//viewer.editCommentEnd();//旧接口已废弃
+		self.getAnnotationObject().editAnnotationEnd();
 		viewer.setPickMode();
 		//删除保存
 		$("#topSaveTip").remove();
