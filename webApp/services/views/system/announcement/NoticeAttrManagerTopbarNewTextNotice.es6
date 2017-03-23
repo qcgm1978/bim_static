@@ -10,7 +10,8 @@ App.Services.NoticeAttrManagerTopbarNewTextNotice = Backbone.View.extend({
 	},
 	default:{
 		flag:true,
-		edit:false
+		edit:false,
+		noticeTime:''
 	},
 	render(parmers){
 		var defaultData = {
@@ -25,8 +26,19 @@ App.Services.NoticeAttrManagerTopbarNewTextNotice = Backbone.View.extend({
 		var data = $.extend({},defaultData,parmers);
 		if(parmers){
 			this.default.edit=true;
+		}else{
+			this.default.edit=false;
 		}
 		this.$el.html(this.template(data));
+		this.$('#noticeTime').datetimepicker({
+		  language: 'zh-CN',
+		  autoclose: true,
+		  format: 'yyyy-mm-dd',
+		  minView: 'month'
+		});
+		this.$('#noticeTime').on('change',function(){
+		  // _this.default.noticeTime=$(this).val();
+		})
 		return this;
 	},
 	cancelBtn(){//取消按钮的方法
@@ -57,6 +69,7 @@ App.Services.NoticeAttrManagerTopbarNewTextNotice = Backbone.View.extend({
 			dataObjEdit.type = $("#hideVal").data("type");
 			dataObjEdit.id = $("#hideVal").data("id");
 			dataObjEdit.status = status;
+			dataObjEdit.orderType = 0;
 		}else{
 			dataObjAdd.title = noticeTitleVal;
 			dataObjAdd.publishTime = noticeTimeVal;
@@ -81,13 +94,16 @@ App.Services.NoticeAttrManagerTopbarNewTextNotice = Backbone.View.extend({
 						App.Services.SystemCollection.addTextNoticeDialog.close();
 						App.Services.SystemCollection.getListHandle();
 						App.Services.SystemCollection.um.destroy();
+						$(".buttonBox > button:gt(1)").addClass("disable");
 						_this.default.flag=true;
+					}else{
+						alert(res.message);
 					}
 				})
 			}
 		}
 	},
-	previewNotice(){//添加文本公告内容
+	previewNotice(){//预览文本公告内容
 		var noticeid = $("#hideVal").data("id");
 		window.open("#services/system/notice/"+noticeid,"about:blank");  
 	}

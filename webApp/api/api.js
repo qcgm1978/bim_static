@@ -362,8 +362,12 @@ App.API = {
 		getNotice:"platform/announce/toEdit",//获取公告的接口
 		editNotice:"platform/announce/edit",//编辑公告的接口
 		addLinkNotice:"platform/announce/add",//添加链接公告的接口
-
-
+		
+		getResourceList:"platform/related/resources/list",//获取资源列表的接口
+		saveResource:"platform/related/resources/save",//添加资源列表的接口
+		deleteResource:"platform/related/resources/delete",//添加资源列表的接口
+		searchResourceTypeList:"platform/related/resources/listType",//资源类型查询列表的接口
+		downloadResource:"platform/related/resources/download/{id}",//资源类型下载的接口
 
 	},
 

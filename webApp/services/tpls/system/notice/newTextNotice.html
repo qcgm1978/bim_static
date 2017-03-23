@@ -6,8 +6,9 @@
 </div>
 <div class="newTextNitoceBox">
 	<label>发布时间：</label>
-	<div class="newTextInputBox">
-		<input id="noticeTime" type="text" value="<%=publishTime%>" placeholder="请输发布时间">
+	<div class="firstDate dateBox newTextInputBox" style="position: relative; display: inline-block;">
+	    <i class="iconCal add-on"></i>
+	    <input readonly="true" id="noticeTime" type="text" class="span2" value="<%=publishTime%>" placeholder="请输发布时间">
 	</div>
 </div>
 <div class="newTextNitoceBox">
@@ -17,7 +18,7 @@
 	</div>
 </div>
 <div class="newTextTextareaBox">
-	<script type="text/plain" id="myEditor"><p>这里我可以写一些输入提示</p></script>
+	<script type="text/plain" id="myEditor"></script>
 </div>
 <div class="newTextNoticeFoot">
 	<button id="previewNotice">预览</button>

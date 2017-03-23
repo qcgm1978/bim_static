@@ -1,23 +1,15 @@
-//资源管理
-App.Services.System.ResourceAttrManagerContentList=Backbone.View.extend({
-	tagName:'tr',
-	template:_.templateUrl("/services/tpls/system/resource/resourceContentList.html"),
+App.Services=App.Services||{};
+App.Services.MoreDetail=Backbone.View.extend({
+	tagName:"li",
+	template:_.templateUrl("/services/tpls/services.more.detail.html"),
 	events:{
-		"click .checkItem": "checkItemFun",
+		"click .fileName a":"download"
 	},
-	render(){//渲染
+	render:function(){
 		this.model.createTime = this.changeTimeHandle(this.model.createTime);
 		this.model.size = this.changeSizeHandle(this.model.size);
 		this.$el.html(this.template(this.model));
 		return this;
-	},
-	checkItemFun(){//点击列表的单个复选框的方法
-		var allCheck = $(".allCheck");
-		if (this.$el.parent().parent().find(".checkItem:not(:checked)").length>0) {
-			allCheck.prop("checked",false);
-		}else{
-			allCheck.prop("checked",true);
-		}
 	},
 	changeTimeHandle(time){//时间转换
 		var timeStr = new Date(time);
@@ -32,5 +24,15 @@ App.Services.System.ResourceAttrManagerContentList=Backbone.View.extend({
 			sizeStr = size+"KB"
 		}
 		return sizeStr;
+	},
+	download(event){
+		var targetId = $(event.target).data("id");
+		var data = {
+			URLtype: "downloadResource",
+			data: {
+				id: targetId,
+			}
+		} 
+		window.location.href = App.Comm.getUrlByType(data).url;
 	}
 });

@@ -26,6 +26,12 @@ App.Services.NoticeAttrManagerTopbarNewLinkNotice = Backbone.View.extend({
 			this.default.edit=true;
 		}
 		this.$el.html(this.template(data));
+		this.$('#noticeTime').datetimepicker({
+		  language: 'zh-CN',
+		  autoclose: true,
+		  format: 'yyyy-mm-dd',
+		  minView: 'month'
+		});
 		return this;
 	},
 	cancelBtn(){//取消按钮的方法
@@ -88,6 +94,9 @@ App.Services.NoticeAttrManagerTopbarNewLinkNotice = Backbone.View.extend({
 						App.Services.SystemCollection.addLinkNoticeDialog.close();
 						App.Services.SystemCollection.getListHandle();
 						_this.default.flag=true;
+						$(".buttonBox > button:gt(1)").addClass("disable");
+					}else{
+						alert(res.message)
 					}
 				})
 			}
