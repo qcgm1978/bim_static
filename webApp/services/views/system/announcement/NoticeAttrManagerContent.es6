@@ -29,13 +29,7 @@ App.Services.NoticeAttrManagerContent = Backbone.View.extend({
 		var publishState = target.find("td:eq(0)").data("publishstate");//当前公告是否发布
 		var sticeState = target.find("td:eq(0)").data("sticestate");//当前公告是否置顶
 		target.siblings().removeClass('selectClass');
-		deleteNotice.addClass('disable');
-		publishNotice.addClass('disable');
-		stickNotice.addClass('disable');
-		cancelStickNotice.addClass('disable');
-		editNotice.addClass('disable');
-		previewNotice.addClass('disable');
-		withdrawNotice.addClass('disable');
+		$(".buttonBox > button:gt(1)").addClass("disable");
 		if(target.hasClass("selectClass")){
 			target.removeClass("selectClass");
 		}else{
@@ -50,9 +44,9 @@ App.Services.NoticeAttrManagerContent = Backbone.View.extend({
 				deleteNotice.removeClass('disable');
 				publishNotice.removeClass('disable');
 			}
-			if(sticeState == "0"){
+			if(sticeState == "0" && publishState!="3"){
 				stickNotice.removeClass('disable');
-			}else if(sticeState == "1"){
+			}else if(sticeState == "1" && publishState!="3"){
 				cancelStickNotice.removeClass('disable');
 			}
 		}
@@ -65,7 +59,7 @@ App.Services.NoticeAttrManagerContent = Backbone.View.extend({
 			var listDom = this.$el.find("#listDom");
 			listDom.append(view.render().el);
 		}
-		this.bindScroll();
+		// this.bindScroll();
 	},
 	reset:function(){
 		this.$el.find("tbody#listDom").html('<tr> <td  colspan="3" class="noDataTd">正在加载...</td></tr>');

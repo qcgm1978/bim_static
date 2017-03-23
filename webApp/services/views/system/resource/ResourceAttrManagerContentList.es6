@@ -6,7 +6,9 @@ App.Services.System.ResourceAttrManagerContentList=Backbone.View.extend({
 		"click .checkItem": "checkItemFun",
 	},
 	render(){//渲染
-		this.$el.html(this.template({data:this.model}));
+		this.model.createTime = this.changeTimeHandle(this.model.createTime);
+		this.model.size = this.changeSizeHandle(this.model.size);
+		this.$el.html(this.template(this.model));
 		return this;
 	},
 	checkItemFun(){//点击列表的单个复选框的方法
@@ -17,4 +19,18 @@ App.Services.System.ResourceAttrManagerContentList=Backbone.View.extend({
 			allCheck.prop("checked",true);
 		}
 	},
+	changeTimeHandle(time){//时间转换
+		var timeStr = new Date(time);
+		timeStr = timeStr.getFullYear() + "-" + (timeStr.getMonth() + 1) + "-" + timeStr.getDate() + " " + timeStr.getHours() + ":" + timeStr.getMinutes() + ":" + timeStr.getSeconds();
+		return timeStr;
+	},
+	changeSizeHandle(size){//字节转换
+		var sizeStr = "";
+		if(size>=1024){
+			sizeStr = (size/(1024*1024)).toFixed(2)+"M";
+		}else{
+			sizeStr = size+"KB"
+		}
+		return sizeStr;
+	}
 });

@@ -12,10 +12,13 @@
 				<input type="text" id="noticeTitle" value="<%= title %>" placeholder="请输入公告标题">
 			</td>
 			<td>
-				<input type="text" id="noticeLink" value="<%= href %>" placeholder="请输入公告链接地址">
+				<input type="text" id="noticeLink" title="<%= href %>" value="<%= href %>" placeholder="请输入公告链接地址">
 			</td>
 			<td>
-				<input type="text" id="noticeTime" value="<%= publishTime %>" placeholder="请输入公告发布时间">
+				<div class="firstDate dateBox newLinkInputBox" style="position: relative; display: inline-block;">
+				    <i class="iconCal add-on"></i>
+				    <input readonly="true" id="noticeTime" type="text" class="span2" value="<%=publishTime%>" placeholder="请输发布时间">
+				</div>
 			</td>
 		</tr>
 	</tbody>
