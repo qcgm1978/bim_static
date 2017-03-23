@@ -13,6 +13,15 @@
       return self.annotationHelper3D;
     },
     
+    getMakerObject : function(viewer){
+      var self = this;
+      if (!self.MarkerHelper)
+      {
+        self.MarkerHelper = new CLOUD.Extensions.MarkerHelper(self.viewer||viewer);
+      }
+      return self.MarkerHelper;
+    },
+
     getMiniMapObject : function(viewer){
       var self = this;
       if (!self.MiniMapHelper)
@@ -635,8 +644,8 @@
       $.each(list, function(i, item) {
         newList.push(JSON.parse(item));
       });
-      viewer.setMarkerMode();
-      viewer.loadMarkers(newList);
+      //viewer.setMarkerMode();//废弃 by wuweiwei
+      self.getMakerObject().loadMarkers(newList);
     },
     // 批注
     comment: function(data) {

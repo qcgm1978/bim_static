@@ -6353,7 +6353,7 @@ CLOUD.Extensions.MarkerEditor.prototype.getInverseSceneMatrix = function () {
 CLOUD.Extensions.MarkerEditor.prototype.worldToClient = function (wPoint) {
 
     var bounds = this.getDomContainerBounds();
-    var camera = this.cameraEditor.object;
+    var camera = this.cameraEditor.camera;
     var sceneMatrix = this.getSceneMatrix();
     var result = new THREE.Vector3(wPoint.x, wPoint.y, wPoint.z);
 
@@ -6376,7 +6376,7 @@ CLOUD.Extensions.MarkerEditor.prototype.worldToClient = function (wPoint) {
 CLOUD.Extensions.MarkerEditor.prototype.clientToWorld = function (cPoint) {
 
     var bounds = this.getDomContainerBounds();
-    var camera = this.cameraEditor.object;
+    var camera = this.cameraEditor.camera;
     var result = new THREE.Vector3();
 
     result.x = cPoint.x / bounds.width * 2 - 1;
