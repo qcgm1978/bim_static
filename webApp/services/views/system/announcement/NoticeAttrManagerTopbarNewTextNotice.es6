@@ -67,7 +67,7 @@ App.Services.NoticeAttrManagerTopbarNewTextNotice = Backbone.View.extend({
 			dataObjEdit.title = noticeTitleVal;
 			dataObjEdit.department = noticeDepartementVal;
 			dataObjEdit.publishTime = noticeTimeVal;
-			dataObjEdit.content = App.Services.SystemCollection.um.getContent();
+			dataObjEdit.content = App.Services.SystemCollection.um.getContentTxt();
 			dataObjEdit.href = $("#hideVal").data("noticeLink");
 			dataObjEdit.type = $("#hideVal").data("type");
 			dataObjEdit.id = $("#hideVal").data("id");
@@ -77,7 +77,7 @@ App.Services.NoticeAttrManagerTopbarNewTextNotice = Backbone.View.extend({
 			dataObjAdd.title = noticeTitleVal;
 			dataObjAdd.publishTime = noticeTimeVal;
 			dataObjAdd.department = noticeDepartementVal;
-			dataObjAdd.content = App.Services.SystemCollection.um.getContent();
+			dataObjAdd.content = App.Services.SystemCollection.um.getContentTxt();
 			dataObjAdd.href = "";
 			dataObjAdd.type = 2;
 			dataObjAdd.status = status;
@@ -107,7 +107,23 @@ App.Services.NoticeAttrManagerTopbarNewTextNotice = Backbone.View.extend({
 		}
 	},
 	previewNotice(){//预览文本公告内容
-		var noticeid = $("#hideVal").data("id");
-		window.open("#services/system/notice/"+noticeid,"about:blank");  
+		localStorage.setItem("noticeNoSavePreview", "");
+		if(this.default.edit){
+			var noticeid = $("#hideVal").data("id");
+			window.open("#services/system/notice/"+noticeid,"about:blank"); 
+		}else{
+			var noticeTitleVal = $("#noticeTitle").val().trim();
+			var noticeTimeVal = $("#noticeTime").val().trim();
+			var noticeDepartementVal = $("#noticeDepartement").val().trim();
+			var noticeContent = App.Services.SystemCollection.um.getContent();
+			var previewObj = {
+				"title":noticeTitleVal,
+				"publishTime":noticeTimeVal,
+				"department":noticeDepartementVal,
+				"content":noticeContent,
+			}
+			localStorage.setItem("noticeNoSavePreview", JSON.stringify(previewObj));
+			window.open("#services/system/notice/noticeNoSavePreview","about:blank"); 
+		}
 	}
 })
