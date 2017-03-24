@@ -318,6 +318,10 @@ var Login = {
 			{
 				return true;
 			}
+			else
+			{
+				return false;
+			}
 		}
 		catch(e)
 		{
@@ -466,3 +470,6 @@ var App = {
 String.prototype.trim = function() {
 	return this.replace(/(^\s*)|(\s*$)/g, '');
 };
+
+//Login.setCookie("test",'"abc"');
+//alert(Login.getCookie("test").length);
