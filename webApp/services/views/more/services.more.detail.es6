@@ -1,6 +1,7 @@
 App.Services=App.Services||{};
 App.Services.MoreDetail=Backbone.View.extend({
-	tagName:"li",
+	tagName:"div",
+	className:'listItem',
 	template:_.templateUrl("/services/tpls/services.more.detail.html"),
 	events:{
 		"click .fileName a":"download"

@@ -23,7 +23,7 @@ html,body{
     height: 100%;
     position: relative;
     margin-top: -110px;
-    padding-top: 120px;
+    padding-top: 140px;
     padding-left: 20px;
     padding-right: 20px;
 }
@@ -31,7 +31,6 @@ html,body{
     width: 100%;
     height: 100%;
     border:1px solid #ccc;
-    margin-top:20px;
 }
 .moreContainer .moreTable div{
     float: left;
@@ -52,32 +51,41 @@ html,body{
     width: 100%;
     height: 100%;
     margin-top: -38px;
-    border-bottom: 1px solid #ccc;
     color:#888;
     background-color: #FFF;
     position: relative;
     padding-top: 44px;
 }
-.moreContainer .moreTable dd ul.resourceListBox{
+.moreContainer .moreTable dd .scrollBox{
     width: 100%;
     height: 100%;
 }
-.resourceListBox li{
+.moreContainer .moreTable dd .scrollBox .mCSB_scrollTools_vertical {
+    right: -20px;
+}
+.moreContainer .moreTable dd .resourceListBox{
+    width: 100%;
+    height: 100%;
+}
+.resourceListBox .listItem{
     width: 100%;
     height: 36px;
     line-height: 36px;
     border-bottom: #ccc solid 1px;
 }
-.resourceListBox li:nth-last-child(1){
+.resourceListBox .listItem:nth-last-child(1){
     /*border-bottom: 0;*/
 }
-.resourceListBox li.loading{
+.resourceListBox .loading{
+    width: 100%;
+    height: 36px;
+    line-height: 36px;
     text-align: center;
 }
-.resourceListBox li:hover{
+.resourceListBox .listItem:hover{
     background-color: #eee;
 }
-.resourceListBox li:hover .fileName{
+.resourceListBox .listItem:hover .fileName{
     font-size: 18px;
 }
 dl,dt,dd{
@@ -102,6 +110,9 @@ dl,dt,dd{
 }
 .moreContainer .moreTable dd{
     position: relative;
+}
+.moreContainer .moreTable dd#pageBoxDd{
+    padding-bottom: 44px;
 }
 .moreContainer .moreTable dd .pagingBox{
     position: absolute;bottom: 0px;left:20px;right: 20px;line-height: 40px;
@@ -166,8 +177,11 @@ a:hover{
             <div class="type">资源类型</div>
         </dt>
         <dd id="pageBoxDd">
-            <ul class="resourceListBox">
-            </ul>
+            <div class="scrollBox">
+                <div class="resourceListBox">
+
+                </div>
+            </div>
             <div class="pagingBox">
                <div class="sumDesc"></div><div class="listPagination"></div>
             </div>
