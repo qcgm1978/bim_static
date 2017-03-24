@@ -695,6 +695,10 @@ App.Console = {
         alert("请添加接收人");
         return;
       }
+      if ($("#s01").val()== null) {
+        alert("请选择项目类型");
+        return;
+      }
       var data = {
         id:$("#s00").val()==""?0:$("#s00").val(),
         type: 3,

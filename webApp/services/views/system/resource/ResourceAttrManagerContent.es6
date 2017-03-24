@@ -26,8 +26,19 @@ App.Services.System.ResourceAttrManagerContent=Backbone.View.extend({
 		var data = model.toJSON();
 		var ResourceAttrManagerContentList = new App.Services.System.ResourceAttrManagerContentList({model:data});
 		this.$(".resourceList").append(ResourceAttrManagerContentList.render().el);
+		this.bindScroll();
 	},
 	resetList(){//重置加载
 		this.$(".resourceList").html('<li class="loading">正在加载，请稍候……</li>');
-	}
+	},
+	bindScroll:function(){//绑定滚动条
+		this.$el.find("div.scrollBox").mCustomScrollbar({
+			theme: 'minimal-dark',
+			axis: 'y',
+			keyboard: {
+				enable: true
+			},
+			scrollInertia: 0
+		}); 
+	},
 });

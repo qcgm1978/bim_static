@@ -65,7 +65,7 @@ App.Services = {
 	},
 	getResListHandle(){//获取首页五条资源列表
 		var MoreIndex = new App.Services.MoreIndex();
-		$(".content").html(MoreIndex.render().el);
+		$("#resourceList").html(MoreIndex.render().el);
 	},
 	noticeInit(noticeId){//公告打开新页面预览
 		viewer = new App.Services.PreviewNotice();

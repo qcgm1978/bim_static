@@ -36,6 +36,9 @@ App.Services.NoticeAttrManagerTopbarNewTextNotice = Backbone.View.extend({
 		  format: 'yyyy-mm-dd',
 		  minView: 'month'
 		});
+		this.$(".dateBox .iconCal").on("click",function() {
+		    $(this).next().focus();
+		});
 		this.$('#noticeTime').on('change',function(){
 		  // _this.default.noticeTime=$(this).val();
 		})

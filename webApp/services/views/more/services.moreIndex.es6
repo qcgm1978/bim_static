@@ -19,6 +19,6 @@ App.Services.MoreIndex=Backbone.View.extend({
 		$(".resourceList").append(MoreDetail.render().el);
 	},
 	resetList(){//重置加载
-		$(".content").html('<li class="loading">正在加载，请稍候……</li>');
+		$("#resourceList").html('<li class="loading">正在加载，请稍候……</li>');
 	}
 });

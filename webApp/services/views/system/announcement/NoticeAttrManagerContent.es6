@@ -59,7 +59,7 @@ App.Services.NoticeAttrManagerContent = Backbone.View.extend({
 			var listDom = this.$el.find("#listDom");
 			listDom.append(view.render().el);
 		}
-		// this.bindScroll();
+		this.bindScroll();
 	},
 	reset:function(){
 		this.$el.find("tbody#listDom").html('<tr> <td  colspan="3" class="noDataTd">正在加载...</td></tr>');

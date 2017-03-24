@@ -32,6 +32,9 @@ App.Services.NoticeAttrManagerTopbarNewLinkNotice = Backbone.View.extend({
 		  format: 'yyyy-mm-dd',
 		  minView: 'month'
 		});
+		this.$(".dateBox .iconCal").on("click",function() {
+		    $(this).next().focus();
+		});
 		return this;
 	},
 	cancelBtn(){//取消按钮的方法

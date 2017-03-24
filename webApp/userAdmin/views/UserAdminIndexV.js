@@ -27,12 +27,12 @@ App.userAdmin.UserAdminIndexV = Backbone.View.extend({
 	renderAddPrefixDom:function(){//加载添加前缀的方法
 		$("#viewShowBox").find("div.viewUserSet").siblings().css("display","none").end().css("display","block");
 		var UserAdminPrefixListV = new App.userAdmin.UserAdminPrefixListV;
-		this.$el.find(".viewUserSetBox").html(UserAdminPrefixListV.render().el);
+		this.$el.find(".viewUserSetBox").append(UserAdminPrefixListV.render().el);
 	},
 	renderUserAdminListDom:function(){//加载添加用户的方法
 		$("#viewShowBox").find("div.viewUserList").siblings().css("display","none").end().css("display","block");
 		var UserAdminListV = new App.userAdmin.UserAdminListV;
-		this.$el.find(".viewUserListBox").html(UserAdminListV.render().el);
+		this.$el.find(".viewUserListBox").append(UserAdminListV.render().el);
 	},
 	addViewUserFun:function(evt){//添加用户列表的方法
 		var addDialogEle = new App.userAdmin.AddUserAdminDialogV;

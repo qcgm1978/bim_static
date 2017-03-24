@@ -20,9 +20,8 @@ App.Services.System.ResourceAttrManagerTopbar=Backbone.View.extend({
 	render(){//渲染
 		var template = _.templateUrl('/services/tpls/system/resource/resourceTopbar.html');
 		var startTime = new Date().setMonth(new Date().getMonth()-1);
-		var endTime = new Date().setMonth(new Date().getMonth()-1);
 		var sTimeStr = new Date(startTime);
-		var eTimeStr = new Date(endTime);
+		var eTimeStr = new Date();
 		var startTimeStr = sTimeStr.getFullYear() + "-" + (sTimeStr.getMonth() + 1) + "-" + sTimeStr.getDate();
 		var endTimeStr = eTimeStr.getFullYear() + "-" + (eTimeStr.getMonth() + 1) + "-" + eTimeStr.getDate();
 		this.default.startTime = startTimeStr;
@@ -217,6 +216,9 @@ App.Services.System.ResourceAttrManagerTopbar=Backbone.View.extend({
 		  autoclose: true,
 		  format: 'yyyy-mm-dd',
 		  minView: 'month'
+		});
+		this.$(".dateBox .iconCal").on("click",function() {
+		    $(this).next().focus();
 		});
 		this.$('#dateStar').on('change',function(){
 		  _this.default.startTime=$(this).val();

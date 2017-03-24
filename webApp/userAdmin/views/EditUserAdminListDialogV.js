@@ -48,6 +48,7 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 				}
 				var dataArr = response.data;
 				var DialogProjectListV = new App.userAdmin.DialogProjectListV;
+				_this.$el.find(".dialogProjectList>.loading").css("display","none")
 				_this.$el.find(".dialogProjectList").append(DialogProjectListV.render(dataArr).el);
 				App.Comm.initScroll(_this.$(".dialogProjectList"), "y");
 			}

@@ -35,6 +35,7 @@ App.userAdmin.UserAdminListV = Backbone.View.extend({
 				if(response.code == 0){
 					_this.$el.html("");
 					_this.$el.html(_this.template({state:response.data.items}));
+					$(".loading").css("display","none");
 					var $content = $(".pagingBox");
 					var pageCount = response.data.totalItemCount;
 					$content.find(".sumDesc").html('共 ' + pageCount + ' 个用户');
