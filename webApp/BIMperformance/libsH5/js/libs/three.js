@@ -2347,6 +2347,18 @@ THREE.Vector3.prototype = {
 
 	},
 
+	setFromSpherical: function( s ) {
+
+		var sinPhiRadius = Math.sin( s.phi ) * s.radius;
+
+		this.x = sinPhiRadius * Math.sin( s.theta );
+		this.y = Math.cos( s.phi ) * s.radius;
+		this.z = sinPhiRadius * Math.cos( s.theta );
+
+		return this;
+
+	},
+
 	normalize: function () {
 
 		return this.divideScalar( this.length() );
@@ -14782,7 +14794,7 @@ THREE.ImageLoader.prototype = {
 
 		}
 
-		var image = document.createElement( 'img' );
+		var image = document.createElement( 'images' );
 
 		image.addEventListener( 'load', function ( event ) {
 
@@ -20316,7 +20328,7 @@ THREE.UniformsLib = {
 // File:src/renderers/shaders/ShaderLib.js
 
 /**
- * Webgl Shader Library for three.js
+ * Webgl Shader Library for three.modify.js
  *
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
@@ -22178,6 +22190,45 @@ THREE.WebGLRenderer = function ( parameters ) {
 					var size = geometryAttribute.itemSize;
 					var buffer = objects.getAttributeBuffer( geometryAttribute );
 
+					var type = _gl.FLOAT;
+					var array = geometryAttribute.array;
+					var normalized = geometryAttribute.normalized;
+
+					if ( array instanceof Float32Array ) {
+
+						type = _gl.FLOAT;
+
+					} else if ( array instanceof Float64Array ) {
+
+						console.warn( "Unsupported data buffer format: Float64Array" );
+
+					} else if ( array instanceof Uint16Array ) {
+
+						type = _gl.UNSIGNED_SHORT;
+
+					} else if ( array instanceof Int16Array ) {
+
+						type = _gl.SHORT;
+
+					} else if ( array instanceof Uint32Array ) {
+
+						type = _gl.UNSIGNED_INT;
+
+					} else if ( array instanceof Int32Array ) {
+
+						type = _gl.INT;
+
+					} else if ( array instanceof Int8Array ) {
+
+						type = _gl.BYTE;
+
+					} else if ( array instanceof Uint8Array ) {
+
+						type = _gl.UNSIGNED_BYTE;
+
+					}
+
+
 					if ( geometryAttribute instanceof THREE.InterleavedBufferAttribute ) {
 
 						var data = geometryAttribute.data;
@@ -22201,7 +22252,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, stride * data.array.BYTES_PER_ELEMENT, ( startIndex * stride + offset ) * data.array.BYTES_PER_ELEMENT );
+						_gl.vertexAttribPointer( programAttribute, size, type, false, stride * data.array.BYTES_PER_ELEMENT, ( startIndex * stride + offset ) * data.array.BYTES_PER_ELEMENT );
+
+						// _gl.vertexAttribPointer( programAttribute, size, type, false, 0, startIndex * size * array.BYTES_PER_ELEMENT ); // 4 bytes per Float32
 
 					} else {
 
@@ -22222,7 +22275,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
+						// _gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
+						_gl.vertexAttribPointer( programAttribute, size, type, false, 0, startIndex * size * array.BYTES_PER_ELEMENT ); // 4 bytes per Float32
 
 					}
 
@@ -24585,7 +24639,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	// Map three.js constants to WebGL constants
+	// Map three.modify.js constants to WebGL constants
 
 	function paramThreeToGL ( p ) {
 
@@ -25457,7 +25511,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	function update( object ) {
 
-		// TODO: Avoid updating twice (when using shadowMap). Maybe add frame counter.
+		// TODO: Avoid updating twice (when using shadowMap). Maybe add frame taskCounter.
 
 		var geometry = geometries.get( object );
 
@@ -28633,7 +28687,7 @@ THREE.ShapeUtils = {
 				verts = [],
 				vertIndices = [];
 
-			/* we want a counter-clockwise polygon in verts */
+			/* we want a taskCounter-clockwise polygon in verts */
 
 			var u, v, w;
 
@@ -28706,7 +28760,7 @@ THREE.ShapeUtils = {
 
 					nv --;
 
-					/* reset error detection counter */
+					/* reset error detection taskCounter */
 
 					count = 2 * nv;
 
@@ -31234,7 +31288,7 @@ THREE.CatmullRomCurve3 = ( function() {
 	 - http://ideone.com/NoEbVM
 
 	This CubicPoly class could be used for reusing some variables and calculations,
-	but for three.js curve use, it could be possible inlined and flatten into a single function call
+	but for three.modify.js curve use, it could be possible inlined and flatten into a single function call
 	which can be placed in CurveUtils.
 	*/
 
@@ -34120,7 +34174,7 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 	}
 
 
-	// Angle around the Y axis, counter-clockwise when looking from above.
+	// Angle around the Y axis, taskCounter-clockwise when looking from above.
 
 	function azimuth( vector ) {
 

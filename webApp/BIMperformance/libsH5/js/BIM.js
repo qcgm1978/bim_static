@@ -74,7 +74,7 @@
       _opt._dom.bimBox.append(_opt._dom.lockAxis,_opt._dom.isolation,modelBar);
       //_opt._dom.bimBox.append(modelBar);
       var viewer = new self.BIM(_opt);
-      viewer.disableLoD();
+      // viewer.disableLoD();
       return viewer;
     },
     familyModel: function(options) {
