@@ -8,6 +8,8 @@ App.Services.System.ResourceAttrManagerTopbar=Backbone.View.extend({
 		addDataObj:{},
 		startTime:"",
 		endTime:"",
+		maxUploadSize:(50*1024*1000),
+		zzsText:/^[0-9]*[0-9]*$/
 	},
 	tagName:'div',
 	className:"resourceTopbar",
@@ -20,9 +22,8 @@ App.Services.System.ResourceAttrManagerTopbar=Backbone.View.extend({
 	render(){//渲染
 		var template = _.templateUrl('/services/tpls/system/resource/resourceTopbar.html');
 		var startTime = new Date().setMonth(new Date().getMonth()-1);
-		var endTime = new Date().setMonth(new Date().getMonth()-1);
 		var sTimeStr = new Date(startTime);
-		var eTimeStr = new Date(endTime);
+		var eTimeStr = new Date();
 		var startTimeStr = sTimeStr.getFullYear() + "-" + (sTimeStr.getMonth() + 1) + "-" + sTimeStr.getDate();
 		var endTimeStr = eTimeStr.getFullYear() + "-" + (eTimeStr.getMonth() + 1) + "-" + eTimeStr.getDate();
 		this.default.startTime = startTimeStr;
@@ -58,6 +59,10 @@ App.Services.System.ResourceAttrManagerTopbar=Backbone.View.extend({
 					_self.afterUpload(data,_this);
 				})
 				inputSuggestFile.on("change",function(){//当上传那妞有变化执行的方法
+					if(this.files[0].size>_self.default.maxUploadSize){
+						alert("文件大小超过50M，请重新选择！");
+						return;
+					}					
 					var attachList = $(".attachList");
 					attachList.append('<li class="loading">正在上传，请稍候……</li>');
 					uploadSuggestForm.submit();
@@ -75,11 +80,14 @@ App.Services.System.ResourceAttrManagerTopbar=Backbone.View.extend({
 				
 				saveButton.on("click",function(){//点击确定保存
 					if(resourceType.val().trim() == ""){
-						alert("资源类型不能为空")
+						alert("资源类型不能为空");
 						return;
 					}
 					if(resourceNum.val().trim() == ""){
-						alert("资源编码不能为空")
+						alert("排序编码不能为空");
+						return;
+					}else if(!_self.default.zzsText.test(resourceNum.val().trim())){
+						alert("排序编码只能是正整数");
 						return;
 					}
 					_self.default.addDataObj.type = resourceType.val().trim();
@@ -217,6 +225,9 @@ App.Services.System.ResourceAttrManagerTopbar=Backbone.View.extend({
 		  autoclose: true,
 		  format: 'yyyy-mm-dd',
 		  minView: 'month'
+		});
+		this.$(".dateBox .iconCal").on("click",function() {
+		    $(this).next().focus();
 		});
 		this.$('#dateStar').on('change',function(){
 		  _this.default.startTime=$(this).val();

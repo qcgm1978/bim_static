@@ -29,6 +29,7 @@
 			.showDateBox{
 				margin-left: 30px;
 				float: left;
+				position: relative;
 				span.searchLabel{
 					width: 66px;
 				    display: inline-block;
@@ -45,11 +46,11 @@
 					border-left: 1px #ccc solid;
 				}
 				input{
+					width: 180px;
 					height: 30px;
 				    line-height: 30px;
 				    padding-left: 8px;
-				    broder: 1px #ddd solid;
-				    width: 180px;
+				    border:#ddd solid 1px;
 				    padding-right: 30px;
 				}
 				.btnSearch{
@@ -111,6 +112,7 @@
 			top: 40px;
 		    border: 1px #ccc solid;
 		    background-color: #eee;
+		    z-index: 10;
 		    td{
 		    	border-bottom:0;
 		    }
@@ -130,6 +132,9 @@
 						margin: 0;
 						padding: 0;
 					}
+				}
+				.mCS-minimal-dark.mCSB_scrollTools_vertical {
+					right: -20px;
 				}
 			}
 			.pagingBox{position: absolute;bottom: 0px;left:20px;right: 20px;line-height: 40px;

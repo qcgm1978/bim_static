@@ -204,7 +204,7 @@ App.Services.SystemCollection = {
 			start:'',
 			end:'',
 			pageIndex:App.Services.SystemCollection.Settings.pageIndexRG,
-			pageItemCount:5,
+			pageItemCount:15,
 		};
 		var extendData = $.extend({},defaultData,parmer);
 		App.Services.SystemCollection.ResourceGetCollection.reset();

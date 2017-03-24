@@ -38,7 +38,7 @@ App.Services.System=Backbone.View.extend({
 			$container.append(tabs.resourceAttribute.tab);
 		}
 
-		this.$(".serviceNav .item").eq(2).trigger("click");
+		this.$(".serviceNav .item").eq(0).trigger("click");
 
 		return this;
 	},

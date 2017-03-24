@@ -95,8 +95,8 @@ App.backStage.AddDepartmentV = Backbone.View.extend({
 					var zNodes= res.data || [];
 					zNodes.forEach(function(i){
 						i.iconSkin='business';
-						i.nameN = i.name;
 						i.name=i.name+'<i style="color:#999999;">（'+i.parentname+'）</i>';
+						i.nameN = i.name;
 						if(i.type == 1){
 							i.userId = i.id
 						}else{
@@ -306,7 +306,7 @@ App.backStage.AddDepartmentV = Backbone.View.extend({
 		for(var i=0,len=nodes.length-1;i<=len;i++){
 			var moveObj={};
 			moveObj.orgid=nodes[i].orgId;
-			moveObj.orgname=nodes[i].namePath||nodes[i].nameN;
+			moveObj.orgname=nodes[i].name||nodes[i].nameN;
 			moveObj.type=self.default.type;
 			moveObj.outersite=nodes[i].outer?1:0;
 			self.default.ajaxArr.push(moveObj);
