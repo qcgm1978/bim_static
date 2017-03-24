@@ -7,7 +7,7 @@ App.Services.System.ResourceAttrManagerContentList=Backbone.View.extend({
 	},
 	render(){//渲染
 		this.model.createTime = this.changeTimeHandle(this.model.createTime);
-		this.model.size = this.changeSizeHandle(this.model.size);
+		this.model.size = App.Comm.formatSize(this.model.size);
 		this.$el.html(this.template(this.model));
 		return this;
 	},
@@ -24,13 +24,4 @@ App.Services.System.ResourceAttrManagerContentList=Backbone.View.extend({
 		timeStr = timeStr.getFullYear() + "-" + (timeStr.getMonth() + 1) + "-" + timeStr.getDate() + " " + timeStr.getHours() + ":" + timeStr.getMinutes() + ":" + timeStr.getSeconds();
 		return timeStr;
 	},
-	changeSizeHandle(size){//字节转换
-		var sizeStr = "";
-		if(size>=1024){
-			sizeStr = (size/(1024*1024)).toFixed(2)+"M";
-		}else{
-			sizeStr = size+"KB"
-		}
-		return sizeStr;
-	}
 });
