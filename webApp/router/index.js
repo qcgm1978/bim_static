@@ -76,7 +76,18 @@ var AppRoute = Backbone.Router.extend({
 		if (this.reset() == false) {
 			return;
 		}
-		//this.reset();
+		var userType = App.Comm.getCookie("userType");
+		if(userType!=undefined)
+		{
+			if(userType=="innerNet")
+			{
+				$("#btn_modifyPassword").attr("href","http://sso.wanda.cn/passwordupdate.aspx");
+			}
+			else
+			{
+				$("#btn_modifyPassword").attr("href","https://vendor.wanda.cn/sso/ChangePassword.aspx");
+			}
+		}
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".bodyConMenu").addClass('selected');
 		_.require('/static/dist/bodyContent/bodyContent.css');
 		_.require('/static/dist/bodyContent/bodyContent.js');
@@ -593,6 +604,7 @@ window.Global = {
 		var $userinfo = $(".userinfo");
 		$userinfo.find("img").css("display","none");
 		$userinfo.find(".info").css("width","200px");
+		$("#btn_modifyPassword").css("display","none");
 		$("#uiPosition").html("");
 		$("#uiPartment").html("演示用户组");
 		
