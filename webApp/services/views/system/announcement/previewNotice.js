@@ -3,7 +3,12 @@ App.Services.PreviewNotice=Backbone.View.extend({
 	className:"previewNoticeBox",
 	render(noticeId){
 		this.$el.html(new App.Services.previewNoticeTopBar().render().el);
-		this.getNoticeData(noticeId);//获取当前公告的信息方法
+		if(noticeId == "noticeNoSavePreview"){
+			var noticeId = localStorage.getItem(noticeId);
+			this.$el.append(new App.Services.previewNoticeContent({model:{data:JSON.parse(noticeId)}}).render().el);
+		}else{
+			this.getNoticeData(noticeId);//获取当前公告的信息方法
+		}
 		return this;
 	},
 	getNoticeData(noticeId){//获取当前公告的信息方法
