@@ -231,6 +231,16 @@ var Login = {
 			Login.setCookie('userId', data.data.userId);
 			Login.setCookie('isOuter', data.data.outer);
 
+			//判断用户是外网用户还是内网用户
+			if(data.data.outer)
+			{
+				Login.setCookie("userType","outerNet");
+			}
+			else
+			{
+				Login.setCookie("userType","innerNet");
+			}
+			
 			//记住我
 			if ($(".loginDialog .remember").hasClass("selected")) {
 				Login.rememberMe();

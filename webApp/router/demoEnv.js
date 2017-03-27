@@ -46,6 +46,7 @@ window.Global = {
 		var $userinfo = $(".userinfo");
 		$userinfo.find("img").css("display","none");
 		$userinfo.find(".info").css("width","200px");
+		$("#btn_modifyPassword").css("display","none");
 		$("#uiPosition").html("");
 		$("#uiPartment").html("演示用户组");
 		
