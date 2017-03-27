@@ -16699,8 +16699,9 @@ CLOUD.Model.prototype.loadMpk = function (mpkId, callback) {
     //var mpkCount = this.mpkCount;
     this.meshLoader.load(this.mpkUrl(mpkId), function (data) {
         if(scope.userWorker) {
-            //var worker = new Worker(CLOUD.GlobalData.MpkWorkerUrl); //注释 by wuweiwei 2017/3/24
-            var worker = new Worker("http://bim.wanda-dev.cn/static/dist/BIMperformance/mpkWorker2.min.js");
+            console.log(CLOUD.GlobalData.MpkWorkerUrl);
+            var worker = new Worker(CLOUD.GlobalData.MpkWorkerUrl);
+            //var worker = new Worker("http://bim.wanda-dev.cn/static/dist/BIMperformance/mpkWorker2.min.js");
             worker.onmessage = function( event ) {
                 //var mpkReader = event.data[0];
                 //if (mpkReader.header.blockId < mpkCount) {

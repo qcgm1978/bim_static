@@ -61,9 +61,9 @@
       var url,
         host = window.location.host;
       if (host == "bim.wanda-dev.cn" || host == "bim-uat.wanda-dev.cn" || host == "bim.wanda.cn") {
-        url = "/static/dist/js/mpkWorker.min.js";
+        url = "/static/dist/js/mpkWorker2.min.js";
       } else {
-        url = "http://bim.wanda.cn/static/dist/js/mpkWorker.min.js";
+        url = "http://bim.wanda.cn/static/dist/js/mpkWorker2.min.js";
       } 
 
       // //外部引用
@@ -85,7 +85,8 @@
         var workerJSBlob = new Blob([data], {
           type: "text/javascript"
         });
-        CLOUD.GlobalData.MpkWorkerUrl = window.URL.createObjectURL(workerJSBlob);
+        //CLOUD.GlobalData.MpkWorkerUrl = window.URL.createObjectURL(workerJSBlob);
+        CLOUD.GlobalData.MpkWorkerUrl = url;
       }).fail(function() {
         console.log("get error " + url);
       });
