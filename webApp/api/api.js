@@ -369,6 +369,9 @@ App.API = {
 		searchResourceTypeList:"platform/related/resources/listType",//资源类型查询列表的接口
 		downloadResource:"platform/related/resources/download/{id}",//资源类型下载的接口
 
+		getFeedBackList:"platform/advice/feedback/query/page",//获取建议反馈列表的接口
+		getFeedBackInfo:"platform/advice/feedback/query/page",//获取建议反馈列表的接口
+
 	},
 
 	DEBUGURL: {

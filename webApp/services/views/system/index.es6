@@ -38,7 +38,7 @@ App.Services.System=Backbone.View.extend({
 			$container.append(tabs.resourceAttribute.tab);
 		}
 
-		this.$(".serviceNav .item").eq(0).trigger("click");
+		this.$(".serviceNav .item").eq(3).trigger("click");
 
 		return this;
 	},
@@ -62,7 +62,7 @@ App.Services.System=Backbone.View.extend({
 			viewer=new App.Services.NoticeAttrManager();
 		}else if (type=="feedback") {
 			//反馈
-			viewer=new App.Services.System.FeedbackAttrManager();
+			viewer=new App.Services.System.FeedBackAttrManager();
 		}else if (type=="resource") {
 			//资源
 			viewer=new App.Services.System.ResourceAttrManager();

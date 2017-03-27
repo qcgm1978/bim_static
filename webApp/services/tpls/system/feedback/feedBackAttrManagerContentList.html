@@ -1,0 +1,18 @@
+<% if(havaAttachment){%>
+<td data-feedbackid="<%= id%>" data-createid="<%= createId%>" data-loginname="<%= loginName%>" data-createname="<%= createName%>"><a href="javascript:;">下载</a></td>
+<td class="feedBackTd">
+    <p>建议内容：<%=title%></p>
+    <p class="feedBackContentText">回复内容：<%=content%> <%=createTime%></p>
+</td>
+<%}else{%>
+<td></td>
+<td><%=title%></td>
+<%} %>
+<td><%=createName%></td>
+<td><%=createTime%></td>
+<% if(haveReply){%>
+<td>已回复</td>
+<%}else{%>
+<td>未回复</td>
+<%}%>
+<td><a href="javascript:;" class="answerBtn" data-feedbackid="<%= id%>" data-createid="<%= createId %>" data-loginname="<%= loginName%>" data-createname="<%= createName%>">回复</a></td>
