@@ -3,6 +3,7 @@ App.Services.SystemCollection = {
 		pageIndex:1,
 		pageIndexR:1,
 		pageIndexRG:1,
+		pageIndexFeedBack:1,
 		pageItemCount:24
 	},
 	//分类列表
@@ -58,6 +59,23 @@ App.Services.SystemCollection = {
 				}
                  return response.data;
              }
+		}
+	})),
+	FeedBackCollection:new(Backbone.Collection.extend({
+		model:Backbone.Model.extend({
+			defaults:function(){
+				return {
+					items:[{
+						name:''
+					}]
+				}
+			}
+		}),
+		urlType:"getFeedBackList",
+		parse(response){
+			if(response.code == 0){
+				return response.data.items;
+			}
 		}
 	})),
 	ResourceCollection:new(Backbone.Collection.extend({
@@ -248,6 +266,47 @@ App.Services.SystemCollection = {
 			data:extendData,
 			success:function(collection, response, options){
 				$(".content").find(".loading").remove();
+				return response.data;
+			}
+		})
+	},
+	getFeedBackListHandle(parmer){//获取建议反馈列表的方法
+		var self = this;
+		var defaultData = {
+			query:'all',
+			content:'',
+			createName:'',
+			opTimeStart:'',
+			opTimeEnd:'',
+			have_reply:false,
+			pageIndex:App.Services.SystemCollection.Settings.pageIndexFeedBack,
+			pageItemCount:15,
+		};
+		var extendData = $.extend({},defaultData,parmer);
+		App.Services.SystemCollection.FeedBackCollection.reset();
+		App.Services.SystemCollection.FeedBackCollection.fetch({
+			data:JSON.stringify(extendData),
+			type:"POST",
+			contentType:"application/json",
+			success:function(collection, response, options){
+				$(".feedBackList").find(".loading").remove();
+				var $content = $(".feedBackContentDown");
+				var pageCount = response.data.totalItemCount;
+				$content.find(".sumDesc").html('共 ' + pageCount + ' 个资源');
+				$content.find(".listPagination").empty().pagination(pageCount, {
+				    items_per_page: response.data.pageItemCount,
+				    current_page: response.data.pageIndex - 1,
+				    num_edge_entries: 3, //边缘页数
+				    num_display_entries: 5, //主体页数
+				    link_to: 'javascript:void(0);',
+				    itemCallback: function(pageIndex) {
+				        //加载数据
+				        App.Services.SystemCollection.Settings.pageIndexFeedBack = pageIndex + 1;
+				        App.Services.SystemCollection.getFeedBackListHandle();
+				    },
+				    prev_text: "上一页",
+				    next_text: "下一页"
+				});
 				return response.data;
 			}
 		})
