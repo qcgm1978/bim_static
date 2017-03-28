@@ -298,22 +298,13 @@ var Login = {
 
 	isSSO : function(cooks){
 		var bool;
-		var OUTSSO_AuthNum   = Login.getCookie("OUTSSO_AuthNum",cooks);
-		var isOuter   = Login.getCookie("isOuter",cooks);
 
-		var AuthUser_LoginId = Login.getCookie("AuthUser_LoginId",cooks);
 		var AuthUser_AuthNum = Login.getCookie("AuthUser_AuthNum",cooks);
 		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken",cooks);
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC",cooks);
 		var AuthUser_Signature = Login.getCookie("AuthUser_Signature",cooks);
-		var AuthUser_LoginId = Login.getCookie("AuthUser_LoginId",cooks);
 
-		console.log("AuthUser_AuthNum:",AuthUser_AuthNum);
-		console.log("AuthUser_AuthToken:",AuthUser_AuthToken);
-		console.log("AuthUser_AuthMAC:",AuthUser_AuthMAC);
-		console.log("AuthUser_Signature:",AuthUser_Signature);
-		
-		try
+		//try
 		{
 			bool = AuthUser_AuthNum.length>5 && AuthUser_AuthToken.length>5 && AuthUser_AuthMAC.length>5 && AuthUser_Signature.length>5;
 			if(AuthUser_AuthToken == undefined)
@@ -326,6 +317,7 @@ var Login = {
 			}
 			if(bool)
 			{
+				Login.checkSSO(cooks);
 				return true;
 			}
 			else
@@ -333,7 +325,7 @@ var Login = {
 				return false;
 			}
 		}
-		catch(e)
+		//catch(e)
 		{
 			return false;
 		}
