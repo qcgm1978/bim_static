@@ -371,6 +371,7 @@ App.API = {
 
 		getFeedBackList:"platform/advice/feedback/query/page",//获取建议反馈列表的接口
 		getFeedBackInfo:"platform/advice/feedback/query/page",//获取建议反馈列表的接口
+		deleteFeedBack:"platform/advice/feedback/reply/delete",//删除建议反馈列表的接口
 
 	},
 

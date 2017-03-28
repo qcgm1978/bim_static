@@ -181,27 +181,65 @@
 	.feedBackTr{
 		border-top: #ccc solid 1px;
 	}
-	.dialogFooter{
-		width: 100%;
-		height: 35px;
-		font-size: 12px;
-		float: left;
+	.dialogFooterButton{
 		text-align: right;
-		border-top: 1px solid #ccc;
-		margin-top: 16px;
-		padding-top: 22px;
 		button{
-			width: 80px;
-		    height: 30px;
-		    line-height: 28px;
+		    background-color: #117EE1;
 		    display: inline-block;
+		    width: 80px;
+		    height: 30px;
+		    text-align: center;
+		    line-height: 30px;
 		    color: #fff;
-    		background-color: #208aee;
-    		border: 0;
-    		text-align: center;
-    		&:hover{
-    			background-color: #51a6f2;
-    		}
+		    box-sizing: border-box;
+		    cursor: pointer;
+		    border: 0;
+		}
+	    button.disabled{
+		    background: #eee;
+		    color: #ccc;
+		    border-color: #ccc;
+		    cursor: default;
+		    border: #ccc solid 1px;
+		    outline: none;
+		}
+	}
+}
+.attachList{
+	div{
+		a{
+			line-height: 24px;
+			display: inline-block;
+		}
+	}
+}
+.feedBackDl{
+	width: 100%;
+	height: 48px;
+	position: relative;
+	dt,dd{
+		height: 24px;
+		line-height: 24px;
+		span{
+			display: inline-block;
+			font-size: 14px;
+			&:nth-child(2){
+				float: right;
+			}
+		}
+		font-size: 14px;
+	}
+	a{
+		display: inline-block;
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		font-size: 14px;
+		display: none;
+	}
+	&:hover{
+		a{
+			display: inline-block;
 		}
 	}
 }
