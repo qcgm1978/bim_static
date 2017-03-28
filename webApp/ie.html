@@ -226,9 +226,13 @@
     try
     {
         var cookies =  document.cookie;
-        cookies = cookies.replace(/"/g,"");
+        if(cookies.indexOf('"')>0)
+        {
+            cookies = cookies.replace(/"/g,"");
+        }
         //myWebView.runScript('Login.isSSO(' + document.cookie + ')', function(result) {});
         myWebView.runScript('Login.isSSO("'+cookies+'")', function(result) {});
+        //myWebView.runScript('Login.isSSO("'+cookies+'")', function(result) {});
     }
     catch(e)
     {}
