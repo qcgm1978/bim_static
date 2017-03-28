@@ -348,12 +348,7 @@ var Login = {
 	//OUTSSO_AuthNum为空; AuthUser_AuthNum,AuthUser_AuthToken,AuthUser_AuthMAC有值; wd_sso_user不为空
 	checkSSO : function(cooks){
 		var url = "/platform/login/inner";
-		alert("into checkSSO");
 		var SSO = Login.getSSO(cooks);
-		alert(SSO.AuthUser_AuthNum);
-		alert(SSO.AuthUser_AuthToken);
-		alert(SSO.AuthUser_AuthMAC);
-
 		$.ajax({
 			url:url,
 			type :"post",
