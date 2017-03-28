@@ -304,9 +304,15 @@ var Login = {
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC",cooks);
 		var AuthUser_Signature = Login.getCookie("AuthUser_Signature",cooks);
 
+		alert("AuthUser_AuthNum:",AuthUser_AuthNum);
+		alert("AuthUser_AuthToken:",AuthUser_AuthToken);
+		alert("AuthUser_AuthMAC:",AuthUser_AuthMAC);
+		alert("AuthUser_Signature:",AuthUser_Signature);
+
 		//try
 		{
 			bool = AuthUser_AuthNum.length>5 && AuthUser_AuthToken.length>5 && AuthUser_AuthMAC.length>5 && AuthUser_Signature.length>5;
+			alert("bool:"+bool);
 			if(AuthUser_AuthToken == undefined)
 			{
 				return false;
@@ -336,11 +342,6 @@ var Login = {
 		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken",cooks);
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC",cooks);
 
-		Login.delCook("AuthUser_loginId");
-		Login.delCook("AuthUser_loginInfo");
-		Login.delCook("AuthUser_Signature");
-		Login.delCook("wd_sso_user");
-
 		return {
 		"AuthUser_AuthNum":AuthUser_AuthNum,
 		"AuthUser_AuthToken":AuthUser_AuthToken,
@@ -353,7 +354,12 @@ var Login = {
 	//OUTSSO_AuthNum为空; AuthUser_AuthNum,AuthUser_AuthToken,AuthUser_AuthMAC有值; wd_sso_user不为空
 	checkSSO : function(cooks){
 		var url = "/platform/login/inner";
+		alert("into checkSSO");
 		var SSO = Login.getSSO(cooks);
+		alert(SSO.AuthUser_AuthNum);
+		alert(SSO.AuthUser_AuthToken);
+		alert(SSO.AuthUser_AuthMAC);
+
 		$.ajax({
 			url:url,
 			type :"post",
@@ -368,7 +374,7 @@ var Login = {
 					for (var p in obj) 
 					{
 						Login.setCookie(p, obj[p]);
-					}				
+					}			
 					Login.getUserInfo();
 				}
 			}
