@@ -8,7 +8,6 @@ App.Services.System.FeedBackAttrManagerContentList=Backbone.View.extend({
 	render(){//渲染
 		this.model.createTime = this.changeTimeHandle(this.model.createTime);
 		this.model.size = App.Comm.formatSize(this.model.size);
-		console.log(this.model);
 		this.$el.html(this.template(this.model));
 		return this;
 	},
@@ -19,36 +18,14 @@ App.Services.System.FeedBackAttrManagerContentList=Backbone.View.extend({
 	},
 	answerBtnHandle(event){
 		var target = $(event.target);
-		var answerObj = {}
-		answerObj.feedbackid = target.data("feedbackid");
-		answerObj.createid = target.data("createid");
-		answerObj.loginname = target.data("loginname");
-		answerObj.createname = target.data("createname");
-		var getFeedBackInfo = {
-			id:target.data("feedbackid")
-		}
-		var dialogHtml = _.templateUrl("/services/tpls/system/feedBack/feedBackAttrManagerDialog.html",true);
-		var feedBackDialog = new App.Comm.modules.Dialog({
+		var FeedBackAttrManagerContentDialog = new App.Services.System.FeedBackAttrManagerContentDialog(target.data("feedbackid"));
+		App.Services.System.FeedBackDialog = new App.Comm.modules.Dialog({
 			title: "建议反馈",
 			width: 600,
 			height: 600,
 			isConfirm: false,
 			isAlert: false,
-			message: dialogHtml,
-			readyFn:function(){
-				App.Comm.ajax({
-					URLtype:"getFeedBackInfo",
-					data:JSON.stringify(getFeedBackInfo),
-					type:'POST',
-					contentType:"application/json",
-				}).done(function(res){
-					if(res.code == 0){
-						console.log(res);
-					}else{
-						alert(res.message)
-					}
-				})
-			}
+			message: FeedBackAttrManagerContentDialog.render().el,
 		})
 	}
 });
