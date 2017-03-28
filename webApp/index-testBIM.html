@@ -8,164 +8,18 @@
     <META HTTP-EQUIV="Cache-Control" CONTENT="no-store, must-revalidate">
     <META HTTP-EQUIV="expires" CONTENT="Wed, 26 Feb 1997 08:21:57 GMT">
     <META HTTP-EQUIV="expires" CONTENT="0">
-    <title>BIM总发包管理平台</title>
-    <link rel="styleSheet" href="./libs/jquery/jquery.mCustomScrollbar.css"/>
-    <script type="text/javascript">
-        var App = {};
-        //缓存全局属性
-        App.Global = {
-            module: null
-        };
-        App.modules = {};
-        App.pkg = {};
-        App.time = +new Date();
-    </script>
-    
-    <script>
-        document.write('<link rel="styleSheet" href="/static/dist/comm/comm_20160313.css?t='+App.time+'"/>')
-    </script>
-    <link rel="styleSheet" href="./libsH5/css/modelStyle.less"/>
-    <!--<link rel="styleSheet" href="./comm/css/treeView.less"/>-->
-    <link rel="styleSheet" href="./topNav/css/topNav.less"/>
-    <link rel="stylesheet" href="./bodyContent/css/bottomBar.less"/>
-    <link href="../../../favico.ico" rel="shortcut icon"/>
+    <title>测试SSO</title>
+
 </head>
 <body>
-<div id="topBar">
-    <ul class="navHeader">
-        <li class="item bodyConMenu"><a href="#bodyContent">首页</a></li>
-        <!--  <li class="item todo"> <a href="#todo">待办</a></li> -->
-        <li class="item projects"><a href="#projects">图纸模型</a></li>
-        <li class="item flow"><a href="#flow">业务流程</a></li>
-        <li class="item resources"><a href="#resources">基础资源</a></li>
-        <li class="item services"><a href="#services">在线服务</a></li>
-        <li class="user">
-            <img class="userBg hoverClass" src="/topNav/images/user.png">
-            <span class="hoverClass">您好，</span> 
-            <span id="loginName" class="userName hoverClass"></span>&nbsp;
-            <i class="icon-angle-down hoverClass"></i>
-        </li>
-        <!--<li class="imbox"><a href="#inbox" target="_blank"><i></i><span id='messageCount'></span></a></li>-->
-        <li class="menuNav">
-            <i class="image-online-more hoverClass"></i>
-            <span class="edgeNum count"><span class="messageCounter">0</span></span>
-        </li>
-    </ul>
-    <div class="logo"><span class="text"></span></div>
-</div>
-<div id="contains"></div>
-<div id="pageLoading"></div>
-<div id="dataLoading"></div>
-<div id="modalWrapper"></div>
-<div class="userinfo">
-    <div class="conatiner">
-        <img id="uiLogo" src="" width="64px" height="85px">
-        <div class="info">
-            <table>
-                <tr>
-                    <td class="labelName">账号：</td>
-                    <td id="uiAccount" class="overflowEllipsis" style="max-width: 100px;"></td>
-                </tr>
-                <tr>
-                    <td class="labelName">职务：</td>
-                    <td id="uiPosition"></td>
-                </tr>
-                <tr>
-                    <td class="labelName">部门：</td>
-                    <td id="uiPartment"></td>
-                </tr>
-            </table>
-        </div>
-    </div>
-    <div class="tool">
-        <a href="#/logout">退出</a>
-    </div>
-</div>
-<div class="onlineNav">
-    <ul>
-        <li>
-            <i class="osIcon pic_6"></i>
-            <span>
-                <a href="#inbox" target="_blank">我的消息(<span class='messageCounter'></span>)</a>
-            </span>
-        </li>
-        <li class="split">
-            <div></div>
-        </li>
-        <li id="indexSuggestItem">
-            <i class="osIcon pic_3"></i>
-            <span>建议反馈
-            </span>
-        </li>
-        <li>
-            <i class="osIcon pic_10"></i>
-            <span><a href="http://lms.wanda.cn/jsp/wandabim/bim.jsp" target="_blank">在线培训</a></span>
-        </li>
-        <li class="split">
-            <div></div>
-        </li>
-        <li id="auth-auth">
-            <i class="osIcon pic_4"></i>
-            <span>
-                <a href="#services/auth" target="_blank">
-                    <div class="text">权限管理</div>
-                </a>
-            </span>
-        </li>
-        <li id="auth-project">
-            <i class="osIcon pic_10"></i>
-            <span>
-                 <a href="#services/project" target="_blank">
-                     <div class="text">项目管理 </div>
-                 </a>
-            </span>
-        </li>
-        <li id="auth-app">
-            <i class="osIcon pic_11"></i>
-            <span>
-                 <a href="#services/application" target="_blank">
-                     <div class="text">应用管理 </div>
-                 </a>
-            </span>
-        </li>
-        <li id="auth-sys">
-            <i class="osIcon pic_8"></i>
-            <span>
-                <a href="#services/system" target="_blank">
-                    <div class="text">系统管理 </div>
-                </a>
-            </span>
-        </li>
-        <li id="auth-log">
-            <i class="osIcon pic_5"></i>
-            <span>
-                <a href="#services/log" target="_blank">
-                    <div class="text">日志管理 </div>
-                </a>
-            </span>
-        </li>
-    </ul>
-</div>
-<!--<script type="text/javascript">-->
-    <!--var App = {};-->
-    <!--//缓存全局属性-->
-    <!--App.Global = {-->
-        <!--module: null-->
-    <!--};-->
-    <!--App.modules = {};-->
-    <!--App.pkg = {};-->
-    <!--App.time = Math.round(Math.random() * 9999);-->
 
-<!--</script>-->
-<script type="text/javascript" src="./libs/underscore.1.8.2.js"></script>
-<script type="text/javascript" src="./api/api.js"></script>
+<script type="text/javascript" src="/login/js/login.es6"></script>
 <script>
-    document.write('<script src="/static/dist/comm/comm_20160313.js?t='+App.time+'"><'+'/script>')
+Login.setCookie("AuthUser_AuthNum",'"qqqqqqqqqqqqqqqqqqqqqqqqq"');
+Login.setCookie("AuthUser_AuthToken",'"qqqqqqqqqqqqqqqqqqqqqqqqq"');
+Login.setCookie("AuthUser_AuthMAC","qqqqqqqqqqqqqqqqqqqqqqqqq");
 </script>
-<!--<script type="text/javascript" src="/static/dist/comm/comm_20160313.js?t=123"></script>-->
-<script type="text/javascript" src="./topNav/js/topNav.es6"></script>
-<script type="text/javascript" src="./commH5/pluging/clipboard/clipboard.js"></script>
-<script type="text/javascript" src="./router/index.js"></script>
+
 
 </body>
 </html>

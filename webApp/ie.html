@@ -225,16 +225,10 @@
     //SSO登录
     try
     {
-        myWebView.runScript('Login.isSSO("' + document.cookie + '")', function(result) {
-            /*
-            if(result)
-            {
-                myWebView.runScript('Login.checkSSO("' + document.cookie + '")', function(result) {
-
-                });
-            }
-            */
-        });
+        var cookies =  document.cookie;
+        cookies = cookies.replace(/"/g,"");
+        //myWebView.runScript('Login.isSSO(' + document.cookie + ')', function(result) {});
+        myWebView.runScript('Login.isSSO("'+cookies+'")', function(result) {});
     }
     catch(e)
     {}

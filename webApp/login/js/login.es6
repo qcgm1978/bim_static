@@ -43,15 +43,12 @@ var Login = {
 			len = items.length,
 			str, pos;
 
-
 		for (var i = 0; i < len; i++) {
 
 			str = items[i];
 			pos = str.indexOf('=');
 
 			name = str.substring(0, pos);
-
-
 
 			if (name == key) {
 				result = str.substring(pos + 1);
@@ -298,21 +295,18 @@ var Login = {
 
 	isSSO : function(cooks){
 		var bool;
-		alert(cooks);
+
 		var AuthUser_AuthNum = Login.getCookie("AuthUser_AuthNum",cooks);
 		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken",cooks);
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC",cooks);
 		var AuthUser_Signature = Login.getCookie("AuthUser_Signature",cooks);
 
-		alert("AuthUser_AuthNum:",AuthUser_AuthNum);
-		alert("AuthUser_AuthToken:",AuthUser_AuthToken);
-		alert("AuthUser_AuthMAC:",AuthUser_AuthMAC);
-		alert("AuthUser_Signature:",AuthUser_Signature);
+		//alert("AuthUser_AuthNum:"+AuthUser_AuthNum);
 
 		//try
 		{
 			bool = AuthUser_AuthNum.length>5 && AuthUser_AuthToken.length>5 && AuthUser_AuthMAC.length>5 && AuthUser_Signature.length>5;
-			alert("bool:"+bool);
+
 			if(AuthUser_AuthToken == undefined)
 			{
 				return false;
