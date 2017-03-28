@@ -298,7 +298,7 @@ var Login = {
 
 	isSSO : function(cooks){
 		var bool;
-
+		alert(cooks);
 		var AuthUser_AuthNum = Login.getCookie("AuthUser_AuthNum",cooks);
 		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken",cooks);
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC",cooks);
