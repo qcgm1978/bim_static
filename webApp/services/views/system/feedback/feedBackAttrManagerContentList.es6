@@ -2,6 +2,7 @@ App.Services.System.FeedBackAttrManagerContentList=Backbone.View.extend({
 	tagName:'tr',
 	template:_.templateUrl("/services/tpls/system/feedBack/feedBackAttrManagerContentList.html"),
 	events:{
+		"click .downLoadId":"downLoadIdHandle",
 		"click .feedBackTd":"answerBtnHandle",
 		"click .answerBtn":"answerBtnHandle"
 	},
@@ -27,5 +28,16 @@ App.Services.System.FeedBackAttrManagerContentList=Backbone.View.extend({
 			isAlert: false,
 			message: FeedBackAttrManagerContentDialog.render().el,
 		})
+	},
+	downLoadIdHandle(event){
+		var target = $(event.target);
+		var downloadid = target.data("downloadid");
+		var downloadDataObj = {
+			URLtype:"downloadsFeedBack",
+			data: {
+				adviceId: downloadid,
+			}
+		}
+		window.location.href = App.Comm.getUrlByType(downloadDataObj).url;
 	}
 });

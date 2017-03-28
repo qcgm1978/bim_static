@@ -1,7 +1,18 @@
-<% _.each(data,function(item){%>
-<li>
-	<span class="title" onclick="App.Suggest.show(this);" data-id="<%=item.id%>"><%=item.title%></span>
-	<span class="user"><%=item.createName%></span>
-	<span class="time"><%= item.createTime?new Date(item.createTime).format("yyyy-MM-dd hh:mm:ss"):'--' %></span>
-</li>
-<% }) %>
+<tr>
+	<td>
+		<dl>
+			<dt>我的建议：</dt>
+			<dd data-id="<%=data.id%>" onclick="App.Suggest.show(this);"><%= data.content%></dd>
+		</dl>
+		<dl>
+			<dt>回复内容：</dt>
+			<dd><%= data.adviceReplys[0].content%></dd>
+		</dl>
+	</td>
+	<td><%= data.createTime?new Date(data.createTime).format("yyyy-MM-dd"):'--' %></td>
+	<td>
+		<%if(data.havaAttachment){%>
+			<span class="downLoad" data-downloadid="<%= data.id%>"></span>
+		<%}%>
+	</td>
+</tr>

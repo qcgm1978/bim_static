@@ -1,5 +1,5 @@
 <% if(havaAttachment){%>
-<td data-feedbackid="<%= id%>" data-createid="<%= createId%>" data-loginname="<%= loginName%>" data-createname="<%= createName%>"><a href="javascript:;">下载</a></td>
+<td><a href="javascript:;" class="downLoadId" data-downloadid="<%= id%>"></a></td>
 <td class="feedBackTd">
     <p>建议内容：<%=title%></p>
     <p class="feedBackContentText">回复内容：<%=content%> <%=createTime%></p>

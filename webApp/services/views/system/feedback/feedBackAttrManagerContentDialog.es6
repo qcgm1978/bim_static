@@ -2,6 +2,7 @@ App.Services.System.FeedBackAttrManagerContentDialog=Backbone.View.extend({
 	tagName:'div',
 	className:"feedBackDialog suggestView",
 	events:{
+		"click #saveButton":"addFeedBack",
 		"click .feedBackDl a":"deleteFeedBack"
 	},
 	render(){//渲染
@@ -19,7 +20,6 @@ App.Services.System.FeedBackAttrManagerContentDialog=Backbone.View.extend({
 			contentType:"application/json",
 		}).done(function(res){
 			if(res.code == 0){
-				var saveButton = $("#saveButton");
 				var dialogHtml = _.templateUrl("/services/tpls/system/feedBack/feedBackAttrManagerDialog.html");
 				_this.$el.html(dialogHtml(res.data.items[0]));
 			}else{
@@ -27,54 +27,50 @@ App.Services.System.FeedBackAttrManagerContentDialog=Backbone.View.extend({
 			}
 		})
 	},
+	addFeedBack(event){//添加回复
+		var target = $(event.target);
+		var feedBackDesc = $("#feedBackDesc").val();
+		var addDataObj = {
+			"adviceId": target.data("adviceid"),  
+		    "content": feedBackDesc,
+		    "replyId": target.data("createid"),
+		    "loginName":target.data("loginname"),
+		    "replyName": target.data("createname")
+		}
+		if(!target.hasClass("disabled")){
+			App.Comm.ajax({
+				URLtype:"addFeedBack",
+				data:JSON.stringify(addDataObj),
+				type:'POST',
+				contentType:"application/json",
+			}).done(function(res){
+				if(res.code == 0){
+					App.Services.System.FeedBackDialog.close();
+				}else{
+					alert(res.message)
+				}
+			})
+		}
+	},
 	deleteFeedBack(event){//删除当前回复
 		var target = $(event.target);
 		var adviceId = target.data('adviceid');
-		var deleteId = target.data('id');
+		var replytId = target.data('id');
 		App.Comm.ajax({
 			URLtype: "deleteFeedBack",
 			type: "DELETE",
-			data:JSON.stringify({
+			data:{
 				adviceId:adviceId,
-				attachmentId:deleteId
-			}),
+				replytId:replytId
+			},
 		}).done(function(res){
 			if(res.code == 0){
 				if(res.code == 0){
-					console.log(res)
+					App.Services.System.FeedBackDialog.close();
 				}else{
 					alert(res.message)
 				}
 			}
 		})
-		// var dialogDeleteHtml = _.templateUrl('/services/tpls/system/feedBack/feedBackDeleteDialog.html',true);
-		// var dialog = new App.Comm.modules.Dialog({
-		// 	width: 300,
-		// 	height: 180,
-		// 	isConfirm: false,
-		// 	isAlert: false,
-		// 	message: dialogDeleteHtml,
-		// 	readyFn:function(){
-		// 		$("#saveButton").on("click",function(){
-		// 			debugger;
-		// 			App.Comm.ajax({
-		// 				URLtype: "deleteFeedBack",
-		// 				type: "DELETE",
-		// 				data:JSON.stringify({
-		// 					adviceId:adviceId,
-		// 					attachmentId:deleteId
-		// 				}),
-		// 			}).done(function(res){
-		// 				if(res.code == 0){
-		// 					if(res.code == 0){
-		// 						console.log(res)
-		// 					}else{
-		// 						alert(res.message)
-		// 					}
-		// 				}
-		// 			})
-		// 		})
-		// 	}
-		// })
 	}
 });

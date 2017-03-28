@@ -6,84 +6,263 @@
 		}
 	}
 }
-& #imboxContent { height: 100%; padding-bottom: 40px;
-	& .suggestTitle{
+#imboxContent { 
+	height: 100%;
+	width: 100%;
+	position: relative;
+	.suggestTitle{
 		height: 38px;
 		width: 100%;
 		background: #eee;
 		line-height: 38px;
 		border-bottom:1px solid #ccc;
-		& span{
+		padding:0 20px;
+		position: absolute;
+		z-index: 10;
+		left: 0;
+		top: 0;
+		span{
 			font-size: 14px;
 			font-family: "Microsoft YaHei";
 			color: #888;
-			margin-left: 20px;
 		}
 	}
-
-
-
-	& .commissionLists { position: static; left: 0; right: 0; bottom: 80px; top: 130px; border-bottom: none; }
-
-	& li { height: 40px; line-height: 40px; margin: 0 20px; border-bottom: 1px solid #ccc; box-sizing: border-box; font-size: 14px;
-		.title { width: 48%; display: inline-block;
-			color:#3F8CDF;
-			font-family: "Microsoft YaHei";
-			font-size: 12px;
-			&:hover{
-				text-decoration: underline;
-				cursor: pointer;
+	.commissionBox{
+		width: 100%;
+		height: 100%;
+		position: relative;
+		padding: 48px 20px 0 20px;
+		.listBoxFeedBox{
+			width: 100%;
+			height: 100%;
+			position: relative;
+			table{
+				width: 100%;
+				td{
+					height: 32px;
+					line-height: 32px;
+					padding-left: 8px;
+				}
+				td:nth-child(1){
+					width: 80%;
+				}
+				td:nth-child(2){
+					width: 10%;
+				}
+				td:nth-child(3){
+					width: 10%;
+				}
 			}
-			&.ulHeader{
-				color:#999999;
+			.listBoxFeedBoxTop{
+				width: 100%;
+				height: 32px;
+				border-bottom: #ccc solid 1px;
+				position: absolute;
+				left: 0;
+				top: 0;
+				z-index: 11;
 			}
-
-		}
-		.user.ulHeader{
-			font-family: "Microsoft YaHei";
-			color:#999999;
-			font-size: 12px;
-			float:right;
-		}
-		.user{
-			font-family: "Microsoft YaHei";
-			color:#999999;
-			font-size: 12px;
-			float:right;
-			width:80px;
-			text-align:center;
-		}
-		.time { width: 150px; display: inline-block; text-align: left; float: right; color:#999999;
-			&.ulHeader{
-				font-family: "Microsoft YaHei";
-				color:#999999;
-				font-size: 12px;
+			.listBoxFeedBoxDown{
+				width: 100%;
+				height: 100%;
+				position: relative;
+				padding-top: 48px;
+				.scrollBox{
+					width: 100%;
+					height: 100%;
+					padding-bottom: 58px;
+					.downLoad{
+						width: 36px;
+						height: 36px;
+						background: url('../images/down_load.png') center no-repeat;
+						cursor: pointer;
+						display: inline-block;
+					}
+					table{
+						td{
+							border-bottom: 1px solid #ccc; 
+							dl{
+								width: 100%;
+								font-size: 12px;
+								font-family: "Microsoft YaHei";
+								padding-bottom: 8px;
+								dt{
+									float: left;
+									font-weight: bold;
+								}
+								dd{
+									color:#666;
+								}
+							}
+							dl:nth-child(2){
+								dt{
+									color: #fbb165;
+								}
+							}
+						}
+					}
+					.noData{
+						width: 100%; 
+						display: inline-block; 
+						text-align: center; 
+						padding-top: 100px; 
+						color: #ccc; 
+						font-size: 20px;
+						.tip { 
+							background: url('../images/icon.png') no-repeat -40px -260px; 
+							width: 40px; 
+							height: 40px; 
+							display: inline-block; 
+							vertical-align: -17px; 
+							margin-right: 20px; 
+						}
+					}
+				}
+				.pagingBox{
+					position: absolute;
+					bottom: 10px;
+					left:0;
+					right:0;
+					line-height:30px;
+					border-top:#ccc solid 1px; 
+					padding-top: 10px;
+					.sumDesc {
+						float: left;
+						margin-left: 20px;
+						margin-top: 0;
+					}
+					.listPagination {
+						float: right; 
+						margin-right:20px;
+					}
+					.pagination {
+						margin: 0px;
+					}
+				}
 			}
 		}
+		// .listBoxFeedBox{
+		// 	width: 100%;
+		// 	height: 100%;
+		// 	position: relative;
+		// 	.listBoxFeedBoxTop{
+		// 		width: 100%;
+		// 		height: 32px;
+		// 		border-bottom: #ccc solid 1px;
+		// 		position: absolute;
+		// 		left: 0;
+		// 		top: 0;
+		// 		z-index: 11;
+		// 		table{
+		// 			width: 100%;
+		// 		}
+		// 		td{
+		// 			height: 32px;
+		// 			line-height: 32px;
+		// 			padding-left: 8px;
+		// 		}
+		// 	}
+		// 	.listBoxFeedBoxDown{
+		// 		width: 100%;
+		// 		height: 100%;
+		// 		margin-top: -40px;
+		// 		position: relative;
+		// 		padding-top: 48px;
+		// 	}
+		// }
 	}
-	& .page {
-		height:70px;
-		position: static; 
-		bottom: 10px; 
-		right: 20px; 
-		left: 20px; 
-		border-top: 1px solid #ccc; 
-		margin-left:20px; 
-		margin-right:20px;
-		margin-top:40px; 
-	}
-	& .alreadyBox { display: none; }
+
+	// & .commissionLists { position: static; left: 0; right: 0; bottom: 80px; top: 130px; border-bottom: none; }
+
+	// & li { 
+	// 	height: auto; 
+	// 	line-height: 24px; 
+	// 	margin: 8px 20px; 
+	// 	border-bottom: 1px solid #ccc; 
+	// 	box-sizing: border-box; 
+	// 	font-size: 12px;
+	// 	font-family: "Microsoft YaHei";
+	// 	// dl{
+	// 	// 	dt{
+	// 	// 		float: left;
+	// 	// 		width: 48%;
+	// 	// 		height: auto;
+	// 	// 	}
+	// 	// }
+	// 	// &>dl:nth-child(1){
+	// 	// 	dt{
+	// 	// 		span:nth-child(1){
+	// 	// 			font-weight: bold;
+	// 	// 		}
+	// 	// 	}
+	// 	// 	dd{
+	// 	// 		.downLoad{
+	// 	// 			width: 80px;
+	// 	// 			height: 36px;
+	// 	// 			background: url('../images/down_load.png') center no-repeat;
+	// 	// 			cursor: pointer;
+	// 	// 		}
+	// 	// 	}
+	// 	// }
+	// 	// &>dl:nth-child(2){
+	// 	// 	dt{
+	// 	// 		span:nth-child(1){
+	// 	// 			color: #fbb165;
+	// 	// 		}	
+	// 	// 	}
+	// 	// }
+	// 	// .title { 
+	// 	// 	width: 48%; 
+	// 	// 	display: inline-block;
+	// 	// 	&.ulHeader{
+	// 	// 		color:#999999;
+	// 	// 	}
+	// 	// }
+	// 	// .user.ulHeader{
+	// 	// 	font-family: "Microsoft YaHei";
+	// 	// 	color:#999999;
+	// 	// 	font-size: 12px;
+	// 	// 	float:right;
+	// 	// }
+	// 	// .user{
+	// 	// 	font-family: "Microsoft YaHei";
+	// 	// 	color:#999999;
+	// 	// 	font-size: 12px;
+	// 	// 	float:right;
+	// 	// 	width:80px;
+	// 	// 	text-align:center;
+	// 	// }
+	// 	// .time { width: 150px; display: inline-block; text-align: left; float: right; color:#999999;
+	// 	// 	&.ulHeader{
+	// 	// 		font-family: "Microsoft YaHei";
+	// 	// 		color:#999999;
+	// 	// 		font-size: 12px;
+	// 	// 	}
+	// 	// }
+	// }
+	// & .page {
+	// 	height:70px;
+	// 	position: static; 
+	// 	bottom: 10px; 
+	// 	right: 20px; 
+	// 	left: 20px; 
+	// 	border-top: 1px solid #ccc; 
+	// 	margin-left:20px; 
+	// 	margin-right:20px;
+	// 	margin-top:40px; 
+	// }
+	// & .alreadyBox { display: none; }
 	
-	& .noData { width: 100%; display: inline-block; text-align: center; padding-top: 100px; color: #ccc; font-size: 20px;
-		& .tip { background: url('../images/icon.png') no-repeat -40px -260px; width: 40px; height: 40px; display: inline-block; vertical-align: -17px; margin-right: 20px; }
-	}
-  	.detail-box{
-	  position: absolute;
-	  display: none;
-	  width: 100%;
-	  height: 100%;
-	  background: rgba(0, 0, 0, .5);
-	}
+	// & .noData { width: 100%; display: inline-block; text-align: center; padding-top: 100px; color: #ccc; font-size: 20px;
+	// 	& .tip { background: url('../images/icon.png') no-repeat -40px -260px; width: 40px; height: 40px; display: inline-block; vertical-align: -17px; margin-right: 20px; }
+	// }
+ //  	.detail-box{
+	//   position: absolute;
+	//   display: none;
+	//   width: 100%;
+	//   height: 100%;
+	//   background: rgba(0, 0, 0, .5);
+	// }
 }
 & .todoDetailView { height: 48px; line-height: 48px; border: 1px #ccc solid; margin: 10px 25px 0px 12px; position: relative;
 	& .title { padding-left: 15px; width: 59%; float: left; }

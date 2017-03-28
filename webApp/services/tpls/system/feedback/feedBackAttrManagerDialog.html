@@ -16,7 +16,7 @@
     </tr>
     <tr>
         <td class="attachList">
-            <%if(attachmentList.length>0){%>
+            <%if(havaAttachment){%>
                 <% _.each(attachmentList,function(item){ %>
                     <div>
                         <a href="javascript:;" data-id="<%= item.id%>" class="alink listItem">
@@ -34,19 +34,16 @@
     </tr>
     <tr>
         <td class="feedBackTrList">
-        <%if(adviceReplys.length>0){%>
-            <% _.each(adviceReplys,function(item){ %>
-                <dl class="feedBackDl">
-                    <dt>
-                        <span><%= item.replyName%></span>
-                        <span><%= item.replyTimeStr%></span>
-                    </dt>
-                    <dd><%= item.content%></dd>
-                    <a href="javascript:;" data-id="<%= item.id%>" data-adviceid="<%= item.adviceId%>">删除</a>
-                </dl>
-            <%})%>
+        <% if(haveReply){%>
+            <dl class="feedBackDl">
+                <dt>
+                    <span><%= adviceReplys[0].replyName%></span>
+                    <span><%= adviceReplys[0].replyTimeStr%></span>
+                </dt>
+                <dd><%= adviceReplys[0].content%></dd>
+                <a href="javascript:;" data-id="<%= adviceReplys[0].id%>" data-adviceid="<%= adviceReplys[0].adviceId%>">删除</a>
+            </dl>
         <%}%>
-            
         </td>
     </tr>
     <tr>
@@ -56,9 +53,9 @@
     </tr>
 </table>
 <div class="dialogFooterButton">
-    <%if(adviceReplys.length>0){%>
+    <%if(haveReply){%>
        <button id="saveButton" class="disabled">确定</button>
     <%}else{%>
-        <button id="saveButton">确定</button>
+        <button id="saveButton" data-createname="<%= createName%>" data-loginname="<%= loginName%>" data-createid="<%= createId%>" data-adviceid="<%= id%>">确定</button>
     <%}%>
 </div>

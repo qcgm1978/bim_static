@@ -2,30 +2,28 @@
 	<span>建议反馈</span>
 </div>
 <div class="commissionBox">
-		<ul>
-			<li>
-				<span class="title ulHeader">标题</span>
-				<span class="user ulHeader">附件</span>
-				<span class="time ulHeader">时间</span>
-			</li>
-		</ul>
-		<ul class="commissionLists">
-			<span class="noData"><i class="tip"></i>没有消息</span>
-		</ul>
-		<div class="page">
-			<div class="commissionListPagination">
-				<dl>
-					<dd>12</dd>
-					<dd>33</dd>
-				</dl>
+	<div class="listBoxFeedBox">
+		<div class="listBoxFeedBoxTop">
+			<table>
+				<tr>
+					<td>标题</td>
+					<td>时间</td>
+					<td>附件</td>
+				</tr>
+			</table>
+		</div>
+		<div class="listBoxFeedBoxDown">
+			<div class="scrollBox">
+				<span class="noData" style="display: none;"><i class="tip"></i>没有消息</span>
+				<table>
+					<tbody id="commissionLists">
+						
+					</tbody>
+				</table>
 			</div>
+			<div class="pagingBox">
+		       <div class="sumDesc"></div><div class="listPagination"></div>
+		    </div>
 		</div>
 	</div>
-	<div class="alreadyBox">
-		<ul class="alreadyLists">
-			<span class="noData"><i class="tip"></i>没有消息</span>
-		</ul>
-		<div class="page">
-			<div class="alreadyListPagination"></div>
-		</div>
-	</div>
+</div>

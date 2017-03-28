@@ -6,6 +6,9 @@ App.Services.System.FeedBackAttrManagerTopbar=Backbone.View.extend({
 		startTime:'',
 		endTime:''
 	},
+	events:{
+		"click .btnSearch":"btnSearchHandle"
+	},
 	render(){
 		var startTime = new Date().setMonth(new Date().getMonth()-1);
 		var sTimeStr = new Date(startTime);
@@ -42,4 +45,19 @@ App.Services.System.FeedBackAttrManagerTopbar=Backbone.View.extend({
 		  _this.default.endTime=$(this).val();
 		})
 	},
+	btnSearchHandle(){//点击搜索功能
+		var keyName = $("#keyName");
+		var feedBackPeople = $("#feedBackPeople");
+		var keyNameVal = keyName.val().trim();
+		var feedBackPeopleVal = feedBackPeople.val().trim();
+		var feedBackState =  $('#feedBackState option:selected').data('feedbackstate');
+		var searchData = {
+			content:keyNameVal,
+			createName:feedBackPeopleVal,
+			start:this.default.startTime,
+			end:this.default.endTime,
+			have_reply:feedBackState,
+		}
+	    App.Services.SystemCollection.getFeedBackListHandle(searchData);
+	}
 })
