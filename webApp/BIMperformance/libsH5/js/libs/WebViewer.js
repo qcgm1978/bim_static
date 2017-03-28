@@ -16,8 +16,7 @@ CLOUD.GlobalData = {
     TextureResRoot: 'images/',
 
     UseMpkWorker: true,
-    //MpkWorkerUrl: "mpkWorker2.min.js", //"../libs/mpkWorker.min.js",
-    MpkWorkerUrl: "http://bim.wanda-dev.cn/static/dist/BIMperformance/mpkWorker2.min.js", //"../libs/mpkWorker.min.js",
+    MpkWorkerUrl: "../libs/mpkWorker.min.js", //"../libs/mpkWorker.min.js",
 
     disableAntialias: false,
     EnableDemolishByDClick: true,
@@ -25,6 +24,7 @@ CLOUD.GlobalData = {
     SelectionColor: {color: 0x003BBD, side: THREE.DoubleSide/*, opacity: 0.5, transparent: true*/},
 
     maxObjectNumInPool: 100000,
+    maxDrawCacheNum : 20000,
     ShowOctant: false,
     OctantDepth: 8,
     MaximumDepth: 0,
@@ -1944,65 +1944,372 @@ CLOUD.Logger = {
 };
 
 /**
+ * A doubly linked list-based Least Recently Used (LRU) cache. Will keep most
+ * recently used items while discarding least recently used items when its limit
+ * is reached.
+ *
+ * Licensed under MIT. Copyright (c) 2010 Rasmus Andersson <http://hunch.se/>
+ * See README.md for details.
+ *
+ * Illustration of the design:
+ *
+ *       entry             entry             entry             entry
+ *       ______            ______            ______            ______
+ *      | head |.newer => |      |.newer => |      |.newer => | tail |
+ *      |  A   |          |  B   |          |  C   |          |  D   |
+ *      |______| <= older.|______| <= older.|______| <= older.|______|
+ *
+ *  removed  <--  <--  <--  <--  <--  <--  <--  <--  <--  <--  <--  added
+ */
+(function(g,f){
+  const e = typeof exports == 'object' ? exports : typeof g == 'object' ? g : {};
+  f(e);
+  if (typeof define == 'function' && define.amd) { define('lru', e); }
+})(this, function(exports) {
+
+const NEWER = Symbol('newer');
+const OLDER = Symbol('older');
+
+function LRUMap(limit, entries) {
+  if (typeof limit !== 'number') {
+    // called as (entries)
+    entries = limit;
+    limit = 0;
+  }
+
+  this.size = 0;
+  this.limit = limit;
+  this.oldest = this.newest = undefined;
+  this._keymap = new Map();
+
+  if (entries) {
+    this.assign(entries);
+    if (limit < 1) {
+      this.limit = this.size;
+    }
+  }
+}
+
+exports.LRUMap = LRUMap;
+
+function Entry(key, value) {
+  this.key = key;
+  this.value = value;
+  this[NEWER] = undefined;
+  this[OLDER] = undefined;
+}
+
+
+LRUMap.prototype._markEntryAsUsed = function(entry) {
+  if (entry === this.newest) {
+    // Already the most recenlty used entry, so no need to update the list
+    return;
+  }
+  // HEAD--------------TAIL
+  //   <.older   .newer>
+  //  <--- add direction --
+  //   A  B  C  <D>  E
+  if (entry[NEWER]) {
+    if (entry === this.oldest) {
+      this.oldest = entry[NEWER];
+    }
+    entry[NEWER][OLDER] = entry[OLDER]; // C <-- E.
+  }
+  if (entry[OLDER]) {
+    entry[OLDER][NEWER] = entry[NEWER]; // C. --> E
+  }
+  entry[NEWER] = undefined; // D --x
+  entry[OLDER] = this.newest; // D. --> E
+  if (this.newest) {
+    this.newest[NEWER] = entry; // E. <-- D
+  }
+  this.newest = entry;
+};
+
+LRUMap.prototype.assign = function(entries) {
+  let entry, limit = this.limit || Number.MAX_VALUE;
+  this._keymap.clear();
+  let it = entries[Symbol.iterator]();
+  for (let itv = it.next(); !itv.done; itv = it.next()) {
+    let e = new Entry(itv.value[0], itv.value[1]);
+    this._keymap.set(e.key, e);
+    if (!entry) {
+      this.oldest = e;
+    } else {
+      entry[NEWER] = e;
+      e[OLDER] = entry;
+    }
+    entry = e;
+    if (limit-- == 0) {
+      throw new Error('overflow');
+    }
+  }
+  this.newest = entry;
+  this.size = this._keymap.size;
+};
+
+LRUMap.prototype.get = function(key) {
+  // First, find our cache entry
+  var entry = this._keymap.get(key);
+  if (!entry) return; // Not cached. Sorry.
+  // As <key> was found in the cache, register it as being requested recently
+  this._markEntryAsUsed(entry);
+  return entry.value;
+};
+
+LRUMap.prototype.set = function(key, value) {
+  var entry = this._keymap.get(key);
+
+  if (entry) {
+    // update existing
+    entry.value = value;
+    this._markEntryAsUsed(entry);
+    return this;
+  }
+
+  // new entry
+  this._keymap.set(key, (entry = new Entry(key, value)));
+
+  if (this.newest) {
+    // link previous tail to the new tail (entry)
+    this.newest[NEWER] = entry;
+    entry[OLDER] = this.newest;
+  } else {
+    // we're first in -- yay
+    this.oldest = entry;
+  }
+
+  // add new entry to the end of the linked list -- it's now the freshest entry.
+  this.newest = entry;
+  ++this.size;
+  if (this.size > this.limit) {
+    // we hit the limit -- remove the head
+    this.shift();
+  }
+
+  return this;
+};
+
+LRUMap.prototype.shift = function() {
+  // todo: handle special case when limit == 1
+  var entry = this.oldest;
+  if (entry) {
+    if (this.oldest[NEWER]) {
+      // advance the list
+      this.oldest = this.oldest[NEWER];
+      this.oldest[OLDER] = undefined;
+    } else {
+      // the cache is exhausted
+      this.oldest = undefined;
+      this.newest = undefined;
+    }
+    // Remove last strong reference to <entry> and remove links from the purged
+    // entry being returned:
+    entry[NEWER] = entry[OLDER] = undefined;
+    this._keymap.delete(entry.key);
+    --this.size;
+    return [entry.key, entry.value];
+  }
+};
+
+// ----------------------------------------------------------------------------
+// Following code is optional and can be removed without breaking the core
+// functionality.
+
+LRUMap.prototype.find = function(key) {
+  let e = this._keymap.get(key);
+  return e ? e.value : undefined;
+};
+
+LRUMap.prototype.has = function(key) {
+  return this._keymap.has(key);
+};
+
+LRUMap.prototype['delete'] = function(key) {
+  var entry = this._keymap.get(key);
+  if (!entry) return;
+  this._keymap.delete(entry.key);
+  if (entry[NEWER] && entry[OLDER]) {
+    // relink the older entry with the newer entry
+    entry[OLDER][NEWER] = entry[NEWER];
+    entry[NEWER][OLDER] = entry[OLDER];
+  } else if (entry[NEWER]) {
+    // remove the link to us
+    entry[NEWER][OLDER] = undefined;
+    // link the newer entry to head
+    this.oldest = entry[NEWER];
+  } else if (entry[OLDER]) {
+    // remove the link to us
+    entry[OLDER][NEWER] = undefined;
+    // link the newer entry to head
+    this.newest = entry[OLDER];
+  } else {// if(entry[OLDER] === undefined && entry.newer === undefined) {
+    this.oldest = this.newest = undefined;
+  }
+
+  this.size--;
+  return entry.value;
+};
+
+LRUMap.prototype.clear = function() {
+  // Not clearing links should be safe, as we don't expose live links to user
+  this.oldest = this.newest = undefined;
+  this.size = 0;
+  this._keymap.clear();
+};
+
+
+function EntryIterator(oldestEntry) { this.entry = oldestEntry; }
+EntryIterator.prototype[Symbol.iterator] = function() { return this; }
+EntryIterator.prototype.next = function() {
+  let ent = this.entry;
+  if (ent) {
+    this.entry = ent[NEWER];
+    return { done: false, value: [ent.key, ent.value] };
+  } else {
+    return { done: true, value: undefined };
+  }
+};
+
+
+function KeyIterator(oldestEntry) { this.entry = oldestEntry; }
+KeyIterator.prototype[Symbol.iterator] = function() { return this; }
+KeyIterator.prototype.next = function() {
+  let ent = this.entry;
+  if (ent) {
+    this.entry = ent[NEWER];
+    return { done: false, value: ent.key };
+  } else {
+    return { done: true, value: undefined };
+  }
+};
+
+function ValueIterator(oldestEntry) { this.entry = oldestEntry; }
+ValueIterator.prototype[Symbol.iterator] = function() { return this; }
+ValueIterator.prototype.next = function() {
+  let ent = this.entry;
+  if (ent) {
+    this.entry = ent[NEWER];
+    return { done: false, value: ent.value };
+  } else {
+    return { done: true, value: undefined };
+  }
+};
+
+
+LRUMap.prototype.keys = function() {
+  return new KeyIterator(this.oldest);
+};
+
+LRUMap.prototype.values = function() {
+  return new ValueIterator(this.oldest);
+};
+
+LRUMap.prototype.entries = function() {
+  return this;
+};
+
+LRUMap.prototype[Symbol.iterator] = function() {
+  return new EntryIterator(this.oldest);
+};
+
+LRUMap.prototype.forEach = function(fun, thisObj) {
+  if (typeof thisObj !== 'object') {
+    thisObj = this;
+  }
+  let entry = this.oldest;
+  while (entry) {
+    fun.call(thisObj, entry.value, entry.key, this);
+    entry = entry[NEWER];
+  }
+};
+
+/** Returns a JSON (array) representation */
+LRUMap.prototype.toJSON = function() {
+  var s = new Array(this.size), i = 0, entry = this.oldest;
+  while (entry) {
+    s[i++] = { key: entry.key, value: entry.value };
+    entry = entry[NEWER];
+  }
+  return s;
+};
+
+/** Returns a String representation */
+LRUMap.prototype.toString = function() {
+  var s = '', entry = this.oldest;
+  while (entry) {
+    s += String(entry.key)+':'+entry.value;
+    entry = entry[NEWER];
+    if (entry) {
+      s += ' < ';
+    }
+  }
+  return s;
+};
+
+});
+
+/**
 * @author mrdoob / http://mrdoob.com/
 */
 
 THREE.WebGLGeometriesExt = function ( gl, properties, info ) {
 
-	var geometries = {};
+	var geometries = new LRUMap(CLOUD.GlobalData.maxDrawCacheNum);
+
+	// limit use of memory to only hold commonly-used geometries,
+	// dispose infrequent geometries. - xiaojian
+	geometries.shift = function() {
+		var entry = LRUMap.prototype.shift.call(this);
+		var geometry = entry[1];
+		geometry.dispose();
+	}
 
 	function get( object ) {
 
 		var geometry = object.geometry;
+		var key = geometry.id;
 
-		if ( geometries[ geometry.id ] !== undefined ) {
-
-			return geometries[ geometry.id ];
-
+		if(geometries.has(key)) {
+			return geometries.get(key);
 		}
 
 		geometry.addEventListener( 'dispose', onGeometryDispose );
-
-		var buffergeometry;
-
+		var bufferGeometry;
 		if ( geometry instanceof THREE.BufferGeometry ) {
-
-			buffergeometry = geometry;
-
+			bufferGeometry = geometry;
 		} else if ( geometry instanceof THREE.Geometry ) {
 
 			if ( geometry._bufferGeometry === undefined ) {
 
 				geometry._bufferGeometry = new THREE.BufferGeometry().setFromObject( object );
-
 			}
 
-			buffergeometry = geometry._bufferGeometry;
-
+			bufferGeometry = geometry._bufferGeometry;
 		}
 
-		geometries[ geometry.id ] = buffergeometry;
+		geometries.set(key, bufferGeometry);
 
 		info.memory.geometries ++;
 
-		return buffergeometry;
+		return bufferGeometry;
 
 	}
 
 	function onGeometryDispose( event ) {
 
-		var geometry = event.target;
-		var buffergeometry = geometries[ geometry.id ];
+		var buffergeometry = event.target;
+		//var buffergeometry = geometries[ geometry.id ];
 
 		deleteAttributes( buffergeometry.attributes );
 		if (buffergeometry.index) {
-		    deleteAttribute(buffergeometry.index);
+			deleteAttribute(buffergeometry.index);
 		}
-		geometry.removeEventListener( 'dispose', onGeometryDispose );
+		buffergeometry.removeEventListener( 'dispose', onGeometryDispose );
 
-		geometries[geometry.id] = undefined;
+		//geometries[geometry.id] = undefined;
 
-		var property = properties.get( geometry );
+		var property = properties.get( buffergeometry );
 		if ( property.wireframe ) deleteAttribute( property.wireframe );
 
 		info.memory.geometries --;
@@ -2074,10 +2381,18 @@ THREE.WebGLObjectsExt = function (gl, properties, info) {
 
         var geometry = geometries.get(object);
 
-        if (geometry.ticket === this.renderTicket)
-            return geometry;
+        // if (geometry.ticket === this.renderTicket)
+        //     return geometry;
+        //
+        // geometriesTotal++;
 
-        geometry.ticket = this.renderTicket;
+        // geometry.ticket = this.renderTicket;
+
+        // if (geometry.using) {
+        //     return geometry;
+        // }
+        //
+        // geometry.using = true;
 
         if (object.geometry instanceof THREE.Geometry) {
 
@@ -2441,21 +2756,6 @@ CLOUD.RenderGroup = function () {
             object.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, object.matrixWorld);
             object.normalMatrix.getNormalMatrix(object.modelViewMatrix);
 
-            // var geometry = renderItem.geometry;
-            // if (geometry && geometry._listeners) {
-            //     if (geometry.refCount === 0) {
-            //         geometry = null;
-            //     }
-            // }
-            // else {
-            //     geometry = null;
-            // }
-
-            // if (object.loaded === 0) {
-            //     object.load();
-            // }
-            // var geometry = objects.update(object);           
-
             renderer.renderBufferDirect(camera, lights, fog, geometry, material, object, group);
 
             if ((i % 5000) === 4999) {
@@ -2466,7 +2766,6 @@ CLOUD.RenderGroup = function () {
                 if (timeElapse > CLOUD.GlobalData.LimitFrameTime) {
 
                     renderingIdx = i + 1;
-
                     return false;
                 }
             }
@@ -2649,43 +2948,46 @@ CLOUD.OrderedRenderer = function () {
                         return true;
                     }
 
-                    if (object.renderOrder <= 5) {
+                    // if (object.renderOrder <= 5) {
+                    //     //
+                    //     // if (!object.modelCenter) {
+                    //     //     computeObjectCenter(object);
+                    //     // }
+                    //     //
+                    //     // if (object.radius !== undefined) {
+                    //     //
+                    //     //     _vector3.copy(object.modelCenter);
+                    //     //     _vector3.applyProjection(_projScreenMatrix);
+                    //     //     // _vector3End.copy(camera.realUp);
+                    //     //     // _vector3End.multiplyScalar(object.radius).add(object.modelCenter);
+                    //     //     //
+                    //     //     // _vector3End.applyProjection(_projScreenMatrix);
+                    //     //
+                    //     //     // var sqrtDist = _vector3End.distanceTo(_vector3) * 10;
+                    //     //     // if (sqrtDist < CLOUD.GlobalData.ScreenCullLOD) {
+                    //     //     //     ++_countScreenCullOff;
+                    //     //     //     return true;
+                    //     //     // }
+                    //     //
+                    //     // }
+                    //     // else {
+                    //     //     _vector3.copy(object.modelCenter);
+                    //     //     _vector3.applyProjection(_projScreenMatrix);
+                    //     // }
+                    // }
 
-                        if (!object.modelCenter) {
-                            computeObjectCenter(object);
-                        }
-
-                        if (object.radius !== undefined) {
-
-                            _vector3.copy(object.modelCenter);
-                            _vector3.applyProjection(_projScreenMatrix);
-                            // _vector3End.copy(camera.realUp);
-                            // _vector3End.multiplyScalar(object.radius).add(object.modelCenter);
-                            //
-                            // _vector3End.applyProjection(_projScreenMatrix);
-
-                            // var sqrtDist = _vector3End.distanceTo(_vector3) * 10;
-                            // if (sqrtDist < CLOUD.GlobalData.ScreenCullLOD) {
-                            //     ++_countScreenCullOff;
-                            //     return true;
-                            // }
-
-                        }
-                        else {
-                            _vector3.copy(object.modelCenter);
-                            _vector3.applyProjection(_projScreenMatrix);
-                        }
-                    }
+                    _vector3.setFromMatrixPosition( object.matrixWorld );
+                    _vector3.applyProjection( _projScreenMatrix );
 
                     // 材质过滤
                     var material = _filterObject.getOverridedMaterial(object);
                     material = material || object.material;
 
-                    //var geometry = objects.update(object);
+                    // //var geometry = objects.update(object);
                     var geometry = object.geometry;
-                    if (geometry instanceof THREE.Geometry) {
-                        geometry = geometry._bufferGeometry;
-                    }
+                    // if (geometry instanceof THREE.Geometry) {
+                    //     geometry = geometry._bufferGeometry;
+                    // }
 
                     pushRenderItem(object, geometry, material, _vector3.z);
 
@@ -2702,7 +3004,6 @@ CLOUD.OrderedRenderer = function () {
 
             }
         }
-
 
         return true;
     }
@@ -6605,6 +6906,7 @@ THREE.WebGLIncrementRenderer = function (parameters) {
     this.setRenderTicket = function (ticket) {
         objects.renderTicket = ticket;
     };
+
 };
 
 
@@ -8846,6 +9148,12 @@ CLOUD.MeshEx.prototype.spawn = function (parameters) {
         this.updateMatrixWorld(true);//  this.matrixAutoUpdate = false;需要强制更新
     }
 
+    if (parameters.databagId) {
+        this.databagId = parameters.databagId;
+    } else {
+        this.databagId = "";
+    }
+
     if (parameters.userData) {
         this.userData = parameters.userData;
     } else {
@@ -8864,6 +9172,7 @@ CLOUD.MeshEx.prototype.spawn = function (parameters) {
  * Resets the object values to default
  */
 CLOUD.MeshEx.prototype.clear = function () {
+
     this.geometry = CLOUD.GeomUtil.EmptyGeometry;
     this.material = CLOUD.MaterialUtil.DefaultMaterial;
     this.visible = false;
@@ -10493,7 +10802,7 @@ CLOUD.Scene.prototype.pickByRect = function () {
         function frustumTest(node) {
 
             if (node instanceof CLOUD.Group) {
-                if (node.fileId && scope.filter.hasFileFilter(node.fileId))
+                if (node.userData && node.userData.sceneId && scope.filter.hasFileFilter(node.userData.sceneId))
                     return;
             }
 
@@ -10554,9 +10863,11 @@ CLOUD.Scene.prototype.pickByRect = function () {
 CLOUD.Scene.prototype.traverseIf = function (callback) {
 
     function traverseChild(node, callback) {
+
         var children = node.children;
 
         for (var i = 0, len = children.length; i < len; i++) {
+
             var child = children[i];
 
             if (!callback(child, node)) {
@@ -10580,9 +10891,12 @@ CLOUD.Scene.prototype.traverseIf = function (callback) {
 CLOUD.Scene.prototype.findSceneNode = function (sceneId) {
 
     var children = this.rootNode.children;
+
     for (var i = 0, l = children.length; i < l; i++) {
+
         var child = children[i];
-        if (sceneId == child.sceneId) {
+
+        if (child.userData && sceneId == child.userData.sceneId) {
             return child;
         }
     }
@@ -10591,9 +10905,11 @@ CLOUD.Scene.prototype.findSceneNode = function (sceneId) {
 };
 
 CLOUD.Scene.prototype.getNodeById = function (id) {
+
     var children = this.rootNode.children;
 
     for (var i = 0, l = children.length; i < l; i++) {
+
         var node = children[i];
 
         if (id === node.name) {
@@ -10604,19 +10920,22 @@ CLOUD.Scene.prototype.getNodeById = function (id) {
     return null;
 };
 
-CLOUD.Scene.prototype.showSceneNodes = function (client, bVisible) {
+CLOUD.Scene.prototype.showSceneNodes = function (model, bVisible) {
+
     var children = this.rootNode.children;
 
     for (var i = 0, l = children.length; i < l; i++) {
+
         var child = children[i];
 
-        if (child.client.databagId === client.databagId) {
+        if (child.databagId === model.databagId) {
             child.visible = bVisible;
         }
     }
 };
 
 CLOUD.Scene.prototype.containsBoxInFrustum = function () {
+
     var p1 = new THREE.Vector3(),
         p2 = new THREE.Vector3();
 
@@ -14626,7 +14945,7 @@ CLOUD.EditorManager = function() {
         var dom = scope.editor.getDomElement();
         if (dom) {
             var canvas = dom.querySelector("#cloud-main-canvas");
-            if (canvas)
+            if (canvas && canvas.focus)
                 canvas.focus();
         }
     }
@@ -16608,7 +16927,7 @@ CLOUD.Model = function (manager, serverUrl, databagId, texturePath) {
     // cache overall referenced unique meshes
     this.referencedMeshCache = {};
     this.taskManager = new CLOUD.TaskManager(this);
-    this.userWorker = (typeof window.Worker === "function");
+    this.userWorker = false;//(typeof window.Worker === "function");
     this.notifyProgress = true;
 };
 
@@ -16699,9 +17018,7 @@ CLOUD.Model.prototype.loadMpk = function (mpkId, callback) {
     //var mpkCount = this.mpkCount;
     this.meshLoader.load(this.mpkUrl(mpkId), function (data) {
         if(scope.userWorker) {
-            console.log(CLOUD.GlobalData.MpkWorkerUrl);
             var worker = new Worker(CLOUD.GlobalData.MpkWorkerUrl);
-            //var worker = new Worker("http://bim.wanda-dev.cn/static/dist/BIMperformance/mpkWorker2.min.js");
             worker.onmessage = function( event ) {
                 //var mpkReader = event.data[0];
                 //if (mpkReader.header.blockId < mpkCount) {
@@ -16724,6 +17041,7 @@ CLOUD.Model.prototype.loadMpk = function (mpkId, callback) {
             worker.postMessage( {"msg": data});
         }else {
             scope.parseMpk(data);
+            callback();
             scope.onTaskFinished();
         }
     });
@@ -16778,7 +17096,7 @@ CLOUD.Model.prototype.destroy = function () {
 };
 
 CLOUD.Model.prototype.projectUrl = function () {
-    return this.serverUrl +"config/"+ this.databagId + "/config.json";
+    return this.serverUrl + this.databagId + "/config.json";
 };
 
 CLOUD.Model.prototype.sceneUrl = function (idx) {
@@ -16796,7 +17114,7 @@ CLOUD.Model.prototype.userIdUrl = function () {
 
 CLOUD.Model.prototype.octreeUrl = function (idx) {
     idx = idx || 'o';
-    return this.serverUrl +"file/"+ this.databagId + "/scene/index_" + idx;
+    return this.serverUrl + this.databagId + "/scene/index_" + idx;
 };
 
 CLOUD.Model.prototype.symbolUrl = function () {
@@ -16907,13 +17225,27 @@ CLOUD.Model.prototype.parseSymbol = function (data) {
 };
 
 CLOUD.Model.prototype.parseMpk = function (data) {
-    var mpkReader = new CLOUD.Loader.MPKReader(data);
 
-    if (mpkReader.header.blockId < this.mpkCount) {
-        this.mpkArray[mpkReader.header.blockId] = mpkReader;
+    var reader = new MPK.MPKReader(data);
+    var id = reader.header.startId;
+    var count = id + reader.header.meshCount;
+    for( ; id < count; ++id) {
+        var p = reader.getPtBuffer(id);
+        var i = reader.getIdxBuffer(id);
+        var n = reader.getNormalBuffer(id);
+        var m = reader.getMeshData(id);
+        if (p == undefined || i == undefined || n == undefined) {
+            CLOUD.Logger.log("Error Geometry!");
+            continue;
+        }
+        this.referencedMeshCache[id] = {
+            P: p,  // position
+            I: i,  // index
+            N: n,  // normal
+            M: m   // mesh info
+        };
     }
-
-    mpkReader = null;
+    reader = null;
 };
 
 CLOUD.Model.prototype.parseUserId = function (data) {
@@ -16984,6 +17316,7 @@ CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
 
     var geometry = cacheGeometries[meshInfo.meshId];
     var meshNode = meshPool.get({
+        databagId: this.databagId,
         nodeId: meshInfo.nodeId,
         userId: userId,
         userData: userData,
@@ -17209,6 +17542,7 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
                 var geometry = this.cache.geometries[meshId];
                 var material = this.cache.materials[materialId];
                 var meshNode = meshPool.get({
+                    databagId: this.databagId,
                     nodeId: nodeId,
                     userId: userId,
                     userData: userData,
@@ -17604,14 +17938,11 @@ CLOUD.MpkTaskWorker = function (threadCount) {
         var doingList = this.todoList;
         this.todoList = [];
         var items = [];
-
-        // for(var i = 0, len = doingList.length; i < len; ++i){
-        //     items.push(doingList[i]);
-        // }
         for (var item in doingList) {
             if(doingList.hasOwnProperty(item)) {
                 items.push(item);
             }
+
         }
 
         var scope = this;
@@ -19440,6 +19771,11 @@ CLOUD.Viewer.prototype = {
             if (isUpdateRenderList) {
                 this.modelManager.prepareScene(camera);
             }
+
+            // if (!scene.hasVisibleNode()) {
+            //     this.rendering = false;
+            //     return;
+            // }
 
             this.renderer.resetIncrementRender();// 重置增量绘制状态
             this.renderer.setObjectListUpdateState(isUpdateRenderList);// 设置更新状态
