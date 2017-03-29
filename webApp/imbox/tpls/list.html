@@ -1,7 +1,21 @@
 <% _.each(data,function(item){%>
-<% var url=item.targetUrl.split('/'),projectId=url[url.length-3], version=url[url.length-2] %>
-<li>
-	<span class="title"><% if(item.status !== 1) {%><i></i><% } %><a data-status="<%= item.status %>" href='javascript:;' onclick="App.INBox.read(<%=item.id%>,this,<%=projectId%>,<%=version%>,<%=item.shareId%>)" target='_blank'><%=item.content%></a></span>
-	<span class="time"><%=item.createStmp?new Date(item.createStmp).format('yyyy-MM-dd hh:mm:ss'):'--'%></span>
-</li>
+	<% if(item.targetUrl == "adviceFeedback"){ %>
+		<li>
+			<span class="title">
+				<% if(item.status !== 1) {%><i></i><% } %>
+				<a onclick="App.INBox.dialogHandle(this)" data-status="<%= item.status %>" data-idinfo="<%= item.id %>"  data-id="<%= item.shareId %>" href='javascript:;'>
+					<%= item.sendUserName%>已经回复了您的建议：<%=item.content%>
+				</a>
+			</span>
+			<span class="time">
+				<%=item.createStmp?new Date(item.createStmp).format('yyyy-MM-dd hh:mm:ss'):'--'%>
+			</span>
+		</li>
+	<% }else {%>
+		<% var url=item.targetUrl.split('/'),projectId=url[url.length-3], version=url[url.length-2] %>
+		<li>
+			<span class="title"><% if(item.status !== 1) {%><i></i><% } %><a data-status="<%= item.status %>" href='javascript:;' onclick="App.INBox.read(<%=item.id%>,this,<%=projectId%>,<%=version%>,<%=item.shareId%>)" target='_blank'><%=item.content%></a></span>
+			<span class="time"><%=item.createStmp?new Date(item.createStmp).format('yyyy-MM-dd hh:mm:ss'):'--'%></span>
+		</li>
+	<%}%>
 <% }) %>

@@ -278,7 +278,7 @@ App.Services.SystemCollection = {
 			createName:'',
 			opTimeStart:'',
 			opTimeEnd:'',
-			have_reply:"",
+			haveReply:"",
 			pageIndex:App.Services.SystemCollection.Settings.pageIndexFeedBack,
 			pageItemCount:15,
 		};
