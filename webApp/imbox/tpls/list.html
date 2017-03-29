@@ -3,7 +3,7 @@
 		<li>
 			<span class="title">
 				<% if(item.status !== 1) {%><i></i><% } %>
-				<a onclick="App.INBox.dialogHandle(this)" data-status="<%= item.status %>" data-idinfo="<%= item.id %>"  data-id="<%= item.shareId %>" href='javascript:;'>
+				<a onclick="App.INBox.dialogHandle(this,event)" data-status="<%= item.status %>" data-idinfo="<%= item.id %>"  data-id="<%= item.shareId %>" href='javascript:;'>
 					<%= item.sendUserName%>已经回复了您的建议：<%=item.content%>
 				</a>
 			</span>

@@ -6,7 +6,11 @@
 <% if(haveReply){%>
 	<td class="feedBackTd">
 	    <p>建议内容：<%=title%></p>
+	    <%if(adviceReplys.length>0){%>
 	    <p class="feedBackContentText"><span>回复内容：</span><%= adviceReplys[0].content%> <%=createTime%></p>
+	    <%}else{%>
+	    <p class="feedBackContentText"><span>回复内容：</span>没有回复内容 <%=createTime%></p>
+	    <%}%>
 	</td>
 <%}else{%>
 	<td><%=title%></td>
