@@ -46,35 +46,26 @@ App.Services.SuggestView = {
     },
 
     deleteFile : function(_this){
+        var target=$(_this);
         var replytId = $(_this).data('id');
         App.Comm.ajax({
-            URLtype: "deleteFeedBack",
+            URLtype: "deleteFeedBackQT",
             type: "DELETE",
             data:{
                 replytId:replytId
             },
         }).done(function(res){
             if(res.code == 0){
-                console.log(res);
+                target.parent().remove();
             }else{
                 alert(res.message)
             }
         })
-        // var id=$(_this).data('id');
-        // $.ajax({
-        //     url : url,
-        //     type : "get",
-        //     dataType : "json",
-        //     success : function(json){
-
-        //     }
-        // });
     },
 
     afterUpload:function(res,_this){
-        console.log(res);
         if(res.code==0){
-            _this.find('.attachList').append('<div><a data-id="'+res.data.attachmentId+'" href="javascript:;" onclick="App.Services.SuggestView.download(this);" class="alink listItem">'+res.data.attachmentName+'</a>&nbsp;&nbsp;<a href="javascript:;" onclick="App.Services.SuggestView.deleteFile(this)" >删除</a></div>');
+            _this.find('.attachList').append('<div><a data-id="'+res.data.attachmentId+'" href="javascript:;" onclick="App.Services.SuggestView.download(this);" class="alink listItem">'+res.data.attachmentName+'</a>&nbsp;&nbsp;<a href="javascript:;" data-id="'+res.data.attachmentId+'" onclick="App.Services.SuggestView.deleteFile(this)" >删除</a></div>');
         }
     },
 
