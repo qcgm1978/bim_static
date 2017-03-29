@@ -15,9 +15,8 @@ App.Suggest.containerView=Backbone.View.extend({
 	},
     addOne(model){//每一条数据 进行处理
         var data = model.toJSON();
-        console.log(data,"model");
         var _html=_.templateUrl('./suggest/tpls/list.html');
-        this.$('#commissionLists').html(_html({data:data}));
+        this.$('#commissionLists').append(_html({data:data}));
         this.bindScroll();
     },
     resetList(){//重置加载

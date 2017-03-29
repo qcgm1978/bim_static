@@ -1,15 +1,40 @@
 <tr>
-	<td>
-		<dl>
-			<dt>我的建议：</dt>
-			<dd data-id="<%=data.id%>" onclick="App.Suggest.show(this);"><%= data.content%></dd>
-		</dl>
-		<dl>
-			<dt>回复内容：</dt>
-			<dd><%= data.adviceReplys[0].content%></dd>
-		</dl>
-	</td>
-	<td><%= data.createTime?new Date(data.createTime).format("yyyy-MM-dd"):'--' %></td>
+	<%if(data.haveReply){%>
+		<td>
+			<dl>
+				<dt>我的建议：</dt>
+				<dd data-id="<%=data.id%>" onclick="App.Suggest.show(this);"><%= data.content%></dd>
+			</dl>
+			<dl>
+				<dt>回复内容：</dt>
+				<dd>
+					<span title="<%= data.content%>">
+						<%= data.adviceReplys[0].content%>
+					</span>
+				</dd>
+			</dl>
+		</td>
+		<td>
+			<dl>
+				<dd><%= data.createTime?new Date(data.createTime).format("yyyy-MM-dd"):'--' %></dd>
+			</dl>
+			<dl>
+				<dd>
+					<%= data.createTime?new Date(data.adviceReplys[0].replyTime).format("yyyy-MM-dd"):'--' %>
+				</dd>
+			</dl>
+		</td>
+	<%}else{%>
+		<td>
+			<span title="<%= data.content%>">
+				<%= data.content%>
+			</span>
+		</td>
+		<td>
+			<%= data.createTime?new Date(data.createTime).format("yyyy-MM-dd"):'--' %>
+		</td>
+	<%}%>
+	
 	<td>
 		<%if(data.havaAttachment){%>
 			<span class="downLoad" data-downloadid="<%= data.id%>"></span>
