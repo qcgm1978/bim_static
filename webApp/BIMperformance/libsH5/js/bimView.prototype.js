@@ -15,10 +15,22 @@
     
     getMakerObject : function(viewer){
       var self = this;
+      self.viewer = self.viewer||viewer;
       if (!self.MarkerHelper)
       {
-        self.MarkerHelper = new CLOUD.Extensions.MarkerHelper(self.viewer||viewer);
+        self.MarkerHelper = new CLOUD.Extensions.MarkerHelper(self.viewer);
+        // render 回调
+        var renderCB = function(){
+            self.MarkerHelper.renderMarkers();
+        }
+        self.viewer.addCallbacks("render", renderCB );
+        // resize 回调
+        var resizeCB = function(){
+            self.MarkerHelper.resizeMarkers();
+        }
+        self.viewer.addCallbacks("render", resizeCB );
       }
+
       return self.MarkerHelper;
     },
 
