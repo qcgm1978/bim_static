@@ -853,6 +853,15 @@ fis.match('/static/dist/BIMperformance/libsH5.js', {
   release: '/static/dist/BIMperformance/libsH5.js'
 });
 
+/*
+fis.match('/BIMperformance/comm/**.{js,es6}', {
+  packTo: '/static/dist/BIMperformance/comm.js'
+});
+fis.match('/static/dist/BIMperformance/comm.js', {
+  release: '/static/dist/BIMperformance/comm.js'
+});
+*/
+
 fis.match('/BIMperformance/projects/**.{less,css}', {
   packTo: '/static/dist/BIMperformance/projects.css'
 });
