@@ -29,14 +29,10 @@ App.INBox = {
 
 		}
 		this.id = id;
-		//	this.loadData('un');
-		//location.reload();
 		//发送已读状态
 		$.ajax({
 			url: App.API.Settings.hostname + "platform/message/read?flag=1&id=" + id
 		}).done(function(data) {
-			//console.log(data)
-
 		});
 		//弹窗显示详情
 		$('#comment').show();
@@ -91,9 +87,22 @@ App.INBox = {
 			})
 		}
 
+	},
+	dialogHandle(_this){//回复信息点击弹出方法
+		_.require('/static/dist/services/services.css');
+		_.require('/static/dist/services/services.js');
+		//发送已读状态
+		$.ajax({
+			url: App.API.Settings.hostname + "platform/message/read?id=" + $(_this).data('idinfo')
+		}).done(function(data) {
+			if(data.code==0){
+				$(_this).closest('li').remove();
+			}else{
+				alert(data.message)
+			}
+		});
+		App.Services.SuggestView.init($(_this).data('id'));
 	}
-
-
 };
 
 App.INBox.comment = {
