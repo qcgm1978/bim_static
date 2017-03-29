@@ -970,7 +970,7 @@ App.Project = {
 				}
 				App.Project.Settings.Viewer.setTopView(boxs, true);
 				//viewer.viewer.setMarkerClickCallback(App.Project.markerClick); //old interface
-				viewer.getMakerObject().setMarkerClickCallback(markerClick);  // add by wuweiwei new interface
+				viewer.getMakerObject().setMarkerClickCallback(App.Project.markerClick);  // add by wuweiwei new interface
 				viewer.loadMarkers(result);
 				App.Project.Settings.Viewer.highlight({
 					type: 'userId',
