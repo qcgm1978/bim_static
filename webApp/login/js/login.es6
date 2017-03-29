@@ -275,9 +275,9 @@ var Login = {
 		//事件绑定
 		Login.bindEvent();
 		
-		if(Login.isSSO())
+		if(Login.isSSO(document.cookies))
 		{
-			Login.checkSSO();
+			//Login.checkSSO();
 		}
 		else
 		{
@@ -295,15 +295,12 @@ var Login = {
 
 	isSSO : function(cooks){
 		var bool;
-
 		var AuthUser_AuthNum = Login.getCookie("AuthUser_AuthNum",cooks);
 		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken",cooks);
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC",cooks);
 		var AuthUser_Signature = Login.getCookie("AuthUser_Signature",cooks);
 
-		//alert("AuthUser_AuthNum:"+AuthUser_AuthNum);
-
-		//try
+		try
 		{
 			bool = AuthUser_AuthNum.length>5 && AuthUser_AuthToken.length>5 && AuthUser_AuthMAC.length>5 && AuthUser_Signature.length>5;
 
@@ -325,7 +322,7 @@ var Login = {
 				return false;
 			}
 		}
-		//catch(e)
+		catch(e)
 		{
 			return false;
 		}
@@ -364,8 +361,7 @@ var Login = {
 					{
 						Login.setCookie(p, obj[p]);
 					}			
-					//Login.getUserInfo();
-					Login.checkLogin();
+					Login.getUserInfo();
 				}
 			}
 		});

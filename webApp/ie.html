@@ -154,6 +154,21 @@
                 });
             }
 
+            //SSO登录
+            try
+            {
+                var cookies =  document.cookie;
+                if(cookies.indexOf('"')>0)
+                {
+                    cookies = cookies.replace(/"/g,"");
+                }
+                setTimeout(function(){
+                    myWebView.runScript('Login.isSSO("' + cookies + '")', function(result) {});
+                },1);
+            }
+            catch(e)
+            {}
+
         });
 
         var isIE = function (ver) {
@@ -221,21 +236,6 @@
             $("body").html(html);
         }
     }
-
-    //SSO登录
-    try
-    {
-        var cookies =  document.cookie;
-        if(cookies.indexOf('"')>0)
-        {
-            cookies = cookies.replace(/"/g,"");
-        }
-        //myWebView.runScript('Login.isSSO(' + document.cookie + ')', function(result) {});
-        myWebView.runScript('Login.isSSO("'+cookies+'")', function(result) {});
-        //myWebView.runScript('Login.isSSO("'+cookies+'")', function(result) {});
-    }
-    catch(e)
-    {}
 
     //检查登录
     function checkLogin() {
