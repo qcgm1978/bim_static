@@ -1,18 +1,23 @@
 <% if(havaAttachment){%>
-<td><a href="javascript:;" class="downLoadId" data-downloadid="<%= id%>"></a></td>
-<td class="feedBackTd">
-    <p>建议内容：<%=title%></p>
-    <p class="feedBackContentText">回复内容：<%=content%> <%=createTime%></p>
-</td>
+	<td><a href="javascript:;" class="downLoadId" data-downloadid="<%= id%>"></a></td>
 <%}else{%>
-<td></td>
-<td><%=title%></td>
+	<td></td>
+<%} %>
+<% if(haveReply){%>
+	<td class="feedBackTd">
+	    <p>建议内容：<%=title%></p>
+	    <p class="feedBackContentText"><span>回复内容：</span><%= adviceReplys[0].content%> <%=createTime%></p>
+	</td>
+<%}else{%>
+	<td><%=title%></td>
 <%} %>
 <td><%=createName%></td>
 <td><%=createTime%></td>
 <% if(haveReply){%>
-<td>已回复</td>
+	<td>已回复</td>
 <%}else{%>
-<td>未回复</td>
+	<td>未回复</td>
 <%}%>
-<td><a href="javascript:;" class="answerBtn" data-feedbackid="<%= id%>" data-createid="<%= createId %>" data-loginname="<%= loginName%>" data-createname="<%= createName%>">回复</a></td>
+<td>
+	<a href="javascript:;" class="answerBtn" data-feedbackid="<%= id%>">回复</a>
+</td>

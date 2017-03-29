@@ -104,7 +104,7 @@ App.Suggest = {
 			type:"POST",
 			contentType:"application/json",
 			success:function(collection, response, options){
-				$(".commissionLists").find(".loading").remove();
+				$("#commissionLists").find(".loading").remove();
 				var $content = $(".listBoxFeedBoxDown");
 				var pageCount = response.data.totalItemCount;
 				$content.find(".sumDesc").html('共 ' + pageCount + ' 个资源');

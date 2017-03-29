@@ -45,6 +45,7 @@ App.Services.System.FeedBackAttrManagerContentDialog=Backbone.View.extend({
 				contentType:"application/json",
 			}).done(function(res){
 				if(res.code == 0){
+					App.Services.SystemCollection.getFeedBackListHandle();
 					App.Services.System.FeedBackDialog.close();
 				}else{
 					alert(res.message)
@@ -65,11 +66,10 @@ App.Services.System.FeedBackAttrManagerContentDialog=Backbone.View.extend({
 			},
 		}).done(function(res){
 			if(res.code == 0){
-				if(res.code == 0){
-					App.Services.System.FeedBackDialog.close();
-				}else{
-					alert(res.message)
-				}
+				App.Services.System.FeedBackDialog.close();
+				App.Services.SystemCollection.getFeedBackListHandle();
+			}else{
+				alert(res.message)
 			}
 		})
 	}
