@@ -443,7 +443,7 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/BIMperformance/libsH5.js');
 		_.require('/static/dist/BIMperformance/projects.css');
 		_.require('/static/dist/BIMperformance/projects.js');
-
+		
 		App.Project.Settings = $.extend({}, App.Project.Defaults);
 
 		App.Project.Settings.projectId = id;

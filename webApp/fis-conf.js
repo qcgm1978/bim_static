@@ -624,17 +624,26 @@ fis.match('/components/inspectSelection/model.html',{
 fis.match('/components/inspectSelection/**.{css,less}',{
   packTo: '/static/dist/components/inspectSelection/css/inspectSelection.css'
 });
-//fis.match('/static/dist/components/inspectSelection/css/inspectSelection.css', {
-//  useHash: true,
-//  release: '/static/dist/components/inspectSelection/css/inspectSelection.css'
-//});
+
 fis.match('/components/inspectSelection/**.{js,es6}',{
   packTo: '/static/dist/components/inspectSelection/js/inspectSelection.js'
 });
-//fis.match('/static/dist/components/inspectSelection/js/inspectSelection.js', {
-//  useHash: true,
-//  release: '/static/dist/components/inspectSelection/js/inspectSelection.js'
-//});
+//旧模型
+fis.match('/components/inspectSelectionOld/index.html',{
+  release: '/static/dist/components/inspectSelectionOld/index.html'
+});
+fis.match('/components/inspectSelectionOld/model.html',{
+  release: '/static/dist/components/inspectSelectionOld/model.html'
+});
+
+fis.match('/components/inspectSelectionOld/**.{css,less}',{
+  packTo: '/static/dist/components/inspectSelectionOld/css/inspectSelection.css'
+});
+
+fis.match('/components/inspectSelectionOld/**.{js,es6}',{
+  packTo: '/static/dist/components/inspectSelectionOld/js/inspectSelection.js'
+});
+
 
 //设备模型组件
 fis.match('/components/device/index.html',{
@@ -867,6 +876,12 @@ fis.match('/static/dist/BIMperformance/projects.js', {
   release: '/static/dist/BIMperformance/projects.js'
 });
 
+fis.match('/commOld/**.{js,es6}', {
+  packTo: '/static/dist/commOld/commOld.js'
+});
+fis.match('/static/dist/commOld/commOld.js', {
+  release: '/static/dist/commOld/commOld.js'
+});
 
 
 
