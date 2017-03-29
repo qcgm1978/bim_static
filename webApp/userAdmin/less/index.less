@@ -75,6 +75,63 @@
     			position: absolute;
     			left: 20px;
     			top: 20px;
+    			z-index: 10;
+    		}
+    		.searchUserListBox{
+    			position: absolute;
+    			left: 136px;
+    			top: 20px;
+    			width: 440px;
+    			z-index: 10;
+    			display: inline-block;
+    			label{
+					float: left;
+					width: 70px;
+					line-height: 30px;
+					height: 30px;
+					font-size: 14px;
+					color: #333;
+					font-weight: normal;
+    			}
+    			.inputBox{
+    				float: left;
+    				width:160px;
+    				margin-left: 10px;
+    				input{
+    					resize: none;
+    					width:170px;
+    					height: 30px;
+    					padding: 6px 8px;
+    					outline: none;
+    					font-size: 12px;
+    					line-height: 1.2;
+    					color: #333;
+    					background-color: #fff;
+    					border: 1px solid #ccc;
+    					-webkit-box-sizing: border-box;
+    					-moz-box-sizing: border-box;
+    					box-sizing: border-box;
+    				}
+    			}
+    			.searchBtnBox{
+    				float: left;
+    				margin-left: 10px;
+    				button{
+    					background-color: #117EE1;
+					    display: inline-block;
+					    width: 80px;
+					    height: 30px;
+					    text-align: center;
+					    line-height: 30px;
+					    color: #fff;
+					    margin-left: 30px;
+					    letter-spacing: 10px;
+					    padding-left: 9px;
+					    box-sizing: border-box;
+					    cursor: pointer;
+					    border: 0;
+    				}
+    			}
     		}
     		.nullViewUserList{
 				position: fixed;
@@ -153,11 +210,12 @@
 	    				tr td{
 	    					border-right: #aaa solid 1px;
 	    					font-size: 16px;
+	    					width: 15%;
 	    				}
 	    			}
 	    			tbody tr td{
 	    				font-size: 14px;
-	    				width: 20%;
+	    				width: 15%;
 	    			}
 	    		}
 	    		table tr td{
@@ -309,6 +367,16 @@
 
 				}
 			}
+		}
+		.iconCal {
+		  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 6px -230px;
+		  position: absolute;
+		  right: 5px;
+		  width: 28px;
+		  height: 30px;
+		  top: 9px;
+		  background-color: #eee;
+		  border-left: 1px #ccc solid;
 		}
 		.dialogProjectList{
 			height: 162px!important;

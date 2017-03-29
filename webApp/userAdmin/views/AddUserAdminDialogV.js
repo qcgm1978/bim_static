@@ -5,6 +5,7 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 		userNameVal:'',
 		accrentPassWordVal:'',
 		selectProjectArr:'',
+		endDate:'',
 		prefixBool:false,
 		accrentNameBool:false,
 		userNameBool:false,
@@ -20,7 +21,28 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 		this.$el.html(this.template());
 		this.getProjectData();//获取用户的信息方法
 		this.getPrefixData();//获取用户前缀列表的方法
+		this.bindTimeHandle();//绑定时间事件
 		return this;
+	},
+	bindTimeHandle:function(){
+		var _this = this;
+		this.$('#endDate').datetimepicker({
+		  language: 'zh-CN',
+		  autoclose: true,
+		  format: 'yyyy-mm-dd',
+		  minView: 'month',
+		  startDate:new Date()
+		});
+		var endTime = new Date().setDate(new Date().getDate()+7);
+		var endTimeStr = new Date(endTime);
+		this.$('#endDate').val(endTimeStr.getFullYear() + "-" + (endTimeStr.getMonth() + 1) + "-" + endTimeStr.getDate());
+		this.default.endDate = endTimeStr.getFullYear() + "-" + (endTimeStr.getMonth() + 1) + "-" + endTimeStr.getDate();
+		this.$('#endDate').on('change',function(){
+		  _this.default.endDate=$(this).val();
+		})
+		this.$(".dateBox .iconCal").on("click",function() {
+		    $(this).next().focus();
+		});
 	},
 	getPrefixData:function(){//获取用户前缀的方法
 		var _this = this;
@@ -166,7 +188,8 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 			"loginId":this.default.accrentNameVal,
 			"userName":this.default.userNameVal,
 		    "pwd":this.default.accrentPassWordVal,
-		    "projects":this.default.selectProjectArr
+		    "projects":this.default.selectProjectArr,
+		    "validTime":this.default.endDate
 		}
 		var saveViewUserDataModel = Backbone.Model.extend({
 			defaults: _data,

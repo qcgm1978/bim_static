@@ -9,8 +9,9 @@ App.userAdmin.UserAdminListV = Backbone.View.extend({
  		"click .viewUserEdite": "editViewUserFun",
  		"click .viewUserDelete": "deleteViewUserFun",
  	},
-	render:function(){
-		this.getViewUserListFun();//第一次进入 获取用户列表的方法
+	render:function(parmer){
+		this.$el.html("<div class='loading'>加载中，请稍后...</div>");
+		this.getViewUserListFun(parmer);//第一次进入 获取用户列表的方法
 		return this;
 	},
 	initScroll:function(){
@@ -23,19 +24,19 @@ App.userAdmin.UserAdminListV = Backbone.View.extend({
              scrollInertia: 0
          });
 	},
-	getViewUserListFun:function(){//获取浏览用户列表的方法
+	getViewUserListFun:function(parmer){//获取浏览用户列表的方法
 		var _this = this;
 	    var _data = {
+	    	name:"",
 	    	pageIndex:this.default.pageIndex,
 	    	pageItemCount:App.Comm.Settings.pageItemCount
 	    }
+	    var _datas = $.extend({},_data,parmer);
 	    App.userAdmin.getViewUserListC.fetch({
-			data: _data,
+			data: _datas,
 			success: function(collection, response, options) {
 				if(response.code == 0){
-					_this.$el.html("");
 					_this.$el.html(_this.template({state:response.data.items}));
-					$(".loading").css("display","none");
 					var $content = $(".pagingBox");
 					var pageCount = response.data.totalItemCount;
 					$content.find(".sumDesc").html('共 ' + pageCount + ' 个用户');

@@ -10,6 +10,7 @@ App.userAdmin.UserAdminPrefixListV = Backbone.View.extend({
  		"click .viewUserDelete": "deleteViewUserFun",
  	},
 	render:function(){
+		this.$el.html("<div class='loading'>加载中，请稍后...</div>");
 		this.getViewUserPrefixListFun();//第一次进入 获取用户前缀列表的方法
 		return this;
 	},

@@ -7,6 +7,7 @@
 					<td>账号前缀</td>
 					<td>用户名称</td>
 					<td>账号密码</td>
+					<td>到期日</td>
 					<td>账号操作</td>
 				</tr>
 			</thead>
@@ -17,6 +18,7 @@
 						<td><%= item.prefix %></td>
 						<td><%= item.username %></td>
 						<td><%= item.pwd %></td>
+						<td><%= item.valid_time %></td>
 						<td>
 							<a href="javascript:;" data-loginid='<%= item.loginid %>' class="viewUserItem viewUserEdite">编辑</a>
 							<a href="javascript:;" data-loginid='<%= item.loginid %>' class="viewUserItem viewUserDelete">删除</a>

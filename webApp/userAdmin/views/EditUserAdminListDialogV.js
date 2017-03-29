@@ -4,6 +4,7 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 		userNameVal:'',
 		accrentPassWordVal:'',
 		selectProjectArr:'',
+		endDate:'',
 		userNameBool:true,
 		accrentPassWordBool:true,
 		selectProjectBool:true,
@@ -15,6 +16,22 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 	render:function(editId){
 		this.getViewUserInfoFun(editId);//获取用户的信息方法
 		return this;
+	},
+	bindTimeHandle:function(){
+		var _this = this;
+		this.$('#endDateEdit').datetimepicker({
+		  language: 'zh-CN',
+		  autoclose: true,
+		  format: 'yyyy-mm-dd',
+		  minView: 'month',
+		  startDate:new Date()
+		});
+		this.$('#endDateEdit').on('change',function(){
+		  _this.default.endDate=$(this).val();
+		})
+		this.$(".dateBox .iconCal").on("click",function() {
+		    $(this).next().focus();
+		});
 	},
 	getViewUserInfoFun:function(editId){//获取用户的信息方法
 		var _this = this;
@@ -29,7 +46,9 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 					_this.default.accrentNameVal = response.data.loginid;
 					_this.default.accrentPassWordVal = response.data.pwd;
 					_this.default.prefixVal = response.data.prefix;
+					_this.default.endDate = response.data.valid_time;
 					_this.$el.html(_this.template({state:response.data}));
+					_this.bindTimeHandle();
 					_this.getProjectData(response.data.projects);//获取全部项目的方法
 				}
 			}
@@ -122,7 +141,8 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 			"loginId":this.default.accrentNameVal,
 			"userName":this.default.userNameVal,
 		    "pwd":this.default.accrentPassWordVal,
-		    "projects":this.default.selectProjectArr
+		    "projects":this.default.selectProjectArr,
+		    "validTime":this.default.endDate
 		}
 		$.ajax({
 		    type:"PUT",

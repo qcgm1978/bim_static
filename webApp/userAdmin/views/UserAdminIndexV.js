@@ -4,6 +4,7 @@ App.userAdmin.UserAdminIndexV = Backbone.View.extend({
 	events: {
  		"click #viewUlTab li": "switchTab",
  		"click #addViewUserBtn": "addViewUserFun",
+ 		"click .searchBtnBoxBtn": "searchBtnBox",
  		"click #addViewUserPrefixFun": "addViewUserPrefixFun",
  	},
 	render:function(){
@@ -11,6 +12,7 @@ App.userAdmin.UserAdminIndexV = Backbone.View.extend({
 		$("#viewUlTab").find("li").eq(0).addClass("selected");
 		$("#viewShowBox > div").eq(0).css("display","block");
 		this.renderUserAdminListDom();//显示用户列表
+		$(".inputBox input").on('keydown',(e)=>this.initEventHandle(e));
 		return this;
 	},
 	switchTab:function(event){
@@ -29,10 +31,10 @@ App.userAdmin.UserAdminIndexV = Backbone.View.extend({
 		var UserAdminPrefixListV = new App.userAdmin.UserAdminPrefixListV;
 		this.$el.find(".viewUserSetBox").append(UserAdminPrefixListV.render().el);
 	},
-	renderUserAdminListDom:function(){//加载添加用户的方法
+	renderUserAdminListDom:function(parmer){//加载添加用户的方法
 		$("#viewShowBox").find("div.viewUserList").siblings().css("display","none").end().css("display","block");
 		var UserAdminListV = new App.userAdmin.UserAdminListV;
-		this.$el.find(".viewUserListBox").append(UserAdminListV.render().el);
+		this.$el.find(".viewUserListBox").html(UserAdminListV.render(parmer).el);
 	},
 	addViewUserFun:function(evt){//添加用户列表的方法
 		var addDialogEle = new App.userAdmin.AddUserAdminDialogV;
@@ -48,6 +50,10 @@ App.userAdmin.UserAdminIndexV = Backbone.View.extend({
 		    message:addDialogEleDom
 		});
 	},
+	searchBtnBox:function(){//点击搜索执行的方法
+		var inputBoxVal = $(".inputBox input").val().trim();
+		this.renderUserAdminListDom({name:inputBoxVal});
+	},
 	addViewUserPrefixFun:function(evt){//添加用户前缀的方法
 		var addDialogEle = new App.userAdmin.AddUserAdminPrefixDialogV;
 		var addDialogEleDom = addDialogEle.render().el;
@@ -62,5 +68,10 @@ App.userAdmin.UserAdminIndexV = Backbone.View.extend({
 		    message:addDialogEleDom
 		});
 	},
-
+	initEventHandle:function(e){
+		if(e.keyCode == 13){
+			var inputBoxVal = $(".inputBox input").val().trim();
+			this.renderUserAdminListDom({name:inputBoxVal});
+		}
+	}
 })
