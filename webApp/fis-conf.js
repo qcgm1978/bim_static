@@ -868,10 +868,10 @@ fis.match('/static/dist/BIMperformance/projects.js', {
 });
 
 fis.match('/commOld/**.{js,es6}', {
-  packTo: '/static/dist/comm/commOld.js'
+  packTo: '/static/dist/commOld/commOld.js'
 });
-fis.match('/static/dist/comm/commOld.js', {
-  release: '/static/dist/comm/commOld.js'
+fis.match('/static/dist/commOld/commOld.js', {
+  release: '/static/dist/commOld/commOld.js'
 });
 
 
