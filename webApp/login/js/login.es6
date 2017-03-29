@@ -275,9 +275,9 @@ var Login = {
 		//事件绑定
 		Login.bindEvent();
 		
-		if(Login.isSSO())
+		if(Login.isSSO(document.cookies))
 		{
-			Login.checkSSO();
+			//Login.checkSSO();
 		}
 		else
 		{
@@ -300,8 +300,6 @@ var Login = {
 		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken",cooks);
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC",cooks);
 		var AuthUser_Signature = Login.getCookie("AuthUser_Signature",cooks);
-
-		//alert("AuthUser_AuthNum:"+AuthUser_AuthNum);
 
 		//try
 		{

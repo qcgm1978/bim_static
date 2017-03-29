@@ -230,9 +230,10 @@
         {
             cookies = cookies.replace(/"/g,"");
         }
-        //myWebView.runScript('Login.isSSO(' + document.cookie + ')', function(result) {});
-        myWebView.runScript('Login.isSSO("'+cookies+'")', function(result) {});
-        //myWebView.runScript('Login.isSSO("'+cookies+'")', function(result) {});
+        console.log(cookies);
+        setTimeout(function(){
+            myWebView.runScript('Login.isSSO("' + cookies + '")', function(result) {});
+        },500);
     }
     catch(e)
     {}
