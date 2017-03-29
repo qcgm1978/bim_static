@@ -17096,7 +17096,7 @@ CLOUD.Model.prototype.destroy = function () {
 };
 
 CLOUD.Model.prototype.projectUrl = function () {
-    return this.serverUrl + this.databagId + "/config.json";
+    return this.serverUrl +"config/"+ this.databagId + "/config.json";
 };
 
 CLOUD.Model.prototype.sceneUrl = function (idx) {
@@ -17114,7 +17114,7 @@ CLOUD.Model.prototype.userIdUrl = function () {
 
 CLOUD.Model.prototype.octreeUrl = function (idx) {
     idx = idx || 'o';
-    return this.serverUrl + this.databagId + "/scene/index_" + idx;
+    return this.serverUrl +"file/"+ this.databagId + "/scene/index_" + idx;
 };
 
 CLOUD.Model.prototype.symbolUrl = function () {
