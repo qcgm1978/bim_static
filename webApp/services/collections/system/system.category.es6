@@ -272,7 +272,6 @@ App.Services.SystemCollection = {
 	},
 	getFeedBackListHandle(parmer){//获取建议反馈列表的方法
 		var self = this;
-		var user= JSON.parse(localStorage.getItem("user"));
 		var defaultData = {
 			query:'all',
 			content:'',
@@ -280,7 +279,6 @@ App.Services.SystemCollection = {
 			opTimeStart:'',
 			opTimeEnd:'',
 			haveReply:"",
-			createId:user.userId,
 			pageIndex:App.Services.SystemCollection.Settings.pageIndexFeedBack,
 			pageItemCount:15,
 		};

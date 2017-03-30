@@ -121,7 +121,7 @@ App.Services.SuggestView = {
                    _this.find('#sugTitle').val(data.title);
                    _this.find('#sugDescr').val(data.content);
                    if(data.haveReply){
-                       $("#suggestViewTable").append('<tr><td class="textRow feedBackTr"><span class="label">回复(1)</span></td></tr><tr id="haveReplyList"></tr>')
+                       $("#suggestViewTable").append('<tr><td class="textRow feedBackTr"><span class="label">回复</span></td></tr><tr id="haveReplyList"></tr>')
                    }
                    _.each(data.attachmentList,function(item){
                        _this.find('.attachList').append('<div><a data-id="'+item.id+'" href="javascript:;" onclick="App.Services.SuggestView.download(this);" class="alink listItem">'+item.attachmentName+'</a></div>');

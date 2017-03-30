@@ -50,9 +50,9 @@ App.Services.System.FeedBackAttrManagerContentDialog=Backbone.View.extend({
 		var addDataObj = {
 			"adviceId": target.data("adviceid"),  
 		    "content": feedBackDesc,
-		    "replyId": target.data("createid"),
+		    "replyId": user.userId,
 		    "loginName":user.loginName,
-		    "replyName": target.data("createname")
+		    "replyName": user.name
 		}
 		if(!target.hasClass("disabled")){
 			App.Comm.ajax({
