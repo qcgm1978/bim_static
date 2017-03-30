@@ -375,6 +375,7 @@ App.API = {
 		deleteFeedBackQT:"platform/advice/feedback/delete/{replytId}",//删除建议反馈列表的接口
 		addFeedBack:"platform/advice/feedback/reply/write",//删除建议反馈列表的接口
 		downloadsFeedBack:"platform/advice/feedback/zipdownload/{adviceId}",//下载建议反馈附件列表的接口
+		downloadsOneFeedBack:"platform/advice/feedback/download/{attachmentId}",//下载建议反馈单个附件列表的接口
 
 	},
 

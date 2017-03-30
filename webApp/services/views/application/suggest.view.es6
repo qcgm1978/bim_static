@@ -76,6 +76,7 @@ App.Services.SuggestView = {
             "content": _this.find('#sugDescr').val(),//内容
             "createId": user.userId,//上传人用户id
             "createName": user.name,//上传人姓名
+            "loginName": user.loginName,//上传人姓名
             "attachmentList": []
         }
 

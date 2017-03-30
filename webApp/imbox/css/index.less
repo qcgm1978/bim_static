@@ -9,10 +9,21 @@
 & #imboxContent { height: 100%; padding-bottom: 10px;.commissionBox{height: 100%;width: 100%; padding: 0 20px;}
 	& ul {width: 100%; height: 100%;}
 	& li { height: 50px; line-height: 50px; margin: 0 20px; border-bottom: 1px solid #ccc; box-sizing: border-box; font-size: 14px;
-		& .title { width: 48%; display: inline-block;
+		& .title { 
+			width: 78%; 
+			display: inline-block;
+			a{
+				height: 20px;
+				line-height: 28px;
+				display: inline-block;
+				width: 90%;
+				overflow: hidden;
+				white-space: nowrap;
+				text-overflow:ellipsis;
+			}
 			& i { background: url('../images/icon.png') -28px -400px no-repeat; width: 40px; height: 20px; display: inline-block; display: inline-block; vertical-align: -10px; }
 		}
-		& .time { width: 48%; display: inline-block; text-align: right; float: right;}
+		& .time { width: 18%; display: inline-block; text-align: right; float: right;}
 	}
 	& .page { 
 		height:50px;position: absolute; bottom: 10px; right: 20px; left: 20px; border: 1px solid #ccc; border-top: none; 

@@ -272,6 +272,7 @@ App.Services.SystemCollection = {
 	},
 	getFeedBackListHandle(parmer){//获取建议反馈列表的方法
 		var self = this;
+		var user= JSON.parse(localStorage.getItem("user"));
 		var defaultData = {
 			query:'all',
 			content:'',
@@ -279,6 +280,7 @@ App.Services.SystemCollection = {
 			opTimeStart:'',
 			opTimeEnd:'',
 			haveReply:"",
+			createId:user.userId,
 			pageIndex:App.Services.SystemCollection.Settings.pageIndexFeedBack,
 			pageItemCount:15,
 		};
@@ -292,7 +294,7 @@ App.Services.SystemCollection = {
 				$(".feedBackList").find(".loading").remove();
 				var $content = $(".feedBackContentDown");
 				var pageCount = response.data.totalItemCount;
-				$content.find(".sumDesc").html('共 ' + pageCount + ' 个资源');
+				$content.find(".sumDesc").html('共 ' + pageCount + ' 个反馈');
 				$content.find(".listPagination").empty().pagination(pageCount, {
 				    items_per_page: response.data.pageItemCount,
 				    current_page: response.data.pageIndex - 1,
