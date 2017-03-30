@@ -3,7 +3,7 @@
 		<td>
 			<dl>
 				<dt>我的建议：</dt>
-				<dd data-id="<%=data.id%>" onclick="App.Suggest.show(this);"><%= data.content%></dd>
+				<dd data-id="<%=data.id%>" onclick="App.Suggest.show(this);"><%= data.title%></dd>
 			</dl>
 			<dl>
 				<dt>回复内容：</dt>
@@ -26,8 +26,8 @@
 		</td>
 	<%}else{%>
 		<td>
-			<span title="<%= data.content%>" class="noRepret">
-				<%= data.content%>
+			<span title="<%= data.title%>" class="noRepret">
+				<%= data.title%>
 			</span>
 		</td>
 		<td>
