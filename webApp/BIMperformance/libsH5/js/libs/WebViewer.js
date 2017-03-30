@@ -23,8 +23,8 @@ CLOUD.GlobalData = {
 
     SelectionColor: {color: 0x003BBD, side: THREE.DoubleSide/*, opacity: 0.5, transparent: true*/},
 
-    maxObjectNumInPool: 100000,
-    maxDrawCacheNum : 20000,
+    maxObjectNumInPool: 80000,
+    maxDrawCacheNum : 60000,
     ShowOctant: false,
     OctantDepth: 8,
     MaximumDepth: 0,
