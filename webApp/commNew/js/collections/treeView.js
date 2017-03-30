@@ -1,5 +1,5 @@
 /**
- * @require /comm/js/comm.es6 
+ * @require /commNew/js/comm.es6 
  */
 
 

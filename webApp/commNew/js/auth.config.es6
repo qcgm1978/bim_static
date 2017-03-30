@@ -1,3 +1,6 @@
+/**
+ * @require /commNew/js/comm.es6 
+ */
 //权限配置
 App.Comm.AuthConfig = {
 	//项目 
