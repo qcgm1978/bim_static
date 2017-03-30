@@ -23,13 +23,17 @@ App.Services.System.FeedBackAttrManagerContentDialog=Backbone.View.extend({
 				var dialogHtml = _.templateUrl("/services/tpls/system/feedBack/feedBackAttrManagerDialog.html");
 				_this.$el.html(dialogHtml(res.data.items[0]));
 			}else{
-				alert(res.message)
+				$.tip({message:res.message,type:'alarm'});
 			}
 		})
 	},
 	addFeedBack(event){//添加回复
 		var target = $(event.target);
 		var feedBackDesc = $("#feedBackDesc").val();
+		if(feedBackDesc == ""){
+			$.tip({message:'回复内容不能为空',type:'alarm'});
+			return false
+		}
 		var addDataObj = {
 			"adviceId": target.data("adviceid"),  
 		    "content": feedBackDesc,
@@ -49,6 +53,7 @@ App.Services.System.FeedBackAttrManagerContentDialog=Backbone.View.extend({
 					App.Services.System.FeedBackDialog.close();
 				}else{
 					alert(res.message)
+					$.tip({message:res.message,type:'alarm'});
 				}
 			})
 		}
@@ -69,7 +74,7 @@ App.Services.System.FeedBackAttrManagerContentDialog=Backbone.View.extend({
 				App.Services.System.FeedBackDialog.close();
 				App.Services.SystemCollection.getFeedBackListHandle();
 			}else{
-				alert(res.message)
+				$.tip({message:res.message,type:'alarm'});
 			}
 		})
 	}

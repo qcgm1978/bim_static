@@ -115,18 +115,20 @@ App.Services.SuggestView = {
             contentType:"application/json",
         },function(res){
             if(res.code==0){
-                var data=res.data.items[0];
-                _this.find('#sugTitle').val(data.title);
-                _this.find('#sugDescr').val(data.content);
-                if(data.haveReply){
-                    $("#suggestViewTable").append('<tr><td class="textRow feedBackTr"><span class="label">回复(1)</span></td></tr><tr id="haveReplyList"></tr>')
+                if(res.data.items.length>0){
+                   var data=res.data.items[0];
+                   _this.find('#sugTitle').val(data.title);
+                   _this.find('#sugDescr').val(data.content);
+                   if(data.haveReply){
+                       $("#suggestViewTable").append('<tr><td class="textRow feedBackTr"><span class="label">回复(1)</span></td></tr><tr id="haveReplyList"></tr>')
+                   }
+                   _.each(data.attachmentList,function(item){
+                       _this.find('.attachList').append('<div><a data-id="'+item.id+'" href="javascript:;" onclick="App.Services.SuggestView.download(this);" class="alink listItem">'+item.attachmentName+'</a></div>');
+                   })
+                   _.each(data.adviceReplys,function(item){
+                       _this.find('#haveReplyList').append('<td class="feedBackTrList"><dl class="feedBackDl"><dt><span>'+item.replyName+'</span><span>'+item.replyTimeStr+'</span></dt><dd>'+item.content+'</dd></dl></td>');
+                   }) 
                 }
-                _.each(data.attachmentList,function(item){
-                    _this.find('.attachList').append('<div><a data-id="'+item.id+'" href="javascript:;" onclick="App.Services.SuggestView.download(this);" class="alink listItem">'+item.attachmentName+'</a></div>');
-                })
-                _.each(data.adviceReplys,function(item){
-                    _this.find('#haveReplyList').append('<td class="feedBackTrList"><dl class="feedBackDl"><dt><span>'+item.replyName+'</span><span>'+item.replyTimeStr+'</span></dt><dd>'+item.content+'</dd></dl></td>');
-                })
             }
         })
     }

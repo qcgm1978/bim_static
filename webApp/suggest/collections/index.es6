@@ -58,20 +58,6 @@ App.Suggest = {
 			}
 		}
 	})),
-	// messageCollection: new(Backbone.Collection.extend({
-	// 	model: Backbone.Model.extend({
-	// 		defaults:function(){
-	// 			return {
-	// 				title:''
-	// 			}
-	// 		}
-	// 	}),
-	// 	urlType: "serviceSuggestHistory",
-	// 	parse: function(response) {
-	// 		return response.data;
-	// 	}
-	// })),
-
 	messageAllCollection: new(Backbone.Collection.extend({
 		model: Backbone.Model.extend({
 			defaults:function(){

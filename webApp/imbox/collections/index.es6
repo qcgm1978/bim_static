@@ -477,7 +477,7 @@ App.INBox.comment = {
 
 			//新增数据
 			addOne(model) {
-
+				console.log(123456);
 				//模板数据
 				var $list = new App.INBox.comment.CommentView.ReMarkListDetail({
 						model: model
