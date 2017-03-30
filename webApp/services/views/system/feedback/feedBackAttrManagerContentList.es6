@@ -19,7 +19,7 @@ App.Services.System.FeedBackAttrManagerContentList=Backbone.View.extend({
 	},
 	answerBtnHandle(event){
 		var target = $(event.target);
-		var feedbackid = target.data("feedbackid");
+		var feedbackid = target.parents("td").data("feedbackid");
 		var FeedBackAttrManagerContentDialog = new App.Services.System.FeedBackAttrManagerContentDialog({model:feedbackid});
 		App.Services.System.FeedBackDialog = new App.Comm.modules.Dialog({
 			title: "建议反馈",
