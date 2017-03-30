@@ -4,7 +4,7 @@
 	<td></td>
 <%} %>
 <% if(haveReply){%>
-	<td class="feedBackTd">
+	<td class="feedBackTd" data-feedbackid="<%= id%>">
 	    <p>建议内容：<%=title%></p>
 	    <%if(adviceReplys.length>0){%>
 	    <p class="feedBackContentText"><span>回复内容：</span><%= adviceReplys[0].content%> <%=createTime%></p>
@@ -22,6 +22,6 @@
 <%}else{%>
 	<td>未回复</td>
 <%}%>
-<td>
-	<a href="javascript:;" class="answerBtn" data-feedbackid="<%= id%>">回复</a>
+<td data-feedbackid="<%= id%>">
+	<a href="javascript:;" class="answerBtn">回复</a>
 </td>
