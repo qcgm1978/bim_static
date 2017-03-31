@@ -418,7 +418,7 @@ var CommProject = {
         if (!_.isArray(marks)) {
             marks = [marks];
         }
-        viewer.viewer.setMarkerClickCallback(markerClick); // modify by wuweiwei old interface
+        _viewer.viewer.setMarkerClickCallback(markerClick); // modify by wuweiwei old interface
         //_viewer.getMakerObject().setMarkerClickCallback(markerClick);// add by wuweiwei new interface
         _viewer.loadMarkers(marks);
     },
