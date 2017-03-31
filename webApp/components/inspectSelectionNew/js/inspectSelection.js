@@ -1,7 +1,7 @@
 /*
- *@require /components/inspectSelectionOld/libs/jquery-1.12.0.min.js
- *@require /components/inspectSelectionOld/libs/underscore.1.8.2.js
- *@require /components/inspectSelectionOld/libs/backbone.1.1.2.js
+ *@require /components/inspectSelectionNew/libs/jquery-1.12.0.min.js
+ *@require /components/inspectSelectionNew/libs/underscore.1.8.2.js
+ *@require /components/inspectSelectionNew/libs/backbone.1.1.2.js
  */
 
 (function(win) {
@@ -200,8 +200,8 @@
 	var ourl = "";
 	var scripts = document.getElementsByTagName('script');
 	for (var i = 0, size = scripts.length; i < size; i++) {
-		if (scripts[i].src.indexOf('/static/dist/components/inspectSelectionOld/js/inspectSelection.js') != -1) {
-			var a = scripts[i].src.replace('/static/dist/components/inspectSelectionOld/js/inspectSelection.js', '');
+		if (scripts[i].src.indexOf('/static/dist/components/inspectSelectionNew/js/inspectSelection.js') != -1) {
+			var a = scripts[i].src.replace('/static/dist/components/inspectSelectionNew/js/inspectSelection.js', '');
 			ourl = a;
 		}
 	}
@@ -928,10 +928,10 @@
 		},
 		init: function() {
 			var self = this,
-				srciptUrl = ourl + '/static/dist/libs/libsH5.js',
-				commjs = ourl + '/static/dist/comm/comm_20160313.js',
+				srciptUrl = ourl + '/static/dist/BIMperformance/libsH5.js',
+				commjs = ourl + '/static/dist/commNew/commNew.js',
 				libStyle = ourl + '/static/dist/libs/libsH5_20160313.css',
-				myStyle = ourl + '/static/dist/components/inspectSelectionOld/css/inspectSelection.css',
+				myStyle = ourl + '/static/dist/components/inspectSelectionNew/css/inspectSelection.css',
 				$css = '<link rel="stylesheet" href="' + libStyle + '" />',
 				$css2 = '<link rel="stylesheet" href="' + myStyle + '" />';
 				$css3 = '<link rel="stylesheet" href="' + myStyle + '" />';
