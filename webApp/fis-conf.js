@@ -796,6 +796,9 @@ fis.media('prod').match('*.{png,jpg,gif}', {
 fis.match('qualityFill/tpls/qualityFill.html', {
   release: "/static/dist/qualityFill/qualityFill.html"
 });
+fis.match('qualityFill/tpls/qualityFill2.html', {
+  release: "/static/dist/qualityFill/qualityFill2.html"
+});
 fis.match('qualityFill/tpls/quality.html', {
   release: "/static/dist/qualityFill/quality.html"
 });
