@@ -3,18 +3,18 @@
 <%}else{%>
 	<td></td>
 <%} %>
-<% if(haveReply){%>
-	<td class="feedBackTd" data-feedbackid="<%= id%>">
-	    <p>建议内容：<%=title%></p>
-	    <%if(adviceReplys.length>0){%>
-	    <p class="feedBackContentText"><span>回复内容：</span><%= adviceReplys[0].content%> <%=createTime%></p>
-	    <%}else{%>
-	    <p class="feedBackContentText"><span>回复内容：</span>没有回复内容 <%=createTime%></p>
-	    <%}%>
-	</td>
+<%if(haveReply){%>
+    <td class="feedBackTd" data-feedbackid="<%= id%>">
+        <p><span>建议内容：</span><%=title%></p>
+        <%if(adviceReplys.length>0){%>
+            <p class="feedBackContentText"><span>回复内容：</span><%= adviceReplys[0].content%> <%=createTime%></p>
+        <%}%>
+    </td>
 <%}else{%>
-	<td class="feedBackTd" data-feedbackid="<%= id%>"><p><%=title%></p></td>
-<%} %>
+    <td class="feedBackTd" data-feedbackid="<%= id%>">
+        <p><span>建议内容：</span><%=title%></p>
+    </td>
+<%}%>
 <td><%=createName%></td>
 <td><%=createTime%></td>
 <% if(haveReply){%>

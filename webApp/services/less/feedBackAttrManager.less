@@ -97,11 +97,12 @@
 			border-left: 1px #ccc solid;
 			border-bottom: 1px #ccc solid;
 			&:nth-child(1){
-				width: 8%;
+				width: 2%;
 				border-left: 0;
+				position: relative;
 			}
 			&:nth-child(2){
-				width: 60%;
+				width: 66%;
 			}
 			&:nth-child(3){
 				width: 8%;
@@ -143,6 +144,11 @@
 					&:nth-child(2){
 						&.feedBackTd{
 							cursor: pointer;
+							p{
+								span{
+									font-weight: bold;
+								}
+							}
 						}
 						text-align: left;
 						padding-left: 16px;
@@ -166,6 +172,9 @@
 					background: url('../images/down_load.png') center no-repeat;
 					background-size: 16px 16px;
 					display: inline-block;
+					position: absolute;
+				    left: 0;
+				    top: 2px;
 				}
 			}
 			.pagingBox{position: absolute;bottom: 0px;left:20px;right: 20px;line-height: 40px;
@@ -250,7 +259,6 @@
 		position: absolute;
 		right: 0;
 		bottom: 0;
-		font-size: 14px;
 		display: none;
 	}
 	&:hover{

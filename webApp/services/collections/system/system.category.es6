@@ -289,25 +289,36 @@ App.Services.SystemCollection = {
 			type:"POST",
 			contentType:"application/json",
 			success:function(collection, response, options){
-				$(".feedBackList").find(".loading").remove();
-				var $content = $(".feedBackContentDown");
-				var pageCount = response.data.totalItemCount;
-				$content.find(".sumDesc").html('共 ' + pageCount + ' 个反馈');
-				$content.find(".listPagination").empty().pagination(pageCount, {
-				    items_per_page: response.data.pageItemCount,
-				    current_page: response.data.pageIndex - 1,
-				    num_edge_entries: 3, //边缘页数
-				    num_display_entries: 5, //主体页数
-				    link_to: 'javascript:void(0);',
-				    itemCallback: function(pageIndex) {
-				        //加载数据
-				        App.Services.SystemCollection.Settings.pageIndexFeedBack = pageIndex + 1;
-				        App.Services.SystemCollection.getFeedBackListHandle();
-				    },
-				    prev_text: "上一页",
-				    next_text: "下一页"
-				});
-				return response.data;
+				if(response.code == 0){
+					var $content = $(".feedBackContentDown");
+					if(response.data.items.length>0){
+						$(".feedBackList").find(".loading").remove();
+						var pageCount = response.data.totalItemCount;
+						$content.find(".sumDesc").html('共 ' + pageCount + ' 个反馈');
+						$content.find(".listPagination").empty().pagination(pageCount, {
+						    items_per_page: response.data.pageItemCount,
+						    current_page: response.data.pageIndex - 1,
+						    num_edge_entries: 3, //边缘页数
+						    num_display_entries: 5, //主体页数
+						    link_to: 'javascript:void(0);',
+						    itemCallback: function(pageIndex) {
+						        //加载数据
+						        App.Services.SystemCollection.Settings.pageIndexFeedBack = pageIndex + 1;
+						        App.Services.SystemCollection.getFeedBackListHandle(extendData);
+						    },
+						    prev_text: "上一页",
+						    next_text: "下一页"
+						});
+						return response.data;
+					}else{
+						$content.find(".feedBackList").html('<li class="loading">数据为空</li>');
+						$content.find(".sumDesc").html('');
+						$content.find(".listPagination").empty('');
+					}
+					
+				}else{
+					$.tip({message:res.message,type:'alarm'});
+				}
 			}
 		})
 	},

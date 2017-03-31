@@ -33,10 +33,15 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 		  minView: 'month',
 		  startDate:new Date()
 		});
-		var endTime = new Date().setDate(new Date().getDate()+7);
+		// var nowDate = new Date(new Date().getTime()+15*24*3600*1000);
+		// var getYear = nowDate.getFullYear();
+		// var getMone = nowDate.getMonth()<10?"0"+nowDate.getMonth()+1:nowDate.getMonth()+1;
+		var endTime = new Date().setDate(new Date().getDate()+15);
 		var endTimeStr = new Date(endTime);
-		this.$('#endDate').val(endTimeStr.getFullYear() + "-" + (endTimeStr.getMonth() + 1) + "-" + endTimeStr.getDate());
-		this.default.endDate = endTimeStr.getFullYear() + "-" + (endTimeStr.getMonth() + 1) + "-" + endTimeStr.getDate();
+		var endDateMon = (endTimeStr.getMonth()+1)<10?"0"+(endTimeStr.getMonth()+1):(endTimeStr.getMonth()+1);
+		var endDateStrt = endTimeStr.getFullYear() + "-" + endDateMon + "-" + endTimeStr.getDate();
+		this.$('#endDate').val(endDateStrt);
+		this.default.endDate = endDateStrt;
 		this.$('#endDate').on('change',function(){
 		  _this.default.endDate=$(this).val();
 		})
