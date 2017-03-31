@@ -274,6 +274,7 @@ App.Services.SystemCollection = {
 		var self = this;
 		var defaultData = {
 			query:'all',
+			title:'',
 			content:'',
 			createName:'',
 			opTimeStart:'',
