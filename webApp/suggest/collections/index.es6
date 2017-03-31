@@ -106,7 +106,7 @@ App.Suggest = {
 				    itemCallback: function(pageIndex) {
 				        //加载数据
 				        App.Suggest.Settings.pageIndex = pageIndex + 1;
-				        App.Suggest.loadData();
+				        App.Suggest.getSuggestList();
 				    },
 				    prev_text: "上一页",
 				    next_text: "下一页"

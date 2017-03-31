@@ -4,7 +4,9 @@
 		<div class="liTopBox">
 			<dl>
 				<dt>我的建议：</dt>
-				<dd><%= data.title%>  <%= data.content%></dd>
+				<dd>
+					<%= data.title%><br/><%= data.content%>
+				</dd>
 				<dd class="ddTime"><%= data.createTime?new Date(data.createTime).format("yyyy-MM-dd"):'--' %></dd>
 				<dd class="ddDownLoad">
 					<%if(data.havaAttachment){%>
@@ -30,7 +32,7 @@
 		<div class="liTopBox">
 			<dl>
 				<dt>我的建议：</dt>
-				<dd><%= data.title%>  <%= data.content%></dd>
+				<dd><%= data.title%><br/><%= data.content%></dd>
 				<dd class="ddTime"><%= data.createTime?new Date(data.createTime).format("yyyy-MM-dd"):'--' %></dd>
 				<dd class="ddDownLoad">
 					<%if(data.havaAttachment){%>

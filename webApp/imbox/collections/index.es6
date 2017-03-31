@@ -1,5 +1,7 @@
 App.INBox = {
-
+	default:{
+		statusStr:true
+	},
 	init() {
 		$('#pageLoading').hide();
 		$('#dataLoading').hide();
@@ -24,6 +26,7 @@ App.INBox = {
 	read(id, _this, projectId, version, shareId) {
 		//window.open(App.API.Settings.hostname+"platform/message/read?id="+id);
 		if ($(_this).data('status') == 0) {
+			this.default.statusStr=false;
 			App.Comm.loadMessageCount(-1);
 			$(_this).closest('li').remove();
 
@@ -477,7 +480,6 @@ App.INBox.comment = {
 
 			//新增数据
 			addOne(model) {
-				console.log(123456);
 				//模板数据
 				var $list = new App.INBox.comment.CommentView.ReMarkListDetail({
 						model: model
@@ -488,9 +490,28 @@ App.INBox.comment = {
 				$reMarkList.append($list);
 				//移除加载
 				$reMarkList.find(".loading").remove();
-				//滚动条
-				App.Comm.initScroll(this.$(".reMarkListScroll"), "y");
-
+				if(App.INBox.default.statusStr){
+					this.$(".reMarkListScroll").mCustomScrollbar({
+						theme: 'minimal-dark',
+						axis: 'y',
+						set_height:'100%',
+						keyboard: {
+							enable: true
+						},
+						scrollInertia: 0
+					});
+				}else{
+					this.$(".reMarkListScroll").mCustomScrollbar({
+						theme: 'minimal-dark',
+						axis: 'y',
+						set_height:'100%',
+						keyboard: {
+							enable: true
+						},
+						scrollInertia: 0
+					}).mCustomScrollbar("scrollTo","bottom");
+				}
+				
 			},
 
 			//加载数据
