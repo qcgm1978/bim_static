@@ -6,9 +6,20 @@
   bimView.prototype = {
     getAnnotationObject : function(viewer){
       var self = this;
+      self.viewer = self.viewer||viewer;
       if (!self.annotationHelper3D)
       {
-        self.annotationHelper3D = new CLOUD.Extensions.AnnotationHelper3D(self.viewer||viewer);
+        self.annotationHelper3D = new CLOUD.Extensions.AnnotationHelper3D(self.viewer);
+        // render 回调
+        var renderCB = function(){
+                helper.renderAnnotations();
+        }
+        self.viewer.addCallbacks("render", renderCB );
+        // resize 回调
+        var resizeCB = function(){
+                helper.resizeAnnotations();
+        }
+        self.viewer.addCallbacks("render", resizeCB );
       }
       return self.annotationHelper3D;
     },
@@ -36,9 +47,15 @@
 
     getMiniMapObject : function(viewer){
       var self = this;
+      self.viewer = self.viewer||viewer;
       if (!self.MiniMapHelper)
       {
-        self.MiniMapHelper = new CLOUD.Extensions.MiniMapHelper(self.viewer||viewer);
+        self.MiniMapHelper = new CLOUD.Extensions.MiniMapHelper(self.viewer);
+        var renderCB = function(){
+            self.MiniMapHelper.renderMiniMap();
+        }
+        self.viewer.addCallbacks("render", renderCB );
+
       }
       return self.MiniMapHelper;
     },
@@ -719,7 +736,8 @@
       return {
         camera: self.getCamera(),
         list: newList,
-        image: viewer.canvas2image().substr(22),
+        //image: viewer.canvas2image().substr(22),
+        image: self.getAnnotationObject().captureAnnotationsScreenSnapshot().substr(22), //modify by wuweiwei new interface
         filter: {
           files: files,
           category: category,
