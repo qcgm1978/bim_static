@@ -179,6 +179,10 @@
 .feedBackDialog{
 	width: 100%;
 	height: 100%;
+	tr{
+		min-height: 30px;
+		height: auto;
+	}
 	input,textarea{
 		background: #ddd;
 		font-size: 14px!important;
@@ -223,12 +227,15 @@
 }
 .feedBackDl{
 	width: 100%;
-	height: 48px;
+	min-height: 48px;
+	height: auto;
 	position: relative;
 	dt,dd{
-		height: 24px;
+		min-height: 24px;
+		height: auto;
 		line-height: 24px;
 		padding-left: 8px;
+		padding-right: 40px;
 		color: #666;
 		font-weight: normal;
 		span{

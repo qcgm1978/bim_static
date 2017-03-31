@@ -10,7 +10,8 @@ App.Suggest = {
 		$("#topBar li.user").show();
 		$("#contains").append(new App.Suggest.containerView().render().$el);
 		// this.loadData();
-		this.getSuggestList();//获取反馈历史的列表
+		
+		this.getSuggestList();
 	},
 
 	read(id,_this,projectId,version,shareId){
@@ -73,6 +74,7 @@ App.Suggest = {
 	})),
 	getSuggestList(parmer) {
 		var self = this;
+		var user= JSON.parse(localStorage.getItem("user"));
 		var defaultData = {
 			query:'all',
 			content:'',
@@ -80,6 +82,7 @@ App.Suggest = {
 			opTimeStart:'',
 			opTimeEnd:'',
 			have_reply:"",
+			createId:user.userId,
 			pageIndex:App.Suggest.Settings.pageIndex,
 			pageItemCount:15,
 		};
@@ -93,7 +96,7 @@ App.Suggest = {
 				$("#commissionLists").find(".loading").remove();
 				var $content = $(".listBoxFeedBoxDown");
 				var pageCount = response.data.totalItemCount;
-				$content.find(".sumDesc").html('共 ' + pageCount + ' 个资源');
+				$content.find(".sumDesc").html('共 ' + pageCount + ' 个反馈');
 				$content.find(".listPagination").empty().pagination(pageCount, {
 				    items_per_page: response.data.pageItemCount,
 				    current_page: response.data.pageIndex - 1,
@@ -103,7 +106,7 @@ App.Suggest = {
 				    itemCallback: function(pageIndex) {
 				        //加载数据
 				        App.Suggest.Settings.pageIndex = pageIndex + 1;
-				        App.Suggest.loadData();
+				        App.Suggest.getSuggestList();
 				    },
 				    prev_text: "上一页",
 				    next_text: "下一页"
