@@ -52,7 +52,7 @@ App.Services.System.FeedBackAttrManagerTopbar=Backbone.View.extend({
 		var feedBackPeopleVal = feedBackPeople.val().trim();
 		var feedBackState =  $('#feedBackState option:selected').data('feedbackstate');
 		var searchData = {
-			content:keyNameVal,
+			title:keyNameVal,
 			createName:feedBackPeopleVal,
 			opTimeStart:this.default.startTime,
 			opTimeEnd:this.default.endTime,

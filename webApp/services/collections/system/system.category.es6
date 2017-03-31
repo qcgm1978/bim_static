@@ -274,6 +274,7 @@ App.Services.SystemCollection = {
 		var self = this;
 		var defaultData = {
 			query:'all',
+			title:'',
 			content:'',
 			createName:'',
 			opTimeStart:'',
@@ -304,6 +305,7 @@ App.Services.SystemCollection = {
 						    itemCallback: function(pageIndex) {
 						        //加载数据
 						        App.Services.SystemCollection.Settings.pageIndexFeedBack = pageIndex + 1;
+						        extendData.pageIndex=pageIndex + 1;
 						        App.Services.SystemCollection.getFeedBackListHandle(extendData);
 						    },
 						    prev_text: "上一页",

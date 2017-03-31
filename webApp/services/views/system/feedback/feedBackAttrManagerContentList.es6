@@ -4,7 +4,7 @@ App.Services.System.FeedBackAttrManagerContentList=Backbone.View.extend({
 	events:{
 		"click .downLoadId":"downLoadIdHandle",
 		"click td.feedBackTd":"answerBtnHandle",
-		"click td.answerBtn":"answerBtnHandle"
+		"click td a.answerBtn":"answerBtnHandle"
 	},
 	render(){//渲染
 		this.model.createTime = this.changeTimeHandle(this.model.createTime);
