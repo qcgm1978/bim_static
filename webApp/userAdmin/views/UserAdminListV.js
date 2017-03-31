@@ -28,6 +28,7 @@ App.userAdmin.UserAdminListV = Backbone.View.extend({
 		var _this = this;
 	    var _data = {
 	    	name:"",
+	    	validTime:"",
 	    	pageIndex:this.default.pageIndex,
 	    	pageItemCount:App.Comm.Settings.pageItemCount
 	    }

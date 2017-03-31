@@ -141,10 +141,20 @@
 				width: 100%;
 				height: 100%;
 				td{
+					height: auto;
+					min-height: 40px;
+					line-height: normal;
+					padding: 9px 0;
 					&:nth-child(2){
 						&.feedBackTd{
 							cursor: pointer;
-							p{
+							div{
+								width: 100%;
+								height: auto;
+								float: left;
+								&:nth-child(1){
+									margin-bottom: 8px;
+								}
 								span{
 									font-weight: bold;
 								}
@@ -174,7 +184,7 @@
 					display: inline-block;
 					position: absolute;
 				    left: 0;
-				    top: 2px;
+				    top: 9px;
 				}
 			}
 			.pagingBox{position: absolute;bottom: 0px;left:20px;right: 20px;line-height: 40px;
