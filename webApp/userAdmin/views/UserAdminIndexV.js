@@ -7,12 +7,29 @@ App.userAdmin.UserAdminIndexV = Backbone.View.extend({
  		"click .searchBtnBoxBtn": "searchBtnBox",
  		"click #addViewUserPrefixFun": "addViewUserPrefixFun",
  	},
+ 	default:{
+ 		endDateSearch:""
+ 	},
 	render:function(){
+		var _this = this;
 		this.$el.html(this.template());
 		$("#viewUlTab").find("li").eq(0).addClass("selected");
 		$("#viewShowBox > div").eq(0).css("display","block");
 		this.renderUserAdminListDom();//显示用户列表
 		$(".inputBox input").on('keydown',(e)=>this.initEventHandle(e));
+		this.$('#endDateSearch').datetimepicker({
+		  language: 'zh-CN',
+		  autoclose: true,
+		  format: 'yyyy-mm-dd',
+		  minView: 'month',
+		  startDate:new Date()
+		});
+		this.$('#endDateSearch').on('change',function(){
+		  _this.default.endDateSearch=$(this).val();
+		})
+		this.$(".dateBox .iconCal").on("click",function() {
+		    $(this).next().focus();
+		});
 		return this;
 	},
 	switchTab:function(event){
@@ -52,7 +69,8 @@ App.userAdmin.UserAdminIndexV = Backbone.View.extend({
 	},
 	searchBtnBox:function(){//点击搜索执行的方法
 		var inputBoxVal = $(".inputBox input").val().trim();
-		this.renderUserAdminListDom({name:inputBoxVal});
+		var inputTimeBoxVal = this.default.endDateSearch;
+		this.renderUserAdminListDom({validTime:inputTimeBoxVal,name:inputBoxVal});
 	},
 	addViewUserPrefixFun:function(evt){//添加用户前缀的方法
 		var addDialogEle = new App.userAdmin.AddUserAdminPrefixDialogV;
