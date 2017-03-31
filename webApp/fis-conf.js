@@ -586,7 +586,6 @@ fis.match('/components/fileSelection/es6/**.{es6,js}',{
 //});
 
 
-
 //模型 \modelSelection
 fis.match('/components/modelSelection/index.html',{
   release: '/static/dist/components/modelSelection/index.html'
@@ -623,20 +622,20 @@ fis.match('/components/inspectSelection/**.{css,less}',{
 fis.match('/components/inspectSelection/**.{js,es6}',{
   packTo: '/static/dist/components/inspectSelection/js/inspectSelection.js'
 });
-//旧模型
-fis.match('/components/inspectSelectionOld/index.html',{
-  release: '/static/dist/components/inspectSelectionOld/index.html'
+//新模型
+fis.match('/components/inspectSelectionNew/index.html',{
+  release: '/static/dist/components/inspectSelectionNew/index.html'
 });
-fis.match('/components/inspectSelectionOld/model.html',{
-  release: '/static/dist/components/inspectSelectionOld/model.html'
-});
-
-fis.match('/components/inspectSelectionOld/**.{css,less}',{
-  packTo: '/static/dist/components/inspectSelectionOld/css/inspectSelection.css'
+fis.match('/components/inspectSelectionNew/model.html',{
+  release: '/static/dist/components/inspectSelectionNew/model.html'
 });
 
-fis.match('/components/inspectSelectionOld/**.{js,es6}',{
-  packTo: '/static/dist/components/inspectSelectionOld/js/inspectSelection.js'
+fis.match('/components/inspectSelectionNew/**.{css,less}',{
+  packTo: '/static/dist/components/inspectSelectionNew/css/inspectSelection.css'
+});
+
+fis.match('/components/inspectSelectionNew/**.{js,es6}',{
+  packTo: '/static/dist/components/inspectSelectionNew/js/inspectSelection.js'
 });
 
 
