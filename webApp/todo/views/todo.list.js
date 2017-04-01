@@ -29,7 +29,6 @@ App.Todo.TodoListView=Backbone.View.extend({
 		return this;
 
 	},
-
 	addOne:function(model){
 		//渲染单个view
 	    var view=new App.Todo.TodoDetailView({model:model});
