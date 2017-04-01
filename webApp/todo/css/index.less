@@ -36,7 +36,10 @@
 						text-overflow: ellipsis;
 					}
 				}
-				.operator { float: left; width: 14%; font-size: 14px;color: #999;}
+				.operator { 
+					float: left; width: 14%; font-size: 14px;color: #999;
+
+				}
 				.date { float: left; width: 26%; padding-right: 30px;font-size: 14px; color: #999; text-align: left;}
 			}
 		}
@@ -51,7 +54,26 @@
 				text-overflow: ellipsis;
 			}
 		}
-		.operator { float: left; width: 14%; }
+		.operator { 
+			float: left;
+			width: 14%;
+			height: 46px;
+			position: relative;
+			&>span.text{
+				position: absolute;
+				left: 0;
+				top: 0;
+			}
+			&>span:nth-child(2){
+				display: inline-block;
+				width: 100%;
+				height: 46px;
+				padding-left: 45px;
+				overflow: hidden;
+				text-overflow:ellipsis;
+				white-space: nowrap;
+			}
+		 }
 		.date { float: left; width: 26%; text-align: left; padding-right: 30px; }
 		.newMsg { position: absolute; right: 0px; top: 0px; bottom: 0px; width: 30px; background: url(/todo/images/new.png) no-repeat; }
 	}

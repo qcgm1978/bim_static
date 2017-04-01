@@ -7,7 +7,13 @@
     <td class="feedBackTd" data-feedbackid="<%= id%>">
         <div class="feedBackTdTop"><span>建议内容：</span><%=title%></div>
         <%if(adviceReplys.length>0){%>
-            <div class="feedBackTdDown feedBackContentText"><span>回复内容：</span><%= adviceReplys[0].content%> <%=createTime%></div>
+            <div class="feedBackTdDown feedBackContentText">
+                <dl>
+                    <dt>回复内容：</dt>
+                    <dd><%= adviceReplys[0].content%> <%=createTime%></dd>
+                </dl>
+                <!-- <span>回复内容：</span><%= adviceReplys[0].content%> <%=createTime%> -->
+            </div>
         <%}%>
     </td>
 <%}else{%>
