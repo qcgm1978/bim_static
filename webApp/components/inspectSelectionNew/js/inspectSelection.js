@@ -1264,8 +1264,8 @@
 							return;
 						}
 						floor = data.data.floor;
-
-						if(floor!=null||floor!='[""]'||floor!="")
+						console.log("floor==[]:",floor=='[""]');
+						if(floor!=null&&floor!='[""]'&&floor!="")
 						{
 							Project.locationName[_userId] = Project.locationName[_userId] + ",楼层 " + floor;
 						}
