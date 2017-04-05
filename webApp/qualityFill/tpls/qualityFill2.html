@@ -620,9 +620,11 @@ var Event = {
     bindYuSheDian:function(curDOM){
         var tr = curDOM.parentNode.parentNode ,dataid;
         dataid = tr.getAttribute("dataid");
+        console.log(window.viewer.data());
+        console.log("curDOM.innerHTML:",curDOM.innerHTML);
+        console.log("readyPosState[0]:",readyPosState[0]);
         window.viewer.data();
-        window.viewer.data();
-        try
+        //try
         {
             if(curDOM.innerHTML == readyPosState[0])
             {
@@ -640,7 +642,7 @@ var Event = {
                 curDOM.innerHTML = readyPosState[0];
             }
         }
-        catch(e){;}
+        //catch(e){;}
         
     },
     bindGoJian : function(curDOM){/*curDOM is td > span*/

@@ -11198,6 +11198,37 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
         if (miniMap) {
             miniMap.flyByAxisGridNumber(abcName, numeralName);
         }
+    },
+
+    /**
+     * 根据指定点获得轴网信息
+     *
+     * @param {THREE.Vector3} point - 指定构件包围盒
+     */
+    getAxisGridInfoByPoint:function (point) {
+
+        var defaultMiniMap = this.defaultMiniMap;
+        var axisGridInfo = null;
+
+        if (defaultMiniMap) {
+            axisGridInfo = defaultMiniMap.getAxisGridInfoByPoint(point);
+        }
+
+        return axisGridInfo;
+    },
+
+    /**
+     * 根据相交信息获得轴网信息
+     *
+     * @param {Object} intersect - 相交信息对象
+     */
+    getAxisGridInfoByIntersect:function (intersect) {
+
+        var defaultMiniMap = this.defaultMiniMap;
+
+        if (defaultMiniMap) {
+            intersect.axisGridInfo = defaultMiniMap.getAxisGridInfoByPoint(intersect.point);
+        }
     }
 
     // ------------------ 小地图API -- E ------------------ //

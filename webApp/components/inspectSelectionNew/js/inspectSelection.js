@@ -1212,7 +1212,10 @@
 					_position=model.intersect.worldPosition,
 					_modelId=_userId.slice(0, _userId.indexOf('.')),
 				fileUrl = _url + _modelId;
-				console.log(model.intersect.axisGridInfo);
+
+				var intersect = viewer.getMiniMapObject().getAxisGridInfoByIntersect(model.intersect);
+				_axisObj = model.intersect.axisGridInfo;
+
 				Project.sceneId = model.intersect.object.userData.sceneId;
 				Project.renderAttr(_userId, Project.sceneId);
 				if(Project.mode=="readOnly"){
@@ -1261,7 +1264,8 @@
 							return;
 						}
 						floor = data.data.floor;
-						if(floor!=null)
+
+						if(floor!=null||floor!='[""]'||floor!="")
 						{
 							Project.locationName[_userId] = Project.locationName[_userId] + ",楼层 " + floor;
 						}
@@ -1319,9 +1323,33 @@
 
 		showInModel:function(param){
 			var p=JSON.stringify(param);
-			WebView.runScript("allIn('"+p+"')",function(val){
+			if(this.isIE())
+			{
+				WebView.runScript("allIn('"+p+"')",function(val){
 
-			})
+				});
+			}
+			else
+			{
+				this.allIn(p);
+			}
+
+		},
+
+		clearCache : function(){
+	        var view = viewer.Project.Viewer;
+	        $(".tbOpeningacceptanceBody tr").removeClass('selected');
+	        view.highlight({
+	            type: "userId",
+	            ids: undefined
+	        });
+	        view.viewer.getFilters().setSelectedIds();
+	        this.Project.presetPointShowData=null;
+	        this.Project.presetPoint=null;
+	        this.Project.currentRiskShowData=null;
+	        this.Project.currentUserId=null;
+	        this.Project.isSelect = 'open';
+	        this.Project.mode = 'edit';			
 		},
 
 		data:function(){
