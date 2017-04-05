@@ -23,8 +23,8 @@ CLOUD.GlobalData = {
 
     SelectionColor: {color: 0x003BBD, side: THREE.DoubleSide/*, opacity: 0.5, transparent: true*/},
 
-    maxObjectNumInPool: 80000,
-    maxDrawCacheNum : 60000,
+    maxObjectNumInPool: 70000,
+    maxDrawCacheNum : 40000,
     ShowOctant: false,
     OctantDepth: 8,
     MaximumDepth: 0,
@@ -2261,8 +2261,17 @@ THREE.WebGLGeometriesExt = function ( gl, properties, info ) {
 	// dispose infrequent geometries. - xiaojian
 	geometries.shift = function() {
 		var entry = LRUMap.prototype.shift.call(this);
-		var geometry = entry[1];
-		geometry.dispose();
+		var buffergeometry = entry[1];
+		//geometry.dispose();
+
+		deleteAttributes( buffergeometry.attributes );
+		if (buffergeometry.index) {
+			deleteAttribute(buffergeometry.index);
+		}
+		var property = properties.get( buffergeometry );
+		if ( property.wireframe ) deleteAttribute( property.wireframe );
+
+		info.memory.geometries --;
 	}
 
 	function get( object ) {
@@ -2274,7 +2283,9 @@ THREE.WebGLGeometriesExt = function ( gl, properties, info ) {
 			return geometries.get(key);
 		}
 
-		geometry.addEventListener( 'dispose', onGeometryDispose );
+		// do not add listener, dispose directly
+		//geometry.addEventListener( 'dispose', onGeometryDispose );
+
 		var bufferGeometry;
 		if ( geometry instanceof THREE.BufferGeometry ) {
 			bufferGeometry = geometry;
@@ -2299,15 +2310,14 @@ THREE.WebGLGeometriesExt = function ( gl, properties, info ) {
 	function onGeometryDispose( event ) {
 
 		var buffergeometry = event.target;
-		//var buffergeometry = geometries[ geometry.id ];
 
 		deleteAttributes( buffergeometry.attributes );
 		if (buffergeometry.index) {
 			deleteAttribute(buffergeometry.index);
 		}
-		buffergeometry.removeEventListener( 'dispose', onGeometryDispose );
 
-		//geometries[geometry.id] = undefined;
+		//
+		//buffergeometry.removeEventListener( 'dispose', onGeometryDispose );
 
 		var property = properties.get( buffergeometry );
 		if ( property.wireframe ) deleteAttribute( property.wireframe );
@@ -2811,8 +2821,7 @@ CLOUD.OrderedRenderer = function () {
     var _frustum = null;
     var _projScreenMatrix = null;
 
-    var _vector3 = new THREE.Vector3(),
-        _vector3End = new THREE.Vector3();
+    var _vector3 = new THREE.Vector3();
 
     var _isUpdateObjectList = true;
     var _dirtyIncrementList = true;
@@ -2922,21 +2931,111 @@ CLOUD.OrderedRenderer = function () {
         }
     }
 
+    // function projectObject(object, camera) {
+    //
+    //     if (object.visible === false)
+    //         return true;
+    //
+    //     if (_filterObject.isFileFilter(object)) {
+    //         return true;
+    //     } else if (object._cullTicket != _cullTicket /*&& (object.channels.mask & camera.channels.mask) !== 0*/) {
+    //         ++_countCullingObject;
+    //
+    //         if (_countCullingObject % 5000 == 4999) {
+    //             var diff = Date.now() - _timeStartCull;
+    //             if (diff > 30)
+    //                 return false;
+    //         }
+    //
+    //         object._cullTicket = _cullTicket;
+    //
+    //         if (object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points) {
+    //
+    //             if (object.frustumCulled === false || _frustum.intersectsObject(object) === true) {
+    //
+    //                 // if (!_filterObject.isVisible(object)) {
+    //                 //     return true;
+    //                 // }
+    //
+    //                 // if (object.renderOrder <= 5) {
+    //                 //     //
+    //                 //     // if (!object.modelCenter) {
+    //                 //     //     computeObjectCenter(object);
+    //                 //     // }
+    //                 //     //
+    //                 //     // if (object.radius !== undefined) {
+    //                 //     //
+    //                 //     //     _vector3.copy(object.modelCenter);
+    //                 //     //     _vector3.applyProjection(_projScreenMatrix);
+    //                 //     //     // _vector3End.copy(camera.realUp);
+    //                 //     //     // _vector3End.multiplyScalar(object.radius).add(object.modelCenter);
+    //                 //     //     //
+    //                 //     //     // _vector3End.applyProjection(_projScreenMatrix);
+    //                 //     //
+    //                 //     //     // var sqrtDist = _vector3End.distanceTo(_vector3) * 10;
+    //                 //     //     // if (sqrtDist < CLOUD.GlobalData.ScreenCullLOD) {
+    //                 //     //     //     ++_countScreenCullOff;
+    //                 //     //     //     return true;
+    //                 //     //     // }
+    //                 //     //
+    //                 //     // }
+    //                 //     // else {
+    //                 //     //     _vector3.copy(object.modelCenter);
+    //                 //     //     _vector3.applyProjection(_projScreenMatrix);
+    //                 //     // }
+    //                 // }
+    //
+    //                 _vector3.setFromMatrixPosition( object.matrixWorld );
+    //                 _vector3.applyProjection( _projScreenMatrix );
+    //
+    //                 // 材质过滤
+    //                 // var material = _filterObject.getOverridedMaterial(object);
+    //                 // material = material || object.material;
+    //
+    //                 var material = object.material;
+    //
+    //                 // //var geometry = objects.update(object);
+    //                 var geometry = object.geometry;
+    //                 // if (geometry instanceof THREE.Geometry) {
+    //                 //     geometry = geometry._bufferGeometry;
+    //                 // }
+    //
+    //                 pushRenderItem(object, geometry, material, _vector3.z);
+    //
+    //             }
+    //         }
+    //     }
+    //
+    //     var children = object.children;
+    //     if (children) {
+    //         for (var i = 0, l = children.length; i < l; i++) {
+    //
+    //             if (!projectObject(children[i], camera))
+    //                 return false;
+    //
+    //         }
+    //     }
+    //
+    //     return true;
+    // }
+
     function projectObject(object, camera) {
 
         if (object.visible === false)
             return true;
 
-        if (_filterObject.isFileFilter(object)) {
-            return true;
-        } else if (object._cullTicket != _cullTicket /*&& (object.channels.mask & camera.channels.mask) !== 0*/) {
+        if (object._cullTicket != _cullTicket /*&& (object.channels.mask & camera.channels.mask) !== 0*/) {
+
             ++_countCullingObject;
 
-            if (_countCullingObject % 5000 == 4999) {
+            // if (_countCullingObject % 5000 == 4999) {
                 var diff = Date.now() - _timeStartCull;
-                if (diff > 30)
+                if (diff > 30) {
+                    console.log("------------------ > 30 ms");
                     return false;
-            }
+                }
+
+            // }
 
             object._cullTicket = _cullTicket;
 
@@ -2944,50 +3043,11 @@ CLOUD.OrderedRenderer = function () {
 
                 if (object.frustumCulled === false || _frustum.intersectsObject(object) === true) {
 
-                    if (!_filterObject.isVisible(object)) {
-                        return true;
-                    }
-
-                    // if (object.renderOrder <= 5) {
-                    //     //
-                    //     // if (!object.modelCenter) {
-                    //     //     computeObjectCenter(object);
-                    //     // }
-                    //     //
-                    //     // if (object.radius !== undefined) {
-                    //     //
-                    //     //     _vector3.copy(object.modelCenter);
-                    //     //     _vector3.applyProjection(_projScreenMatrix);
-                    //     //     // _vector3End.copy(camera.realUp);
-                    //     //     // _vector3End.multiplyScalar(object.radius).add(object.modelCenter);
-                    //     //     //
-                    //     //     // _vector3End.applyProjection(_projScreenMatrix);
-                    //     //
-                    //     //     // var sqrtDist = _vector3End.distanceTo(_vector3) * 10;
-                    //     //     // if (sqrtDist < CLOUD.GlobalData.ScreenCullLOD) {
-                    //     //     //     ++_countScreenCullOff;
-                    //     //     //     return true;
-                    //     //     // }
-                    //     //
-                    //     // }
-                    //     // else {
-                    //     //     _vector3.copy(object.modelCenter);
-                    //     //     _vector3.applyProjection(_projScreenMatrix);
-                    //     // }
-                    // }
-
                     _vector3.setFromMatrixPosition( object.matrixWorld );
                     _vector3.applyProjection( _projScreenMatrix );
 
-                    // 材质过滤
-                    var material = _filterObject.getOverridedMaterial(object);
-                    material = material || object.material;
-
-                    // //var geometry = objects.update(object);
+                    var material = object.material;
                     var geometry = object.geometry;
-                    // if (geometry instanceof THREE.Geometry) {
-                    //     geometry = geometry._bufferGeometry;
-                    // }
 
                     pushRenderItem(object, geometry, material, _vector3.z);
 
@@ -3900,13 +3960,14 @@ THREE.WebGLIncrementRenderer = function (parameters) {
         var program = setProgram(camera, lights, fog, material, object);
 
         var updateBuffers = false;
-        var geometryProgram = geometry.id + "_"  + program.id + "_" + material.wireframe;
 
+        //var geometryProgram = geometry.id + "_"  + program.id + "_" + material.wireframe;
+        // Performance fixing: so far we do not have wireframe yet, using number(short string) is faster than long string.
+        var geometryProgram = geometry.id + program.id;
         if (geometryProgram !== _currentGeometryProgram) {
 
             _currentGeometryProgram = geometryProgram;
             updateBuffers = true;
-
         }
 
         //// morph targets
@@ -4101,7 +4162,12 @@ THREE.WebGLIncrementRenderer = function (parameters) {
 
         //}
 
-        if (startIndex === undefined) startIndex = 0;
+        // Performance Fixing
+        //if (startIndex === undefined) startIndex = 0;
+        startIndex = startIndex || 0;
+        //if(typeof (startIndex) === "undefined") {
+        //    startIndex = 0;
+        //}
 
         state.initAttributes();
 
@@ -8685,6 +8751,68 @@ CLOUD.Filter = function () {
         return true;
     };
 
+    this.isVisibleById = function (id , userData) {
+
+        // if (node.customTag) {
+        //     return true;
+        // }
+        //
+        // var id = node.name;
+
+        if (_filter.visibleIds && _filter.visibleIds[id] === undefined) {
+            return false;
+        }
+
+        if (_filter.invisibleIds && _filter.invisibleIds[id]) {
+            return false;
+        }
+
+        // var userData = node.userData;
+        if (!userData)
+            return true;
+
+        var filters = _filter.filters;
+        if (filters) {
+            for (var item in filters) {
+
+                var userValue = userData[item];
+                if (userValue && filters[item][userValue] !== undefined) {
+                    return false;
+                }
+            }
+        }
+
+        var conditions = _filter.conditions;
+        if (conditions) {
+
+            var len = conditions.length;
+            if (len == 0)  // hide if visible array is empty
+                return false;
+
+            function matchCondition(condition) {
+
+                for (var item in condition) {
+                    if (condition[item] != userData[item])
+                        return false;
+                }
+
+                return true;
+            }
+
+
+            for (var idx = 0; idx < len; ++idx) {
+                if (matchCondition(conditions[idx])) {
+                    return true;
+                }
+            }
+
+            // hide if not match.
+            return false;
+        }
+
+        return true;
+    };
+
     // 对象是否可以被pick -- true: 对象可以被pick，false: 对象不可以pick
     this.isSelectable = function (object) {
 
@@ -8851,6 +8979,99 @@ CLOUD.Filter = function () {
         }
 
         var userData = object.userData;
+        if (!userData)
+            return null;
+
+        // 自定义材质过滤器
+        for (var item in _overriderByData) {
+            var overrider = _overriderByData[item];
+            var materialName = overrider[userData[item]];
+            var material = _overridedMaterials[materialName];
+            if (material !== undefined)
+                return material;
+        }
+
+        if (_overriderCondition) {
+
+            function matchCondition(condition) {
+
+                for (var item in condition) {
+                    if (condition[item] != userData[item])
+                        return false;
+                }
+
+                return true;
+            }
+
+            for (var ii = 0, len = _overriderCondition.length; ii < len; ++ii) {
+                var item = _overriderCondition[ii];
+                if (matchCondition(item.condition)) {
+                    return _overridedMaterials[item.material];
+                }
+            }
+
+        }
+
+        if (_isolateCondition) {
+
+            function matchIsoCondition(condition) {
+
+                for (var item in condition) {
+                    if (condition[item] != userData[item])
+                        return false;
+                }
+
+                return true;
+            }
+
+            for (var ii = 0, len = _isolateCondition.length; ii < len; ++ii) {
+                var item = _isolateCondition[ii];
+                if (matchIsoCondition(item)) {
+                    return null;
+                }
+            }
+        }
+
+        // 场景材质
+        if (_overriderByScene) {
+            return _overridedMaterials.scene;
+        }
+
+        return null;
+    };
+
+    // 切换材质
+    this.getOverridedMaterialById = function (id, userData) {
+
+        // if (object.customTag) {
+        //     return null;
+        // }
+
+        // var id = object.name;
+
+        // 半透明
+        if (_frozenSet && _frozenSet[id]) {
+            return _overridedMaterials.scene;
+        }
+
+        //隔离
+        if (_isolateSet && !_isolateSet[id]) {
+            return _overridedMaterials.scene;
+        }
+
+        // 选中
+        if (_selectionSet && _selectionSet[id] !== undefined) {
+            return _overridedMaterials.selection;
+        }
+
+        // 是否在ID集合材质过滤器中
+        for (var item in _overriderByIds) {
+            var overrider = _overriderByIds[item];
+            if (overrider.ids[id])
+                return _overridedMaterials[overrider.material];
+        }
+
+        // var userData = object.userData;
         if (!userData)
             return null;
 
@@ -12671,6 +12892,9 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     }
 
     this.touchMoveHandler = function (event) {
+
+        this.viewer.editorManager.cameraChange = true;
+
         switch (event.touches.length) {
             case 1: // one-fingered touch: rotate
                 if (this.noRotate !== true) {
@@ -12701,6 +12925,9 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     }
 
     this.touchEndHandler = function (event) {
+
+        this.viewer.editorManager.cameraChange = false;
+
         switch (event.touches.length) {
             // case 1:
             //     if ( this.noRotate !== true ){
@@ -15280,6 +15507,15 @@ CLOUD.EditorManager.prototype = {
         }
     },
 
+    setStandardViewWithBox: function (viewer, stdView, box, margin, ratio) {
+        var camera = viewer.camera;
+        camera.setStandardView(stdView, box); // 设置观察视图
+        var target = camera.zoomToBBox(box, margin, ratio);
+        viewer.cameraEditor.updateCamera(target);
+        viewer.render();
+        camera.up.copy(THREE.Object3D.DefaultUp); // 渲染完成后才可以恢复相机up方向
+    },
+
     setTopView: function(viewer, box, margin, ratio) {
 
         var camera = viewer.camera;
@@ -15985,8 +16221,9 @@ CLOUD.Loader.MaterialReader = function (buffer) {
     this.dataBuffer  = buffer.slice( this.offset );
 
     // for data reading
-    this.material_id = 0;
-    this.material_cur = new CLOUD.Loader.Material(this.dataBuffer, 0);
+    this.material_id = -1;
+    var tmp_buffer = new ArrayBuffer( this.dataSize );
+    this.material_cur = new CLOUD.Loader.Material(tmp_buffer, 0);
 
     header = null;
 };
@@ -16888,6 +17125,9 @@ CLOUD.Model = function (manager, serverUrl, databagId, texturePath) {
     this.texturePath = texturePath;
     this.crossOrigin = true;
 
+    this.filter = this.manager.scene.filter;
+    this.pool = this.manager.scene.meshPool;
+
     this.cache = {
         cells: {},
         geometries: {},
@@ -16898,13 +17138,14 @@ CLOUD.Model = function (manager, serverUrl, databagId, texturePath) {
     this.cfgInfo = null;
 
     // Loaders
-    this.sceneLoader = new CLOUD.Loader.SceneLoader(this);
-    this.materialLoader = new CLOUD.Loader.MaterialLoader(this);
-    this.symbolLoader = new CLOUD.Loader.SymbolLoader(this);
-    this.meshLoader = new CLOUD.Loader.MeshLoader(this);
+    this.loader = new THREE.XHRLoader(this);
     this.octreeLoader = new CLOUD.Loader.OctreeLoader(this);
-    this.userIdLoader = new THREE.XHRLoader(this);
-    this.userDataLoader = new THREE.XHRLoader(this);
+    // this.sceneLoader = new CLOUD.Loader.SceneLoader(this);
+    // this.materialLoader = new CLOUD.Loader.MaterialLoader(this);
+    // this.symbolLoader = new CLOUD.Loader.SymbolLoader(this);
+    // this.meshLoader = new CLOUD.Loader.MeshLoader(this);
+    // this.userIdLoader = new THREE.XHRLoader(this);
+    // this.userDataLoader = new THREE.XHRLoader(this);
     this.octreeRootNode = null;
     this.octreeRootNodeI = null;
     this.visibleOctant = new Array();
@@ -16918,9 +17159,10 @@ CLOUD.Model = function (manager, serverUrl, databagId, texturePath) {
     this.sceneCount = 0;
     this.mpkArray = null;
     this.mpkCount = 0;
+    this.symbolCount = 0;
 
     this.taskCount = 0;
-    this.maxTaskCount = 5;
+    this.maxTaskCount = 5;   // TODO: change the way to flag resource loading finish flag.
     this.containsCamera = false;
     this.load_complete = false;
 
@@ -16939,12 +17181,15 @@ CLOUD.Model.prototype.load = function (notifyProgress) {
     var scope = this;
     this.notifyProgress = notifyProgress;
 
-    var cfgLoader = new CLOUD.Loader.ConfigLoader(this);
-    cfgLoader.load(this.projectUrl(), function (text) {
+    // var cfgLoader = new CLOUD.Loader.ConfigLoader(this);
+    this.loader.setResponseType("");
+    this.loader.setCrossOrigin(this.crossOrigin);
+    this.loader.load(this.projectUrl(), function (text) {
         var cfg = JSON.parse(text);
         scope.cfgInfo = cfg;
         scope.sceneCount = cfg.metadata.scenes;
         scope.mpkCount = cfg.metadata.mpks;
+        scope.symbolCount = cfg.metadata.symbol;
         scope.sceneArray = new Array(scope.sceneCount);
         //scope.mpkArray = new Array(scope.mpkCount);
         scope.manager.scene.parseRootNode(cfg);
@@ -16957,7 +17202,8 @@ CLOUD.Model.prototype.load = function (notifyProgress) {
 
         var sceneId = 0;
 
-        scope.sceneLoader.load(scope.sceneUrl(sceneId), function (data) {
+        scope.loader.setResponseType("arraybuffer");
+        scope.loader.load(scope.sceneUrl(sceneId), function (data) {
             var sceneReader = new CLOUD.Loader.SceneReader(data);
 
             if (sceneReader.header.blockId < scope.sceneCount) {
@@ -16977,24 +17223,33 @@ CLOUD.Model.prototype.load = function (notifyProgress) {
 
         // Material
         // scope.materialLoader.setBaseUrl(scope.getTexturePath());
-        scope.materialLoader.setCrossOrigin(scope.crossOrigin);
-        scope.materialLoader.load(scope.materialUrl(), function (data) {
+        // scope.loader.setCrossOrigin(scope.crossOrigin);
+        scope.loader.setResponseType("arraybuffer");
+        scope.loader.load(scope.materialUrl(), function (data) {
             scope.parseMaterial(data);
-            scope.onTaskFinished();
-        }, scope.cache);
-
-        scope.symbolLoader.load(scope.symbolUrl(), function (data) {
-            scope.parseSymbol(data);
             scope.onTaskFinished();
         });
 
-        scope.userIdLoader.setResponseType("arraybuffer");
-        scope.userIdLoader.load(scope.userIdUrl(), function (data) {
+
+        // TODO: maxTaskCount should not be assigned with hard code at initialization (5).
+        if(scope.symbolCount > 0) {
+        scope.loader.setResponseType("arraybuffer");
+        scope.loader.load(scope.symbolUrl(), function (data) {
+            scope.parseSymbol(data);
+            scope.onTaskFinished();
+        });
+        } else {
+            scope.maxTaskCount -= 1;
+        }
+
+        scope.loader.setResponseType("arraybuffer");
+        scope.loader.load(scope.userIdUrl(), function (data) {
             scope.parseUserId(data);
             scope.onTaskFinished();
         });
 
-        scope.userDataLoader.load(scope.userDataUrl(), function (data) {
+        scope.loader.setResponseType("");
+        scope.loader.load(scope.userDataUrl(), function (data) {
             scope.parseUserData(data);
             scope.onTaskFinished();
         });
@@ -17016,7 +17271,8 @@ CLOUD.Model.prototype.loadMpk = function (mpkId, callback) {
 
     var scope = this;
     //var mpkCount = this.mpkCount;
-    this.meshLoader.load(this.mpkUrl(mpkId), function (data) {
+    this.loader.setResponseType("arraybuffer");
+    this.loader.load(this.mpkUrl(mpkId), function (data) {
         if(scope.userWorker) {
             var worker = new Worker(CLOUD.GlobalData.MpkWorkerUrl);
             worker.onmessage = function( event ) {
@@ -17077,12 +17333,36 @@ CLOUD.Model.prototype.onTaskFinished = function () {
 };
 
 CLOUD.Model.prototype.destroy = function () {
+    var geometry, material;
+
+    for (var id in this.cache.geometries) {
+        geometry = this.cache.geometries[id];
+        geometry.dispose();
+    }
+
+    this.cache.geometries = null;
+
+    for (var id in this.cache.materials) {
+        material = this.cache.materials[id];
+        material.dispose();
+    }
+
+    this.cache.geometries = null;
+
+    this.cache = {
+        cells: {},
+        geometries: {},
+        materials: {},
+        instancedMaterials: {}
+    };
+
     this.cache = null;
     this.cfgInfo = null;
-    this.sceneLoader = null;
-    this.materialLoader = null;
-    this.symbolLoader = null;
-    this.meshLoader = null;
+    this.loader = null;
+    // this.sceneLoader = null;
+    // this.materialLoader = null;
+    // this.symbolLoader = null;
+    // this.meshLoader = null;
     this.userIdReader = null;
     this.userDataReader = null;
     this.octreeLoader = null;
@@ -17096,7 +17376,7 @@ CLOUD.Model.prototype.destroy = function () {
 };
 
 CLOUD.Model.prototype.projectUrl = function () {
-    return this.serverUrl +"config/"+ this.databagId + "/config.json";
+    return this.serverUrl + this.databagId + "/config.json";
 };
 
 CLOUD.Model.prototype.sceneUrl = function (idx) {
@@ -17114,7 +17394,7 @@ CLOUD.Model.prototype.userIdUrl = function () {
 
 CLOUD.Model.prototype.octreeUrl = function (idx) {
     idx = idx || 'o';
-    return this.serverUrl +"file/"+ this.databagId + "/scene/index_" + idx;
+    return this.serverUrl + this.databagId + "/scene/index_" + idx;
 };
 
 CLOUD.Model.prototype.symbolUrl = function () {
@@ -17265,7 +17545,7 @@ CLOUD.Model.prototype.parseUserData = function (data) {
  * @param {Object} itemParent - 父节点参数项 {matrix : xxx, ItemId : xxx, originalId: xxx},
  */
 CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
-    var meshPool = this.getPool();
+
     var cacheGeometries = this.cache.geometries;
     var material = this.cache.materials[item.materialId];
     // itemParent存在, 表示读取symbol数据
@@ -17315,7 +17595,8 @@ CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
     };
 
     var geometry = cacheGeometries[meshInfo.meshId];
-    var meshNode = meshPool.get({
+
+    var parameters = {
         databagId: this.databagId,
         nodeId: meshInfo.nodeId,
         userId: userId,
@@ -17323,13 +17604,12 @@ CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
         geometry: geometry,
         matrix: matrixCache,
         material: material
-    });
+    };
+
+    this.updateMeshNode(parameters);
 
     meshInfo = null;
-
-    // if (!meshNode) {
-    //     CLOUD.Logger.log("the pool is full !!!");
-    // }
+    parameters = null;
 };
 
 CLOUD.Model.prototype.readSymbol = function (id, cellId, itemParent) {
@@ -17412,11 +17692,11 @@ CLOUD.Model.prototype.getMeshNodeAttribute = function (sceneOrSymbolReader, item
 
 CLOUD.Model.prototype.prepare = function (camera, clearPool) {
 
-    var sceneCount = this.sceneArray ? this.sceneArray.length : 0;
-
-    if (sceneCount < 1) {
-        return;
-    }
+    //var sceneCount = this.sceneArray ? this.sceneArray.length : 0;
+    //
+    //if (sceneCount < 1) {
+    //    return;
+    //}
 
     // VAAS-100: Mesh and Other resource loading does not sync with reading process,
     // here do scene prepare after all of them loaded.
@@ -17478,7 +17758,7 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
     }
 
     if (cellCount === 0) return;
-    var meshPool = this.getPool();
+    var meshPool = this.pool;
 
     // begin sort
     if (!CLOUD.GlobalData.DisableOctant ) {
@@ -17541,7 +17821,7 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
                 var materialId = this.cache.cells[cellId][id].materialId;
                 var geometry = this.cache.geometries[meshId];
                 var material = this.cache.materials[materialId];
-                var meshNode = meshPool.get({
+                var parameters = {
                     databagId: this.databagId,
                     nodeId: nodeId,
                     userId: userId,
@@ -17549,12 +17829,10 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
                     geometry: geometry,
                     matrix: matrix,
                     material: material
-                });
+                };
 
-                if (!meshNode) {
-                    continue;
-                }
-
+                this.updateMeshNode(parameters);
+                parameters = null;
             }
 
         } else {
@@ -17570,11 +17848,11 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
 
                 var item = sceneReader.getItemInfo(j);
 
-                if (item == undefined) {
+                if (item === undefined) {
                     continue;
                 }
 
-                if (item.type == 0) {
+                if (item.type === 0) {
                     var matrixParent = sceneReader.getMatrixInfo(item.matrixId).matrix.clone();
                     var itemParent = {
                         matrix : matrixParent,
@@ -17597,12 +17875,42 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
     CLOUD.Logger.timeEnd("prepareScene");
 };
 
-CLOUD.Model.prototype.getPool = function () {
-    return this.manager.scene.meshPool;
-};
+// CLOUD.Model.prototype.getPool = function () {
+//     return this.manager.scene.meshPool;
+// };
+//
+// CLOUD.Model.prototype.getFilter = function () {
+//     return this.manager.scene.filter;
+// };
 
 CLOUD.Model.prototype.clearCells = function () {
     this.cache.cells = {};
+};
+
+
+CLOUD.Model.prototype.updateMeshNode = function (parameters) {
+
+    var pool = this.pool;
+    var filter = this.filter;
+
+    // 文件过滤
+    if (parameters.userData && filter.hasFileFilter(parameters.userData.sceneId)) {
+        return;
+    }
+
+    // 可见性过滤
+    if (filter.isVisibleById(parameters.userId, parameters.userData) === false ) {
+        return;
+    }
+
+    // 材质过滤
+    var overridedMaterial = filter.getOverridedMaterialById(parameters.userId, parameters.userData);
+
+    if  (overridedMaterial) {
+        parameters.material = overridedMaterial;
+    }
+
+    pool.get(parameters);
 };
 /**
  * @author Liwei.Ma
@@ -19532,6 +19840,8 @@ CLOUD.Viewer = function () {
     this.calculationPlanesBind = this.calculationPlanes.bind(this);
     this.addRenderFinishedCallback(this.calculationPlanesBind);
 
+    // this.idle = false;
+
 };
 
 CLOUD.Viewer.prototype = {
@@ -19641,6 +19951,7 @@ CLOUD.Viewer.prototype = {
     // ------ 管理外部插件的render E -------------- //
 
     destroy: function () {
+
         this.removeAllCallbacks();
         this.editorManager.unregisterDomEventListeners(this.domElement);
         this.domElement.removeChild(this.domElement.childNodes[0]);
@@ -19743,6 +20054,8 @@ CLOUD.Viewer.prototype = {
         // 增量绘制
         if (this.incrementRenderEnabled && scope.renderer.IncrementRender) {
 
+            // this.idle = false;
+
             ++this.requestRenderCount;
 
             if (this.requestRenderCount > this.requestRenderMaxCount)
@@ -19803,12 +20116,33 @@ CLOUD.Viewer.prototype = {
                     }
 
                     // if (renderer.autoClear) {
-                    //     CLOUD.Logger.time("incrementRender");
+                    //     // CLOUD.Logger.time("incrementRender");
+                    //     console.log("---------------------- render begin");
                     // }
 
                     var isFinished = renderer.IncrementRender(scene, camera);
 
-                    if (isFinished) {
+                    // if (isFinished) {
+                    //     scope.rendering = false;
+                    //     // CLOUD.Logger.timeEnd("incrementRender");
+                    //
+                    //     if (renderId !== scope.requestRenderCount) {
+                    //         scope.render();
+                    //     } else {
+                    //         // 结束后回调函数
+                    //         scope.onRenderFinishedCallback();
+                    //     }
+                    //
+                    // } else {
+                    //     scope.incrementRenderHandle = requestAnimationFrame(incrementRender(renderId, false));
+                    // }
+
+                    if (!isFinished && renderId === scope.requestRenderCount) {
+
+                        scope.incrementRenderHandle = requestAnimationFrame(incrementRender(renderId, false));
+
+                    } else {
+
                         scope.rendering = false;
                         // CLOUD.Logger.timeEnd("incrementRender");
 
@@ -19819,8 +20153,6 @@ CLOUD.Viewer.prototype = {
                             scope.onRenderFinishedCallback();
                         }
 
-                    } else {
-                        scope.incrementRenderHandle = requestAnimationFrame(incrementRender(renderId, false));
                     }
 
                 }
@@ -20286,6 +20618,28 @@ CLOUD.Viewer.prototype = {
     setStandardView: function (stdView, margin, callback) {
         margin = margin || -0.05;
         this.editorManager.setStandardView(stdView, this, margin, callback);
+    },
+
+    /**
+     * 根据指定视角及包围盒缩放
+     *
+     * @param {EnumStandardView} stdView - 视角
+     * @param {THREE.Box3} box - 原始（未变换的）世界包围盒
+     * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
+     * @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
+     */
+    setStandardViewWithBox:function ( stdView, box, margin, ratio) {
+
+        margin = margin || 0.05;
+        ratio = ratio || 1.0;
+
+        if (box) {
+            box.applyMatrix4(this.getScene().getMatrixGlobal());
+        } else {
+            box = this.getScene().getBoundingBox();
+        }
+
+        this.editorManager.setStandardViewWithBox(this, stdView, box, margin, ratio);
     },
 
     setTopView: function (box, margin, ratio) {
