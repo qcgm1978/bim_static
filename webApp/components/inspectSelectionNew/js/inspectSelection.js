@@ -1205,14 +1205,14 @@
 			var _url = ourl + '/doc/' + this.Settings.projectId + '/' + this.Settings.projectVersionId + '?' + _this.Settings.token_cookie + '&modelId=';
 			viewer.on("click", function(model) {
 				console.log("MODEL",model);
-				console.log(model.intersect.axisGridInfo.position);
+
 				var _userId = model.intersect.userId || "",
 					_axisObj = model.intersect.axisGridInfo || {},
 					_boundingBox=model.intersect.worldBoundingBox,
 					_position=model.intersect.worldPosition,
 					_modelId=_userId.slice(0, _userId.indexOf('.')),
 				fileUrl = _url + _modelId;
-
+				console.log(model.intersect.axisGridInfo);
 				Project.sceneId = model.intersect.object.userData.sceneId;
 				Project.renderAttr(_userId, Project.sceneId);
 				if(Project.mode=="readOnly"){
@@ -1280,7 +1280,8 @@
 
 				if (Project.mode == 'preset'||Project.mode == 'edit' || !Project.mode) {
 
-					viewer.viewer.loadMarkersFromIntersect(model.intersect,1,3);
+					//viewer.viewer.loadMarkersFromIntersect(model.intersect,1,3); // old interface
+					viewer.getMakerObject().loadMarkersFromIntersect(model.intersect,1,3); //new interface
 					var m = viewer.saveMarkers();
 					Project.Settings.markers=m;
 					Project.currentRiskShowData={
@@ -1324,16 +1325,61 @@
 		},
 
 		data:function(){
+			var val;
 			var self=this;
-			WebView.runScript("getData()",function(val){
+			if(self.isIE())
+			{
+				WebView.runScript("getData()",function(val){
+					if(val){
+						val=JSON.parse(val);
+					}
+					self.Settings.callback.call(this, val);
+					return val;
+				});
+			}
+			else
+			{
+				val = this.getData();
 				if(val){
 					val=JSON.parse(val);
 				}
 				self.Settings.callback.call(this, val);
 				return val;
-			})
-		},
+			}
 
+		},
+		getData : function(){
+	        var userId = this.Project.currentUserId,
+	                fileId = this.Project.fileIds[userId] || "";
+
+	        var result = {
+	            presetPoint: this.Project.presetPoint,
+	            risk: {}
+	        }
+	        if(userId){
+	           result.risk={
+	               components: {
+	                   id: userId,
+	                   fileUniqueId: fileId + userId.slice(userId.indexOf('.')),
+	                   axis: this.Project.axis[userId],
+	                   location: this.Project.location[userId],
+	                   locationName: this.Project.locationName[userId]
+	               },
+	               markers: this.Project.Settings.markers
+	           }
+	        }else{
+	            if(this.Project.currentRiskShowData){
+	                result.risk={
+	                    components:{
+	                        id:this.Project.currentRiskShowData.id,
+	                        markers:this.Project.currentRiskShowData.marker
+	                    }
+	                }
+	            }
+
+	        }
+	        return JSON.stringify(result);
+		},
 		allIn:function(param) {
 			var _this=this;
 			var view = Project.Viewer,

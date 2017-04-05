@@ -659,7 +659,7 @@
       // 保存检查点
       var self = this;
       var viewer = self.viewer;
-      var list = viewer.getMarkerInfoList();
+      var list = self.getMakerObject().getMarkerInfoList();
       var newList = [];
       $.each(list, function(i, item) {
         newList.push(JSON.stringify(item));
