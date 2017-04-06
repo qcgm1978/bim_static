@@ -490,28 +490,24 @@ App.INBox.comment = {
 				$reMarkList.append($list);
 				//移除加载
 				$reMarkList.find(".loading").remove();
-				if(App.INBox.default.statusStr){
-					this.$(".reMarkListScroll").mCustomScrollbar({
-						theme: 'minimal-dark',
-						axis: 'y',
-						set_height:'100%',
-						keyboard: {
-							enable: true
-						},
-						scrollInertia: 0
-					});
-				}else{
-					this.$(".reMarkListScroll").mCustomScrollbar({
-						theme: 'minimal-dark',
-						axis: 'y',
-						set_height:'100%',
-						keyboard: {
-							enable: true
-						},
-						scrollInertia: 0
-					}).mCustomScrollbar("scrollTo","bottom");
+				if(this.$(".reMarkListScroll").hasClass('mCustomScrollbar')){
+					if (!App.INBox.default.statusStr) {
+						this.$(".reMarkListScroll").mCustomScrollbar("scrollTo","bottom");
+					}else{
+						debugger;
+						this.$(".reMarkListScroll").mCustomScrollbar("update");
+					}
+					return;
 				}
-				
+				this.$(".reMarkListScroll").mCustomScrollbar({
+					theme: 'minimal-dark',
+					axis: 'y',
+					set_height:'100%',
+					keyboard: {
+						enable: true
+					},
+					scrollInertia: 0
+				});
 			},
 
 			//加载数据
