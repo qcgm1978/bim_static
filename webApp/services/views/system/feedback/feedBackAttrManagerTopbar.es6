@@ -57,6 +57,7 @@ App.Services.System.FeedBackAttrManagerTopbar=Backbone.View.extend({
 			opTimeStart:this.default.startTime,
 			opTimeEnd:this.default.endTime,
 			haveReply:feedBackState,
+			pageIndex:1
 		}
 	    App.Services.SystemCollection.getFeedBackListHandle(searchData);
 	}

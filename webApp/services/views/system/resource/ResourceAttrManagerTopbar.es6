@@ -242,7 +242,8 @@ App.Services.System.ResourceAttrManagerTopbar=Backbone.View.extend({
 		var searchData = {
 			keyString:keyNameVal,
 			start:this.default.startTime,
-			end:this.default.endTime
+			end:this.default.endTime,
+			pageIndex:1
 		}
  		if(this.default.searchTimeOut){
  			clearTimeout(this.default.searchTimeOut);

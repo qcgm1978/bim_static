@@ -26,9 +26,11 @@ App.userAdmin.UserAdminListV = Backbone.View.extend({
 	},
 	getViewUserListFun:function(parmer){//获取浏览用户列表的方法
 		var _this = this;
+		var inputBoxVal = $(".inputBox input").val().trim();
+		var endDateSearchVal = $("#endDateSearch").val().trim();
 	    var _data = {
-	    	name:"",
-	    	validTime:"",
+	    	name:inputBoxVal||"",
+	    	validTime:endDateSearchVal||"",
 	    	pageIndex:this.default.pageIndex,
 	    	pageItemCount:App.Comm.Settings.pageItemCount
 	    }

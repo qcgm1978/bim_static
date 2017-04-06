@@ -70,7 +70,7 @@ App.userAdmin.UserAdminIndexV = Backbone.View.extend({
 	searchBtnBox:function(){//点击搜索执行的方法
 		var inputBoxVal = $(".inputBox input").val().trim();
 		var inputTimeBoxVal = this.default.endDateSearch;
-		this.renderUserAdminListDom({validTime:inputTimeBoxVal,name:inputBoxVal});
+		this.renderUserAdminListDom({validTime:inputTimeBoxVal,name:inputBoxVal,pageIndex:1});
 	},
 	addViewUserPrefixFun:function(evt){//添加用户前缀的方法
 		var addDialogEle = new App.userAdmin.AddUserAdminPrefixDialogV;
