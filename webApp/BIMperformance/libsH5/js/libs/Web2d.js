@@ -10569,7 +10569,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.resetCurrentAnnotationText = functio
 // ---------------------------- 外部 API BEGIN ---------------------------- //
 
 // 屏幕快照
-CLOUD.Extensions.AnnotationEditor.prototype.getScreenSnapshot = function (snapshot) {
+CLOUD.Extensions.AnnotationEditor.prototype.getScreenSnapshot = function (snapshot, callback) {
 
     var canvas = document.createElement("canvas");
 
@@ -10581,15 +10581,15 @@ CLOUD.Extensions.AnnotationEditor.prototype.getScreenSnapshot = function (snapsh
     var startColor = this.gradientStartColor;
     var stopColor = this.gradientStopColor;
 
+    var scope = this;
+
     // 绘制背景
     if (startColor) {
 
         if (stopColor) {
-
             var gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
             gradient.addColorStop(0, startColor);
             gradient.addColorStop(1, stopColor);
-
             ctx.fillStyle = gradient;
         } else {
             ctx.fillStyle = startColor;
@@ -10598,22 +10598,40 @@ CLOUD.Extensions.AnnotationEditor.prototype.getScreenSnapshot = function (snapsh
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
+    // fixed bug: 在chrome 版本 57.0.2987.133 (64-bit)上截不到图，估计是图片异步加载的问题, 采用回调函数处理。
+
+    if (callback && snapshot) {
+
+        var preSnapshot = new Image();
+        preSnapshot.onload = function () {
+
+            ctx.drawImage(preSnapshot, 0, 0);
+            scope.renderToCanvas(ctx);// 绘制批注
+
+            var data = canvas.toDataURL("image/png");
+            canvas = ctx = null;
+            callback(data);
+
+        };
+        preSnapshot.src = snapshot;
+
+        return null;
+    }
+
     // 先绘制之前的图像
     if (snapshot) {
-
         var preSnapshot = new Image();
         preSnapshot.src = snapshot;
         ctx.drawImage(preSnapshot, 0, 0);
     }
 
-    // 绘制批注
-    this.renderToCanvas(ctx);
+    this.renderToCanvas(ctx);// 绘制批注
 
     var data = canvas.toDataURL("image/png");
-
     canvas = ctx = null;
 
     return data;
+
 };
 
 // 设置导出背景色
@@ -11198,6 +11216,37 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
         if (miniMap) {
             miniMap.flyByAxisGridNumber(abcName, numeralName);
         }
+    },
+
+    /**
+     * 根据指定点获得轴网信息
+     *
+     * @param {THREE.Vector3} point - 指定构件包围盒
+     */
+    getAxisGridInfoByPoint:function (point) {
+
+        var defaultMiniMap = this.defaultMiniMap;
+        var axisGridInfo = null;
+
+        if (defaultMiniMap) {
+            axisGridInfo = defaultMiniMap.getAxisGridInfoByPoint(point);
+        }
+
+        return axisGridInfo;
+    },
+
+    /**
+     * 根据相交信息获得轴网信息
+     *
+     * @param {Object} intersect - 相交信息对象
+     */
+    getAxisGridInfoByIntersect:function (intersect) {
+
+        var defaultMiniMap = this.defaultMiniMap;
+
+        if (defaultMiniMap) {
+            intersect.axisGridInfo = defaultMiniMap.getAxisGridInfoByPoint(intersect.point);
+        }
     }
 
     // ------------------ 小地图API -- E ------------------ //
@@ -11577,8 +11626,12 @@ CLOUD.Extensions.DwgHelper.prototype = {
             onrendered: function (canvas) {
 
                 var dataUrl = canvas.toDataURL("image/png");
-                dataUrl = scope.editor.getScreenSnapshot(dataUrl);
-                snapshotCallback(dataUrl);
+
+                // fixed bug: 在chrome 版本 57.0.2987.133 (64-bit)上截不到图，采用回调函数处理。
+                // dataUrl = scope.editor.getScreenSnapshot(dataUrl);
+                // snapshotCallback(dataUrl);
+                scope.editor.getScreenSnapshot(dataUrl , snapshotCallback);
+
             }
         });
     },
@@ -11890,8 +11943,8 @@ CLOUD.Extensions.AnnotationHelper2D.prototype = {
     },
 
     // 截屏 base64格式png图片
-    captureAnnotationsScreenSnapshot: function (dataUrl) {
-        return this.editor.getScreenSnapshot(dataUrl);
+    captureAnnotationsScreenSnapshot: function (dataUrl, callback) {
+        return this.editor.getScreenSnapshot(dataUrl, callback);
     },
 
     setAbsoluteBasePoint: function (point) {
@@ -12078,8 +12131,21 @@ CLOUD.Extensions.AnnotationHelper3D.prototype = {
     },
 
     // 截屏 base64格式png图片
-    captureAnnotationsScreenSnapshot: function () {
-        var dataUrl = this.viewer.getRenderBufferScreenShot();
+    captureAnnotationsScreenSnapshot: function (backgroundClr, callback) {
+
+        if (callback) {
+
+            var scope = this;
+
+            this.viewer.getRenderBufferScreenShot(backgroundClr, function (dataUrl) {
+                scope.editor.getScreenSnapshot(dataUrl, callback);
+            });
+
+            return null;
+        }
+
+        // 这种方式在chrome 版本 57.0.2987.133 (64-bit)上截不到图，估计是图片异步加载的问题
+        var dataUrl = this.viewer.getRenderBufferScreenShot(backgroundClr);
         dataUrl = this.editor.getScreenSnapshot(dataUrl);
         return dataUrl;
     }
