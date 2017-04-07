@@ -3033,7 +3033,6 @@ CLOUD.OrderedRenderer = function () {
             // if (_countCullingObject % 5000 == 4999) {
                 var diff = Date.now() - _timeStartCull;
                 if (diff > 30) {
-                    CLOUD.Logger.log("------------------ > 30 ms");
                     return true;
                 }
 
@@ -12180,7 +12179,23 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
                 } else if (Math.abs(phiDelta) > 0.01) { // 垂直旋转
 
+                    var EPS = 0.000001;
+
                     rotAxis = camDir.clone().cross(up).normalize();
+
+                    var cross = new THREE.Vector3(0, 1, 0).clone().cross(up);
+                    var dot = cross.dot(new THREE.Vector3(1, 0, 0));
+                    var angle = Math.asin(cross.length());
+                    if (dot < 0) {
+                        angle = -angle;
+                    }
+                    if ((angle + phiDelta) > (Math.PI / 2 - EPS)) {
+                        phiDelta = Math.PI / 2 - EPS - angle;
+                    }
+                    else if ((angle + phiDelta) < (-Math.PI / 2 + EPS)) {
+                        phiDelta = -Math.PI / 2 + EPS - angle;
+                    }
+
                     viewTrf = new THREE.Quaternion().setFromAxisAngle(rotAxis, phiDelta);
                     adjustCameraPosition(viewTrf);
                     this.camera.realUp.applyQuaternion(viewTrf).normalize();
@@ -12253,6 +12268,20 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             }
             else {
                 rotAxis = rightDir;
+
+                var cross = new THREE.Vector3(0, 1, 0).clone().cross(up);
+                var dot = cross.dot(new THREE.Vector3(1, 0, 0));
+                var angle = Math.asin(cross.length());
+                if (dot < 0) {
+                    angle = -angle;
+                }
+                if ((angle + phiDelta) > (Math.PI / 4 - EPS)) {
+                    phiDelta = Math.PI / 4 - EPS - angle;
+                }
+                else if ((angle + phiDelta) < (-Math.PI / 4 + EPS)) {
+                    phiDelta = -Math.PI / 4 + EPS - angle;
+                }
+
                 rotAngle = phiDelta;
             }
             var viewTrf = new THREE.Quaternion().setFromAxisAngle(rotAxis, rotAngle);
@@ -15753,7 +15782,7 @@ CLOUD.Loader.Url = function (serverUrl, databagId) {
 };
 
 CLOUD.Loader.Url.prototype.projectUrl = function () {
-    return this.serverUrl +"config/"+ this.databagId + "/config.json";
+    return this.serverUrl + this.databagId + "/config.json";
 };
 
 CLOUD.Loader.Url.prototype.sceneUrl = function (idx) {
@@ -15771,7 +15800,7 @@ CLOUD.Loader.Url.prototype.userIdUrl = function () {
 
 CLOUD.Loader.Url.prototype.octreeUrl = function (idx) {
     idx = idx || 'o';
-    return this.serverUrl +"file/"+ this.databagId + "/scene/index_" + idx;
+    return this.serverUrl + this.databagId + "/scene/index_" + idx;
 };
 
 CLOUD.Loader.Url.prototype.symbolUrl = function () {
@@ -17497,14 +17526,25 @@ CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
 
     var nodeId = meshInfo.nodeId;
 
-    if (cacheCell[nodeId]) {
-        CLOUD.Logger.log("nodeId:" + nodeId + " exist");
-    }
+    // if (cacheCell[nodeId]) {
+    //     CLOUD.Logger.log("nodeId:" + nodeId + " exist");
+    // }
 
     var userData = this.userDataReader.getUserData(userDataId);
     var matrixCache = meshInfo.matrix.clone();
 
-    cacheCell[nodeId] = {
+    // cacheCell[nodeId] = {
+    //     nodeId: nodeId,
+    //     userId: userId,
+    //     userData: userData,
+    //     meshId: meshInfo.meshId,
+    //     matrix: matrixCache,
+    //     materialId: item.materialId
+    // };
+
+    // this.pushMeshNode(cellId, nodeId, cacheCell[nodeId]);
+
+    var nodeInfo = {
         nodeId: nodeId,
         userId: userId,
         userData: userData,
@@ -17513,7 +17553,9 @@ CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
         materialId: item.materialId
     };
 
-    this.pushMeshNode(cellId, nodeId, cacheCell[nodeId]);
+    cacheCell.push(nodeInfo);
+
+    this.pushMeshNode(nodeInfo);
 
     meshInfo = null;
 };
@@ -17730,12 +17772,16 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
 
         if (cacheCell) {
 
-            for (var id in cacheCell) {
+            // for (var id in cacheCell) {
+            //
+            //     if (cacheCell.hasOwnProperty(id)) {
+            //         this.pushMeshNode(cellId, id, cacheCell[id]);
+            //     }
+            //
+            // }
 
-                if (cacheCell.hasOwnProperty(id)) {
-                    this.pushMeshNode(cellId, id, cacheCell[id]);
-                }
-
+            for (var j = 0, len = cacheCell.length; j < len; ++j ) {
+                this.pushMeshNode(cacheCell[j]);
             }
 
         } else {
@@ -17743,7 +17789,8 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
             // 缓存node数据
 
             if (!this.cache.cells[cellId]) {
-                this.cache.cells[cellId] = {};
+                //this.cache.cells[cellId] = {};
+                this.cache.cells[cellId] = [];
             }
 
             var cell = sceneReader.getCellInfo(cellId);
@@ -17784,7 +17831,7 @@ CLOUD.Model.prototype.clearCells = function () {
     this.cache.cells = {};
 };
 
-CLOUD.Model.prototype.pushMeshNode = function (cellId, nodeId, node) {
+CLOUD.Model.prototype.pushMeshNode = function (node) {
 
     var filter = this.filter;
     var userId = node.userId;
@@ -17807,9 +17854,9 @@ CLOUD.Model.prototype.pushMeshNode = function (cellId, nodeId, node) {
     var isHighlight = filter.hasHighlightMaterial(userId, userData);
 
     if (isHighlight) {
-        highPriorityNodes.push([cellId, nodeId]);
+        highPriorityNodes.push(node);
     } else {
-        lowPriorityNodes.push([cellId, nodeId]);
+        lowPriorityNodes.push(node);
     }
 
 };
@@ -17832,11 +17879,7 @@ CLOUD.Model.prototype.updateMeshNodes = function (nodes, pool, filter, cacheCell
 
     for (var i = 0; i < len; ++i) {
 
-        var cellId = nodes[i][0];
-        var id = nodes[i][1];
-
-        var cacheNode = cacheCells[cellId][id];
-
+        var cacheNode = nodes[i];
         var nodeId = cacheNode.nodeId;
         var userId = cacheNode.userId;
         var userData = cacheNode.userData;
@@ -20514,7 +20557,7 @@ CLOUD.Viewer.prototype = {
     },
 
     // 获得render buffer的数据
-    getRenderBufferScreenShot: function (backgroundClr) {
+    getRenderBufferScreenShot: function (backgroundClr, callback) {
 
         // 在高分屏上toDataURL直接获得图片数据比实际的图片大
         var dataUrl = this.renderer.domElement.toDataURL("image/png");
@@ -20524,8 +20567,15 @@ CLOUD.Viewer.prototype = {
         var w = canvasWidth / pixelRatio;
         var h = canvasHeight / pixelRatio;
 
-        if (!w || !h)
-            return dataUrl;
+        if (!w || !h) {
+
+            if (callback) {
+                callback(dataUrl);
+                return null
+            } else {
+                return dataUrl;
+            }
+        }
 
         var nw, nh, nx = 0,
             ny = 0;
@@ -20540,8 +20590,36 @@ CLOUD.Viewer.prototype = {
             nx = w / 2 - nw / 2;
         }
 
-        var img = new Image();
-        img.src = dataUrl;
+        if (callback) {
+
+            var newImage = new Image();
+            newImage.onload = function () {
+
+                var tmpCanvas = document.createElement("canvas");
+                var ctx = tmpCanvas.getContext("2d");
+                tmpCanvas.width = w;
+                tmpCanvas.height = h;
+
+                if (backgroundClr) {
+                    ctx.fillStyle = backgroundClr;
+                    ctx.fillRect(0, 0, w, h);
+                }
+
+                ctx.drawImage(newImage, nx, ny, nw, nh);
+
+                var newURL = tmpCanvas.toDataURL("image/png");
+
+                callback(newURL);
+            };
+
+            newImage.src = dataUrl;
+
+            return null;
+        }
+
+        var newImage = new Image();
+
+        newImage.src = dataUrl;
 
         var tmpCanvas = document.createElement("canvas");
         var ctx = tmpCanvas.getContext("2d");
@@ -20553,7 +20631,7 @@ CLOUD.Viewer.prototype = {
             ctx.fillRect(0, 0, w, h);
         }
 
-        ctx.drawImage(img, nx, ny, nw, nh);
+        ctx.drawImage(newImage, nx, ny, nw, nh);
 
         var newURL = tmpCanvas.toDataURL("image/png");
 
