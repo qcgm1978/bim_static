@@ -7,29 +7,31 @@ CLOUD.Version = "20170222";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
-    SceneScale: 2,
-    LengthUnitScale: 1000,
-    MinBoxSize: new THREE.Vector3(500, 500, 500),
-
-    LimitFrameTime: 250,
+    // SceneScale: 2,
+    // LengthUnitScale: 1000,
+    // MinBoxSize: new THREE.Vector3(500, 500, 500),
 
     TextureResRoot: 'images/',
+
+    SelectionColor: {color: 0x003BBD, side: THREE.DoubleSide/*, opacity: 0.5, transparent: true*/},
+
+    DisableAntialias: false,
+    EnableDemolishByDClick: true,
 
     UseMpkWorker: true,
     MpkWorkerUrl: "../libs/mpkWorker.min.js", //"../libs/mpkWorker.min.js",
 
-    disableAntialias: false,
-    EnableDemolishByDClick: true,
-
-    SelectionColor: {color: 0x003BBD, side: THREE.DoubleSide/*, opacity: 0.5, transparent: true*/},
+    IncrementRender: true,
+    LimitFrameTime: 250,
 
     maxObjectNumInPool: 60000,
-    maxDrawCacheNum : 30000,
-    ShowOctant: false,
+    maxDrawCacheNum : 40000,
+
     OctantDepth: 8,
     MaximumDepth: 0,
     TargetDistance: 10000,
     ConcurrencyRequestCount: 8, // Limitation of concurrency request (HTTP, web worker, etc. ) count
+    ShowOctant: false,
     DisableOctant: false,
     DEBUG: false
 };
@@ -3031,8 +3033,7 @@ CLOUD.OrderedRenderer = function () {
             // if (_countCullingObject % 5000 == 4999) {
                 var diff = Date.now() - _timeStartCull;
                 if (diff > 30) {
-                    console.log("------------------ > 30 ms");
-                    return false;
+                    return true;
                 }
 
             // }
@@ -9146,6 +9147,77 @@ CLOUD.Filter = function () {
         return null;
     };
 
+    // 是否有高亮材质(pick, highlight)
+    this.hasHighlightMaterial = function (id, userData) {
+
+        // 选中
+        if (_selectionSet && _selectionSet[id] !== undefined) {
+            return true;
+        }
+
+        // 是否在ID集合材质过滤器中
+        for (var item in _overriderByIds) {
+            var overrider = _overriderByIds[item];
+            if (overrider.ids[id])
+                return true;
+        }
+
+        if (!userData)
+            return false;
+
+        // 自定义材质过滤器
+        for (var item in _overriderByData) {
+            var overrider = _overriderByData[item];
+            var materialName = overrider[userData[item]];
+            var material = _overridedMaterials[materialName];
+            if (material !== undefined)
+                return true;
+        }
+
+        if (_overriderCondition) {
+
+            function matchCondition(condition) {
+
+                for (var item in condition) {
+                    if (condition[item] != userData[item])
+                        return false;
+                }
+
+                return true;
+            }
+
+            for (var ii = 0, len = _overriderCondition.length; ii < len; ++ii) {
+                var item = _overriderCondition[ii];
+                if (matchCondition(item.condition)) {
+                    return true;
+                }
+            }
+
+        }
+
+        if (_isolateCondition) {
+
+            function matchIsoCondition(condition) {
+
+                for (var item in condition) {
+                    if (condition[item] != userData[item])
+                        return false;
+                }
+
+                return true;
+            }
+
+            for (var ii = 0, len = _isolateCondition.length; ii < len; ++ii) {
+                var item = _isolateCondition[ii];
+                if (matchIsoCondition(item)) {
+                    return false;
+                }
+            }
+        }
+
+        return false;
+    };
+
     // 重置包围盒
     this.resetSelectionBox = function () {
         _selectionBoundingBox.makeEmpty();
@@ -12107,7 +12179,23 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
                 } else if (Math.abs(phiDelta) > 0.01) { // 垂直旋转
 
+                    var EPS = 0.000001;
+
                     rotAxis = camDir.clone().cross(up).normalize();
+
+                    var cross = new THREE.Vector3(0, 1, 0).clone().cross(up);
+                    var dot = cross.dot(new THREE.Vector3(1, 0, 0));
+                    var angle = Math.asin(cross.length());
+                    if (dot < 0) {
+                        angle = -angle;
+                    }
+                    if ((angle + phiDelta) > (Math.PI / 2 - EPS)) {
+                        phiDelta = Math.PI / 2 - EPS - angle;
+                    }
+                    else if ((angle + phiDelta) < (-Math.PI / 2 + EPS)) {
+                        phiDelta = -Math.PI / 2 + EPS - angle;
+                    }
+
                     viewTrf = new THREE.Quaternion().setFromAxisAngle(rotAxis, phiDelta);
                     adjustCameraPosition(viewTrf);
                     this.camera.realUp.applyQuaternion(viewTrf).normalize();
@@ -12180,6 +12268,20 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             }
             else {
                 rotAxis = rightDir;
+
+                var cross = new THREE.Vector3(0, 1, 0).clone().cross(up);
+                var dot = cross.dot(new THREE.Vector3(1, 0, 0));
+                var angle = Math.asin(cross.length());
+                if (dot < 0) {
+                    angle = -angle;
+                }
+                if ((angle + phiDelta) > (Math.PI / 4 - EPS)) {
+                    phiDelta = Math.PI / 4 - EPS - angle;
+                }
+                else if ((angle + phiDelta) < (-Math.PI / 4 + EPS)) {
+                    phiDelta = -Math.PI / 4 + EPS - angle;
+                }
+
                 rotAngle = phiDelta;
             }
             var viewTrf = new THREE.Quaternion().setFromAxisAngle(rotAxis, rotAngle);
@@ -15529,24 +15631,6 @@ CLOUD.EditorManager.prototype = {
         camera.up.copy(THREE.Object3D.DefaultUp); // 渲染完成后才可以恢复相机up方向
     },
 
-    setTopView: function(viewer, box, margin, ratio) {
-
-        var camera = viewer.camera;
-        var worldBox = viewer.getScene().getBoundingBox();
-        var target = camera.setStandardView(CLOUD.EnumStandardView.ISO, worldBox); // 设置观察视图
-
-        if (box) {
-            // fit all
-            target = camera.zoomToBBox(box, margin, ratio);
-        } else {
-            target = camera.zoomToBBox(worldBox, margin, ratio);
-        }
-
-        viewer.cameraEditor.updateCamera(target);
-        viewer.render();
-        camera.up.copy(THREE.Object3D.DefaultUp); // 渲染完成后才可以恢复相机up方向
-    },
-
     resize: function () {
         if (this.editor) {
             this.editor.resize();
@@ -17442,14 +17526,25 @@ CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
 
     var nodeId = meshInfo.nodeId;
 
-    if (cacheCell[nodeId]) {
-        CLOUD.Logger.log("nodeId:" + nodeId + " exist");
-    }
+    // if (cacheCell[nodeId]) {
+    //     CLOUD.Logger.log("nodeId:" + nodeId + " exist");
+    // }
 
     var userData = this.userDataReader.getUserData(userDataId);
     var matrixCache = meshInfo.matrix.clone();
 
-    cacheCell[nodeId] = {
+    // cacheCell[nodeId] = {
+    //     nodeId: nodeId,
+    //     userId: userId,
+    //     userData: userData,
+    //     meshId: meshInfo.meshId,
+    //     matrix: matrixCache,
+    //     materialId: item.materialId
+    // };
+
+    // this.pushMeshNode(cellId, nodeId, cacheCell[nodeId]);
+
+    var nodeInfo = {
         nodeId: nodeId,
         userId: userId,
         userData: userData,
@@ -17458,7 +17553,9 @@ CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
         materialId: item.materialId
     };
 
-    this.pushMeshNode(cellId, nodeId, cacheCell[nodeId]);
+    cacheCell.push(nodeInfo);
+
+    this.pushMeshNode(nodeInfo);
 
     meshInfo = null;
 };
@@ -17609,7 +17706,6 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
     }
 
     if (cellCount === 0) return;
-    var pool = this.pool;
 
     // begin sort
     if (!CLOUD.GlobalData.DisableOctant) {
@@ -17645,11 +17741,17 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
     // CLOUD.Logger.timeEnd("frustum");
     // END OF FRUSTUM Querying Cost < 1 ms
 
+
+    var pool = this.pool;
+    var filter = this.filter;
+    var databagId = this.databagId;
+    var cacheCells = this.cache.cells;
+    var cacheGeometries = this.cache.geometries;
+    var cacheMaterials = this.cache.materials;
+
     if (clearPool) {
         pool.clear();
     }
-
-    var cacheCells = this.cache.cells;
 
     this.highPriorityNodes = [];
     this.lowPriorityNodes = [];
@@ -17670,12 +17772,16 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
 
         if (cacheCell) {
 
-            for (var id in cacheCell) {
+            // for (var id in cacheCell) {
+            //
+            //     if (cacheCell.hasOwnProperty(id)) {
+            //         this.pushMeshNode(cellId, id, cacheCell[id]);
+            //     }
+            //
+            // }
 
-                if (cacheCell.hasOwnProperty(id)) {
-                    this.pushMeshNode(cellId, id, cacheCell[id]);
-                }
-
+            for (var j = 0, len = cacheCell.length; j < len; ++j ) {
+                this.pushMeshNode(cacheCell[j]);
             }
 
         } else {
@@ -17683,7 +17789,8 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
             // 缓存node数据
 
             if (!this.cache.cells[cellId]) {
-                this.cache.cells[cellId] = {};
+                //this.cache.cells[cellId] = {};
+                this.cache.cells[cellId] = [];
             }
 
             var cell = sceneReader.getCellInfo(cellId);
@@ -17713,8 +17820,8 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
         }
     }
 
-    this.updateMeshNodes(highPriorityNodes);
-    this.updateMeshNodes(lowPriorityNodes);
+    this.updateMeshNodes(highPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
+    this.updateMeshNodes(lowPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
 
     CLOUD.Logger.log("mesh count:", pool.counter);
     CLOUD.Logger.timeEnd("prepareScene");
@@ -17724,7 +17831,7 @@ CLOUD.Model.prototype.clearCells = function () {
     this.cache.cells = {};
 };
 
-CLOUD.Model.prototype.pushMeshNode = function (cellId, nodeId, node) {
+CLOUD.Model.prototype.pushMeshNode = function (node) {
 
     var filter = this.filter;
     var userId = node.userId;
@@ -17744,25 +17851,25 @@ CLOUD.Model.prototype.pushMeshNode = function (cellId, nodeId, node) {
     }
 
     // 材质过滤
-    var overridedMaterial = filter.getOverridedMaterialById(userId, userData);
+    var isHighlight = filter.hasHighlightMaterial(userId, userData);
 
-    if (overridedMaterial) {
-        highPriorityNodes.push([cellId, nodeId]);
+    if (isHighlight) {
+        highPriorityNodes.push(node);
     } else {
-        lowPriorityNodes.push([cellId, nodeId]);
+        lowPriorityNodes.push(node);
     }
 
 };
 
-CLOUD.Model.prototype.updateMeshNodes = function (nodes) {
+CLOUD.Model.prototype.updateMeshNodes = function (nodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId) {
 
-    var pool = this.pool;
-    var filter = this.filter;
-    var databagId = this.databagId;
+    // var pool = this.pool;
+    // var filter = this.filter;
+    // var databagId = this.databagId;
 
-    var cacheCells = this.cache.cells;
-    var cacheGeometries = this.cache.geometries;
-    var cacheMaterials = this.cache.materials;
+    // var cacheCells = cache.cells;
+    // var cacheGeometries = cache.geometries;
+    // var cacheMaterials = cache.materials;
 
     var len = nodes.length;
 
@@ -17772,10 +17879,7 @@ CLOUD.Model.prototype.updateMeshNodes = function (nodes) {
 
     for (var i = 0; i < len; ++i) {
 
-        var cellId = nodes[i][0];
-        var id = nodes[i][1];
-        var cacheNode = cacheCells[cellId][id];
-
+        var cacheNode = nodes[i];
         var nodeId = cacheNode.nodeId;
         var userId = cacheNode.userId;
         var userData = cacheNode.userData;
@@ -19721,7 +19825,6 @@ CLOUD.Viewer = function () {
     this.requestRenderMaxCount = 10000;
     this.rendering = false;
     this.incrementRenderHandle = 0;
-    this.incrementRenderEnabled = true; // 启用增量绘制
 
     this.callbacks = {};
     this.services = {};
@@ -19877,6 +19980,7 @@ CLOUD.Viewer.prototype = {
         var scope = this;
         this.domElement = domElement;
         var settings = {alpha: true, preserveDrawingBuffer: true, antialias: true};
+        var incrementRenderEnabled = CLOUD.GlobalData.IncrementRender;
 
         //if (!CLOUD.GlobalData.disableAntialias)
         //    settings.antialias = true;
@@ -19886,8 +19990,11 @@ CLOUD.Viewer.prototype = {
         try {
             canvas = document.createElement('canvas');
             var webglContext = canvas.getContext('webgl', settings) || canvas.getContext('experimental-webgl', settings);
-            if (!webglContext)
+
+            if (!webglContext) {
                 settings.antialias = false;
+            }
+
         } catch (e) {
             return false;
         }
@@ -19895,17 +20002,15 @@ CLOUD.Viewer.prototype = {
         CLOUD.GeomUtil.initializeUnitInstances();
 
         settings.canvas = canvas;
-        this.incrementRenderer = new THREE.WebGLIncrementRenderer(settings);
-        this.webGLRenderer = new THREE.WebGLRenderer(settings);
 
-        if (this.incrementRenderEnabled) {
-            this.renderer = this.incrementRenderer;
+        if (incrementRenderEnabled) {
+            this.renderer = new THREE.WebGLIncrementRenderer(settings);
             this.renderer.setRenderTicket(0);
         } else {
-            this.renderer = this.webGLRenderer;
+            this.renderer = new THREE.WebGLRenderer(settings);
         }
 
-        this.renderer.domElement.addEventListener("webglcontextlost", function(event) {
+        this.renderer.domElement.addEventListener("webglcontextlost", function (event) {
             event.preventDefault();
             if (scope.incrementRenderHandle > 0) {
                 cancelAnimationFrame(scope.incrementRenderHandle);
@@ -19917,7 +20022,16 @@ CLOUD.Viewer.prototype = {
         var viewportWidth = domElement.offsetWidth;
         var viewportHeight = domElement.offsetHeight;
 
-        this.initRenderer(true);
+        this.renderer.setClearColor(0x000000, 0);
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setSize(viewportWidth, viewportHeight);
+
+        // Added by xmh begin
+        // 允许获得焦点，将键盘事件注册到父容器（之前注册到window上会存在各种联动问题），鼠标点击父容器，激活canvas
+        this.renderer.domElement.setAttribute('tabindex', '0');
+        this.renderer.domElement.setAttribute('id', 'cloud-main-canvas');
+        // Added by xmh end
+        this.domElement.appendChild(this.renderer.domElement);
 
         // Camera
         this.camera = new CLOUD.Camera(viewportWidth, viewportHeight, 45, 0.1, CLOUD.GlobalData.SceneSize * 20.0);
@@ -19945,9 +20059,10 @@ CLOUD.Viewer.prototype = {
         var scope = this;
         var camera = this.camera;
         var scene = this.getScene();
+        var incrementRenderEnabled = CLOUD.GlobalData.IncrementRender;
 
         // 增量绘制
-        if (this.incrementRenderEnabled && scope.renderer.IncrementRender) {
+        if (incrementRenderEnabled && scope.renderer.IncrementRender) {
 
             ++this.requestRenderCount;
 
@@ -20043,6 +20158,9 @@ CLOUD.Viewer.prototype = {
                         if (renderId !== scope.requestRenderCount) {
                             scope.render();
                         } else {
+
+                            // console.log("------------ rendered ------------");
+
                             // 结束后回调函数
                             scope.onRenderFinishedCallback();
                         }
@@ -20068,6 +20186,15 @@ CLOUD.Viewer.prototype = {
         }
 
         // console.timeEnd("viewer.render");
+    },
+
+    resize: function (width, height) {
+        this.camera.setSize(width, height);
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(width, height);
+        this.editorManager.resize();
+        this.onCallbacks("resize");
+        this.render();
     },
 
     calculateNearFar: function () {
@@ -20103,109 +20230,6 @@ CLOUD.Viewer.prototype = {
         }
     },
 
-    resize: function (width, height) {
-        this.camera.setSize(width, height);
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize(width, height);
-        this.editorManager.resize();
-        this.onCallbacks("resize");
-        this.render();
-    },
-
-    // 设置图片资源的路径。默认在“images/”
-    setImageResPath: function (path) {
-        CLOUD.GlobalData.TextureResRoot = path;
-    },
-
-    getScene: function () {
-        return this.modelManager.scene;
-    },
-
-    // 初始化renderer
-    initRenderer: function (first) {
-        var viewportWidth = this.domElement.offsetWidth;
-        var viewportHeight = this.domElement.offsetHeight;
-        this.renderer.setClearColor(0x000000, 0);
-        this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.setSize(viewportWidth, viewportHeight);
-
-        if (first) {
-            // Added by xmh begin
-            // 允许获得焦点，将键盘事件注册到父容器（之前注册到window上会存在各种联动问题），鼠标点击父容器，激活canvas
-            this.renderer.domElement.setAttribute('tabindex', '0');
-            this.renderer.domElement.setAttribute('id', 'cloud-main-canvas');
-            // Added by xmh end
-            this.domElement.appendChild(this.renderer.domElement);
-        }
-    },
-
-    setIncrementRenderEnabled: function (enable) {
-
-        this.incrementRenderEnabled = enable;
-
-        if (this.domElement) {
-
-            if (enable) {
-                this.renderer = this.incrementRenderer;
-                this.renderer.setRenderTicket(0);
-                this.rendering = false;
-                this.requestRenderCount = 0;
-                // this.editorManager.isUpdateRenderList = true;
-            } else {
-
-                if (this.incrementRenderHandle > 0) {
-                    cancelAnimationFrame(this.incrementRenderHandle);
-                }
-
-                this.renderer = this.webGLRenderer;
-                // this.modelManager.clearScene();
-            }
-
-            this.initRenderer(false);
-        }
-    },
-
-    // 清除状态
-    clearIncrementRender: function () {
-
-        if (this.incrementRenderEnabled) {
-
-            if (this.incrementRenderHandle > 0) {
-                cancelAnimationFrame(this.incrementRenderHandle);
-            }
-
-            this.rendering = false;
-            this.requestRenderCount = 0;
-            this.renderer.setRenderTicket(0);
-        }
-
-    },
-
-    // 设置每帧的最大耗时
-    setLimitFrameTime: function (limitTime) {
-        if (this.incrementRenderEnabled) {
-
-            if (limitTime <= 0) {
-                limitTime = 30;
-            }
-
-            CLOUD.GlobalData.LimitFrameTime = limitTime;
-        }
-    },
-
-    // 限制帧率
-    limitFrameRate: function (frameRate) {
-
-        if (this.incrementRenderEnabled) {
-
-            if (frameRate <= 0) {
-                frameRate = 4;
-            }
-
-            CLOUD.GlobalData.LimitFrameTime = 1000 / frameRate;
-        }
-    },
-
     registerDomEventListeners: function () {
         if (this.domElement) {
             this.editorManager.registerDomEventListeners(this.domElement);
@@ -20227,7 +20251,9 @@ CLOUD.Viewer.prototype = {
      * @return the databag client.
      */
     load: function (databagId, serverUrl, notifyProgress, debug) {
+
         notifyProgress = notifyProgress || true;
+
         return this.modelManager.load({
             databagId: databagId,
             serverUrl: serverUrl,
@@ -20243,6 +20269,14 @@ CLOUD.Viewer.prototype = {
 
     clearAll: function () {
         this.getScene().clearAll();
+    },
+
+    getScene: function () {
+        return this.modelManager.scene;
+    },
+
+    getFilters: function () {
+        return this.getScene().filter;
     },
 
     /**
@@ -20287,14 +20321,6 @@ CLOUD.Viewer.prototype = {
 
     setClipPlanesMode: function () {
         this.editorManager.setClipPlanesMode(this);
-    },
-
-    // 锁定Z轴
-    lockAxisZ: function (isLock) {
-
-        if (this.cameraEditor) {
-            this.cameraEditor.lockAxisZ(isLock);
-        }
     },
 
     zoomIn: function (factor) {
@@ -20411,104 +20437,6 @@ CLOUD.Viewer.prototype = {
         }
     },
 
-    lookAt: function (position, target, up) {
-        var dir = new THREE.Vector3();
-        dir.subVectors(target, position);
-
-        this.camera.LookAt(target, dir, up);
-        this.cameraEditor.updateCamera(target);
-        this.render();
-    },
-
-    // transform
-    transformCamera: function (camera) {
-        return CLOUD.CameraUtil.transformCamera(camera, this.modelManager.scene);
-    },
-
-    getCamera: function () {
-        return this.cameraEditor.getCameraInfo();
-    },
-
-    setCamera: function (jsonStr) {
-        var camInfo = CLOUD.CameraUtil.parseCameraInfo(jsonStr);
-        this.lookAt(camInfo.position, camInfo.target, camInfo.up);
-    },
-
-    // 获得render buffer的数据
-    getRenderBufferScreenShot: function (backgroundClr) {
-
-        // 在高分屏上toDataURL直接获得图片数据比实际的图片大
-        var dataUrl = this.renderer.domElement.toDataURL("image/png");
-        var canvasWidth = this.renderer.domElement.width;
-        var canvasHeight = this.renderer.domElement.height;
-        var pixelRatio = window.devicePixelRatio || 1;
-        var w = canvasWidth / pixelRatio;
-        var h = canvasHeight / pixelRatio;
-
-        if (!w || !h)
-            return dataUrl;
-
-        var nw, nh, nx = 0,
-            ny = 0;
-
-        if (w > h || (canvasWidth / canvasHeight < w / h)) {
-            nw = w;
-            nh = canvasHeight / canvasWidth * w;
-            ny = h / 2 - nh / 2;
-        } else {
-            nh = h;
-            nw = canvasWidth / canvasHeight * h;
-            nx = w / 2 - nw / 2;
-        }
-
-        var img = new Image();
-        img.src = dataUrl;
-
-        var tmpCanvas = document.createElement("canvas");
-        var ctx = tmpCanvas.getContext("2d");
-        tmpCanvas.width = w;
-        tmpCanvas.height = h;
-
-        if (backgroundClr) {
-            ctx.fillStyle = backgroundClr;
-            ctx.fillRect(0, 0, w, h);
-        }
-
-        ctx.drawImage(img, nx, ny, nw, nh);
-
-        var newURL = tmpCanvas.toDataURL("image/png");
-
-        return newURL;
-    },
-
-    canvas2image: function (backgroundClr) {
-
-        var dataUrl = this.getRenderBufferScreenShot(backgroundClr);
-        // 在chrome中多调用几次，会出现图片显示不正常（显示空白，原因是转换的值变得不正常了），
-        // 每次获得截图后，缓存数据貌似被清除了
-        // 所以在每次调用后render一次
-        this.render();
-
-        return dataUrl;
-    },
-
-    getFilters: function () {
-        return this.getScene().filter;
-    },
-
-    // 允许双击半透明
-    enableTranslucentByDClick: function (enable) {
-        CLOUD.GlobalData.EnableDemolishByDClick = enable;
-    },
-
-    // 禁止旋转
-    disableRotate: function (disable) {
-
-        if (this.cameraEditor) {
-            this.cameraEditor.disableRotate(disable);
-        }
-    },
-
     setStandardView: function (stdView, margin, callback) {
         margin = margin || -0.05;
         this.editorManager.setStandardView(stdView, this, margin, callback);
@@ -20522,7 +20450,7 @@ CLOUD.Viewer.prototype = {
      * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
      * @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
      */
-    setStandardViewWithBox:function ( stdView, box, margin, ratio) {
+    setStandardViewWithBox: function (stdView, box, margin, ratio) {
 
         margin = margin || 0.05;
         ratio = ratio || 1.0;
@@ -20537,14 +20465,7 @@ CLOUD.Viewer.prototype = {
     },
 
     setTopView: function (box, margin, ratio) {
-        margin = margin || 0.05;
-        ratio = ratio || 1.0;
-
-        if (box) {
-            box.applyMatrix4(this.getScene().rootNode.matrix);
-        }
-
-        this.editorManager.setTopView(this, box, margin, ratio);
+        this.setStandardViewWithBox(CLOUD.EnumStandardView.ISO, box, margin, ratio);
     },
 
     // 设置初始视角
@@ -20554,6 +20475,7 @@ CLOUD.Viewer.prototype = {
 
     // 切换到初始视图
     goToInitialView: function () {
+
         var target;
 
         if (!this.initialView) {
@@ -20573,13 +20495,179 @@ CLOUD.Viewer.prototype = {
 
     // 设置home视图类型
     setHomeViewType: function (viewType) {
-
         this.currentHomeView = viewType;
     },
 
     // 进入home视图
     goToHomeView: function (margin) {
         this.setStandardView(this.currentHomeView, margin);
+    },
+
+    lookAt: function (position, target, up) {
+        var dir = new THREE.Vector3();
+        dir.subVectors(target, position);
+
+        this.camera.LookAt(target, dir, up);
+        this.cameraEditor.updateCamera(target);
+        this.render();
+    },
+
+    // 设置图片资源的路径。默认在“images/”
+    setImageResPath: function (path) {
+        CLOUD.GlobalData.TextureResRoot = path;
+    },
+
+    // 设置每帧的最大耗时
+    setLimitFrameTime: function (limitTime) {
+        if (CLOUD.GlobalData.IncrementRender) {
+
+            if (limitTime <= 0) {
+                limitTime = 30;
+            }
+
+            CLOUD.GlobalData.LimitFrameTime = limitTime;
+        }
+    },
+
+    // 限制帧率
+    limitFrameRate: function (frameRate) {
+
+        if (CLOUD.GlobalData.IncrementRender) {
+
+            if (frameRate <= 0) {
+                frameRate = 4;
+            }
+
+            CLOUD.GlobalData.LimitFrameTime = 1000 / frameRate;
+        }
+    },
+
+    // transform
+    transformCamera: function (camera) {
+        return CLOUD.CameraUtil.transformCamera(camera, this.modelManager.scene);
+    },
+
+    getCamera: function () {
+        return this.cameraEditor.getCameraInfo();
+    },
+
+    setCamera: function (jsonStr) {
+        var camInfo = CLOUD.CameraUtil.parseCameraInfo(jsonStr);
+        this.lookAt(camInfo.position, camInfo.target, camInfo.up);
+    },
+
+    // 获得render buffer的数据
+    getRenderBufferScreenShot: function (backgroundClr, callback) {
+
+        // 在高分屏上toDataURL直接获得图片数据比实际的图片大
+        var dataUrl = this.renderer.domElement.toDataURL("image/png");
+        var canvasWidth = this.renderer.domElement.width;
+        var canvasHeight = this.renderer.domElement.height;
+        var pixelRatio = window.devicePixelRatio || 1;
+        var w = canvasWidth / pixelRatio;
+        var h = canvasHeight / pixelRatio;
+
+        if (!w || !h) {
+
+            if (callback) {
+                callback(dataUrl);
+                return null
+            } else {
+                return dataUrl;
+            }
+        }
+
+        var nw, nh, nx = 0,
+            ny = 0;
+
+        if (w > h || (canvasWidth / canvasHeight < w / h)) {
+            nw = w;
+            nh = canvasHeight / canvasWidth * w;
+            ny = h / 2 - nh / 2;
+        } else {
+            nh = h;
+            nw = canvasWidth / canvasHeight * h;
+            nx = w / 2 - nw / 2;
+        }
+
+        if (callback) {
+
+            var newImage = new Image();
+            newImage.onload = function () {
+
+                var tmpCanvas = document.createElement("canvas");
+                var ctx = tmpCanvas.getContext("2d");
+                tmpCanvas.width = w;
+                tmpCanvas.height = h;
+
+                if (backgroundClr) {
+                    ctx.fillStyle = backgroundClr;
+                    ctx.fillRect(0, 0, w, h);
+                }
+
+                ctx.drawImage(newImage, nx, ny, nw, nh);
+
+                var newURL = tmpCanvas.toDataURL("image/png");
+
+                callback(newURL);
+            };
+
+            newImage.src = dataUrl;
+
+            return null;
+        }
+
+        var newImage = new Image();
+
+        newImage.src = dataUrl;
+
+        var tmpCanvas = document.createElement("canvas");
+        var ctx = tmpCanvas.getContext("2d");
+        tmpCanvas.width = w;
+        tmpCanvas.height = h;
+
+        if (backgroundClr) {
+            ctx.fillStyle = backgroundClr;
+            ctx.fillRect(0, 0, w, h);
+        }
+
+        ctx.drawImage(newImage, nx, ny, nw, nh);
+
+        var newURL = tmpCanvas.toDataURL("image/png");
+
+        return newURL;
+    },
+
+    canvas2image: function (backgroundClr) {
+
+        var dataUrl = this.getRenderBufferScreenShot(backgroundClr);
+        // 在chrome中多调用几次，会出现图片显示不正常（显示空白，原因是转换的值变得不正常了），
+        // 每次获得截图后，缓存数据貌似被清除了
+        // 所以在每次调用后render一次
+        this.render();
+
+        return dataUrl;
+    },
+
+    // 锁定Z轴
+    lockAxisZ: function (isLock) {
+
+        if (this.cameraEditor) {
+            this.cameraEditor.lockAxisZ(isLock);
+        }
+    },
+
+    // 允许双击半透明
+    enableTranslucentByDClick: function (enable) {
+        CLOUD.GlobalData.EnableDemolishByDClick = enable;
+    },
+
+    // 禁止旋转
+    disableRotate: function (disable) {
+
+        if (this.cameraEditor) {
+            this.cameraEditor.disableRotate(disable);
+        }
     },
 
     calculationPlanes: function () {
@@ -20597,10 +20685,20 @@ CLOUD.Viewer.prototype = {
         this.isRecalculationPlanes = true;
     },
 
+    /**
+     * 设置octree 深度
+     *
+     * @param {Int} depth - 深度
+     */
     setOctantDepth: function (depth) {
         CLOUD.GlobalData.OctantDepth = depth;
     },
 
+    /**
+     * 重置对象池大小
+     *
+     * @param {Int} size - 对象池对象数
+     */
     resizePool: function (size) {
         CLOUD.GlobalData.maxObjectNumInPool = size;
         this.getScene().resizePool();
