@@ -1379,7 +1379,8 @@
 		getData : function(){
 	        var userId = this.Project.currentUserId,
 	                fileId = this.Project.fileIds[userId] || "";
-
+	        console.log("userId:",userId);
+	        
 	        var result = {
 	            presetPoint: this.Project.presetPoint,
 	            risk: {}
