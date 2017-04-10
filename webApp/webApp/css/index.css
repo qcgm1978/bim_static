@@ -1,0 +1,141 @@
+/*
+write by wuweiwei(邬畏畏)
+department:glodon;
+
+说明：首页样式文件
+*/
+
+nav{
+	height: 2.8125rem;
+	background-color: #e6eaf0;
+	border-bottom:1px solid #ccc;
+	overflow: hidden;
+	margin:0;
+	padding:0;
+}
+nav div{
+	float: left;
+	width:25%;
+	height: 2.1875rem;
+	margin-top:0.3125rem;
+	position: relative;
+}
+nav div i{
+	display: block;
+	width:1.40625rem;
+	height:1.40625rem;
+	background-size: 100%;
+	position: absolute;
+	left: 50%;
+	transform: translate(-50%);
+}
+nav div i.nav-design{
+	background-image:url(../images/index/nav-icon-1.png);
+}
+nav div i.nav-model{
+	background-image:url(../images/index/nav-icon-2.png);
+}
+nav div i.nav-cost{
+	background-image:url(../images/index/nav-icon-3.png);
+}
+nav div i.nav-quality{
+	background-image:url(../images/index/nav-icon-4.png);
+}
+
+nav div span{
+	display: block;
+	width:1.40625rem;
+	position: absolute;
+	left: 50%;
+	transform: translate(-50%);
+	text-align: center;
+	bottom:0.125rem;
+	color:#77808f;
+	font-weight: bold;
+}
+.sideMargin{
+	margin-left: 0.3125rem; /*左右边距*/
+	margin-right: 0.3125rem; /*左右边距*/
+}
+.sidePad{
+	padding-left: 0.3125rem; /*左右边距*/
+	padding-right: 0.3125rem; /*左右边距*/	
+}
+
+article dl dt{
+	height: 0.9375rem;
+	border-bottom:1px solid #ccc;
+	background-color: #EFEFF4;
+}
+article dl dt label,article dl dt span{
+	display: block;
+}
+article dl dt label{
+	height: 0.9375rem;
+	border-bottom:1px solid #ccc;
+	line-height: 0.9375rem;
+	float: left;
+	font-weight: bold;
+	color:#b6b6b7;
+}
+article dl dt span{
+	height: 0.9375rem;
+	border-bottom:1px solid #ccc;
+	line-height: 0.9375rem;
+	float: right;
+	font-weight: bold;
+	color:#b6b6b7;
+}
+
+article dl dd{
+	height: 2.765rem;
+	border-bottom:1px solid #ccc;
+	position: relative;
+}
+article dl dd i{
+	display: block;
+	height: 0.21875rem;
+	width:  0.21875rem;
+	background-image: url(../images/index/circle.png);
+	background-repeat: no-repeat;
+	background-size: 100%;
+	position:absolute;
+	margin-top:0.7187rem;
+}
+article dl dd p{
+	margin-left: 0.625rem;
+	padding-top: 0.5031rem;
+	font-size: 0.44rem;
+	line-height: 0.7rem;
+	overflow: hidden;
+	max-height: 1.3125rem;
+}
+
+article .info{
+	height: 0.421rem;
+	margin-top:0.22rem;
+}
+
+article dl dd .info span,article dl dd .info label{
+	display: block;
+}
+article dl dd .info span{
+	float: left;
+	margin-left: 0.625rem;
+	background-image: url(../images/index/icon-time.png);
+	background-repeat: no-repeat;
+	background-size:0.3125rem 0.3125rem;
+	padding-left: 0.53rem;
+	background-position: 0 center;
+}
+article dl dd .info label{
+	float: right;
+	margin-right:1.718rem;
+	padding-left: 0.53rem;
+	background-image: url(../images/index/icon-user.png);
+	background-repeat: no-repeat;
+	background-size:0.3125rem 0.3125rem;
+	background-position: 0 center;
+}
+
+
