@@ -15782,7 +15782,7 @@ CLOUD.Loader.Url = function (serverUrl, databagId) {
 };
 
 CLOUD.Loader.Url.prototype.projectUrl = function () {
-    return this.serverUrl + this.databagId + "/config.json";
+    return this.serverUrl +"config/"+ this.databagId + "/config.json";
 };
 
 CLOUD.Loader.Url.prototype.sceneUrl = function (idx) {
@@ -15800,7 +15800,7 @@ CLOUD.Loader.Url.prototype.userIdUrl = function () {
 
 CLOUD.Loader.Url.prototype.octreeUrl = function (idx) {
     idx = idx || 'o';
-    return this.serverUrl + this.databagId + "/scene/index_" + idx;
+    return this.serverUrl +"file/"+ this.databagId + "/scene/index_" + idx;
 };
 
 CLOUD.Loader.Url.prototype.symbolUrl = function () {

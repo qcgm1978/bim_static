@@ -1388,7 +1388,8 @@
 	           result.risk={
 	               components: {
 	                   id: userId,
-	                   fileUniqueId: fileId + userId.slice(userId.indexOf('.')),
+	                   //fileUniqueId: fileId + userId.slice(userId.indexOf('.')),
+	                   fileUniqueId : userId, 
 	                   axis: this.Project.axis[userId],
 	                   location: this.Project.location[userId],
 	                   locationName: this.Project.locationName[userId]
