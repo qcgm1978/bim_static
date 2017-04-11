@@ -117,7 +117,8 @@
 			var Days = 30,
 				exp = new Date();
 			exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000),
-				doMain = window.location.host.substring(window.location.host.indexOf("."));
+				doMain = window.location.host;
+				// doMain = window.location.host.substring(window.location.host.indexOf("."));
 
 			document.cookie = name + "=" + value + ";domain=" + doMain + ";expires=" + exp.toGMTString() + ";path=/";
 		},

@@ -611,7 +611,9 @@
         var Days = 0.01,
           exp = new Date();
         exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-        document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";path=/;domain=" + window.location.host.substring(window.location.host.indexOf(".")) + ";";
+        // var domain = window.location.host.substring(window.location.host.indexOf("."));
+        var domain = window.location.host;
+        document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";path=/;domain=" + domain + ";";
       } catch (e) {
         alert(e);
       }
@@ -647,8 +649,10 @@
       var exp = new Date();
       exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
       var cval = this.getCookie(name);
+      // var domain = window.location.host.substring(window.location.host.indexOf("."));
+      var domain = window.location.host;
       if (cval != null)
-        document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=" + window.location.host.substring(window.location.host.indexOf(".")) + ";path=/";
+        document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=" + domain + ";path=/";
     }
 
 
