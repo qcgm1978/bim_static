@@ -3033,7 +3033,7 @@ CLOUD.OrderedRenderer = function () {
             // if (_countCullingObject % 5000 == 4999) {
                 var diff = Date.now() - _timeStartCull;
                 if (diff > 30) {
-                    return true;
+                    return false;
                 }
 
             // }
@@ -3159,7 +3159,7 @@ CLOUD.OrderedRenderer = function () {
 
         state.setBlending(THREE.NoBlending);
 
-        _isIncrementalRenderFinish = true; //
+        // _isIncrementalRenderFinish = true; //
 
         for (var ii = _renderGroups.length - 1; ii >= 0; --ii) {
             var group = _renderGroups[ii];
@@ -12184,7 +12184,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                     rotAxis = camDir.clone().cross(up).normalize();
 
                     var cross = new THREE.Vector3(0, 1, 0).clone().cross(up);
-                    var dot = cross.dot(new THREE.Vector3(1, 0, 0));
+                    var dot = cross.dot(rightDir);
                     var angle = Math.asin(cross.length());
                     if (dot < 0) {
                         angle = -angle;
@@ -12270,7 +12270,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                 rotAxis = rightDir;
 
                 var cross = new THREE.Vector3(0, 1, 0).clone().cross(up);
-                var dot = cross.dot(new THREE.Vector3(1, 0, 0));
+                var dot = cross.dot(rightDir);
                 var angle = Math.asin(cross.length());
                 if (dot < 0) {
                     angle = -angle;
@@ -17128,7 +17128,7 @@ CLOUD.Model = function (manager, serverUrl, databagId, texturePath) {
         instancedMaterials: {}
     };
 
-    this.cfgInfo = null;
+    // this.cfgInfo = null;
 
     // Loaders
     this.loader = new THREE.XHRLoader(this);
@@ -17171,7 +17171,7 @@ CLOUD.Model.prototype.load = function (notifyProgress) {
 
     var scope = this;
     var modelUrl = this.modelUrl;
-    var filter = this.filter;
+    // var filter = this.filter;
 
     this.notifyProgress = notifyProgress;
 
@@ -17180,7 +17180,7 @@ CLOUD.Model.prototype.load = function (notifyProgress) {
     this.loader.setCrossOrigin(this.crossOrigin);
     this.loader.load(modelUrl.projectUrl(), function (text) {
         var cfg = JSON.parse(text);
-        scope.cfgInfo = cfg;
+        // scope.cfgInfo = cfg;
         scope.sceneCount = cfg.metadata.scenes;
         scope.mpkCount = cfg.metadata.mpks;
         scope.symbolCount = cfg.metadata.symbol;
@@ -17329,6 +17329,7 @@ CLOUD.Model.prototype.onTaskFinished = function () {
 };
 
 CLOUD.Model.prototype.destroy = function () {
+
     var geometry, material;
 
     for (var id in this.cache.geometries) {
@@ -17336,14 +17337,10 @@ CLOUD.Model.prototype.destroy = function () {
         geometry.dispose();
     }
 
-    this.cache.geometries = null;
-
     for (var id in this.cache.materials) {
         material = this.cache.materials[id];
         material.dispose();
     }
-
-    this.cache.geometries = null;
 
     this.cache = {
         cells: {},
@@ -17353,7 +17350,7 @@ CLOUD.Model.prototype.destroy = function () {
     };
 
     this.cache = null;
-    this.cfgInfo = null;
+    // this.cfgInfo = null;
     this.loader = null;
     this.userIdReader = null;
     this.userDataReader = null;
