@@ -1,6 +1,7 @@
 var Login = {
 
-	doMain: window.location.host.substring(window.location.host.indexOf(".")),
+	// doMain: window.location.host.substring(window.location.host.indexOf(".")),
+	doMain: window.location.host,
 
 	isIp : function(){
 		//判断URL是否是IP地址,是IP地址返回IP地址,否则返回空字符串
