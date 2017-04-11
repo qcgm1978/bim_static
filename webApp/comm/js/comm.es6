@@ -273,7 +273,8 @@ App.Comm = {
 	},
 
 	//JS操作cookies方法!
-	doMain: window.location.host.substring(window.location.host.indexOf(".")),
+	// doMain: window.location.host.substring(window.location.host.indexOf(".")),
+	doMain: window.location.host,
 
 	setCookie(name, value) {
 		var Days = 0.02,

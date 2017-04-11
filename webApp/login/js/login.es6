@@ -33,6 +33,7 @@ var Login = {
 		{
 			exp.setTime(exp.getTime() + 365 * 24 * 60 * 60 * 1000);
 		}
+		console.log(Login.doMain);
 		document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";domain=" + Login.doMain + ";path=/";
 	},
 	//获取cookie
