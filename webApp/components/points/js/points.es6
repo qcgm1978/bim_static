@@ -612,8 +612,8 @@
           exp = new Date();
         exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
         // var domain = window.location.host.substring(window.location.host.indexOf("."));
-        var domain = window.location.host;
-        document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";path=/;domain=" + domain + ";";
+        // var domain = window.location.host;
+        document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";path=/;domain=" + window.location.host.substring(window.location.host.indexOf(".")) + ";";
       } catch (e) {
         alert(e);
       }
@@ -650,9 +650,9 @@
       exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
       var cval = this.getCookie(name);
       // var domain = window.location.host.substring(window.location.host.indexOf("."));
-      var domain = window.location.host;
+      // var domain = window.location.host;
       if (cval != null)
-        document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=" + domain + ";path=/";
+        document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=" + window.location.host.substring(window.location.host.indexOf(".")) + ";path=/";
     }
 
 

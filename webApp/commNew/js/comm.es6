@@ -274,13 +274,13 @@ App.Comm = {
 
 	//JS操作cookies方法!
 	// doMain: window.location.host.substring(window.location.host.indexOf(".")),
-	doMain: window.location.host,
+	// doMain: window.location.host,
 
 	setCookie(name, value) {
 		var Days = 0.02,
 			exp = new Date();
 		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-		document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";domain=" + App.Comm.doMain + ";path=/";
+		document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";domain=" + window.location.host.substring(window.location.host.indexOf(".")) + ";path=/";
 	},
 	//获取cookie
 	getCookie: function(key, cookis) {
