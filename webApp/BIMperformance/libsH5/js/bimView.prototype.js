@@ -995,7 +995,8 @@
     },
     setAxisGrid: function(name, x, y) {
       var viewer = this.viewer;
-      viewer.flyBypAxisGridNumber(name, x, y);
+      //viewer.flyBypAxisGridNumber(name, x, y); note by wuweiwei old version
+      this.getMiniMapObject().flyBypAxisGridNumber(name, x, y);
     },
     setFloorMap: function(obj, name, flag) {
       // 设置小地图
@@ -1005,7 +1006,8 @@
     },
     showAxisGrid: function(name) {
       var viewer = this.viewer;
-      viewer.showAxisGrid(name, true);
+      //viewer.showAxisGrid(name, true); note by wuweiwei old version
+      this.getMiniMapObject().showAxisGrid(name, true);
     },
     load: function(etag) {
       // 加载场景
