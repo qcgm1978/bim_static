@@ -599,7 +599,7 @@
         hours = d.getUTCHours(),
         minutes = d.getUTCMinutes(),
         startYear = this.startDate !== -Infinity ? this.startDate.getUTCFullYear() : -Infinity,
-        startMonth = this.startDate !== -Infinity ? this.startDate.getUTCMonth() + 1 : -Infinity,
+        startMonth = this.startDate !== -Infinity ? this.startDate.getUTCMonth() - 1 : -Infinity,
         endYear = this.endDate !== Infinity ? this.endDate.getUTCFullYear() : Infinity,
         endMonth = this.endDate !== Infinity ? this.endDate.getUTCMonth() + 1 : Infinity,
         currentDate = (new UTCDate(this.date.getUTCFullYear(), this.date.getUTCMonth(), this.date.getUTCDate())).valueOf(),
