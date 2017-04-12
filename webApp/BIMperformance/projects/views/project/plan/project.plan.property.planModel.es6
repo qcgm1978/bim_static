@@ -157,7 +157,7 @@ App.Project.PlanModel = Backbone.View.extend({
 					type: 'userId',
 					ids: undefined
 				});
-				return;
+				//return;
 			}else{
 				$target.parents('.rightPropertyContent').find(".planContainer").find(".selected").removeClass('selected');
 				$target.parents('.rightPropertyContent').find(".qualityContainer").find(".selected").removeClass('selected');
@@ -166,7 +166,7 @@ App.Project.PlanModel = Backbone.View.extend({
 				if (!$target.hasClass("odd")){
 					var arr = checked?[]:"";
 					App.Project.Settings.Viewer.filterByUserIds(arr);
-					return;
+					//return;
 				}
 			}
 		}
@@ -214,7 +214,6 @@ App.Project.PlanModel = Backbone.View.extend({
 					ids: undefined
 				});
 				if (box && box.length) {
-					console.log("data.data.elements:",data.data.elements);
 					$target.data("userId", data.data.elements);
 					$target.data("box", box);
 					if (checked) {
@@ -223,7 +222,7 @@ App.Project.PlanModel = Backbone.View.extend({
 						App.Project.Settings.Viewer.filterByUserIds(data.data.elements);
 						return
 					}
-					if (!$el) {
+					if ($el) {
 						App.Project.Settings.Viewer.translucent(false);
 						App.Project.Settings.Viewer.ignoreTranparent({
 							type: "plan",

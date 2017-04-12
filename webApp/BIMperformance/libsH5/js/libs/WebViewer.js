@@ -3026,14 +3026,14 @@ CLOUD.OrderedRenderer = function () {
         if (object.visible === false)
             return true;
 
-        //if (object._cullTicket != _cullTicket /*&& (object.channels.mask & camera.channels.mask) !== 0*/) {
+        if (object._cullTicket != _cullTicket /*&& (object.channels.mask & camera.channels.mask) !== 0*/) {
 
             ++_countCullingObject;
 
             // if (_countCullingObject % 5000 == 4999) {
                 var diff = Date.now() - _timeStartCull;
                 if (diff > 30) {
-                    return false;
+                    return true;
                 }
 
             // }
@@ -3054,7 +3054,7 @@ CLOUD.OrderedRenderer = function () {
 
                 }
             }
-        //}
+        }
 
         var children = object.children;
         if (children) {
@@ -3159,7 +3159,7 @@ CLOUD.OrderedRenderer = function () {
 
         state.setBlending(THREE.NoBlending);
 
-        // _isIncrementalRenderFinish = true; //
+         _isIncrementalRenderFinish = true; //
 
         for (var ii = _renderGroups.length - 1; ii >= 0; --ii) {
             var group = _renderGroups[ii];
