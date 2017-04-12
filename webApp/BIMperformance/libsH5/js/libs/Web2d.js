@@ -3943,6 +3943,15 @@ CLOUD.Extensions.Utils.Shape2D = {
         shape.setAttribute('d', path);
 
         return shape;
+    },
+    makeCommon: function (url) {
+
+        var shape = this.createSvgElement('image');
+        shape.href.baseVal = url;
+        shape.setAttribute('height', '50px');
+        shape.setAttribute('width', '50px');
+
+        return shape;
     }
 };
 
@@ -6096,7 +6105,7 @@ CLOUD.Extensions.Marker.prototype = {
     }
 };
 
-CLOUD.Extensions.Marker.shapeTypes = {BUBBLE: 0, FLAG: 1};
+CLOUD.Extensions.Marker.shapeTypes = {BUBBLE: 0, FLAG: 1, COMMON:2};
 
 CLOUD.Extensions.Marker.getDefaultStyle = function () {
     var style = {};
@@ -6507,9 +6516,12 @@ CLOUD.Extensions.MarkerEditor.prototype.createMarker = function(markerInfo) {
 
         marker = new CLOUD.Extensions.MarkerBubble(markerId, this);
 
-    } else {
+    } else if (CLOUD.Extensions.Marker.shapeTypes.FLAG === markerInfo.shapeType) {
 
         marker = new CLOUD.Extensions.MarkerFlag(markerId, this);
+    }
+    else {
+        marker = new CLOUD.Extensions.MarkerCommon(markerId, this, markerInfo.state);
     }
 
     marker.set(markerInfo.userId, markerInfo.position, markerInfo.boundingBox, style);
@@ -11038,6 +11050,809 @@ CLOUD.Extensions.AnnotationEditor3D.prototype.onCameraChange = function () {
     }
 
 };
+CLOUD.Extensions.Marker = function (id, editor) {
+
+    this.id = id;
+    this.editor = editor;
+    this.position = new THREE.Vector3();
+    this.boundingBox = new THREE.Box3();
+    this.shape = null;
+    this.style = CLOUD.Extensions.Marker.getDefaultStyle();
+
+    this.selected = false;
+    this.highlighted = false;
+    this.highlightColor = '#000088';
+    this.isDisableInteractions = false;
+
+    this.keys = {
+        BACKSPACE: 8,
+        ALT: 18,
+        ESC: 27,
+        LEFT: 37,
+        UP: 38,
+        RIGHT: 39,
+        BOTTOM: 40,
+        DELETE: 46,
+        ZERO: 48,
+        A: 65,
+        D: 68,
+        E: 69,
+        Q: 81,
+        S: 83,
+        W: 87,
+        PLUS: 187,
+        SUB: 189
+    };
+
+    this.onMouseDownBinded = this.onMouseDown.bind(this);
+    this.onKeyUpBinded = this.onKeyUp.bind(this);
+};
+
+CLOUD.Extensions.Marker.prototype = {
+    constructor: CLOUD.Extensions.Marker,
+
+    addDomEventListeners: function () {
+        this.shape.addEventListener("mousedown", this.onMouseDownBinded, true);
+        window.addEventListener("keyup", this.onKeyUpBinded);
+    },
+
+    removeDomEventListeners: function () {
+        this.shape.removeEventListener("mousedown", this.onMouseDownBinded, true);
+        window.removeEventListener("keyup", this.onKeyUpBinded);
+    },
+
+    onMouseDown: function (event) {
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.select();
+    },
+
+    onKeyUp: function (event) {
+
+        switch (event.keyCode) {
+            case this.keys.DELETE:
+                this.editor.deselectMarker();
+                this.delete();
+                break;
+            default :
+                break;
+        }
+    },
+
+    createShape:function() {
+
+    },
+
+    destroy: function () {
+        this.removeDomEventListeners();
+        this.deselect();
+        this.setParent(null);
+    },
+
+    set: function (userId, position, boundingBox, style) {
+
+        this.userId = userId;
+        this.position.set(position.x, position.y, position.z);
+        this.boundingBox = boundingBox.clone();
+
+        if (style) {
+            this.style = CLOUD.DomUtil.cloneStyle(style);
+        }
+
+        this.update();
+    },
+
+    setParent: function (parent) {
+
+        var shapeEl = this.shape;
+
+        if (shapeEl) {
+
+            if (shapeEl.parentNode) {
+                shapeEl.parentNode.removeChild(shapeEl);
+            }
+
+            if (parent) {
+                parent.appendChild(shapeEl);
+            }
+        }
+    },
+
+    setStyle: function (style) {
+        this.style = CLOUD.DomUtil.cloneStyle(style);
+        this.update();
+    },
+
+    select: function () {
+
+        //if (this.selected) {
+        //    return;
+        //}
+        //
+        //this.selected = true;
+        //this.highlighted = false;
+        //this.update();
+        //this.editor.selectMarker(this);
+
+
+        if (!this.selected) {
+
+            this.selected = true;
+            this.highlight(true);
+        }
+
+        this.editor.selectMarker(this);
+    },
+
+    deselect: function () {
+
+        this.highlight(false);
+        this.selected = false;
+    },
+
+    highlight: function (isHighlight) {
+
+        if (this.isDisableInteractions) {
+            return;
+        }
+
+        this.highlighted = isHighlight;
+        this.update();
+    },
+
+    disableInteractions: function (disable) {
+
+        this.isDisableInteractions = disable;
+    },
+
+    delete: function () {
+
+        this.editor.deleteMarker(this);
+    },
+
+    getClientPosition: function () {
+
+        return this.editor.worldToClient(this.position);
+    },
+
+    getBoundingBox: function () {
+        return this.boundingBox;
+    },
+
+    toNewObject: function () {
+
+        return {
+            id: this.id,
+            userId: this.userId,
+            shapeType: this.shapeType,
+            position: this.position ? this.position.clone() : null,
+            boundingBox: this.boundingBox ? this.boundingBox.clone() : null
+        };
+    },
+
+    update: function () {
+
+        var strokeWidth = this.style['stroke-width'];
+        var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
+        var strokeOpacity = this.style['stroke-opacity'];
+        var fillColor = this.style['fill-color'];
+        var fillOpacity = this.style['fill-opacity'];
+
+        var position = this.getClientPosition();
+
+        if (!position) {
+
+            this.shape.style.display = "none";
+            return;
+        }
+
+        if (this.shape.style.display !== '') {
+
+            this.shape.style.display = '';
+        }
+
+        var offsetX = position.x;
+        var offsetY = position.y;
+
+        var transformShape = [
+            'translate(', offsetX, ',', offsetY, ') '
+        ].join('');
+
+        this.shape.setAttribute("transform", transformShape);
+        this.shape.setAttribute("stroke-width", strokeWidth);
+        this.shape.setAttribute("stroke", strokeColor);
+        this.shape.setAttribute("stroke-opacity", strokeOpacity);
+        this.shape.setAttribute('fill', fillColor);
+        this.shape.setAttribute('fill-opacity', fillOpacity);
+    }
+};
+
+CLOUD.Extensions.Marker.shapeTypes = {BUBBLE: 0, FLAG: 1, COMMON:2};
+
+CLOUD.Extensions.Marker.getDefaultStyle = function () {
+    var style = {};
+
+    style['stroke-width'] = 2;
+    style['stroke-color'] = '#fffaff';
+    style['stroke-opacity'] = 1.0;
+    style['fill-color'] = '#ff2129';
+    style['fill-opacity'] = 1.0;
+
+    return style;
+};
+CLOUD.Extensions.MarkerBubble = function (id, editor) {
+
+    CLOUD.Extensions.Marker.call(this, id, editor);
+
+    this.shapeType = CLOUD.Extensions.Marker.shapeTypes.BUBBLE;
+
+    this.createShape();
+    this.addDomEventListeners();
+};
+
+CLOUD.Extensions.MarkerBubble.prototype = Object.create(CLOUD.Extensions.Marker.prototype);
+CLOUD.Extensions.MarkerBubble.prototype.constructor = CLOUD.Extensions.Marker;
+
+CLOUD.Extensions.MarkerBubble.prototype.createShape = function () {
+
+    this.shape = CLOUD.Extensions.Utils.Shape2D.makeBubble();
+};
+
+
+CLOUD.Extensions.MarkerFlag = function (id, editor) {
+
+    CLOUD.Extensions.Marker.call(this, id, editor);
+
+    this.shapeType = CLOUD.Extensions.Marker.shapeTypes.FLAG;
+
+    this.createShape();
+    this.addDomEventListeners();
+};
+
+CLOUD.Extensions.MarkerFlag.prototype = Object.create(CLOUD.Extensions.Marker.prototype);
+CLOUD.Extensions.MarkerFlag.prototype.constructor = CLOUD.Extensions.Marker;
+
+CLOUD.Extensions.MarkerFlag.prototype.createShape = function () {
+
+    this.shape = CLOUD.Extensions.Utils.Shape2D.makeFlag();
+};
+
+CLOUD.Extensions.MarkerCommon = function (id, editor, url) {
+
+    CLOUD.Extensions.Marker.call(this, id, editor);
+
+    this.shapeType = CLOUD.Extensions.Marker.shapeTypes.COMMON;
+
+    this.createShape(url);
+    this.addDomEventListeners();
+};
+
+CLOUD.Extensions.MarkerCommon.prototype = Object.create(CLOUD.Extensions.Marker.prototype);
+CLOUD.Extensions.MarkerCommon.prototype.constructor = CLOUD.Extensions.Marker;
+
+CLOUD.Extensions.MarkerCommon.prototype.createShape = function (url) {
+
+    this.shape = CLOUD.Extensions.Utils.Shape2D.makeCommon(url);
+};
+
+CLOUD.Extensions.MarkerEditor = function (viewer) {
+    "use strict";
+
+    this.cameraEditor = viewer.cameraEditor;
+    this.scene = viewer.getScene();
+    this.domElement = viewer.domElement;
+
+    this.markers = [];
+    this.selectedMarker = null;
+
+    // 隐患待整改：红色
+    // 隐患已整改：黄色
+    // 隐患已关闭：绿色
+    // size: 15 * 20
+    this.flagColors = {red: "#ff2129", green: "#85af03", yellow: "#fe9829"};
+
+    // 有隐患：红色
+    // 无隐患：绿色
+    // 过程验收点、开业验收点的未检出：灰色 --> 橙色
+    // size: 14 * 20
+    this.bubbleColors = {red: "#f92a24", green: "#86b507", gray: "#ff9326"};
+
+    this.nextMarkerId = 0;
+    this.initialized = false;
+    this.markerClickCallback = null;
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.onResize = function () {
+
+    if (!this.svg) return;
+
+    var bounds = this.getDomContainerBounds();
+
+    this.svg.setAttribute('width', bounds.width + '');
+    this.svg.setAttribute('height', bounds.height + '');
+
+    this.updateMarkers();
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.init = function () {
+
+    if (!this.svg) {
+
+        var bounds = this.getDomContainerBounds();
+        var svgWidth = bounds.width;
+        var svgHeight = bounds.height;
+
+        this.svg = CLOUD.Extensions.Utils.Shape2D.createSvgElement('svg');
+        this.svg.style.position = "absolute";
+        this.svg.style.display = "block";
+        this.svg.style.position = "absolute";
+        this.svg.style.display = "block";
+        this.svg.style.left = "0";
+        this.svg.style.top = "0";
+        this.svg.setAttribute('width', svgWidth + '');
+        this.svg.setAttribute('height', svgHeight + '');
+
+        this.domElement.appendChild(this.svg);
+        //this.enableSVGPaint(false);
+
+        this.svgGroup = CLOUD.Extensions.Utils.Shape2D.createSvgElement('g');
+        this.svg.insertBefore(this.svgGroup, this.svg.firstChild);
+    }
+
+    this.initialized = true;
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.uninit = function () {
+
+    this.initialized = false;
+
+    if (!this.svg) return;
+
+    // 卸载数据
+    this.unloadMarkers();
+
+    if (this.svgGroup && this.svgGroup.parentNode) {
+        this.svgGroup.parentNode.removeChild(this.svgGroup);
+    }
+
+    if (this.svg.parentNode) {
+        this.svg.parentNode.removeChild(this.svg);
+    }
+
+    this.svgGroup = null;
+    this.svg = null;
+    this.markerClickCallback = null;
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.isInitialized = function () {
+
+    return this.initialized;
+};
+
+// 生成标识ID
+CLOUD.Extensions.MarkerEditor.prototype.generateMarkerId = function () {
+
+    ++this.nextMarkerId;
+
+    var id = this.nextMarkerId.toString(10);
+
+    //var id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    //    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    //    return v.toString(16);
+    //});
+
+    return id;
+};
+
+// 清除数据
+CLOUD.Extensions.MarkerEditor.prototype.clear = function () {
+
+    var markers = this.markers;
+
+    while (markers.length) {
+        var marker = markers[0];
+        this.deleteMarker(marker);
+    }
+
+    var group = this.svgGroup;
+    if (group && group.childNodes.length > 0) {
+        while (group.childNodes.length) {
+            group.removeChild(group.childNodes[0]);
+        }
+    }
+};
+
+// 增加
+CLOUD.Extensions.MarkerEditor.prototype.addMarker = function (marker) {
+
+    marker.setParent(this.svgGroup);
+
+    this.markers.push(marker);
+};
+
+// 删除
+CLOUD.Extensions.MarkerEditor.prototype.deleteMarker = function (marker) {
+
+    if (marker) {
+
+        var idx = this.markers.indexOf(marker);
+
+        if (idx !== -1) {
+            this.markers.splice(idx, 1);
+        }
+
+        marker.destroy();
+    }
+};
+
+// 选中
+CLOUD.Extensions.MarkerEditor.prototype.selectMarker = function (marker) {
+
+    if (this.selectedMarker !== marker) {
+
+        this.deselectMarker();
+        this.selectedMarker = marker;
+
+    } else {
+
+        // 取消选择
+        this.deselectMarker();
+    }
+
+    // click 回调
+    if (this.markerClickCallback) {
+
+        if (this.selectedMarker) {
+            this.markerClickCallback(this.selectedMarker.toNewObject());
+        } else {
+
+            this.markerClickCallback(null);
+        }
+    }
+
+};
+
+// 取消选中
+CLOUD.Extensions.MarkerEditor.prototype.deselectMarker = function () {
+
+    if (this.selectedMarker) {
+
+        this.selectedMarker.deselect();
+        this.selectedMarker = null;
+    }
+};
+
+// 获得主场景构件根节点变换矩阵
+CLOUD.Extensions.MarkerEditor.prototype.getSceneMatrix = function () {
+    return this.scene.getMatrixGlobal();
+};
+
+// 获得主场景构件根节点变换矩阵的逆
+CLOUD.Extensions.MarkerEditor.prototype.getInverseSceneMatrix = function () {
+
+    var sceneMatrix = this.getSceneMatrix();
+    var inverseMatrix = new THREE.Matrix4();
+
+    inverseMatrix.getInverse(sceneMatrix);
+
+    return inverseMatrix;
+};
+
+// 世界坐标转屏幕坐标
+CLOUD.Extensions.MarkerEditor.prototype.worldToClient = function (wPoint) {
+
+    var bounds = this.getDomContainerBounds();
+    var camera = this.cameraEditor.camera;
+    var sceneMatrix = this.getSceneMatrix();
+    var result = new THREE.Vector3(wPoint.x, wPoint.y, wPoint.z);
+
+    result.applyMatrix4(sceneMatrix);
+    result.project(camera);
+
+    // 裁剪不在相机范围的值
+    if (Math.abs(result.z) > 1) {
+        return null;
+    }
+
+    result.x = Math.round(0.5 * (result.x + 1) * bounds.width);
+    result.y = Math.round(-0.5 * (result.y - 1) * bounds.height);
+    result.z = 0;
+
+    return result;
+};
+
+// 屏幕坐标转世界坐标
+CLOUD.Extensions.MarkerEditor.prototype.clientToWorld = function (cPoint) {
+
+    var bounds = this.getDomContainerBounds();
+    var camera = this.cameraEditor.camera;
+    var result = new THREE.Vector3();
+
+    result.x = cPoint.x / bounds.width * 2 - 1;
+    result.y = -cPoint.y / bounds.height * 2 + 1;
+    result.z = 0;
+
+    result.unproject(camera);
+
+    var inverseMatrix = this.getInverseSceneMatrix();
+
+    result.applyMatrix4(inverseMatrix);
+
+    return result;
+};
+
+// 屏幕坐标转规范化坐标
+CLOUD.Extensions.MarkerEditor.prototype.clientToViewport = function (cPoint) {
+
+    var bounds = this.getDomContainerBounds();
+    var result = new THREE.Vector3();
+
+    result.x = cPoint.x / bounds.width * 2 - 1;
+    result.y = -cPoint.y / bounds.height * 2 + 1;
+    result.z = 0;
+
+    return result;
+};
+
+// 是否允许在SVG上绘图
+CLOUD.Extensions.MarkerEditor.prototype.enableSVGPaint = function (enable) {
+
+    if (enable) {
+
+        this.svg && this.svg.setAttribute("pointer-events", "painted");
+    } else {
+
+        this.svg && this.svg.setAttribute("pointer-events", "none");
+    }
+
+};
+
+// 获得容器边框
+CLOUD.Extensions.MarkerEditor.prototype.getDomContainerBounds = function () {
+
+    return CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+};
+
+// 根据形状和状态获得颜色
+CLOUD.Extensions.MarkerEditor.prototype.getMarkerColor = function (shape, state) {
+
+    var markerColor = this.bubbleColors.red;
+
+    if (shape < 0 && shape > 1) {
+        shape = 0;
+    }
+
+    // 兼容以前的模式（0 - 5）
+    if (state > 2) {
+        state -= 3;
+    }
+
+    if (state < 0 && state > 2) {
+        state = 0;
+    }
+
+    switch (state) {
+        case 0:
+            if (shape === 0) {
+                markerColor = this.bubbleColors.red;
+            } else {
+                markerColor = this.flagColors.red;
+            }
+
+            break;
+        case 1:
+
+            if (shape === 0) {
+                markerColor = this.bubbleColors.green;
+            } else {
+                markerColor = this.flagColors.green;
+            }
+            break;
+        case 2:
+
+            if (shape === 0) {
+                markerColor = this.bubbleColors.gray;
+            } else {
+                markerColor = this.flagColors.yellow;
+            }
+            break;
+    }
+
+    return markerColor;
+};
+
+// 根据Pick对象信息创建标记
+CLOUD.Extensions.MarkerEditor.prototype.createMarkerByIntersect = function(intersect, shapeType, state) {
+
+    var id = this.generateMarkerId();//intersect.userId;
+    var userId = intersect.userId;
+    var position = intersect.worldPosition || intersect.object.point;
+    var boundingBox = intersect.worldBoundingBox || intersect.object.boundingBox;
+
+    var markerInfo = {
+        id: id,
+        userId: userId,
+        position: position,
+        boundingBox: boundingBox,
+        shapeType: shapeType,
+        state: state
+    };
+
+    this.createMarker(markerInfo);
+};
+
+// 创建标记
+CLOUD.Extensions.MarkerEditor.prototype.createMarker = function(markerInfo) {
+
+    if (!markerInfo) return;
+
+    var style = CLOUD.Extensions.Marker.getDefaultStyle();
+    style['fill-color'] = this.getMarkerColor(markerInfo.shapeType, markerInfo.state);
+
+    var markerId = markerInfo.id;   //this.generateMarkerId();
+    var marker;
+
+    if (CLOUD.Extensions.Marker.shapeTypes.BUBBLE === markerInfo.shapeType) {
+
+        marker = new CLOUD.Extensions.MarkerBubble(markerId, this);
+
+    } else if (CLOUD.Extensions.Marker.shapeTypes.FLAG === markerInfo.shapeType) {
+
+        marker = new CLOUD.Extensions.MarkerFlag(markerId, this);
+    }
+    else {
+        marker = new CLOUD.Extensions.MarkerCommon(markerId, this, markerInfo.state);
+    }
+
+    marker.set(markerInfo.userId, markerInfo.position, markerInfo.boundingBox, style);
+
+    this.addMarker(marker);
+};
+
+// ---------------------------- 外部 API BEGIN ---------------------------- //
+
+// 获得所有marker的包围盒
+CLOUD.Extensions.MarkerEditor.prototype.getMarkersBoundingBox = function () {
+
+    if (this.markers.length < 1) return null;
+
+    var bBox = new THREE.Box3();
+
+    for (var i = 0, len = this.markers.length; i < len; i++) {
+        var marker = this.markers[i];
+        bBox.union(marker.getBoundingBox());
+    }
+
+    return bBox;
+};
+
+// 获得marker列表
+CLOUD.Extensions.MarkerEditor.prototype.getMarkerInfoList = function () {
+
+    var markerInfoList = [];
+
+    for (var i = 0, len = this.markers.length; i < len; i++) {
+
+        var marker = this.markers[i];
+        var tmpId = marker.userId + "_" + i;
+        var info = {
+            id: marker.id || tmpId,
+            userId: marker.userId,
+            shapeType: marker.shapeType,
+            position: marker.position,
+            boundingBox: marker.boundingBox,
+            state: marker.state
+        };
+
+        markerInfoList.push(info);
+    }
+
+    return markerInfoList;
+};
+
+// 加载
+CLOUD.Extensions.MarkerEditor.prototype.loadMarkers = function (markers) {
+
+    // 清除数据
+    this.clear();
+
+    for (var i = 0, len = markers.length; i < len; i++) {
+
+        var info = markers[i];
+        var tmpId = info.userId + "_" + i;
+        var id = info.id || tmpId;
+        var userId = info.userId;
+        var shapeType = info.shapeType;
+        var state = info.state;
+        var position = info.position;
+
+        var boundingBox = new THREE.Box3();
+        boundingBox.max.x = info.boundingBox.max.x;
+        boundingBox.max.y = info.boundingBox.max.y;
+        boundingBox.max.z = info.boundingBox.max.z;
+        boundingBox.min.x = info.boundingBox.min.x;
+        boundingBox.min.y = info.boundingBox.min.y;
+        boundingBox.min.z = info.boundingBox.min.z;
+
+        var markerInfo = {
+            id: id,
+            userId: userId,
+            position: position,
+            boundingBox: boundingBox,
+            shapeType: shapeType,
+            state: state
+        };
+
+        this.createMarker(markerInfo);
+    }
+};
+
+// 根据Pick对象信息加载
+CLOUD.Extensions.MarkerEditor.prototype.loadMarkersFromIntersect = function (intersect, shapeType, state) {
+
+    // 清除数据
+    this.clear();
+    this.createMarkerByIntersect(intersect, shapeType, state);
+};
+
+// 卸载
+CLOUD.Extensions.MarkerEditor.prototype.unloadMarkers = function () {
+
+    // 清除数据
+    this.clear();
+};
+
+// 更新所有
+CLOUD.Extensions.MarkerEditor.prototype.updateMarkers = function () {
+
+    for (var i = 0, len = this.markers.length; i < len; i++) {
+        var marker = this.markers[i];
+        marker.update();
+    }
+};
+
+//// 显示
+//CLOUD.Extensions.MarkerEditor.prototype.showMarkers = function () {
+//
+//    if (this.svgGroup) {
+//        this.svgGroup.setAttribute("visibility", "visible");
+//    }
+//};
+//
+//// 隐藏
+//CLOUD.Extensions.MarkerEditor.prototype.hideMarkers = function () {
+//
+//    if (this.svgGroup) {
+//        this.svgGroup.setAttribute("visibility", "hidden");
+//    }
+//};
+
+// 根据ID获得marker
+CLOUD.Extensions.MarkerEditor.prototype.getMarker = function (id) {
+
+    var markers = this.markers;
+    var count = markers.length;
+
+    for (var i = 0; i < count; ++i) {
+        if (markers[i].id == id) {
+            return markers[i];
+        }
+    }
+
+    return null;
+};
+
+// 设置marker选中回调
+CLOUD.Extensions.MarkerEditor.prototype.setMarkerClickCallback = function (callback) {
+
+    this.markerClickCallback =  callback;
+};
+
+// ---------------------------- 外部 API END ---------------------------- //
+
+
 CLOUD.Extensions.MiniMapHelper = function (viewer) {
 
     this.viewer = viewer;

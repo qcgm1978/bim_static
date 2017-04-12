@@ -14636,7 +14636,7 @@ CLOUD.FlyEditor = function (cameraEditor, scene, domElement) {
 
     //this.clock = new THREE.Clock();
 
-    var scope = this;
+    //var scope = this;
 
     this.ui = new CLOUD.FlyEditorUI(this.domElement, function (speedMultiplier) {
         //scope.movementSpeedMultiplier = speedMultiplier;
@@ -14657,6 +14657,10 @@ CLOUD.FlyEditor.prototype = {
 
     resize: function () {
         this.ui.resize();
+    },
+
+    getDomElement: function () {
+        return this.domElement;
     },
 
     handleEvent: function (event) {
