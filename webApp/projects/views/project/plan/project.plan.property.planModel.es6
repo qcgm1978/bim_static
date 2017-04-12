@@ -120,7 +120,7 @@ App.Project.PlanModel = Backbone.View.extend({
 			App.Project.Settings.isModelChange=false;
 			App.Project.Settings.isModelCostChange=false;
 		}
-		CommProject.recoverySilder(); /* add by wuweiwei at 2016-12-20*/
+		//CommProject.recoverySilder(); /* add by wuweiwei at 2016-12-20*/
 		var $target, ids, box;
 		if ($el) {
 			$target = $el;
