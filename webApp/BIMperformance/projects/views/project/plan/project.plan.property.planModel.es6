@@ -136,6 +136,7 @@ App.Project.PlanModel = Backbone.View.extend({
 			$target = $(event.target).closest("tr");
 		}
 		ids = $target.data("userId");
+		
 		box = $target.data("box");
 		if (App.Project.Settings.isHighlight) {
 			//高亮钱取消
@@ -213,6 +214,7 @@ App.Project.PlanModel = Backbone.View.extend({
 					ids: undefined
 				});
 				if (box && box.length) {
+					console.log("data.data.elements:",data.data.elements);
 					$target.data("userId", data.data.elements);
 					$target.data("box", box);
 					if (checked) {
@@ -221,7 +223,7 @@ App.Project.PlanModel = Backbone.View.extend({
 						App.Project.Settings.Viewer.filterByUserIds(data.data.elements);
 						return
 					}
-					if ($el) {
+					if (!$el) {
 						App.Project.Settings.Viewer.translucent(false);
 						App.Project.Settings.Viewer.ignoreTranparent({
 							type: "plan",

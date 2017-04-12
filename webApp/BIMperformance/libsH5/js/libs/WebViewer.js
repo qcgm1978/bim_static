@@ -3026,7 +3026,7 @@ CLOUD.OrderedRenderer = function () {
         if (object.visible === false)
             return true;
 
-        if (object._cullTicket != _cullTicket /*&& (object.channels.mask & camera.channels.mask) !== 0*/) {
+        //if (object._cullTicket != _cullTicket /*&& (object.channels.mask & camera.channels.mask) !== 0*/) {
 
             ++_countCullingObject;
 
@@ -3054,7 +3054,7 @@ CLOUD.OrderedRenderer = function () {
 
                 }
             }
-        }
+        //}
 
         var children = object.children;
         if (children) {
