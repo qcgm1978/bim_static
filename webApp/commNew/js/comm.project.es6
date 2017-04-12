@@ -149,7 +149,7 @@ var CommProject = {
             type: "plan",
             ids: []
         });
-        _viewer.translucent(false);
+        //_viewer.translucent(false); //modify by wuweiwei 2017-4-12
         $sp.each(function() {
             var _input=$(this).find('input:first'),
                 _text=$(this).find('.treeText:first').text();
