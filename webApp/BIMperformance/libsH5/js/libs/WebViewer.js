@@ -3030,10 +3030,11 @@ CLOUD.OrderedRenderer = function () {
 
             ++_countCullingObject;
 
+            // TODO: incrmental bug fixing
             // if (_countCullingObject % 5000 == 4999) {
                 var diff = Date.now() - _timeStartCull;
                 if (diff > 30) {
-                    return true;
+                    return false;
                 }
 
             // }
@@ -3159,7 +3160,8 @@ CLOUD.OrderedRenderer = function () {
 
         state.setBlending(THREE.NoBlending);
 
-         _isIncrementalRenderFinish = true; //
+        // TODO: incrmental bug fixing
+         //_isIncrementalRenderFinish = true; //
 
         for (var ii = _renderGroups.length - 1; ii >= 0; --ii) {
             var group = _renderGroups[ii];
@@ -15215,6 +15217,11 @@ CLOUD.EditorManager = function() {
 
     function onMouseWheel(event) {
         scope.cameraChange = true;
+        //window.setTimeout(function() {
+        //
+        //    scope.editor.onMouseWheel(event);
+        //
+        //}, 50);
         scope.editor.onMouseWheel(event);
         // scope.cameraChange = false;
     }
@@ -19827,6 +19834,8 @@ CLOUD.Viewer = function () {
     this.rendering = false;
     this.incrementRenderHandle = 0;
 
+    this.rerenderCounter = 0;
+
     this.callbacks = {};
     this.services = {};
 
@@ -20090,14 +20099,6 @@ CLOUD.Viewer.prototype = {
 
             var isUpdateRenderList = this.editorManager.isUpdateRenderList;
 
-            if (isUpdateRenderList) {
-                this.modelManager.prepareScene(camera);
-            }
-
-            this.renderer.resetIncrementRender();// 重置增量绘制状态
-            this.renderer.setObjectListUpdateState(isUpdateRenderList);// 设置更新状态
-            this.renderer.setFilterObject(scene.filter);// 设置过滤对象
-
             function incrementRender(callId, autoClear) {
 
                 var renderId = callId;
@@ -20160,18 +20161,36 @@ CLOUD.Viewer.prototype = {
                             scope.render();
                         } else {
 
+                            if (scope.rerenderCounter === 0 ) {
+
+                                ++scope.rerenderCounter;
+                                scope.render();
+                            } else {
+
+                                scope.rerenderCounter = 0;
+                                // 结束后回调函数
+                                scope.onRenderFinishedCallback();
+                            }
+
                             // console.log("------------ rendered ------------");
 
-                            // 结束后回调函数
-                            scope.onRenderFinishedCallback();
+                            //// 结束后回调函数
+                            //scope.onRenderFinishedCallback();
                         }
 
                     }
 
                 }
             }
-
             this.incrementRenderHandle = requestAnimationFrame(incrementRender(scope.requestRenderCount, true));
+
+            if (isUpdateRenderList) {
+                this.modelManager.prepareScene(camera);
+            }
+
+            this.renderer.resetIncrementRender();// 重置增量绘制状态
+            this.renderer.setObjectListUpdateState(isUpdateRenderList);// 设置更新状态
+            this.renderer.setFilterObject(scene.filter);// 设置过滤对象
 
             this.onRenderCallback();
 
