@@ -325,8 +325,8 @@
 
         exp.setTime(exp.getTime() + min * 60 * 1000),
 
-            // doMain = window.location.host.substring(window.location.host.indexOf("."));
-            doMain = window.location.host;
+            doMain = window.location.host.substring(window.location.host.indexOf("."));
+            // doMain = window.location.host;
 
         if (keys) {
             for (var i = keys.length; i--;)
@@ -439,8 +439,8 @@
     function setCookie(name, value) {
         var Days = 1,
             exp = new Date();
-        // var domain = window.location.host.substring(window.location.host.indexOf("."));
-        var domain = window.location.host;
+        var domain = window.location.host.substring(window.location.host.indexOf("."));
+        // var domain = window.location.host;
         exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
         document.cookie = name + "=" + value + ";domain=" + domain + ";expires=" + exp.toGMTString() + ";path=/";
     }
@@ -473,8 +473,8 @@
         var exp = new Date();
         exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
         var cval = this.getCookie(name);
-        // var domain = window.location.host.substring(window.location.host.indexOf("."));
-        var domain = window.location.host;
+        var domain = window.location.host.substring(window.location.host.indexOf("."));
+        // var domain = window.location.host;
         if (cval != null)
             document.cookie = name + "=" + cval + ";domain=" + domain + ";expires=" + exp.toGMTString() + ";path=/";
     }
