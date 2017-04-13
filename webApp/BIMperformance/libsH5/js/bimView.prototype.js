@@ -20,6 +20,18 @@
                 helper.resizeAnnotations();
         }
         self.viewer.addCallbacks("render", resizeCB );
+
+        var win = window.open();
+        var snapshot = function(dataUrl){
+          if (dataUrl) {
+              win.document.write('<!DOCTYPE html><html lang="en">');
+              win.document.write('<head><meta charset="utf-8"><title>Cloud Viewer - Screen Shot</title>');
+              win.document.write('<div class="viewport"><div><img src="' + dataUrl + '" /> </div>');
+              win.document.write('</html>');
+              win.document.close();
+          }
+        }
+        self.annotationHelper3D.captureAnnotationsScreenSnapshot(undefined, snapshot);
       }
       return self.annotationHelper3D;
     },

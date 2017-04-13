@@ -81,6 +81,7 @@
       if(!bimView.isLoad){
         bimView.isLoad = true;
         bimView.comm.ajax({
+          timeout:6000,
           type:'get',
           url:bimView.API.fetchFloors,
           etag:self._opt.etag,
@@ -103,6 +104,7 @@
           $('#floors').append(floors);
         });
         bimView.comm.ajax({
+          timeout:6000,
           type:'get',
           url:bimView.API.fetchSpecialty,
           etag:self._opt.etag,
@@ -135,6 +137,7 @@
           $('#specialty').append(specialties);          
         });
         bimView.comm.ajax({
+          timeout: 6000,
           type:'get',
           url:bimView.API.fetchCategory,
           etag:self._opt.etag,
@@ -153,6 +156,7 @@
           $('#category').append(category);
         });
         bimView.comm.ajax({
+          timeout:6000,
           type:'get',
           url:bimView.API.fetchCoding,
           etag:self._opt.etag,
@@ -338,6 +342,7 @@
           floorsData,
           axisGridData;
       bimView.comm.ajax({
+        timeout:6000,
         type:'get',
         url:bimView.API.fetchFloorsMap,
         etag:self._opt.etag,
