@@ -4,6 +4,13 @@
 'use strict';
 (function($) {
   bimView.prototype = {
+    // snapshot:function(dataUrl){
+    //   /*用于生成快照图片*/
+    //   var win = window.open();
+    //   if (dataUrl) {
+    //       return dataUrl;
+    //   }      
+    // },
     getAnnotationObject : function(viewer){
       var self = this;
       self.viewer = self.viewer||viewer;
@@ -20,18 +27,6 @@
                 helper.resizeAnnotations();
         }
         self.viewer.addCallbacks("render", resizeCB );
-
-        var win = window.open();
-        var snapshot = function(dataUrl){
-          if (dataUrl) {
-              win.document.write('<!DOCTYPE html><html lang="en">');
-              win.document.write('<head><meta charset="utf-8"><title>Cloud Viewer - Screen Shot</title>');
-              win.document.write('<div class="viewport"><div><img src="' + dataUrl + '" /> </div>');
-              win.document.write('</html>');
-              win.document.close();
-          }
-        }
-        self.annotationHelper3D.captureAnnotationsScreenSnapshot(undefined, snapshot);
       }
       return self.annotationHelper3D;
     },
@@ -733,7 +728,31 @@
       // var viewer = self.viewer;
       self.getAnnotationObject().setAnnotationStyle(style);
     },
-    saveComment: function() {
+    // saveComment: function() {
+    //   // 保存批注
+    //   var self = this;
+    //   var viewer = self.viewer;
+    //   var list = self.getAnnotationObject().getAnnotationInfoList();
+    //   var newList = [];
+    //   $.each(list, function(i, item) {
+    //     newList.push(window.btoa(JSON.stringify(item)));
+    //   });
+    //   var files = bimView.comm.getFilters($("#floors,#specialty"), 'uncheck');
+    //   var category = bimView.comm.getFilters($("#category"), 'uncheck');
+    //   var classCode = bimView.comm.getFilters($("#classCode"), 'uncheck');
+    //   return {
+    //     camera: self.getCamera(),
+    //     list: newList,
+    //     //image: viewer.canvas2image().substr(22),
+    //     image: self.getAnnotationObject().captureAnnotationsScreenSnapshot(undefined, this.snapshot).substr(22), //modify by wuweiwei new interface
+    //     filter: {
+    //       files: files,
+    //       category: category,
+    //       classCode: classCode
+    //     }
+    //   };
+    // },
+    saveComment: function(callback) {
       // 保存批注
       var self = this;
       var viewer = self.viewer;
@@ -745,18 +764,28 @@
       var files = bimView.comm.getFilters($("#floors,#specialty"), 'uncheck');
       var category = bimView.comm.getFilters($("#category"), 'uncheck');
       var classCode = bimView.comm.getFilters($("#classCode"), 'uncheck');
-      return {
-        camera: self.getCamera(),
-        list: newList,
-        //image: viewer.canvas2image().substr(22),
-        image: self.getAnnotationObject().captureAnnotationsScreenSnapshot().substr(22), //modify by wuweiwei new interface
-        filter: {
-          files: files,
-          category: category,
-          classCode: classCode
-        }
+
+      function snapshot(dataUrl) {
+
+        var object = {
+          camera: self.getCamera(),
+          list: newList,
+          //image: viewer.canvas2image().substr(22),
+          image: dataUrl.substr(22), //modify by wuweiwei new interface
+          filter: {
+            files: files,
+            category: category,
+            classCode: classCode
+          }
+        };
+
+        callback(object);
       };
-    },
+
+      self.getAnnotationObject().captureAnnotationsScreenSnapshot(undefined, snapshot);
+
+      
+    }
     loadComment: function(data) {
       // 加载批注
       var self = this;

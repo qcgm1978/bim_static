@@ -1163,119 +1163,240 @@
 				var $topSaveTip = $("#topSaveTip"),
 					that = this;
 
+				// //保存
+				// $topSaveTip.on("click", ".btnSave", function() {
+
+				// 	var data = App.Project.Settings.Viewer.saveComment(),
+				// 		pars = {
+				// 			cate: cate,
+				// 			img: data.image
+				// 		};
+
+				// 	if (viewPointId) {
+
+				// 		var $li = $comment.find(".remarkCount_" + viewPointId).closest(".item");
+
+				// 		pars = {
+				// 			cate: cate,
+				// 			id: $li.find(".remarkCount").data("id"),
+				// 			type: $li.find(".thumbnailImg").data("type"),
+				// 			img: $li.find(".thumbnailImg").prop('src'),
+				// 			name: $li.find(".title").text().trim()
+				// 		}
+				// 	}
+
+
+				// 	var title = "保存快照";
+
+				// 	if (cate == "address") {
+				// 		title = "保存位置";
+				// 	} else if (cate == "comment") {
+				// 		title = "保存批注";
+				// 	}
+
+				// 	//////
+				// 	//App.Project.Settings.Viewer.viewer.extensionHelper.annotationHelper.annotationEditor.removeDomEventListeners();
+
+
+				// 	var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.save.dialog.html')(pars),
+
+				// 		opts = {
+				// 			title: title,
+				// 			width: 500,
+				// 			height: 250,
+				// 			cssClass: "saveViewPoint",
+				// 			okClass: "btnWhite",
+				// 			cancelClass: "btnWhite",
+				// 			okText: "保存",
+				// 			closeCallback: function() {
+				// 				if (cate != "viewPoint") {
+				// 					App.Project.Settings.Viewer.commentEnd();
+				// 					//收起导航
+				// 					$(".modelSidebar").addClass("show open");
+				// 				} else{
+				// 					//App.Project.Settings.Viewer.viewer.extensionHelper.annotationHelper.annotationEditor.addDomEventListeners();///
+				// 				}
+				// 			},
+
+				// 			cancelText: "保存并分享",
+
+				// 			message: dialogHtml,
+
+				// 			okCallback: () => {
+				// 				//保存批注
+				// 				if (!viewPointId) {
+
+				// 					if (cate == "address") {
+				// 						//保存位置
+				// 						that.savePosition(dialog, data, callback);
+				// 					} else {
+				// 						that.saveComment("save", dialog, data, callback, cate);
+				// 					}
+
+				// 				} else {
+				// 					data.id = viewPointId;
+				// 					that.editComment("save", dialog, data, viewPointId, callback, cate);
+				// 				}
+
+				// 				return false;
+				// 			},
+				// 			cancelCallback() {
+				// 				//保存并分享
+				// 				if (!viewPointId) {
+				// 					that.saveComment("saveShare", dialog, data, CommentApi.shareViewPoint, cate);
+				// 				} else {
+				// 					data.id = viewPointId;
+				// 					that.editComment("saveShare", dialog, data, CommentApi.shareViewPoint, cate);
+				// 				}
+
+				// 				return false;
+				// 			}
+				// 		},
+
+				// 		dialog = new App.Comm.modules.Dialog(opts),
+
+				// 		$viewPointType = dialog.element.find(".viewPointType");
+
+				// 	//分享按钮
+				// 	if (cate != "viewPoint") {
+				// 		dialog.element.find(".cancel").remove();
+				// 	}
+
+				// 	dialog.type = 1;
+				// 	//视点类型
+				// 	$viewPointType.myDropDown({
+				// 		click: function($item) {
+				// 			var type = $item.data("type");
+				// 			if (type == 0) {
+				// 				$viewPointType.find(".modelicon").removeClass('m-unlock').addClass('m-lock');
+				// 			} else {
+				// 				$viewPointType.find(".modelicon").removeClass('m-lock').addClass('m-unlock');
+				// 			}
+
+				// 			dialog.type = type;
+				// 		}
+				// 	});
+
+				// });
+
 				//保存
 				$topSaveTip.on("click", ".btnSave", function() {
 
-					var data = App.Project.Settings.Viewer.saveComment(),
-						pars = {
-							cate: cate,
-							img: data.image
-						};
+					var getCommentData = function(object) {
 
-					if (viewPointId) {
+						var data = object,
+							pars = {
+								cate: cate,
+								img: data.image
+							};
 
-						var $li = $comment.find(".remarkCount_" + viewPointId).closest(".item");
+						if (viewPointId) {
 
-						pars = {
-							cate: cate,
-							id: $li.find(".remarkCount").data("id"),
-							type: $li.find(".thumbnailImg").data("type"),
-							img: $li.find(".thumbnailImg").prop('src'),
-							name: $li.find(".title").text().trim()
+							var $li = $comment.find(".remarkCount_" + viewPointId).closest(".item");
+
+							pars = {
+								cate: cate,
+								id: $li.find(".remarkCount").data("id"),
+								type: $li.find(".thumbnailImg").data("type"),
+								img: $li.find(".thumbnailImg").prop('src'),
+								name: $li.find(".title").text().trim()
+							}
 						}
-					}
 
 
-					var title = "保存快照";
+						var title = "保存快照";
 
-					if (cate == "address") {
-						title = "保存位置";
-					} else if (cate == "comment") {
-						title = "保存批注";
-					}
+						if (cate == "address") {
+							title = "保存位置";
+						} else if (cate == "comment") {
+							title = "保存批注";
+						}
 
-					//////
-					//App.Project.Settings.Viewer.viewer.extensionHelper.annotationHelper.annotationEditor.removeDomEventListeners();
+						//////
+						//App.Project.Settings.Viewer.viewer.extensionHelper.annotationHelper.annotationEditor.removeDomEventListeners();
 
 
-					var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.save.dialog.html')(pars),
+						var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.save.dialog.html')(pars),
 
-						opts = {
-							title: title,
-							width: 500,
-							height: 250,
-							cssClass: "saveViewPoint",
-							okClass: "btnWhite",
-							cancelClass: "btnWhite",
-							okText: "保存",
-							closeCallback: function() {
-								if (cate != "viewPoint") {
-									App.Project.Settings.Viewer.commentEnd();
-									//收起导航
-									$(".modelSidebar").addClass("show open");
-								} else{
-									//App.Project.Settings.Viewer.viewer.extensionHelper.annotationHelper.annotationEditor.addDomEventListeners();///
-								}
-							},
+							opts = {
+								title: title,
+								width: 500,
+								height: 250,
+								cssClass: "saveViewPoint",
+								okClass: "btnWhite",
+								cancelClass: "btnWhite",
+								okText: "保存",
+								closeCallback: function() {
+									if (cate != "viewPoint") {
+										App.Project.Settings.Viewer.commentEnd();
+										//收起导航
+										$(".modelSidebar").addClass("show open");
+									} else{
+										//App.Project.Settings.Viewer.viewer.extensionHelper.annotationHelper.annotationEditor.addDomEventListeners();///
+									}
+								},
 
-							cancelText: "保存并分享",
+								cancelText: "保存并分享",
 
-							message: dialogHtml,
+								message: dialogHtml,
 
-							okCallback: () => {
-								//保存批注
-								if (!viewPointId) {
+								okCallback: () => {
+									//保存批注
+									if (!viewPointId) {
 
-									if (cate == "address") {
-										//保存位置
-										that.savePosition(dialog, data, callback);
+										if (cate == "address") {
+											//保存位置
+											that.savePosition(dialog, data, callback);
+										} else {
+											that.saveComment("save", dialog, data, callback, cate);
+										}
+
 									} else {
-										that.saveComment("save", dialog, data, callback, cate);
+										data.id = viewPointId;
+										that.editComment("save", dialog, data, viewPointId, callback, cate);
 									}
 
-								} else {
-									data.id = viewPointId;
-									that.editComment("save", dialog, data, viewPointId, callback, cate);
-								}
+									return false;
+								},
+								cancelCallback() {
+									//保存并分享
+									if (!viewPointId) {
+										that.saveComment("saveShare", dialog, data, CommentApi.shareViewPoint, cate);
+									} else {
+										data.id = viewPointId;
+										that.editComment("saveShare", dialog, data, CommentApi.shareViewPoint, cate);
+									}
 
-								return false;
+									return false;
+								}
 							},
-							cancelCallback() {
-								//保存并分享
-								if (!viewPointId) {
-									that.saveComment("saveShare", dialog, data, CommentApi.shareViewPoint, cate);
+
+							dialog = new App.Comm.modules.Dialog(opts),
+
+							$viewPointType = dialog.element.find(".viewPointType");
+
+						//分享按钮
+						if (cate != "viewPoint") {
+							dialog.element.find(".cancel").remove();
+						}
+
+						dialog.type = 1;
+						//视点类型
+						$viewPointType.myDropDown({
+							click: function($item) {
+								var type = $item.data("type");
+								if (type == 0) {
+									$viewPointType.find(".modelicon").removeClass('m-unlock').addClass('m-lock');
 								} else {
-									data.id = viewPointId;
-									that.editComment("saveShare", dialog, data, CommentApi.shareViewPoint, cate);
+									$viewPointType.find(".modelicon").removeClass('m-lock').addClass('m-unlock');
 								}
 
-								return false;
+								dialog.type = type;
 							}
-						},
-
-						dialog = new App.Comm.modules.Dialog(opts),
-
-						$viewPointType = dialog.element.find(".viewPointType");
-
-					//分享按钮
-					if (cate != "viewPoint") {
-						dialog.element.find(".cancel").remove();
+						});
 					}
 
-					dialog.type = 1;
-					//视点类型
-					$viewPointType.myDropDown({
-						click: function($item) {
-							var type = $item.data("type");
-							if (type == 0) {
-								$viewPointType.find(".modelicon").removeClass('m-unlock').addClass('m-lock');
-							} else {
-								$viewPointType.find(".modelicon").removeClass('m-lock').addClass('m-unlock');
-							}
-
-							dialog.type = type;
-						}
-					});
+					App.Project.Settings.Viewer.saveComment(getCommentData);					
 
 				});
 
