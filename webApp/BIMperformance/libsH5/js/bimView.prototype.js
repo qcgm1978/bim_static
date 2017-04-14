@@ -21,6 +21,7 @@
         }
         self.viewer.addCallbacks("render", resizeCB );
 
+        /*
         var win = window.open();
         var snapshot = function(dataUrl){
           if (dataUrl) {
@@ -32,6 +33,7 @@
           }
         }
         self.annotationHelper3D.captureAnnotationsScreenSnapshot(undefined, snapshot);
+        */
       }
       return self.annotationHelper3D;
     },
