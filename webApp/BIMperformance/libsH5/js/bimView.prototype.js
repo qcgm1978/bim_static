@@ -703,7 +703,7 @@
       //还原颜色
       self._dom.bimBox.addClass('comment');
       self.getAnnotationObject().editAnnotationBegin();
-      //viewer.setCommentStyle({'stroke-color': 'red','fil-color':'red' });
+      self.setCommentStyle({'stroke-color': 'red','fill-color':'red' });
 
       self.getAnnotationObject().setAnnotationBackgroundColor(modelBgColor);
       if (data) {
