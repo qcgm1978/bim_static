@@ -229,25 +229,29 @@ App.Services.SystemCollection = {
 		App.Services.SystemCollection.ResourceGetCollection.fetch({
 			data:extendData,
 			success:function(collection, response, options){
-				$(".resourceListBox").find(".loading").remove();
-				var $content = $("#pageBoxDd");
-				var pageCount = response.data.totalItemCount;
-				$content.find(".sumDesc").html('共 ' + pageCount + ' 个资源');
-				$content.find(".listPagination").empty().pagination(pageCount, {
-				    items_per_page: response.data.pageItemCount,
-				    current_page: response.data.pageIndex - 1,
-				    num_edge_entries: 3, //边缘页数
-				    num_display_entries: 5, //主体页数
-				    link_to: 'javascript:void(0);',
-				    itemCallback: function(pageIndex) {
-				        //加载数据
-				        App.Services.SystemCollection.Settings.pageIndexRG = pageIndex + 1;
-				        App.Services.SystemCollection.resourceListHandle();
-				    },
-				    prev_text: "上一页",
-				    next_text: "下一页"
-				});
-				return response.data;
+				if(response.code==0){
+					$(".resourceListBox").find(".loading").remove();
+					var $content = $("#pageBoxDd");
+					var pageCount = response.data.totalItemCount;
+					$content.find(".sumDesc").html('共 ' + pageCount + ' 个资源');
+					$content.find(".listPagination").empty().pagination(pageCount, {
+					    items_per_page: response.data.pageItemCount,
+					    current_page: response.data.pageIndex - 1,
+					    num_edge_entries: 3, //边缘页数
+					    num_display_entries: 5, //主体页数
+					    link_to: 'javascript:void(0);',
+					    itemCallback: function(pageIndex) {
+					        //加载数据
+					        App.Services.SystemCollection.Settings.pageIndexRG = pageIndex + 1;
+					        App.Services.SystemCollection.resourceListHandle();
+					    },
+					    prev_text: "上一页",
+					    next_text: "下一页"
+					});
+					return response.data;
+				}else{
+					$.tip({message:response.message,type:'alarm'});
+				}
 			}
 		})
 	},

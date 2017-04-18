@@ -35,7 +35,6 @@ App.userAdmin.UserAdminPrefixListV = Backbone.View.extend({
 			data: _data,
 			success: function(collection, response, options) {
 				if(response.code == 0){
-					_this.$el.html("");
 					_this.$el.html(_this.template({state:response.data}));
 					$(".loading").css("display","none");
 					_this.initScroll();

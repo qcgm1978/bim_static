@@ -637,11 +637,15 @@ App.Comm = {
 				status: 0
 			}
 		}, function(res) {
-			$('.messageCounter').html(res.data.totalItemCount);
-			if(res.data.totalItemCount==0){
-				$('.messageCounter').first().hide();
+			if(res.code == 0){
+				$('.messageCounter').html(res.data.totalItemCount);
+				if(res.data.totalItemCount==0){
+					$('.messageCounter').first().hide();
+				}else{
+					$('.messageCounter').first().show();
+				}
 			}else{
-				$('.messageCounter').first().show();
+				$.tip({message:res.message,type:'alarm'});
 			}
 		})
 
