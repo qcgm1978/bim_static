@@ -161,9 +161,9 @@
         var selected = $(this).is('.selected');
         $(this).toggleClass('selected');
         if(selected){
-          $(this).find('span').text('z轴未锁定')
+          $(this).find('span').text('Z轴未锁')
         }else{
-          $(this).find('span').text('z轴已锁定')
+          $(this).find('span').text('Z轴已锁')
         }
         self.lockAxisZ(!selected);
       });

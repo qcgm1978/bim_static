@@ -210,6 +210,7 @@ var Login = {
 			url: '/platform/user/current?t=' + (+new Date())
 
 		}).done(function(data) {
+			debugger;
 			//获取referer returnurl 进行重定向
 			var r = document.URL.split('ReturnUrl=').pop();
 			//失败

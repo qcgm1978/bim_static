@@ -30,7 +30,7 @@ App.Comm = {
 			url: '/platform/user/current?t=' + (+new Date()),
 			async: async
 		}).done(function(data) {
-
+			debugger;
 			if (typeof(data) == "string") {
 				data = JSON.parse(data);
 			}
