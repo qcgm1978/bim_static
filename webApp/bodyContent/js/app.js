@@ -24,7 +24,8 @@ App.BodyContent.App=Backbone.View.extend({
         };
         App.Comm.ajax(pdata,function(response){
         	if(response.code==0){
-        		$("#monthMore").attr("href",response.data[0].url);
+                $("#monthMore").attr("href",response.data[0].url+"&MonthType=2");
+        		$("#monthMore").attr("data-morehref",response.data[0].url);
         	}
         });
 	},
