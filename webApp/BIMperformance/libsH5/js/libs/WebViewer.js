@@ -36,24 +36,7 @@ CLOUD.GlobalData = {
     DEBUG: false
 };
 
-CLOUD.EnumObjectLevel = {
-    Default: 0,
-    Tiny: 1,
-    Small: 2,
-    Medium: 5,
-    Large: 6
-};
-
-CLOUD.ObjectLevelLoD = {
-    0: 0.1,
-    1: 0.2,
-    2: 1,
-    3: 4,
-    4: 5,
-    5: 5, // will remove
-    6: 6  // 
-};
-
+// 视角枚举
 CLOUD.EnumStandardView = {
     ISO: 0,
     Top: 1,
@@ -102,6 +85,27 @@ CLOUD.EnumStandardView = {
     LeftTurnBack: 44
 };
 
+// 新版已废弃
+CLOUD.EnumObjectLevel = {
+    Default: 0,
+    Tiny: 1,
+    Small: 2,
+    Medium: 5,
+    Large: 6
+};
+
+// 新版已废弃
+CLOUD.ObjectLevelLoD = {
+    0: 0.1,
+    1: 0.2,
+    2: 1,
+    3: 4,
+    4: 5,
+    5: 5, // will remove
+    6: 6  // 
+};
+
+// 新版已废弃
 CLOUD.SCENETYPE = {
     Default: 0,
     Aux: 1,
@@ -109,12 +113,14 @@ CLOUD.SCENETYPE = {
     Link: 3
 };
 
+// 新版已废弃
 CLOUD.OPSELECTIONTYPE = {
     Clear: 0,
     Add: 1,
     Remove: 2
 };
 
+// 新版已废弃
 CLOUD.MPKSTATUS = {
     UNKONW: 0,
     LOADING: 1,
@@ -137,6 +143,10 @@ CLOUD.PrimitiveCount = {
 };
 
 CLOUD.Utils = {
+    /**
+     * 根据数组构造THREE.Box3对象
+     *
+     */
     box3FromArray: function (arr, optionalbox) {
         if (arr instanceof Array) {
             var bbox = optionalbox || new THREE.Box3();
@@ -147,6 +157,10 @@ CLOUD.Utils = {
         return null;
     },
 
+    /**
+     * 根据点数组计算包围盒
+     *
+     */
     computeBBox: function (points) {
         var bbox = new THREE.Box3();
         var v1 = new THREE.Vector3();
@@ -159,7 +173,11 @@ CLOUD.Utils = {
         return bbox;
     },
 
-    // 合并box
+    /**
+     * 合并包围盒
+     *
+     * @param {Array} boxs - 包围盒数组
+     */
     mergeBBox: function (boxs) {
 
         if (boxs.length < 1) return null;
@@ -1788,11 +1806,11 @@ CLOUD.CameraUtil = {
             return [parseFloat(strarr[0]), parseFloat(strarr[1]), parseFloat(strarr[2])];
         };
 
-        position.fromArray(str2float(camera.camera_position.split(",")));
+        position.fromArray(str2float(camera.position.split(",")));
         var dir = new THREE.Vector3();
-        dir.fromArray(str2float(camera.camera_direction.split(",")));
+        dir.fromArray(str2float(camera.direction.split(",")));
         var up = new THREE.Vector3();
-        up.fromArray(str2float(camera.camera_up.split(",")));
+        up.fromArray(str2float(camera.up.split(",")));
 
         var target = new THREE.Vector3();
         target.addVectors(position, dir);
@@ -2857,6 +2875,7 @@ CLOUD.OrderedRenderer = function () {
         _countCullingObject = 0;
         _countScreenCullOff = 0;
         _dirtyIncrementList = true;
+        _isIncrementalCullFinish = true;
     };
 
     this.setFilter = function (filter) {
@@ -8052,6 +8071,10 @@ CLOUD.Filter = function () {
 
     // SERIALIZATION END
 
+    /**
+     * 保存当前过滤器状态
+     *
+     */
     this.saveState = function () {
         var obj = {};
         obj.version = 1;
@@ -8085,6 +8108,10 @@ CLOUD.Filter = function () {
         return obj;
     };
 
+    /**
+     * 恢复过滤器状态
+     *
+     */
     this.loadState = function (obj) {
 
         _filter = obj.filter;
@@ -8116,7 +8143,10 @@ CLOUD.Filter = function () {
 
     };
 
-
+    /**
+     * 清除过滤器
+     *
+     */
     this.clear = function () {
         _filter = {};
         _fileFilter = {};
@@ -8131,44 +8161,72 @@ CLOUD.Filter = function () {
     };
 
     //DEBUG API
-    // 获得可见过滤器
+    /**
+     * 获得可见过滤器
+     *
+     */
     this.getVisibleFilter = function () {
         return _filter;
     };
 
-    // 获得文件可见过滤器
+    /**
+     * 获得文件过滤器
+     *
+     */
     this.getFileFilter = function () {
         return _fileFilter;
     };
 
-    // 获得材质过滤器
+    /**
+     * 获得材质过滤器
+     *
+     */
     this.getOverriderByUserId = function () {
         return _overriderByIds;
     };
 
-    // 获得自定义材质过滤器
+    /**
+     * 获得自定义材质过滤器
+     *
+     */
     this.getOverriderByUserData = function () {
         return _overriderByData;
     };
 
-    // 获得选中构件集合
+    /**
+     * 获得选中构件集对象
+     *
+     */
     this.getSelectionSet = function () {
         return _selectionSet;
     };
 
-    // 获得双击选中构件集合
+    /**
+     * 获得双击选中构件集对象
+     *
+     */
     this.getDemolishSet = function () {
         return _frozenSet;
     };
 
     ////////////////////////////////////////////////////////////////////
     // Visbililty Filter API
-    // conditions: {{'levelId':'F01'},{'categoryId':'21'}}
+
+    /**
+     * 为【可见过滤器】设置过滤条件
+     *
+     * @param {Object} conditions - 过滤条件 conditions: {{'levelId':'F01'},{'categoryId':'21'}}
+     */
     this.setVisibleConditions = function (conditions) {
         _filter.conditions = conditions;
     };
 
-    // only show the nodes with the specified ids. 
+    /**
+     * only show the nodes with the specified ids.
+     *
+     * @param {Array} ids - 构件 id 集合。 ids 已定义，为【可见构件集对象】批量添加属性， 否则，移除【可见构件集对象】属性
+     * @remark 接口很怪
+     */
     this.showByUserIds = function (ids) {
 
         if (ids) {
@@ -8186,11 +8244,20 @@ CLOUD.Filter = function () {
 
     };
 
-    // to remove
+    /**
+     * to remove - 参见 showByUserIds
+     *
+     * @param {Array} ids - 构件 id 集合。
+     */
     this.setFilterByUserIds = function (ids) {
         this.showByUserIds(ids);
     };
 
+    /**
+     * 从【可见构件集对象】批量移除属性，并将【可见构件集对象】从【可见过滤器】中移除
+     *
+     *  @param {Array} ids - 构件 id 集合
+     */
     this.removeShownUserIds = function (ids) {
 
         if (!_filter.visibleIds)
@@ -8211,7 +8278,11 @@ CLOUD.Filter = function () {
 
     };
 
-    // hide by the ids.
+    /**
+     * hide by the ids.
+     *
+     * @param {Array} ids - 构件 id 集合。ids 已定义，为【隐藏构件集对象】批量添加属性， 否则，从【可见过滤器】移除【隐藏构件集对象】
+     */
     this.hideByUserIds = function (ids) {
 
         if (ids) {
@@ -8230,6 +8301,11 @@ CLOUD.Filter = function () {
 
     };
 
+    /**
+     * 从【隐藏构件集对象】中移除属性
+     *
+     * @param {Array} ids - 构件 id 集合
+     */
     this.removeHiddenUserIds = function (ids) {
 
         if (!_filter.invisibleIds)
@@ -8250,7 +8326,11 @@ CLOUD.Filter = function () {
 
     };
 
-    // 将ID集合加入到可见过滤器中
+    /**
+     * 为【可见构件集对象】批量添加属性
+     *
+     * @param {Array} ids - 构件 id 集合
+     */
     this.addFilterByUserIds = function (ids) {
 
         if (!ids)
@@ -8266,7 +8346,12 @@ CLOUD.Filter = function () {
         }
     };
 
-    // 将值为value的ID加入到名字为name的可见过滤器中
+    /**
+     * 将值为value的构件id作为属性添加到【自定义可见过滤器】
+     *
+     * @param {String} name - 过滤器名字
+     * @param {String} value - id 值
+     */
     this.addUserFilter = function (name, value) {
 
         var filters = _filter.filters;
@@ -8283,17 +8368,12 @@ CLOUD.Filter = function () {
         filters[name][value] = true;
     };
 
-    // 获得名字为name的可见对象集
-    this.getUserFilter = function (name) {
-
-        if (_filter.filters) {
-            return _filter.filters[name];
-        }
-
-        return undefined;
-    };
-
-    // 从名字为name的可见过滤器中移除值为value的ID
+    /**
+     * 从名字为name的【自定义可见过滤器】中移除值为value的属性
+     *
+     * @param {String} name - 过滤器名字
+     * @param {String} value - id 值
+     */
     this.removeUserFilter = function (name, value) {
 
         var filters = _filter.filters;
@@ -8318,17 +8398,44 @@ CLOUD.Filter = function () {
         }
     };
 
-    // 清除可见过滤器
+    /**
+     * 获得名字为name的【自定义可见过滤器】
+     *
+     * @param {String} name - 过滤器名字
+     * @return {Object} 存在，返回对应的过滤器，否则，返回 undefined
+     */
+    this.getUserFilter = function (name) {
+
+        if (_filter.filters) {
+            return _filter.filters[name];
+        }
+
+        return undefined;
+    };
+
+    /**
+     * 清除【自定义可见过滤器】
+     *
+     */
     this.clearUserFilters = function () {
         _filter = {};
     };
 
-    // 增加文件id到文件过滤器中
+    /**
+     * 为【文件过滤器】添加属性（文件 id）
+     *
+     * @param {String} fileId - 文件 id
+     */
     this.addFileFilter = function (fileId) {
         _fileFilter[fileId] = 0;
     };
 
-    // 从文件过滤器中移除文件id
+    /**
+     * 从【文件过滤器】中移除属性（文件 id）
+     *
+     * @param {String} fileId - 文件 id
+     * @remark 参数fileId未定义的，清除了整个容器，感觉不合理
+     */
     this.removeFileFilter = function (fileId) {
 
         if (fileId === undefined) {
@@ -8342,20 +8449,41 @@ CLOUD.Filter = function () {
         }
     };
 
-    // 判断文件过滤器中是否存在文件ID
+    /**
+     * 判断【文件过滤器】中是否存在某个文件ID
+     *
+     * @param {String} fileId - 文件 id
+     */
     this.hasFileFilter = function (fileId) {
         return _fileFilter[fileId] !== undefined;
     };
-    
+
+    /**
+     * 判断对象是否在【文件过滤器】中
+     *
+     * @param {Object} object - node 节点对象
+     */
     this.isFileFilter = function (object) {
 
-        if (object.userData && object.userData.sceneId) {
-            return _fileFilter[object.userData.sceneId] !== undefined;
+        var userData = object.userData;
+
+        if (userData) {
+
+            var fileId = userData.sceneId;
+
+            if (fileId) {
+                return _fileFilter[fileId] !== undefined;
+            }
         }
 
         return false;
     };
 
+    /**
+     * 判断【文件过滤器】是否非空对象
+     *
+     * @return {Boolean} true: 非空对象， false: 空对象
+     */
     this.isNotNullFileFilter = function () {
 
         for(var id in _fileFilter) {
@@ -8372,19 +8500,32 @@ CLOUD.Filter = function () {
     ////////////////////////////////////////////////////////////////////
     // material overrider API
 
-    // 是否启用场景材质，用于场景半透明
+    /**
+     * 启用或禁用场景材质，用于场景半透明
+     *
+     * @param {Boolean} enable - 是否启用场景材质，true：启用，否则 禁用
+     */
     this.enableSceneOverrider = function (enable) {
         _overriderByScene = enable;
     };
 
-    // 场景材质启用状态 -- true: 启用， false: 禁用
+    /**
+     * 判断是否启用场景材质
+     *
+     * @return {Boolean} true: 启用， false: 禁用
+     */
     this.isSceneOverriderEnabled = function () {
         return _overriderByScene;
     };
 
-    // 设置材质
-    // 如果存在名为materialName的材质，则修改材质颜色；
-    // 如果不存在名为materialName的材质，则创建一个新材质
+    /**
+     * 设置材质
+     * 如果存在名为materialName的材质，则修改材质颜色
+     * 如果不存在名为materialName的材质，则创建一个新材质
+     * @param {String} materialName - 材质名
+     * @param {Color} color - 材质颜色
+     * @return 存在指定名称的材质，则用新颜色替换；不存在，则新建一个高亮材质
+     */
     this.setOverriderMaterial = function (materialName, color) {
 
         var material = _overridedMaterials[materialName];
@@ -8399,7 +8540,13 @@ CLOUD.Filter = function () {
         }
     };
 
-    // 通过id集合设置材质
+    /**
+     * 分组设置材质， 一个 name 一个组 {name : {material : materialName, ids : {} }}
+     *
+     * @param {String} name - 材质对象名称标识（组名）。name 未定义，则清空【材质过滤器】数据
+     * @param {Array} ids - 构件 id 集合。ids 未定义，则删除名为name材质对象
+     * @param {String} materialName - 使用的材质名称
+     */
     this.setOverriderByUserIds = function (name, ids, materialName) {
 
         // 如果名字未定义，则清空材质过滤器数据
@@ -8430,7 +8577,13 @@ CLOUD.Filter = function () {
 
     };
 
-    // 设置自定义材质过滤器数据
+    /**
+     * 设置自定义材质
+     *
+     * @param {String} name - 自定义材质名。name 未定义，则清空【自定义材质过滤器】数据
+     * @param {String} value - 一般为构件 id 值。value 未定义，则从【自定义材质过滤器】删除属性值为name的对象
+     * @param {String} materialName - 使用的材质名称
+     */
     this.setUserOverrider = function (name, value, materialName) {
 
         if (name === undefined) {
@@ -8454,7 +8607,12 @@ CLOUD.Filter = function () {
         }
     };
 
-    // 从名为name的自定义材质过滤器中移除
+    /**
+     * 从【自定义材质过滤器】中移除名为name的材质
+     *
+     * @param {String} name - 自定义材质名。name 未定义，则清空【自定义材质过滤器】数据
+     * @param {String} value - 一般为构件 id 值。value 未定义，则移除【自定义材质过滤器】中的name属性值， 否则 移除【自定义材质过滤器】name属性下的value属性值
+     */
     this.removeUserOverrider = function (name, value) {
 
         if (name === undefined) {
@@ -8473,22 +8631,35 @@ CLOUD.Filter = function () {
 
     };
 
-    // conditions: the condition array
-    // condition = {condition:{levelName:'f01'}, material:name}
+    /**
+     * 设置材质覆盖条件
+     *
+     * @param {Object} conditions - 材质覆盖条件。
+     *                               conditions: the condition array
+     *                               condition = {condition:{levelName:'f01'}, material:name}
+     */
     this.setConditionOverrider = function (conditions) {
         _overriderCondition = conditions;
     };
 
-
     ////////////////////////////////////////////////////////////////
 
-    // 设置构件选中的颜色
+    /**
+     * 设置【选中构件】的材质颜色
+     *
+     * @param {Color} color - 十六进制颜色
+     */
     this.setSelectionMaterial = function (color) {
         _overridedMaterials.selection.color = color;
     };
 
-    // 设置选中构件集合
-    // 如果选择集有变化，返回true
+    /**
+     * 为【选择集对象】批量设置属性 - 将构件id 作为属性附加到【选择集对象】中（会移除之前的所有属性）
+     *
+     * @param {Array} ids - 构件 id 集合
+     * @return {Boolean} true: 附加属性成功或者清除属性成功
+     * @ramark 这个接口定义有问题：返回值意义模糊
+     */
     this.setSelectedIds = function (ids) {
 
         if (ids && ids.length > 0) {
@@ -8514,7 +8685,11 @@ CLOUD.Filter = function () {
         return false;
     };
 
-    // 增加选中构件集合
+    /**
+     * 为【选择集对象】批量添加属性 - 将构件id 作为属性附加到【选择集对象】中（不移除之前的属性）
+     *
+     * @param {Array} ids - 构件 id 集合
+     */
     this.addSelectedIds = function (ids) {
 
         if (!ids) return;
@@ -8529,7 +8704,13 @@ CLOUD.Filter = function () {
 
     };
 
-    // 移除某个选中构件
+    /**
+     * 从【选择集对象】中移除指定属性
+     *
+     * @param {String} id - 构件id
+     * @return {Boolean} true: 移除成功， false：未找到指定属性。
+     * @remark 返回值意义模糊
+     */
     this.removeSelectedId = function (id) {
 
         if (_selectionSet && _selectionSet[id]) {
@@ -8545,14 +8726,26 @@ CLOUD.Filter = function () {
         return false;
     };
 
-    // 清除选择集
+    /**
+     * 移除【选择集对象】所有属性
+     * 这里直接置为 null
+     *
+     */
     this.clearSelectionSet = function () {
 
         _selectionSet = null;
 
     };
 
-    // 增加或移除某个选中构件
+    /**
+     * 为【选择集对象】添加属性 或者 从【选择集对象】中移除属性
+     *
+     * @param {String} id - 构件 id
+     * @param {String} value - 属性对应值， 默认为 true
+     * @param {Boolean} removeIfExist - 是否移除存在的构件
+     * @return {Boolean} true: 增加成功，false : 移除成功
+     * @remark 返回值意义模糊
+     */
     this.addSelectedId = function (id, value, removeIfExist) {
         if (!_selectionSet) {
             _selectionSet = {};
@@ -8568,7 +8761,11 @@ CLOUD.Filter = function () {
         return true;
     };
 
-    // 是否空选择集
+    /**
+     * 【选择集对象】是否有属性
+     *
+     * @return {Boolean} true: 空对象， false：有属性
+     */
     this.isNullSelectionSet = function () {
 
         for (var id in _selectionSet) {
@@ -8578,7 +8775,11 @@ CLOUD.Filter = function () {
         return true;
     };
 
-    // 设置ID集合
+    /**
+     * 为【Demolish 集对象】批量设置属性 - 将构件id 作为属性附加到【Demolish 集对象】中（移除之前的属性）
+     *
+     * @param {Array} ids - 构件 id 集合。如果 ids 未定义，则将【Demolish 集对象】置为 null
+     */
     this.setDemolishIds = function (ids) {
 
         if (ids && ids.length > 0) {
@@ -8596,7 +8797,11 @@ CLOUD.Filter = function () {
         }
     };
 
-    // 增加ID集合
+    /**
+     * 为【Demolish 集对象】批量添加属性 - 将构件id 作为属性附加到【Demolish 集对象】中（不移除之前的属性）
+     *
+     * @param {Array} ids - 构件 id 集合
+     */
     this.addDemolishIds = function (ids) {
 
         if (!ids)
@@ -8613,7 +8818,13 @@ CLOUD.Filter = function () {
 
     };
 
-    // 增加单个ID
+    /**
+     * 为【Demolish 集对象】添加属性 - 将构件id 作为属性附加到【Demolish 集对象】中（不移除之前的属性），支持累加。
+     *
+     * @param {String} id - 构件id
+     * @param {Boolean} removeIfExist - 是否移除已存在的属性
+     * @return {Boolean} true: 添加属性成功，false：移除属性成功
+     */
     this.addDemolishId = function (id, removeIfExist) {
 
         if (!_frozenSet) {
@@ -8636,7 +8847,11 @@ CLOUD.Filter = function () {
         return true;
     };
 
-    // 是否空选择集
+    /**
+     * 判断【Demolish 集对象】是否为空对象
+     *
+     * @return {Boolean} true：空，否则，非空
+     */
     this.isNullDemolishSet = function () {
 
         for (var id in _frozenSet) {
@@ -8646,18 +8861,29 @@ CLOUD.Filter = function () {
         return true;
     };
 
-    // 清空容器
+    /**
+     * 清除【Demolish 集对象】所有属性（Demolish 集对象 用于存放双击半透明的构件）
+     * 这里直接置为null
+     *
+     */
     this.clearDemolishSet = function () {
-
         _frozenSet = null;
-
     };
 
-    // conditions: {{'levelName':'F01'},{'categoryId':'21'}}
+    /**
+     * 设置构件隔离条件 eg : conditions: {{'levelName':'F01'},{'categoryId':'21'}}
+     *
+     * @param {Object} conditions - 隔离条件
+     */
     this.setIsolateCondition = function (conditions) {
         _isolateCondition = conditions;
     };
 
+    /**
+     * 为【隔离构件集合对象】批量设置属性 - 将构件id 作为属性附加到【隔离构件集合对象】中（移除之前的属性）
+     *
+     * @param {Array} ids - id 集合。 如果 ids 未定义，则将【隔离构件集合对象】置为 null
+     */
     this.setIsolateByUserIds = function (ids) {
 
         if (ids && ids.length > 0) {
@@ -8673,7 +8899,11 @@ CLOUD.Filter = function () {
         }
     };
 
-    // 是否空集
+    /**
+     * 判断【隔离构件集合对象】是否为空对象
+     *
+     * @return {Boolean} true: 空对象， false：非空对象
+     */
     this.isNullIsolateSet = function () {
 
         for (var id in _isolateSet) {
@@ -8683,7 +8913,11 @@ CLOUD.Filter = function () {
         return true;
     };
 
-    // 可见集合是否为空
+    /**
+     * 判断【可见构件集合对象】是否为空对象
+     *
+     * @return {Boolean} true: 空对象， false：非空对象
+     */
     this.isNullVisibleSet = function () {
 
         for (var id in _filter.visibleIds) {
@@ -8693,7 +8927,12 @@ CLOUD.Filter = function () {
         return true;
     };
 
-    // 不可见集合是否为空
+
+    /**
+     * 判断【隐藏构件集合对象】是否为空对象
+     *
+     * @return {Boolean} rue: 空对象， false：非空对象
+     */
     this.isNullInVisibleSet = function () {
 
         for (var id in _filter.invisibleIds) {
@@ -8704,7 +8943,12 @@ CLOUD.Filter = function () {
     };
 
     ////////////////////////////////////////////////////////////////
-    // 判断是否可见, true: 可见， 否则 不可见
+    /**
+     * 判断构件是否可见
+     *
+     * @param {Object} node - 构件对象
+     * @return {Boolean} true: 可见， 否则 不可见
+     */
     this.isVisible = function (node) {
 
         if (node.customTag) {
@@ -8767,6 +9011,12 @@ CLOUD.Filter = function () {
         return true;
     };
 
+    /**
+     * 根据 id 判断构件是否可见
+     *
+     * @param {String} id - 构件id (userId)
+     * @param {Object} userData - 自定义数据
+     */
     this.isVisibleById = function (id , userData) {
 
         // if (node.customTag) {
@@ -8829,7 +9079,12 @@ CLOUD.Filter = function () {
         return true;
     };
 
-    // 对象是否可以被pick -- true: 对象可以被pick，false: 对象不可以pick
+    /**
+     * 对象是否可以被pick
+     *
+     * @param {Object} object - 窗口宽
+     * @return {Boolean} 是否可以pick - true: 对象可以被pick，false: 对象不可以pick
+     */
     this.isSelectable = function (object) {
 
         var id = object.name;
@@ -8891,79 +9146,11 @@ CLOUD.Filter = function () {
         return true;
     };
 
-    // 计算选中对象的包围盒
-    this.computeSelectionBox = function (renderList) {
-
-        if (_selectionSet == null)
-            return false;
-
-        for (var ii = 0; ii < renderList.length; ++ii) {
-
-            var object = renderList[ii].object;
-
-            if (_selectionSet[object.name] !== undefined) {
-
-                if (!object.geometry) {
-                    CLOUD.Logger.log("empty geometry!");
-                    continue;
-                }
-
-                if (object.geometry.boundingBox == null) {
-                    object.geometry.computeBoundingBox();
-                }
-                var box = object.geometry.boundingBox;
-
-                if (box) {
-                    var box2 = box.clone();
-                    if (object.matrixWorld) {
-                        box2.applyMatrix4(object.matrixWorld);
-                    }
-
-                    _selectionBoundingBox.expandByPoint(box2.min);
-                    _selectionBoundingBox.expandByPoint(box2.max);
-                }
-            }
-
-        }
-
-        return true;
-    };
-
-    this.computeRenderObjectsBox = function (renderList) {
-        var boundingBox = new THREE.Box3();
-        for (var ii = 0; ii < renderList.length; ++ii) {
-            var object = renderList[ii].object;
-            if (!this.isVisible(object)) {
-                continue;
-            }
-
-            if (object.customTag) {
-                continue;
-            }
-
-            if (!object.geometry) {
-                CLOUD.Logger.log("empty geometry!");
-                continue;
-            }
-            if (object.geometry.boundingBox == null) {
-                object.geometry.computeBoundingBox();
-            }
-
-            var box = object.geometry.boundingBox;
-            if (box) {
-                var box2 = box.clone();
-                if (object.matrixWorld) {
-                    box2.applyMatrix4(object.matrixWorld);
-                }
-
-                boundingBox.expandByPoint(box2.min);
-                boundingBox.expandByPoint(box2.max);
-            }
-        }
-        return boundingBox;
-    };
-
-    // 切换材质
+    /**
+     * 根据构件对象获得构件材质
+     *
+     * @param {Object} object - 构件node节点
+     */
     this.getOverridedMaterial = function (object) {
 
         if (object.customTag) {
@@ -9056,7 +9243,12 @@ CLOUD.Filter = function () {
         return null;
     };
 
-    // 切换材质
+    /**
+     * 根据构件 id 及 user data 获得构件材质
+     *
+     * @param {String} id - 构件id (userId)
+     * @param {Object} userData - 自定义数据
+     */
     this.getOverridedMaterialById = function (id, userData) {
 
         // if (object.customTag) {
@@ -9149,7 +9341,14 @@ CLOUD.Filter = function () {
         return null;
     };
 
-    // 是否有高亮材质(pick, highlight)
+
+    /**
+     * 根据构件 id 及 user data 判断构件是否高亮(pick, highlight)
+     *
+     * @param {String} id - 构件id (userId)
+     * @param {Object} userData - 自定义数据
+     * @return {Boolean} true: 高亮
+     */
     this.hasHighlightMaterial = function (id, userData) {
 
         // 选中
@@ -9220,19 +9419,109 @@ CLOUD.Filter = function () {
         return false;
     };
 
-    // 重置包围盒
+    /**
+     * 重置包围盒（世界系）
+     *
+     */
     this.resetSelectionBox = function () {
         _selectionBoundingBox.makeEmpty();
     };
 
-    // 获得选中对象包围盒
+    /**
+     * 获得所有选中对象的包围盒（世界系）
+     *
+     */
     this.getSelectionBox = function () {
         return _selectionBoundingBox;
     };
 
-    // 空容器
+    /**
+     * 【选择集对象】是否为null
+     *
+     */
     this.isSelectionSetEmpty = function () {
         return _selectionSet == null;
+    };
+
+    /**
+     * 计算渲染列表中所有选中对象的包围盒
+     *
+     * @param {Array} renderList - 渲染列表
+     */
+    this.computeSelectionBox = function (renderList) {
+
+        if (_selectionSet == null)
+            return false;
+
+        for (var ii = 0; ii < renderList.length; ++ii) {
+
+            var object = renderList[ii].object;
+
+            if (_selectionSet[object.name] !== undefined) {
+
+                if (!object.geometry) {
+                    CLOUD.Logger.log("empty geometry!");
+                    continue;
+                }
+
+                if (object.geometry.boundingBox == null) {
+                    object.geometry.computeBoundingBox();
+                }
+                var box = object.geometry.boundingBox;
+
+                if (box) {
+                    var box2 = box.clone();
+                    if (object.matrixWorld) {
+                        box2.applyMatrix4(object.matrixWorld);
+                    }
+
+                    _selectionBoundingBox.expandByPoint(box2.min);
+                    _selectionBoundingBox.expandByPoint(box2.max);
+                }
+            }
+
+        }
+
+        return true;
+    };
+
+    /**
+     * 计算渲染列表中所有对象的包围盒
+     *
+     * @param {Array} renderList - 渲染列表
+     */
+    this.computeRenderObjectsBox = function (renderList) {
+        var boundingBox = new THREE.Box3();
+        for (var ii = 0; ii < renderList.length; ++ii) {
+            var object = renderList[ii].object;
+            if (!this.isVisible(object)) {
+                continue;
+            }
+
+            if (object.customTag) {
+                continue;
+            }
+
+            if (!object.geometry) {
+                CLOUD.Logger.log("empty geometry!");
+                continue;
+            }
+            if (object.geometry.boundingBox == null) {
+                object.geometry.computeBoundingBox();
+            }
+
+            var box = object.geometry.boundingBox;
+            if (box) {
+                var box2 = box.clone();
+                if (object.matrixWorld) {
+                    box2.applyMatrix4(object.matrixWorld);
+                }
+
+                boundingBox.expandByPoint(box2.min);
+                boundingBox.expandByPoint(box2.max);
+            }
+        }
+        return boundingBox;
     };
 
     // ------------------- 隔离功能（隐藏／半透明）S ------------------- //
@@ -9322,22 +9611,33 @@ CLOUD.Filter = function () {
 
     }
 
-    // 未选中的构件隐藏设置
+    /**
+     * 设置【未选中的构件】隐藏状态
+     *
+     * @param {Boolean} enabled -  是否允许设置隐藏状态
+     */
     this.setHideUnselected = function (enabled) {
 
-        // 如果上一次隐藏了选中构造
         if (enabled) {
             pushToHideUnselectionSet();
         }
 
     };
 
-    // 是否隐藏未选中的构件
+    /**
+     * 检查【未选中的构件】是否隐藏
+     *
+     */
     this.isHideUnselected = function () {
         return _filter.visibleIds !== undefined;
     };
 
-    // 选中构件隐藏设置
+    /**
+     * 设置【选中构件】隐藏状态
+     *
+     * @param {Boolean} enabled - 是否允许设置隐藏状态
+     * @param {Boolean} clear - 是否清除上一次的数据
+     */
     this.setHideSelected = function (enabled, clear) {
 
         if (enabled) {
@@ -9346,7 +9646,12 @@ CLOUD.Filter = function () {
         }
     };
 
-    // 已选构件半透明状态设置
+    /**
+     * 设置【已选构件】半透明状态
+     *
+     * @param {Boolean} enabled - 是否允许设置半透明状态
+     * @param {Boolean} clear - 是否清除上一次的数据
+     */
     this.setTranslucentSelected = function (enabled, clear) {
 
         if (enabled) {
@@ -9356,7 +9661,11 @@ CLOUD.Filter = function () {
 
     };
 
-    // 未选构件半透明状态设置
+    /**
+     * 设置【未选构件】半透明状态
+     *
+     * @param {Boolean} enabled - 是否允许设置半透明状态
+     */
     this.setTranslucentUnselected = function (enabled) {
 
         if (enabled) {
@@ -9366,7 +9675,10 @@ CLOUD.Filter = function () {
 
     };
 
-    // 取消所有半透明
+    /**
+     * 取消所有半透明状态
+     *
+     */
     this.cancelTranslucentAll = function () {
 
         // 全场景半透明
@@ -9377,7 +9689,10 @@ CLOUD.Filter = function () {
         _isolateSet = null;
     };
 
-    // 恢复所有构件
+    /**
+     * 恢复所有构件成显示状态
+     *
+     */
     this.revertAll = function () {
 
         _frozenSet = null;
@@ -9389,8 +9704,11 @@ CLOUD.Filter = function () {
         _overriderByScene = false;
     };
 
-    // 是否处于隔离状态
-    // 构件被选中，构件被隔离都表示处于隔离状态
+    /**
+     * 是否处于隔离状态
+     * 构件被选中，构件被隔离都表示处于隔离状态
+     *
+     */
     this.isIsolateState = function () {
 
         return !this.isNullSelectionSet() || !this.isNullDemolishSet() || !this.isNullIsolateSet() || !this.isNullVisibleSet() || !this.isNullInVisibleSet() || _overriderByScene;
@@ -17020,9 +17338,9 @@ CLOUD.Loader.SceneReader.prototype = {
             this.cell_cur.itemIndex = data_i[2];
             this.cell_cur.itemCount = data_i[3];
 
-            this.layerCount = data_i[4];
-            this.layerIdxBuffer = new Int32Array( this.cellBuffer, index * this.cellSize + 5*4, 64 );
-            this.categoryBuffer = new Int32Array( this.cellBuffer, index * this.cellSize + (5+64)*4, 64 );
+            this.cell_cur.layerCount = data_i[4];
+            this.cell_cur.layerIdxBuffer = new Int32Array( this.cellBuffer, index * this.cellSize + 5*4, 64 );
+            this.cell_cur.categoryBuffer = new Int32Array( this.cellBuffer, index * this.cellSize + (5+64)*4, 64 );
 
             var data_f = new Float32Array( this.cellBuffer, index * this.cellSize + (5+64+64)*4, 6 );
             this.pt_cell_min.set( data_f[0], data_f[1], data_f[2] );
@@ -17497,7 +17815,7 @@ CLOUD.Model.prototype.parseUserData = function (data) {
  * @param {Object} item - 数据项
  * @param {Object} itemParent - 父节点参数项 {matrix : xxx, ItemId : xxx, originalId: xxx},
  */
-CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
+CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent, customPriority) {
 
     var cacheCell = this.cache.cells[cellId];
     var cacheGeometries = this.cache.geometries;
@@ -17558,7 +17876,8 @@ CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
         userData: userData,
         meshId: meshInfo.meshId,
         matrix: matrixCache,
-        materialId: item.materialId
+        materialId: item.materialId,
+        customPriority: customPriority
     };
 
     cacheCell.push(nodeInfo);
@@ -17568,7 +17887,7 @@ CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent) {
     meshInfo = null;
 };
 
-CLOUD.Model.prototype.readSymbol = function (id, cellId, itemParent) {
+CLOUD.Model.prototype.readSymbol = function (id, cellId, itemParent, customPriority) {
 
     if (this.symbolReader == null) {
         return;
@@ -17586,7 +17905,7 @@ CLOUD.Model.prototype.readSymbol = function (id, cellId, itemParent) {
                 continue;
             }
 
-            this.readMesh(this.symbolReader, cellId, item, itemParent);
+            this.readMesh(this.symbolReader, cellId, item, itemParent, customPriority);
         }
     }
 };
@@ -17646,7 +17965,108 @@ CLOUD.Model.prototype.getMeshNodeAttribute = function (sceneOrSymbolReader, item
     return {nodeId: nodeId, meshId: meshId, matrix: matrix};
 };
 
-CLOUD.Model.prototype.prepare = function (camera, clearPool) {
+CLOUD.Model.prototype.calcVisibleOctant = function (camera) {
+
+    if (!(this.octreeRootNode && this.octreeRootNodeI)) {
+        CLOUD.Logger.log("octree load is not finish!");
+        return 0;
+    }
+
+    this.visibleOctant.length = 0;
+
+    //If inner scene contains camera, prioritize inner cells, else prioritize outer cells
+    var frustum = this.manager.getWorldFrustum(camera, true);
+    var cameraPos = camera.position;
+    var depth = CLOUD.GlobalData.OctantDepth; // traverse till depth arrived.
+    // draw bounding of outer layer for test.
+    this.manager.updateOctreeBox(this.octreeRootNode);
+
+    var depthCriteria = CLOUD.GlobalData.MaximumDepth * 0.7;
+    var target = camera.target;
+    var camDir = new THREE.Vector3(target.x - cameraPos.x, target.y - cameraPos.y, target.z - cameraPos.z);
+    camDir.normalize();
+    var octantSize = new THREE.Vector3();
+
+    if (this.containsCamera) {
+        // Inner cell should get higher priority than outer, while generally the pool is large enough in this case.
+        this.octreeRootNodeI.intersectFrustumWithPriority(frustum, depth, cameraPos, camDir, true, depthCriteria, this.visibleOctant);
+        CLOUD.Logger.log("Inner: ", this.visibleOctant.length);
+        this.octreeRootNode.intersectFrustumWithPriority(frustum, depth, cameraPos, camDir, true, depthCriteria, this.visibleOctant);
+    } else {
+        // Outer cell only
+        this.octreeRootNode.intersectFrustumWithPriority(frustum, depth, cameraPos, camDir, false, depthCriteria, this.visibleOctant);
+        CLOUD.Logger.log("Outer: ", this.visibleOctant.length);
+    }
+    //CLOUD.Logger.log("visibleOctant", visibleOctant.join(','));
+    var cellCount = this.visibleOctant.length;
+    CLOUD.Logger.log("Total Octant Count: ", this.visibleOctant.length);
+
+    return cellCount;
+};
+
+CLOUD.Model.prototype.sortVisibleOctant = function (camera) {
+
+    var cameraPos = camera.position;
+
+    this.visibleOctant.sort(function (a, b) {
+        if (this.containsCamera) {
+            // special case: promote octant which contains camera
+            var bCameraOutsideOctantA = cameraPos.x < a.min.x || cameraPos.x > a.max.x ||
+                cameraPos.y < a.min.y || cameraPos.y > a.max.y ||
+                cameraPos.z < a.min.z || cameraPos.z > a.max.z;
+            if (!bCameraOutsideOctantA) {
+                return -1;
+            }
+
+            var bCameraOutsideOctantB = cameraPos.x < b.min.x || cameraPos.x > b.max.x ||
+                cameraPos.y < b.min.y || cameraPos.y > b.max.y ||
+                cameraPos.z < b.min.z || cameraPos.z > b.max.z;
+
+            if (!bCameraOutsideOctantB) {
+                return 1;
+            }
+        }
+        if (a.priority > b.priority) {
+            //  sort a to a lower index than b, i.e. a comes first.
+            return -1;
+        } else if (a.priority < b.priority) {
+            return 1;
+        }
+        // same priority
+        return 0;
+    });
+
+};
+
+CLOUD.Model.prototype.readItemData = function (sceneReader, idx, cellId, customPriority) {
+
+    var item = sceneReader.getItemInfo(idx);
+
+    if (item === undefined) {
+        return;
+    }
+
+    if (item.type === 0) {
+
+        var matrixParent = sceneReader.getMatrixInfo(item.matrixId).matrix.clone();
+        var itemParent = {
+            matrix: matrixParent,
+            ItemId: item.ItemId,
+            originalId: item.originalId,
+            userDataId: item.userDataId
+        };
+
+        this.readSymbol(item.attrIndex, cellId, itemParent, customPriority);
+        itemParent = null;
+
+    } else {
+
+        this.readMesh(sceneReader, cellId, item, null, customPriority);
+
+    }
+};
+
+CLOUD.Model.prototype.prepare = function (camera, clearPool, updateList) {
 
     var sceneCount = this.sceneArray ? this.sceneArray.length : 0;
 
@@ -17677,78 +18097,18 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
     if (CLOUD.GlobalData.DisableOctant) {
         cellCount = sceneReader.header.cellCount;
     } else {
-
-        if (!(this.octreeRootNode && this.octreeRootNodeI)) {
-            CLOUD.Logger.log("octree load is not finish!");
-            return;
-        }
-
-        this.visibleOctant.length = 0;
-
-        //If inner scene contains camera, prioritize inner cells, else prioritize outer cells
-        var frustum = this.manager.getWorldFrustum(camera, true);
-        var cameraPos = camera.position;
-        var depth = CLOUD.GlobalData.OctantDepth; // traverse till depth arrived.
-        // draw bounding of outer layer for test.
-        this.manager.updateOctreeBox(this.octreeRootNode);
-
-        var depthCriteria = CLOUD.GlobalData.MaximumDepth * 0.7;
-        var target = camera.target;
-        var camDir = new THREE.Vector3(target.x - cameraPos.x, target.y - cameraPos.y, target.z - cameraPos.z);
-        camDir.normalize();
-        var octantSize = new THREE.Vector3();
-
-        if (this.containsCamera) {
-            // Inner cell should get higher priority than outer, while generally the pool is large enough in this case.
-            this.octreeRootNodeI.intersectFrustumWithPriority(frustum, depth, cameraPos, camDir, true, depthCriteria, this.visibleOctant);
-            CLOUD.Logger.log("Inner: ", this.visibleOctant.length);
-            this.octreeRootNode.intersectFrustumWithPriority(frustum, depth, cameraPos, camDir, true, depthCriteria, this.visibleOctant);
-        } else {
-            // Outer cell only
-            this.octreeRootNode.intersectFrustumWithPriority(frustum, depth, cameraPos, camDir, false, depthCriteria, this.visibleOctant);
-            CLOUD.Logger.log("Outer: ", this.visibleOctant.length);
-        }
-        //CLOUD.Logger.log("visibleOctant", visibleOctant.join(','));
-        cellCount = this.visibleOctant.length;
-        CLOUD.Logger.log("Total Octant Count: ", this.visibleOctant.length);
+        cellCount = this.calcVisibleOctant(camera);
     }
 
     if (cellCount === 0) return;
 
     // begin sort
     if (!CLOUD.GlobalData.DisableOctant) {
-        this.visibleOctant.sort(function (a, b) {
-            if (this.containsCamera) {
-                // special case: promote octant which contains camera
-                var bCameraOutsideOctantA = cameraPos.x < a.min.x || cameraPos.x > a.max.x ||
-                    cameraPos.y < a.min.y || cameraPos.y > a.max.y ||
-                    cameraPos.z < a.min.z || cameraPos.z > a.max.z;
-                if (!bCameraOutsideOctantA) {
-                    return -1;
-                }
-
-                var bCameraOutsideOctantB = cameraPos.x < b.min.x || cameraPos.x > b.max.x ||
-                    cameraPos.y < b.min.y || cameraPos.y > b.max.y ||
-                    cameraPos.z < b.min.z || cameraPos.z > b.max.z;
-
-                if (!bCameraOutsideOctantB) {
-                    return 1;
-                }
-            }
-            if (a.priority > b.priority) {
-                //  sort a to a lower index than b, i.e. a comes first.
-                return -1;
-            } else if (a.priority < b.priority) {
-                return 1;
-            }
-            // same priority
-            return 0;
-        });
+        this.sortVisibleOctant(camera);
     }
     //end of simple prioritized algorithm
     // CLOUD.Logger.timeEnd("frustum");
     // END OF FRUSTUM Querying Cost < 1 ms
-
 
     var pool = this.pool;
     var filter = this.filter;
@@ -17756,15 +18116,20 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
     var cacheCells = this.cache.cells;
     var cacheGeometries = this.cache.geometries;
     var cacheMaterials = this.cache.materials;
+    var highPriorityCategories = this.manager.highPriorityCategories;
 
     if (clearPool) {
+
+        // console.log("enter pool clear");
         pool.clear();
     }
 
+    this.customPriorityNodes = [];
     this.highPriorityNodes = [];
     this.lowPriorityNodes = [];
     var highPriorityNodes = this.highPriorityNodes;
     var lowPriorityNodes = this.lowPriorityNodes;
+    var customPriorityNodes = this.customPriorityNodes;
 
     for (var i = 0; i < cellCount; ++i) {
 
@@ -17780,14 +18145,6 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
 
         if (cacheCell) {
 
-            // for (var id in cacheCell) {
-            //
-            //     if (cacheCell.hasOwnProperty(id)) {
-            //         this.pushMeshNode(cellId, id, cacheCell[id]);
-            //     }
-            //
-            // }
-
             for (var j = 0, len = cacheCell.length; j < len; ++j ) {
                 this.pushMeshNode(cacheCell[j]);
             }
@@ -17795,40 +18152,65 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool) {
         } else {
 
             // 缓存node数据
-
-            if (!this.cache.cells[cellId]) {
-                //this.cache.cells[cellId] = {};
-                this.cache.cells[cellId] = [];
-            }
+            cacheCells[cellId] = [];
 
             var cell = sceneReader.getCellInfo(cellId);
-            for (var j = cell.itemIndex; j < cell.itemCount; ++j) {
 
-                var item = sceneReader.getItemInfo(j);
+            // 自定义Category优先级
+            if (highPriorityCategories) {
 
-                if (item === undefined) {
-                    continue;
+                var layerCount = cell.layerCount;
+                var layerIdxBuffer = cell.layerIdxBuffer;
+                var categoryBuffer = cell.categoryBuffer;
+
+                for (var k = 0; k < layerCount; ++k ) {
+
+                    var start = layerIdxBuffer[k];
+                    var end = cell.itemCount;
+
+                    if (k < layerCount - 1 ) {
+                        end = layerIdxBuffer[k + 1];
+                    }
+
+                    if (highPriorityCategories[categoryBuffer[k]]) {
+
+                        for (var j = start; j < end; ++j) {
+                            this.readItemData(sceneReader, j, cellId, true);
+                        }
+
+                    } else {
+
+                        for (var j = start; j < end; ++j) {
+                            this.readItemData(sceneReader, j, cellId);
+                        }
+                    }
+
                 }
 
-                if (item.type === 0) {
-                    var matrixParent = sceneReader.getMatrixInfo(item.matrixId).matrix.clone();
-                    var itemParent = {
-                        matrix: matrixParent,
-                        ItemId: item.ItemId,
-                        originalId: item.originalId,
-                        userDataId: item.userDataId
-                    };
-                    this.readSymbol(item.attrIndex, cellId, itemParent);
-                    itemParent = null;
-                } else {
-                    this.readMesh(sceneReader, cellId, item);
+            } else {
+
+                for (var j = cell.itemIndex; j < cell.itemCount; ++j) {
+                    this.readItemData(sceneReader, j, cellId);
                 }
             }
-
         }
     }
 
+    // if (updateList) {
+    //
+    //     this.updateMeshNodes(highPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
+    //     this.updateMeshNodes(customPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
+    //     this.updateMeshNodes(lowPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
+    //
+    // } else {
+    //
+    //     this.updateMeshNodes(highPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
+    //     this.updateMeshNodes(customPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
+    //
+    // }
+
     this.updateMeshNodes(highPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
+    this.updateMeshNodes(customPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
     this.updateMeshNodes(lowPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
 
     CLOUD.Logger.log("mesh count:", pool.counter);
@@ -17844,9 +18226,11 @@ CLOUD.Model.prototype.pushMeshNode = function (node) {
     var filter = this.filter;
     var userId = node.userId;
     var userData = node.userData;
+    var customPriority = node.customPriority;
 
     var highPriorityNodes = this.highPriorityNodes;
     var lowPriorityNodes = this.lowPriorityNodes;
+    var customPriorityNodes = this.customPriorityNodes;
 
     // 文件过滤
     if (userData && filter.hasFileFilter(userData.sceneId)) {
@@ -17863,6 +18247,8 @@ CLOUD.Model.prototype.pushMeshNode = function (node) {
 
     if (isHighlight) {
         highPriorityNodes.push(node);
+    } else if (customPriority){
+        customPriorityNodes.push(node);
     } else {
         lowPriorityNodes.push(node);
     }
@@ -17943,9 +18329,11 @@ CLOUD.ModelManager.prototype.calculateCameraModelRelation = function (cameraPos)
 
     // if one of models contains camera, then camera is inside the model.
     var contains = false;
-    for(var id in this.models) {
-        if (this.models.hasOwnProperty(id)) {
-            var model = this.models[id];
+    var models = this.models;
+
+    for(var id in models) {
+        if (models.hasOwnProperty(id)) {
+            var model = models[id];
             if(model.octreeRootNodeI === null) {
                 continue;
             }
@@ -17977,14 +18365,15 @@ CLOUD.ModelManager.prototype.destroy = function () {
     this.models = {};
 };
 
-CLOUD.ModelManager.prototype.prepareScene = function (camera) {
+CLOUD.ModelManager.prototype.prepareScene = function (camera, updateList) {
 
     var clearPool = true;
     var counter = 0;
+    var models = this.models;
 
-    for(var id in this.models) {
+    for(var id in models) {
 
-        if (this.models.hasOwnProperty(id)) {
+        if (models.hasOwnProperty(id)) {
 
             if (counter > 1) {
                 clearPool = false;
@@ -17992,8 +18381,8 @@ CLOUD.ModelManager.prototype.prepareScene = function (camera) {
 
             counter++;
 
-            var model = this.models[id];
-            model.prepare(camera, clearPool);
+            var model = models[id];
+            model.prepare(camera, clearPool, updateList);
         }
     }
 
@@ -18001,11 +18390,13 @@ CLOUD.ModelManager.prototype.prepareScene = function (camera) {
 
 CLOUD.ModelManager.prototype.clearScene = function () {
 
-    for(var id in this.models) {
+    var models = this.models;
 
-        if (this.models.hasOwnProperty(id)) {
+    for(var id in models) {
 
-            var model = this.models[id];
+        if (models.hasOwnProperty(id)) {
+
+            var model = models[id];
             model.clearCells();
 
         }
@@ -18013,13 +18404,13 @@ CLOUD.ModelManager.prototype.clearScene = function () {
 
 };
 
-CLOUD.ModelManager.prototype.prepareResource = function (renderId, load) {
-
-};
-
-CLOUD.ModelManager.prototype.loadBuidingOutside = function (camera) {
-
-};
+// CLOUD.ModelManager.prototype.prepareResource = function (renderId, load) {
+//
+// };
+//
+// CLOUD.ModelManager.prototype.loadBuidingOutside = function (camera) {
+//
+// };
 
 CLOUD.ModelManager.prototype.getGlobalTransform = function () {
     return this.scene.rootNode.matrix;
@@ -18147,6 +18538,37 @@ CLOUD.ModelManager.prototype.updateOctreeBox = function (rootNode) {
 
     this.scene.updateOctreeBox(rootNode);
 
+};
+
+CLOUD.ModelManager.prototype.hasModel = function () {
+
+    var models = this.models;
+
+    for(var id in models) {
+        if (models.hasOwnProperty(id)) {
+            var model = models[id];
+            if (model.load_complete) {
+                return true;
+            }
+        }
+    }
+
+   return false;
+};
+
+CLOUD.ModelManager.prototype.setHighPriorityCategories = function (categories) {
+
+    var len = categories.length;
+
+    if (len < 1) {
+        return;
+    }
+
+    this.highPriorityCategories = {};
+
+    for (var i = 0; i < len; ++i) {
+        this.highPriorityCategories[categories[i]] = true;
+    }
 };
 
 THREE.EventDispatcher.prototype.apply(CLOUD.ModelManager.prototype);
@@ -19834,10 +20256,10 @@ CLOUD.Viewer = function () {
     this.rendering = false;
     this.incrementRenderHandle = 0;
 
-    this.rerenderCounter = 0;
-
     this.callbacks = {};
     this.services = {};
+
+    // this.isModelLoaded = false;
 
     this.tmpBox = new THREE.Box3();
 
@@ -19857,7 +20279,10 @@ CLOUD.Viewer.prototype = {
     constructor: CLOUD.Viewer,
 
     // ------ 注册自定义回调函数 S -------------- //
-    // 注册回调函数
+    /**
+     * 注册回调函数
+     *
+     */
     addCallbacks: function (type, callback) {
 
         var list = this.callbacks[type];
@@ -19872,7 +20297,10 @@ CLOUD.Viewer.prototype = {
         }
     },
 
-    // 取消注册
+    /**
+     * 取消某类型回调函数注册
+     *
+     */
     removeCallbacks: function (type, callback) {
 
         var list = this.callbacks[type];
@@ -19888,7 +20316,10 @@ CLOUD.Viewer.prototype = {
         }
     },
 
-    // 取消所有注册
+    /**
+     * 取消所有注册
+     *
+     */
     removeAllCallbacks: function () {
 
         for (var type in this.callbacks) {
@@ -19908,7 +20339,10 @@ CLOUD.Viewer.prototype = {
         this.callbacks = {};
     },
 
-    // 响应render
+    /**
+     * 响应回调
+     *
+     */
     onCallbacks: function (type) {
 
         var list = this.callbacks[type];
@@ -19926,38 +20360,61 @@ CLOUD.Viewer.prototype = {
 
     // ------ 管理外部插件的render S -------------- //
 
-    // 注册render回调函数
+    /**
+     * 注册 render 回调函数
+     *
+     */
     addRenderCallback: function (callback) {
         this.addCallbacks("render", callback);
     },
 
     // 取消注册
+    /**
+     * 取消 render 回调注册
+     *
+     */
     removeRenderCallback: function (callback) {
         this.removeCallbacks("render", callback);
     },
 
-    // 响应render Finished
+    /**
+     * 响应 render 回调
+     *
+     */
     onRenderCallback: function () {
         this.onCallbacks("render");
     },
 
-    // 注册render Finished回调函数
+    /**
+     * 注册 render Finished
+     *
+     */
     addRenderFinishedCallback: function (callback) {
         this.addCallbacks("renderFinished", callback);
     },
 
-    // 取消注册
+    /**
+     * 取消 render Finished 注册
+     *
+     */
     removeRenderFinishedCallback: function (callback) {
         this.removeCallbacks("renderFinished", callback);
     },
 
-    // 响应render Finished
+    /**
+     * 响应 render Finished
+     *
+     */
     onRenderFinishedCallback: function () {
         this.onCallbacks("renderFinished");
     },
 
     // ------ 管理外部插件的render E -------------- //
 
+    /**
+     * 释放资源
+     *
+     */
     destroy: function () {
 
         this.removeAllCallbacks();
@@ -19983,6 +20440,11 @@ CLOUD.Viewer.prototype = {
         this.editorManager = null;
     },
 
+    /**
+     * 初始化
+     *
+     * @param {dom} domElement - dom容器
+     */
     init: function (domElement) {
 
         console.log("Web3D: " + CLOUD.Version);
@@ -20050,26 +20512,46 @@ CLOUD.Viewer.prototype = {
             scope.render();
         });
 
-        this.goToInitialView();
         this.setPickMode();
 
         // Register Events
         this.editorManager.registerDomEventListeners(this.domElement);
+
         this.modelManager.onUpdateViewer = function () {
             scope.render(true);
         };
+
+        this.goToInitialView();
 
         //this.editorManager.registerDomEventListeners(canvas);
         return true;
     },
 
+    /**
+     *  刷新渲染模型
+     *
+     */
     render: function () {
 
         // console.time("viewer.render");
         var scope = this;
         var camera = this.camera;
+        var modelManager = this.modelManager;
+        var renderer = this.renderer;
         var scene = this.getScene();
         var incrementRenderEnabled = CLOUD.GlobalData.IncrementRender;
+
+        // // 没有模型加载,返回
+        // if (!this.isModelLoaded) {
+        //
+        //     if (modelManager.hasModel()) {
+        //         this.isModelLoaded = true;
+        //     } else {
+        //         // CLOUD.Logger.log("model not loaded!");
+        //         console.log("model not loaded!");
+        //         return;
+        //     }
+        // }
 
         // 增量绘制
         if (incrementRenderEnabled && scope.renderer.IncrementRender) {
@@ -20086,7 +20568,7 @@ CLOUD.Viewer.prototype = {
             this.rendering = true;
 
             // update camera's inner/outer status, both "calculateNearFar" and "prepareScene" will use this info.
-            this.modelManager.calculateCameraModelRelation(camera.position);
+            modelManager.calculateCameraModelRelation(camera.position);
 
             this.calculateNearFar();
 
@@ -20099,54 +20581,39 @@ CLOUD.Viewer.prototype = {
 
             var isUpdateRenderList = this.editorManager.isUpdateRenderList;
 
+            renderer.resetIncrementRender();// 重置增量绘制状态
+            renderer.setObjectListUpdateState(isUpdateRenderList);// 设置更新状态
+            renderer.setFilterObject(scene.filter);// 设置过滤对象
+
             function incrementRender(callId, autoClear) {
 
                 var renderId = callId;
 
                 return function () {
 
-                    var renderer = scope.renderer;
+                    // var renderer = scope.renderer;
                     renderer.autoClear = autoClear;
 
-                    // if (scope.incrementRenderHandle > 0) {
-                    //     cancelAnimationFrame(scope.incrementRenderHandle);
-                    // }
-
                     if (scope.editorManager.cameraChange) {
-                        scope.renderer.resetIncrementRender();// 重置增量绘制状态
+
+                        renderer.resetIncrementRender();// 重置增量绘制状态
                         renderer.autoClear = true;
                         scope.editorManager.cameraChange = false;
+
                     } else {
+
                         renderer.autoClear = autoClear;
+
                     }
 
-                    // if (renderer.autoClear) {
-                    //     scope.renderer.resetIncrementRender();// 重置增量绘制状态
-                    //     scope.renderer.setObjectListUpdateState(isUpdateRenderList);// 设置更新状态
-                    //     scope.renderer.setFilterObject(scene.filter);// 设置过滤对象
-                    // }
-
-                    // if (renderer.autoClear) {
-                    //     // CLOUD.Logger.time("incrementRender");
-                    //     console.log("---------------------- render begin");
-                    // }
+                    // var timeTag = "IncrementRender_";
+                    // timeTag += renderId;
+                    //
+                    // console.time(timeTag);
 
                     var isFinished = renderer.IncrementRender(scene, camera);
 
-                    // if (isFinished) {
-                    //     scope.rendering = false;
-                    //     // CLOUD.Logger.timeEnd("incrementRender");
-                    //
-                    //     if (renderId !== scope.requestRenderCount) {
-                    //         scope.render();
-                    //     } else {
-                    //         // 结束后回调函数
-                    //         scope.onRenderFinishedCallback();
-                    //     }
-                    //
-                    // } else {
-                    //     scope.incrementRenderHandle = requestAnimationFrame(incrementRender(renderId, false));
-                    // }
+                    // console.timeEnd(timeTag);
 
                     if (!isFinished && renderId === scope.requestRenderCount) {
 
@@ -20155,42 +20622,35 @@ CLOUD.Viewer.prototype = {
                     } else {
 
                         scope.rendering = false;
+
                         // CLOUD.Logger.timeEnd("incrementRender");
 
                         if (renderId !== scope.requestRenderCount) {
                             scope.render();
                         } else {
 
-                            if (scope.rerenderCounter === 0 ) {
-
-                                ++scope.rerenderCounter;
-                                scope.render();
-                            } else {
-
-                                scope.rerenderCounter = 0;
-                                // 结束后回调函数
-                                scope.onRenderFinishedCallback();
-                            }
-
-                            // console.log("------------ rendered ------------");
-
-                            //// 结束后回调函数
-                            //scope.onRenderFinishedCallback();
+                            // console.log("------------ finished rendering ------------");
+                            // 结束后回调函数
+                            scope.onRenderFinishedCallback();
                         }
-
                     }
-
                 }
             }
+
             this.incrementRenderHandle = requestAnimationFrame(incrementRender(scope.requestRenderCount, true));
 
             if (isUpdateRenderList) {
-                this.modelManager.prepareScene(camera);
+
+                // var timeTag = "prepareScene_";
+                // timeTag += scope.requestRenderCount;
+                //
+                // console.time(timeTag);
+                modelManager.prepareScene(camera);
+                // console.timeEnd(timeTag);
+
             }
 
-            this.renderer.resetIncrementRender();// 重置增量绘制状态
-            this.renderer.setObjectListUpdateState(isUpdateRenderList);// 设置更新状态
-            this.renderer.setFilterObject(scene.filter);// 设置过滤对象
+            // modelManager.prepareScene(camera, isUpdateRenderList);
 
             this.onRenderCallback();
 
@@ -20198,8 +20658,8 @@ CLOUD.Viewer.prototype = {
 
             this.calculateNearFar();
             scene.updateLights(camera);
-            this.modelManager.prepareScene(camera);
-            this.renderer.render(scene, camera);
+            modelManager.prepareScene(camera);
+            renderer.render(scene, camera);
             this.onRenderCallback();
             this.onRenderFinishedCallback();// 结束后回调函数
 
@@ -20208,19 +20668,33 @@ CLOUD.Viewer.prototype = {
         // console.timeEnd("viewer.render");
     },
 
+    /**
+     * 窗口大小变化回调事件
+     *
+     * @param {Float} width - 窗口宽
+     * @param {Float} height - 窗口高
+     */
     resize: function (width, height) {
-        this.camera.setSize(width, height);
-        this.camera.updateProjectionMatrix();
+
+        var camera = this.camera;
+        camera.setSize(width, height);
+        camera.updateProjectionMatrix();
+
         this.renderer.setSize(width, height);
         this.editorManager.resize();
         this.onCallbacks("resize");
         this.render();
     },
 
+    /**
+     * 动态计算相机远近裁剪面
+     *
+     */
     calculateNearFar: function () {
 
         var scene = this.getScene();
         var boundingBox = scene.getBoundingBoxWorld();
+        var camera = this.camera;
 
         // reducing z-fighting by dynamically adjust near/far
         if (boundingBox != null) {
@@ -20230,7 +20704,7 @@ CLOUD.Viewer.prototype = {
             box.applyMatrix4(scene.getMatrixGlobal());
 
             var target = box.center();
-            var position = this.camera.position;
+            var position = camera.position;
 
             var newPos = position.clone().sub(target);
             var length = newPos.length();
@@ -20239,36 +20713,52 @@ CLOUD.Viewer.prototype = {
 
             if (this.modelManager.containsCamera || !this.enableCameraNearFar) {
                 ////CLOUD.GlobalData.SceneSize * 20.0
-                this.camera.setNearFar(0.1, 20000.0);
+                camera.setNearFar(0.1, 20000.0);
             } else {
                 var delta = 0.001;
                 var zNear = (length * length + length * delta) / ((1 << 24) * delta);
                 ////CLOUD.GlobalData.SceneSize * 10.0
 
-                this.camera.setNearFar(zNear, length + 10000.0);
+                camera.setNearFar(zNear, length + 10000.0);
             }
         }
     },
 
+    /**
+     *  注册Dom事件
+     *
+     */
     registerDomEventListeners: function () {
         if (this.domElement) {
             this.editorManager.registerDomEventListeners(this.domElement);
         }
     },
 
+    /**
+     *  取消Dom事件
+     *
+     */
     unregisterDomEventListeners: function () {
         if (this.domElement) {
             this.editorManager.unregisterDomEventListeners(this.domElement);
         }
     },
 
+    /**
+     *  注册模型事件监听器
+     *
+     */
     registerEventListener: function (type, callback) {
         this.modelManager.addEventListener(type, callback);
     },
 
     /**
-     * Load all
-     * @return the databag client.
+     * 加载模型
+     *
+     * @param {String} databagId - 模型包名
+     * @param {String} serverUrl - 服务器地址
+     * @param {Boolean} notifyProgress - 是否通知加载进度，默认true
+     * @param {Boolean} debug - 是否调试，可选
      */
     load: function (databagId, serverUrl, notifyProgress, debug) {
 
@@ -20282,19 +20772,35 @@ CLOUD.Viewer.prototype = {
         });
     },
 
+    /**
+     * 卸载模型
+     *
+     */
     unloadAll: function () {
         this.renderer.destroy();
         this.modelManager.destroy();
     },
 
+    /**
+     * 清除场景数据
+     *
+     */
     clearAll: function () {
         this.getScene().clearAll();
     },
 
+    /**
+     * 获得场景对象
+     *
+     */
     getScene: function () {
         return this.modelManager.scene;
     },
 
+    /**
+     * 获得过滤器对象
+     *
+     */
     getFilters: function () {
         return this.getScene().filter;
     },
@@ -20306,56 +20812,114 @@ CLOUD.Viewer.prototype = {
         this.getScene().showSceneNodes(client, bVisibles);
     },
 
+    /**
+     * 设置缺省的Editor模式（orbit, pick, zoom, fly etc）
+     *
+     */
     setEditorDefault: function () {
         this.setPickMode();
     },
 
+    /**
+     * 设置单选模式 - Pick Editor
+     *
+     */
     setPickMode: function (orbitBySelection) {
         this.editorManager.setRectPickMode(this, orbitBySelection);
         //this.editorManager.setPickMode(this);
     },
 
+    /**
+     * 设置框选模式 - RectPick Editor
+     *
+     */
     setRectPickMode: function (orbitBySelection) {
         this.editorManager.setRectPickMode(this, orbitBySelection);
     },
 
+    /**
+     * 设置框选缩放模式 - RectZoom Editor
+     *
+     */
     setRectZoomMode: function () {
         this.editorManager.setRectZoomMode(this);
     },
 
+    /**
+     * 设置自由旋转模式 - Orbit Editor
+     *
+     */
     setOrbitMode: function () {
         this.editorManager.setOrbitMode(this);
     },
 
+    /**
+     * 设置缩放模式 - Zoom Editor
+     *
+     */
     setZoomMode: function () {
         this.editorManager.setZoomMode(this);
     },
 
+    /**
+     * 设置平移模式 - Pan Editor
+     *
+     */
     setPanMode: function () {
         this.editorManager.setPanMode(this);
     },
 
+    /**
+     * 设置飞行模式 - Fly Editor
+     *
+     */
     setFlyMode: function (bShowControlPanel) {
         this.editorManager.setFlyMode(bShowControlPanel, this);
     },
 
+    /**
+     * 设置切面模式 - ClipPlanes Editor
+     *
+     */
     setClipPlanesMode: function () {
         this.editorManager.setClipPlanesMode(this);
     },
 
+    /**
+     * 放大
+     *
+     * @param {Float} factor - 放大因子
+     */
     zoomIn: function (factor) {
         this.editorManager.zoomIn(factor, this);
     },
 
+    /**
+     * 缩小
+     *
+     * @param {Float} factor - 缩小因子
+     */
     zoomOut: function (factor) {
         this.editorManager.zoomOut(factor, this);
     },
 
+    /**
+     * 缩放到场景包围盒大小
+     *
+     * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
+     * @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
+     */
     zoomAll: function (margin, ratio) {
         var box = this.getScene().getBoundingBox();
         this.editorManager.zoomToBBox(this, box, margin, ratio);
     },
 
+    /**
+     * 缩放到场景内部包围盒大小
+     *
+     * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
+     * @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
+     */
     zoomToBuilding: function (margin, ratio) {
         var box = this.getScene().boundingBoxInner;
 
@@ -20366,6 +20930,12 @@ CLOUD.Viewer.prototype = {
         }
     },
 
+    /**
+     * 缩放到选中构件包围盒大小
+     *
+     * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
+     ** @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
+     */
     zoomToSelection: function (margin, ratio) {
         var box = this.renderer.computeSelectionBBox();
 
@@ -20376,6 +20946,13 @@ CLOUD.Viewer.prototype = {
         this.editorManager.zoomToBBox(this, box, margin, ratio);
     },
 
+    /**
+     * 缩放到指定包围包围盒大小
+     *
+     * @param {THREE.Box3} box - 包围盒（世界坐标系）
+     * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
+     ** @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
+     */
     zoomToBBox: function (box, margin, ratio) {
 
         if (!box) {
@@ -20390,7 +20967,7 @@ CLOUD.Viewer.prototype = {
     /**
      * 根据观察方向缩放到指定包围盒范围
      *
-     * @param {THREE.Box3} box - 包围盒
+     * @param {THREE.Box3} box - 包围盒（世界坐标系）
      * @param {THREE.Vector3} direction - 观察方向（从包围盒中心指向某个参考点）
      * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
      * @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
@@ -20425,7 +21002,7 @@ CLOUD.Viewer.prototype = {
     /**
      * 根据外围大包围盒和指定包围盒缩放到指定包围盒范围
      *
-     * @param {THREE.Box3} box - 指定构件包围盒
+     * @param {THREE.Box3} box - 指定构件包围盒（世界坐标系）
      * @param {THREE.Box3} outerBox - 外围大包围盒
      * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
      * @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
@@ -20457,6 +21034,13 @@ CLOUD.Viewer.prototype = {
         }
     },
 
+    /**
+     * 设置视角
+     *
+     * @param {EnumStandardView} stdView - 视角（CLOUD.EnumStandardView.ISO， CLOUD.EnumStandardView.Top etc）
+     * @param {Float} margin - 包围盒缩放比例, 缺省值: -0.05
+     * @param {Float} callback - 回调函数
+     */
     setStandardView: function (stdView, margin, callback) {
         margin = margin || -0.05;
         this.editorManager.setStandardView(stdView, this, margin, callback);
@@ -20465,7 +21049,7 @@ CLOUD.Viewer.prototype = {
     /**
      * 根据指定视角及包围盒缩放
      *
-     * @param {EnumStandardView} stdView - 视角
+     * @param {EnumStandardView} stdView - 视角（CLOUD.EnumStandardView.ISO， CLOUD.EnumStandardView.Top etc）
      * @param {THREE.Box3} box - 原始（未变换的）世界包围盒
      * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
      * @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
@@ -20484,16 +21068,30 @@ CLOUD.Viewer.prototype = {
         this.editorManager.setStandardViewWithBox(this, stdView, box, margin, ratio);
     },
 
+    /**
+     * 根据 Top 视角及包围盒缩放(注意：这里名字有误导， 其实被设成了 ISO 视角)
+     *
+     * @param {THREE.Box3} box - 原始（未变换的）世界包围盒
+     * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
+     * @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
+     */
     setTopView: function (box, margin, ratio) {
         this.setStandardViewWithBox(CLOUD.EnumStandardView.ISO, box, margin, ratio);
     },
 
-    // 设置初始视角
+    /**
+     * 设置初始视角
+     *
+     * @param {EnumStandardView} viewType - 视角（CLOUD.EnumStandardView.ISO， CLOUD.EnumStandardView.Top etc）
+     */
     setInitialViewType: function (viewType) {
         this.initialView = viewType;
     },
 
-    // 切换到初始视图
+    /**
+     * 切换到初始视图
+     *
+     */
     goToInitialView: function () {
 
         var target;
@@ -20513,16 +21111,31 @@ CLOUD.Viewer.prototype = {
         this.render();
     },
 
-    // 设置home视图类型
+    /**
+     * 设置 home 视图类型
+     *
+     * @param {EnumStandardView} viewType - 视角（CLOUD.EnumStandardView.ISO， CLOUD.EnumStandardView.Top etc）
+     */
     setHomeViewType: function (viewType) {
         this.currentHomeView = viewType;
     },
 
-    // 进入home视图
+    /**
+     * 切换到 home 视图
+     *
+     * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
+     */
     goToHomeView: function (margin) {
         this.setStandardView(this.currentHomeView, margin);
     },
 
+    /**
+     * 设置相机观察点
+     *
+     * @param {THREE.Vector3} position - 相机位置
+     * @param {THREE.Vector3} target - 相机观察目标位置
+     * @param {THREE.Vector3} up - 相机向上位置
+     */
     lookAt: function (position, target, up) {
         var dir = new THREE.Vector3();
         dir.subVectors(target, position);
@@ -20532,12 +21145,20 @@ CLOUD.Viewer.prototype = {
         this.render();
     },
 
-    // 设置图片资源的路径。默认在“images/”
+    /**
+     * 设置图片资源的路径。默认在“images/”
+     *
+     * @param {String} path - 资源路径
+     */
     setImageResPath: function (path) {
         CLOUD.GlobalData.TextureResRoot = path;
     },
 
-    // 设置每帧的最大耗时
+    /**
+     * 设置每帧的最大耗时
+     *
+     * @param {Float} limitTime - 最长时间
+     */
     setLimitFrameTime: function (limitTime) {
         if (CLOUD.GlobalData.IncrementRender) {
 
@@ -20549,7 +21170,11 @@ CLOUD.Viewer.prototype = {
         }
     },
 
-    // 限制帧率
+    /**
+     * 限制帧率
+     *
+     * @param {Float} frameRate - 最大帧率
+     */
     limitFrameRate: function (frameRate) {
 
         if (CLOUD.GlobalData.IncrementRender) {
@@ -20562,27 +21187,52 @@ CLOUD.Viewer.prototype = {
         }
     },
 
-    // transform
+    /**
+     * 相机变换
+     *
+     * @param {Object} camera - 相机状态JSON对象
+     *                          （{"position":"26513.603437903, -14576.4810728955, 15107.6582255056",
+     *                          "direction":"-220.050259546712, 169.277369901229, -125.801809656091",
+     *                          "up":"0, 0, 304.8"})
+     * @return {Object} 新相机信息
+     */
     transformCamera: function (camera) {
         return CLOUD.CameraUtil.transformCamera(camera, this.modelManager.scene);
     },
 
+    /**
+     * 获得相机状态
+     *
+     * @return {Object} 相机信息
+     */
     getCamera: function () {
         return this.cameraEditor.getCameraInfo();
     },
 
+    /**
+     * 设置相机状态
+     *
+     * @param {Object} jsonStr - 相机信息JSON对象
+     */
     setCamera: function (jsonStr) {
         var camInfo = CLOUD.CameraUtil.parseCameraInfo(jsonStr);
         this.lookAt(camInfo.position, camInfo.target, camInfo.up);
     },
 
-    // 获得render buffer的数据
+    /**
+     * 获得render buffer base64图形数据
+     *
+     * @param {Color} backgroundClr - 背景颜色
+     * @param {Function} callback - 回调函数（参数为截取的 base64 图形数据）
+     * @return {String} 如果存在回调函数，则返回 null， 否则 返回 base64 图形数据
+     */
     getRenderBufferScreenShot: function (backgroundClr, callback) {
 
         // 在高分屏上toDataURL直接获得图片数据比实际的图片大
-        var dataUrl = this.renderer.domElement.toDataURL("image/png");
-        var canvasWidth = this.renderer.domElement.width;
-        var canvasHeight = this.renderer.domElement.height;
+        var domElement = this.renderer.domElement;
+        var dataUrl = domElement.toDataURL("image/png");
+        var canvasWidth = domElement.width;
+        var canvasHeight = domElement.height;
         var pixelRatio = window.devicePixelRatio || 1;
         var w = canvasWidth / pixelRatio;
         var h = canvasHeight / pixelRatio;
@@ -20658,6 +21308,74 @@ CLOUD.Viewer.prototype = {
         return newURL;
     },
 
+    screenShot: function (width, height, callback) {
+        var scope = this;
+
+        function getRenderBufferScreenShot(width, height, callback) {
+            var domElement = scope.renderer.domElement;
+            var dataUrl = domElement.toDataURL("image/png");
+            var canvasWidth = domElement.width;
+            var canvasHeight = domElement.height;
+            var pixelRatio = window.devicePixelRatio || 1;
+            var w = width;
+            var h = height;
+
+            if (!w || !h) {
+                if (callback) {
+                    callback(dataUrl);
+                    return null
+                } else {
+                    return dataUrl;
+                }
+            }
+
+            var nw, nh, nx = 0,
+                ny = 0;
+
+            if (w > h || (canvasWidth / canvasHeight < w / h)) {
+                nw = w;
+                nh = canvasHeight / canvasWidth * w;
+                ny = h / 2 - nh / 2;
+            } else {
+                nh = h;
+                nw = canvasWidth / canvasHeight * h;
+                nx = w / 2 - nw / 2;
+            }
+
+            if (callback) {
+
+                var newImage = new Image();
+                newImage.onload = function () {
+
+                    var tmpCanvas = document.createElement("canvas");
+                    var ctx = tmpCanvas.getContext("2d");
+                    tmpCanvas.width = w;
+                    tmpCanvas.height = h;
+                    ctx.drawImage(newImage, nx, ny, nw, nh);
+
+                    var newURL = tmpCanvas.toDataURL("image/png");
+                    callback(newURL);
+                };
+
+                newImage.src = dataUrl;
+
+                return null;
+            }
+        }
+
+        var dataUrl = getRenderBufferScreenShot(width, height, callback);
+
+        this.render();
+
+        return dataUrl;
+    },
+
+    /**
+     * 获得render buffer base64 图形数据
+     *
+     * @param {Color} backgroundClr - 背景颜色
+     * @return {String} base64 图形数据
+     */
     canvas2image: function (backgroundClr) {
 
         var dataUrl = this.getRenderBufferScreenShot(backgroundClr);
@@ -20669,7 +21387,11 @@ CLOUD.Viewer.prototype = {
         return dataUrl;
     },
 
-    // 锁定Z轴
+    /**
+     * 是否锁定Z轴
+     *
+     * @param {Boolean} isLock - true 锁定， 否则 解锁
+     */
     lockAxisZ: function (isLock) {
 
         if (this.cameraEditor) {
@@ -20677,12 +21399,20 @@ CLOUD.Viewer.prototype = {
         }
     },
 
-    // 允许双击半透明
+    /**
+     * 允许双击半透明
+     *
+     * @param {Boolean} enable - true 允许
+     */
     enableTranslucentByDClick: function (enable) {
         CLOUD.GlobalData.EnableDemolishByDClick = enable;
     },
 
-    // 禁止旋转
+    /**
+     * 是否禁止旋转
+     *
+     * @param {Boolean} enable - true 禁止
+     */
     disableRotate: function (disable) {
 
         if (this.cameraEditor) {
@@ -20690,6 +21420,10 @@ CLOUD.Viewer.prototype = {
         }
     },
 
+    /**
+     * 计算切面
+     *
+     */
     calculationPlanes: function () {
 
         if (this.isRecalculationPlanes) {
@@ -20701,6 +21435,10 @@ CLOUD.Viewer.prototype = {
         }
     },
 
+    /**
+     * 重置切面状态
+     *
+     */
     recalculationPlanes: function () {
         this.isRecalculationPlanes = true;
     },
@@ -20722,6 +21460,15 @@ CLOUD.Viewer.prototype = {
     resizePool: function (size) {
         CLOUD.GlobalData.maxObjectNumInPool = size;
         this.getScene().resizePool();
+    },
+
+    /**
+     * 设置高优先级
+     *
+     * @param {object} categories - 高优先级category
+     */
+    setHighPriorityCategories: function (categories) {
+        this.modelManager.setHighPriorityCategories(categories);
     }
 
 };
