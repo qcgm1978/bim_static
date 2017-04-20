@@ -168,30 +168,23 @@ App.Comm = {
 	},
 
 	//封装ajax
-	ajax: function(data, callback) {
-
-		if (!data) {
+	ajax: function(datas, callback) {
+		var dataObj = datas;
+		if (!dataObj) {
 			return;
 		}
-
-		data = App.Comm.getUrlByType(data);
-
-		if (data.headers) {
-			data.headers.ReturnUrl = location.href;
+		dataObj = App.Comm.getUrlByType(dataObj);
+		if (dataObj.headers) {
+			dataObj.headers.ReturnUrl = location.href;
 		} else {
 			//登录时要用
-			data.headers = {
+			dataObj.headers = {
 				ReturnUrl: location.href
 			}
 		}
-
-
-
-		return $.ajax(data).done(function(data) {
-
+		return $.ajax(dataObj).done(function(data) {
 			//cookie延长30分钟
 			App.Comm.setCookieTime(120);
-
 			if (_.isString(data)) {
 				// to json
 				if (JSON && JSON.parse) {
@@ -259,7 +252,11 @@ App.Comm = {
 				data.url += "?1=1";
 			}
 			for (var p in data.data) {
-				data.url += "&" + p + "=" + data.data[p];
+				if(data.url.indexOf("?") !== -1){
+					data.url += "&" + p + "=" + encodeURIComponent(data.data[p]);	
+				}else{
+					data.url += "&" + p + "=" + data.data[p];
+				}
 			}
 		}
 
