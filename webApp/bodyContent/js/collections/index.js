@@ -58,7 +58,7 @@ App.BodyContent.control = {
         $(".conMonth .conHeader span").on("click", function() {
 
             var _type=$(this).data("type");
-
+            var hrefUrl = $(this).siblings("a").data("morehref");
             if ($(this).hasClass("active")) return; 
 
             $(this).addClass("active").siblings("span").removeClass("active");
@@ -66,13 +66,13 @@ App.BodyContent.control = {
 
 
             if ( _type== "start") {
-
+                $("#monthMore").attr("href",hrefUrl+"&MonthType=1");
                 $("#endTaskContainer thead .startTime").text("计划开始日期");
                 $("#monthStart").show();
                 $("#monthEnd").hide();
 
             } else if(_type=="end") {
-
+                $("#monthMore").attr("href",hrefUrl+"&MonthType=2");
                 $("#endTaskContainer thead .startTime").text("计划结束日期");
                 $(this).css({
                     "border-radius": "0px"
