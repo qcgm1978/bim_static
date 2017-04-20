@@ -322,6 +322,7 @@
               colors = $this.data('color'),
               param = $this.data('param');
             parent.attr('data-color',colors);
+            self.commentColorString = colors; //add by wuweiwei store comment color
             self.setCommentStyle({'stroke-color': param,'fil-color':param });
             break;
           case "color":
@@ -714,7 +715,10 @@
       }
       self.getAnnotationObject().setAnnotationType("0");
       bimView.model.comment(self._dom.bimBox);
-
+      if(self.commentColorString!=undefined)
+      {
+        self._dom.bimBox.find(".commentBar").find(".m-red").attr("data-color",self.commentColorString);
+      }
     },
     commentEnd: function() {
       // 退出批注模式 
