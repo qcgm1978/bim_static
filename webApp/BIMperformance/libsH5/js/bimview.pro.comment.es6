@@ -1159,126 +1159,111 @@
 
 			//绑定保存 批注事件
 			saveCommEvent(viewPointId, cate, callback) {
-
 				var $topSaveTip = $("#topSaveTip"),
 					that = this;
-
 				//保存
 				$topSaveTip.on("click", ".btnSave", function() {
-
-					var data = App.Project.Settings.Viewer.saveComment(),
-						pars = {
+					var callbackObj = function(data){
+						var pars = {
 							cate: cate,
 							img: data.image
-						};
-
-					if (viewPointId) {
-
-						var $li = $comment.find(".remarkCount_" + viewPointId).closest(".item");
-
-						pars = {
-							cate: cate,
-							id: $li.find(".remarkCount").data("id"),
-							type: $li.find(".thumbnailImg").data("type"),
-							img: $li.find(".thumbnailImg").prop('src'),
-							name: $li.find(".title").text().trim()
 						}
-					}
+						if (viewPointId) {
+							var $li = $comment.find(".remarkCount_" + viewPointId).closest(".item");
+							pars = {
+								cate: cate,
+								id: $li.find(".remarkCount").data("id"),
+								type: $li.find(".thumbnailImg").data("type"),
+								img: $li.find(".thumbnailImg").prop('src'),
+								name: $li.find(".title").text().trim()
+							}
+						}
+						var title = "保存快照";
+						if (cate == "address") {
+							title = "保存位置";
+						} else if (cate == "comment") {
+							title = "保存批注";
+						}
+						var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.save.dialog.html')(pars),
+							opts = {
+								title: title,
+								width: 500,
+								height: 250,
+								cssClass: "saveViewPoint",
+								okClass: "btnWhite",
+								cancelClass: "btnWhite",
+								okText: "保存",
+								closeCallback: function() {
+									if (cate != "viewPoint") {
+										App.Project.Settings.Viewer.commentEnd();
+										//收起导航
+										$(".modelSidebar").addClass("show open");
+									} else{
+										//App.Project.Settings.Viewer.viewer.extensionHelper.annotationHelper.annotationEditor.addDomEventListeners();///
+									}
+								},
 
+								cancelText: "保存并分享",
 
-					var title = "保存快照";
+								message: dialogHtml,
 
-					if (cate == "address") {
-						title = "保存位置";
-					} else if (cate == "comment") {
-						title = "保存批注";
-					}
+								okCallback: () => {
+									//保存批注
+									if (!viewPointId) {
 
-					//////
-					//App.Project.Settings.Viewer.viewer.extensionHelper.annotationHelper.annotationEditor.removeDomEventListeners();
+										if (cate == "address") {
+											//保存位置
+											that.savePosition(dialog, data, callback);
+										} else {
+											that.saveComment("save", dialog, data, callback, cate);
+										}
 
-
-					var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.save.dialog.html')(pars),
-
-						opts = {
-							title: title,
-							width: 500,
-							height: 250,
-							cssClass: "saveViewPoint",
-							okClass: "btnWhite",
-							cancelClass: "btnWhite",
-							okText: "保存",
-							closeCallback: function() {
-								if (cate != "viewPoint") {
-									App.Project.Settings.Viewer.commentEnd();
-									//收起导航
-									$(".modelSidebar").addClass("show open");
-								} else{
-									//App.Project.Settings.Viewer.viewer.extensionHelper.annotationHelper.annotationEditor.addDomEventListeners();///
-								}
-							},
-
-							cancelText: "保存并分享",
-
-							message: dialogHtml,
-
-							okCallback: () => {
-								//保存批注
-								if (!viewPointId) {
-
-									if (cate == "address") {
-										//保存位置
-										that.savePosition(dialog, data, callback);
 									} else {
-										that.saveComment("save", dialog, data, callback, cate);
+										data.id = viewPointId;
+										that.editComment("save", dialog, data, viewPointId, callback, cate);
 									}
 
-								} else {
-									data.id = viewPointId;
-									that.editComment("save", dialog, data, viewPointId, callback, cate);
-								}
+									return false;
+								},
+								cancelCallback() {
+									//保存并分享
+									if (!viewPointId) {
+										that.saveComment("saveShare", dialog, data, CommentApi.shareViewPoint, cate);
+									} else {
+										data.id = viewPointId;
+										that.editComment("saveShare", dialog, data, CommentApi.shareViewPoint, cate);
+									}
 
-								return false;
+									return false;
+								}
 							},
-							cancelCallback() {
-								//保存并分享
-								if (!viewPointId) {
-									that.saveComment("saveShare", dialog, data, CommentApi.shareViewPoint, cate);
+
+							dialog = new App.Comm.modules.Dialog(opts),
+
+							$viewPointType = dialog.element.find(".viewPointType");
+						//分享按钮
+						if (cate != "viewPoint") {
+							dialog.element.find(".cancel").remove();
+						}
+						dialog.type = 1;
+						//视点类型
+						$viewPointType.myDropDown({
+							click: function($item) {
+								var type = $item.data("type");
+								if (type == 0) {
+									$viewPointType.find(".modelicon").removeClass('m-unlock').addClass('m-lock');
 								} else {
-									data.id = viewPointId;
-									that.editComment("saveShare", dialog, data, CommentApi.shareViewPoint, cate);
+									$viewPointType.find(".modelicon").removeClass('m-lock').addClass('m-unlock');
 								}
 
-								return false;
+								dialog.type = type;
 							}
-						},
-
-						dialog = new App.Comm.modules.Dialog(opts),
-
-						$viewPointType = dialog.element.find(".viewPointType");
-
-					//分享按钮
-					if (cate != "viewPoint") {
-						dialog.element.find(".cancel").remove();
+						});
 					}
-
-					dialog.type = 1;
-					//视点类型
-					$viewPointType.myDropDown({
-						click: function($item) {
-							var type = $item.data("type");
-							if (type == 0) {
-								$viewPointType.find(".modelicon").removeClass('m-unlock').addClass('m-lock');
-							} else {
-								$viewPointType.find(".modelicon").removeClass('m-lock').addClass('m-unlock');
-							}
-
-							dialog.type = type;
-						}
-					});
-
+					var data = App.Project.Settings.Viewer.saveComment(callbackObj);
+					//////
+					//App.Project.Settings.Viewer.viewer.extensionHelper.annotationHelper.annotationEditor.removeDomEventListeners();
 				});
-
 				//取消
 				$topSaveTip.on("click", ".btnCanel", function() {
 					App.Project.Settings.Viewer.commentEnd();
@@ -1286,7 +1271,6 @@
 					$(".modelSidebar").addClass("show open");
 
 				});
-
 			},
 
 			//保存批注

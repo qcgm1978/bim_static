@@ -736,7 +736,7 @@
       self.getAnnotationObject().setAnnotationStyle(style);
 
     },
-    saveComment: function() {
+    saveComment: function(callback) {
       // 保存批注
       var self = this;
       var viewer = self.viewer;
@@ -748,17 +748,30 @@
       var files = bimView.comm.getFilters($("#floors,#specialty"), 'uncheck');
       var category = bimView.comm.getFilters($("#category"), 'uncheck');
       var classCode = bimView.comm.getFilters($("#classCode"), 'uncheck');
-      return {
-        camera: self.getCamera(),
-        list: newList,
-        //image: viewer.canvas2image().substr(22),
-        image: self.getAnnotationObject().captureAnnotationsScreenSnapshot().substr(22), //modify by wuweiwei new interface
-        filter: {
-          files: files,
-          category: category,
-          classCode: classCode
-        }
-      };
+      self.getAnnotationObject().captureAnnotationsScreenSnapshot(null,function(data){
+        var varObj = {
+          camera: self.getCamera(),
+          list: newList,
+          image: data.substr(22), //modify by wuweiwei new interface
+          filter: {
+            files: files,
+            category: category,
+            classCode: classCode
+          }
+        };
+        callback(varObj);
+      })
+      // return {
+      //   camera: self.getCamera(),
+      //   list: newList,
+      //   //image: viewer.canvas2image().substr(22),
+      //   image: data.substr(22), //modify by wuweiwei new interface
+      //   filter: {
+      //     files: files,
+      //     category: category,
+      //     classCode: classCode
+      //   }
+      // };
     },
     loadComment: function(data) {
       // 加载批注
