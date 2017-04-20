@@ -702,9 +702,8 @@
       $('.slideBar .icon-caret-right').click();
       //还原颜色
       self._dom.bimBox.addClass('comment');
+      //self.setCommentStyle({'stroke-color': 'red','fil-color':'red' });
       self.getAnnotationObject().editAnnotationBegin();
-      self.setCommentStyle({'stroke-color': 'red','fill-color':'red' });
-
       self.getAnnotationObject().setAnnotationBackgroundColor(modelBgColor);
       if (data) {
         var newList = [];
@@ -715,6 +714,7 @@
       }
       self.getAnnotationObject().setAnnotationType("0");
       bimView.model.comment(self._dom.bimBox);
+
     },
     commentEnd: function() {
       // 退出批注模式 
@@ -734,6 +734,7 @@
       var self = this;
       // var viewer = self.viewer;
       self.getAnnotationObject().setAnnotationStyle(style);
+
     },
     saveComment: function() {
       // 保存批注
