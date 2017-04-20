@@ -136,14 +136,15 @@
           });
           $('#specialty').append(specialties);          
         });
-        bimView.comm.ajax({
-          timeout: 6000,
+        bimView.comm.ajax({//构件分类的ajax方法
           type:'get',
           url:bimView.API.fetchCategory,
           etag:self._opt.etag,
           sourceId:self._opt.sourceId
-        },function(data){
-          var data = data.data;
+        },function(datas){
+          var data = datas.data.tree;
+          var total = datas.data.total;
+          $("#category").find("span.treeText").empty().html("构件类型"+"<span class='treeColor'>("+total+")</span>");
           var category = bimView.comm.viewTree({
             arr:data,
             type:'categoryId',
@@ -155,21 +156,56 @@
           bimView.prototype.ComponentTypeFilesData=data;
           $('#category').append(category);
         });
-        bimView.comm.ajax({
-          timeout:6000,
+        bimView.comm.ajax({//分类编码的ajax请求
           type:'get',
           url:bimView.API.fetchCoding,
           etag:self._opt.etag,
           sourceId:self._opt.sourceId
-        },function(data){
-          self.classCodeData = data.data;
+        },function(datas){
+          self.classCodeData = datas.data.tree;
+          var total = datas.data.total;
+          $("#classCode").find("span.treeText").empty().html("分类编码"+"<span class='treeColor'>("+total+")</span>");
           var classCode = bimView.comm.viewTree({
             type:'classCode',
             rootName:'分类编码'
           });
-          bimView.prototype.ClassCodeData= data.data;
+          bimView.prototype.ClassCodeData= datas.data.tree;
           $('#classCode').append(classCode);
         });
+        // bimView.comm.ajax({
+        //   timeout: 6000,
+        //   type:'get',
+        //   url:bimView.API.fetchCategory,
+        //   etag:self._opt.etag,
+        //   sourceId:self._opt.sourceId
+        // },function(data){
+        //   var data = data.data;
+        //   var category = bimView.comm.viewTree({
+        //     arr:data,
+        //     type:'categoryId',
+        //     name:'specialty',
+        //     code:'specialtyCode',
+        //     children:'categories',
+        //     childrenType:'json',
+        //   });
+        //   bimView.prototype.ComponentTypeFilesData=data;
+        //   $('#category').append(category);
+        // });
+        // bimView.comm.ajax({
+        //   timeout:6000,
+        //   type:'get',
+        //   url:bimView.API.fetchCoding,
+        //   etag:self._opt.etag,
+        //   sourceId:self._opt.sourceId
+        // },function(data){
+        //   self.classCodeData = data.data;
+        //   var classCode = bimView.comm.viewTree({
+        //     type:'classCode',
+        //     rootName:'分类编码'
+        //   });
+        //   bimView.prototype.ClassCodeData= data.data;
+        //   $('#classCode').append(classCode);
+        // });
       }
     },
 
