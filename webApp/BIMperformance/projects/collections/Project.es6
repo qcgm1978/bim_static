@@ -978,7 +978,7 @@ App.Project = {
 				});
 			}
 		} else {
-			//viewer.loadMarkers(null);
+			viewer.loadMarkers(null);
 		}
 	},
 
