@@ -506,7 +506,6 @@ App.Project.PlanAnalog = Backbone.View.extend({
 			if (data.code == 0) {
 				var box = App.Project.formatBBox(data.data.boundingBox);
 				if (box && box.length) {
-					debugger;
 					$target.data("userId", data.data.elements);
 					$target.data("box", box);
 					App.Project.zoomToBox(data.data.elements, box);
