@@ -233,10 +233,6 @@ fis.match('/libsH5/**.{js,es6}', {
 });
 
 
-//fis.match('/static/dist/libs/libsH5.js', {
-//  useHash:true,
-//  release: '/static/dist/libs/libsH5.js'
-//});
 fis.match('/libsH5/**.{less,css}', {
   packTo: '/static/dist/libs/libsH5_'+v+'.css'
 });
@@ -851,13 +847,24 @@ fis.match('/meeting/**.html', {
 
 
 
-//测试BIM模型性能
+/*
+测试BIM模型性能,新旧模型替换只需要调整packTo和release即可
+*/
 fis.match('/BIMperformance/libsH5/**.{js,es6}', {
   packTo: '/static/dist/BIMperformance/libsH5.js'
 });
 fis.match('/static/dist/BIMperformance/libsH5.js', {
   release: '/static/dist/BIMperformance/libsH5.js'
 });
+
+// fis.match('/BIMperformance/libsH5/**.{js,es6}', {
+//   packTo: '/static/dist/libs/libsH5.js'
+// });
+// fis.match('/static/dist/libs/libsH5.js', {
+//   release: '/static/dist/libs/libsH5.js'
+// });
+
+/*end*/
 
 fis.match('/BIMperformance/projects/**.{less,css}', {
   packTo: '/static/dist/BIMperformance/projects.css'
