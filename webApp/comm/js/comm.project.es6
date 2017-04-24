@@ -149,7 +149,7 @@ var CommProject = {
             type: "plan",
             ids: []
         });
-        _viewer.translucent(false);
+        //_viewer.translucent(false); //modify by wuweiwei 2017-4-12
         $sp.each(function() {
             var _input=$(this).find('input:first'),
                 _text=$(this).find('.treeText:first').text();
@@ -418,8 +418,8 @@ var CommProject = {
         if (!_.isArray(marks)) {
             marks = [marks];
         }
-        _viewer.viewer.setMarkerClickCallback(markerClick); // modify by wuweiwei old interface
-        //_viewer.getMakerObject().setMarkerClickCallback(markerClick);// add by wuweiwei new interface
+        //viewer.viewer.setMarkerClickCallback(markerClick); // modify by wuweiwei old interface
+        _viewer.getMakerObject().setMarkerClickCallback(markerClick);// add by wuweiwei new interface
         _viewer.loadMarkers(marks);
     },
 
