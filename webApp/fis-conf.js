@@ -881,11 +881,11 @@ fis.match('/static/dist/projects/projects.js', {
 });
 
 fis.match('/commNew/**.{js,es6}', {
+  useHash: false,
+  //useHash:true,
   packTo: '/static/dist/comm/comm_'+v+'.js'
 });
-fis.match('/static/dist/comm/comm_'+v+'.js', {
-  release: '/static/dist/comm/comm_'+v+'.js'
-});
+
 
 
 
