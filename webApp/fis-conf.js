@@ -516,23 +516,23 @@ fis.match('/static/dist/console1/console.css', {
 });
 
 //项目
-// fis.match('/projects/**.{less,css}', {
-//   //useHash: false,
-//   packTo: '/static/dist/projects/projects.css'
-// });
-// fis.match('/static/dist/projects/projects.css', {
-//   //useHash: true,
-//   release: '/static/dist/projects/projects.css'
-// });
-// fis.match('/projects/**.{js,es6}', {
-//   //useHash: false,
-//   //useHash:true,
-//   packTo: '/static/dist/projects/projects.js'
-// });
-// fis.match('/static/dist/projects/projects.js', {
-//   //useHash: true,
-//   release: '/static/dist/projects/projects.js'
-// });
+fis.match('/projects/**.{less,css}', {
+  //useHash: false,
+  packTo: '/static/dist/projects/projects.css'
+});
+fis.match('/static/dist/projects/projects.css', {
+  //useHash: true,
+  release: '/static/dist/projects/projects.css'
+});
+fis.match('/projects/**.{js,es6}', {
+  //useHash: false,
+  //useHash:true,
+  packTo: '/static/dist/projects/projects.js'
+});
+fis.match('/static/dist/projects/projects.js', {
+  //useHash: true,
+  release: '/static/dist/projects/projects.js'
+});
 
 
 // 流程
@@ -867,25 +867,25 @@ fis.match('/static/dist/libs/libsH5.js', {
 /*end*/
 
 fis.match('/BIMperformance/projects/**.{less,css}', {
-  packTo: '/static/dist/projects/projects.css'
+  packTo: '/static/dist/BIMperformance/projects.css'
 });
-fis.match('/static/dist/projects/projects.css', {
-  release: '/static/dist/projects/projects.css'
+fis.match('/static/dist/BIMperformance/projects.css', {
+  release: '/static/dist/BIMperformance/projects.css'
 });
 
 fis.match('/BIMperformance/projects/**.{js,es6}', {
-  packTo: '/static/dist/projects/projects.js'
+  packTo: '/static/dist/BIMperformance/projects.js'
 });
-fis.match('/static/dist/projects/projects.js', {
-  release: '/static/dist/projects/projects.js'
+fis.match('/static/dist/BIMperformance/projects.js', {
+  release: '/static/dist/BIMperformance/projects.js'
 });
 
 fis.match('/commNew/**.{js,es6}', {
-  useHash: false,
-  //useHash:true,
-  packTo: '/static/dist/comm/comm_'+v+'.js'
+  packTo: '/static/dist/commNew/commNew.js'
 });
-
+fis.match('/static/dist/commNew/commNew.js', {
+  release: '/static/dist/commNew/commNew.js'
+});
 
 
 
