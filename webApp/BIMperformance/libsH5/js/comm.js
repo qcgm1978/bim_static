@@ -159,6 +159,9 @@
               itemName,data,iconStatus,input,span,itemClassCodeNumber;
           if(dataType == 'arr'){
             itemName = item[name];
+            if(type=="classCode"){
+              itemClassCodeNumber = item["classCodeNumber"];
+            }
             data = item[_opt.data] ? item[_opt.data].toString() :'';
           }else{
             itemName = item;
