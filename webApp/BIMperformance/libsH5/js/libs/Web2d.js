@@ -113,7 +113,6 @@ CLOUD.DomUtil = CLOUD.DomUtil || {
          * set css class name
          * @param {String} id
          * @param {String} cssName
-         * @returns
          */
         setClassName: function (id, cssName) {
             var dom = document.getElementById(id);
@@ -126,7 +125,6 @@ CLOUD.DomUtil = CLOUD.DomUtil || {
          * add css class name
          * @param {String} id
          * @param {String} cssName
-         * @returns
          */
         addClassName: function (id, cssName) {
             var a, b, c;
@@ -163,7 +161,6 @@ CLOUD.DomUtil = CLOUD.DomUtil || {
          * remove css class name
          * @param {String} id
          * @param {String} cssName
-         * @returns
          */
         removeClassName: function (id, className) {
             var a, b, c;
@@ -193,7 +190,6 @@ CLOUD.DomUtil = CLOUD.DomUtil || {
          * show or hide element
          * @param {String} id
          * @param {Boolean} isShow
-         * @returns
          */
         showOrHideElement: function (id, isShow) {
             var dom = document.getElementById(id);
@@ -11853,6 +11849,11 @@ CLOUD.Extensions.MarkerEditor.prototype.setMarkerClickCallback = function (callb
 // ---------------------------- 外部 API END ---------------------------- //
 
 
+/**
+ * 小地图批注辅助类
+ * @class  CLOUD.Extensions.MiniMapHelper
+ * @param {Object} viewer- 模型浏览类对象
+ */
 CLOUD.Extensions.MiniMapHelper = function (viewer) {
 
     this.viewer = viewer;
@@ -11860,10 +11861,18 @@ CLOUD.Extensions.MiniMapHelper = function (viewer) {
     this.defaultMiniMap = null;
 };
 
+/**
+ * @lends CLOUD.Extensions.MiniMapHelper.prototype
+ *
+ */
 CLOUD.Extensions.MiniMapHelper.prototype = {
 
     constructor: CLOUD.Extensions.MiniMapHelper,
 
+    /**
+     * 释放资源
+     *
+     */
     destroy: function () {
 
         // TODO: clear other resources.
@@ -11875,6 +11884,37 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
     },
 
     // ------------------ 小地图API -- S ------------------ //
+    /**
+     * 创建小地图
+     *
+     * @param {String} name - 小地图名
+     * @param {HTMLElement} domElement - 父容器
+     * @param {Number} width - 小地图宽度
+     * @param {Number} height - 小地图高度
+     * @param {Object} styleOptions - 小地图显示风格
+     * @param {function(Object)} callbackCameraChanged - 相机变化回调
+     *                                                      ({
+     *                                                      position: position,
+     *                                                      isInScene : isInScene,
+     *                                                      axis: {
+     *                                                          abcName: abcName,
+     *                                                          numeralName: numeralName,
+     *                                                          offsetX: offsetX,
+     *                                                          offsetY: offsetY,
+     *                                                          offsetZ: offsetZ,
+     *                                                          infoX: axisInfoX,
+     *                                                          infoY: axisInfoY
+     *                                                          }
+     *                                                      })
+     * @param {function(Object)} callbackClickOnAxisGrid - click 回调
+     *                                                      ({
+     *                                                          position: position,
+     *                                                          abcName: abcName,
+     *                                                          numeralName: numeralName,
+     *                                                          offsetX: offsetX,
+     *                                                          offsetY: offsetY
+     *                                                       })
+     */
     createMiniMap:function(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid){
 
         var miniMap = this.miniMaps[name];
@@ -11899,6 +11939,11 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
         //return this.miniMaps[name];
     },
 
+    /**
+     *  销毁小地图
+     *
+     * @param {String} name - 小地图名
+     */
     destroyMiniMap:function(name){
 
         var miniMap = this.miniMaps[name];
@@ -11915,6 +11960,10 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
         }
     },
 
+    /**
+     * 销毁所有小地图资源
+     *
+     */
     destroyAllMiniMap:function(){
 
         for(var name in this.miniMaps) {
@@ -11923,6 +11972,11 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
         }
     },
 
+    /**
+     * 将小地图容器从主容器中移除
+     *
+     * @param {String} name - 小地图名
+     */
     removeMiniMap: function (name) {
 
         var miniMap = this.miniMaps[name];
@@ -11934,6 +11988,11 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
         }
     },
 
+    /**
+     * 将小地图容器附加到主容器中
+     *
+     * @param {String} name - 小地图名
+     */
     appendMiniMap: function (name) {
 
         var miniMap = this.miniMaps[name];
@@ -11943,16 +12002,28 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
         }
     },
 
+    /**
+     * 获得所有的小地图对象
+     *
+     */
     getMiniMaps: function() {
         return this.miniMaps;
     },
 
+    /**
+     * 获得小地图对象
+     *
+     * @param {String} name - 小地图名
+     */
     getMiniMap: function(name) {
 
         return this.miniMaps[name];
     },
 
-    // 绘制小地图
+    /**
+     * 绘制小地图
+     *
+     */
     renderMiniMap: function(){
 
         for (var name in this.miniMaps) {
@@ -11964,12 +12035,22 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
         }
     },
 
-    // 设置平面图
+    /**
+     * 设置平面图
+     *
+     * @param {Object} jsonObj - 平面图数据对象
+     */
     setFloorPlaneData: function(jsonObj) {
 
         CLOUD.MiniMap.setFloorPlaneData(jsonObj);
     },
 
+    /**
+     * 构造平面图
+     *
+     * @param {String} name - 小地图名
+     * @param {Boolean} [changeView] - 是否改变视角
+     */
     generateFloorPlane: function(name, changeView) {
         var miniMap = this.miniMaps[name];
 
@@ -11978,12 +12059,22 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
         }
     },
 
-    // 设置轴网数据
+    /**
+     * 设置轴网数据
+     *
+     * @param {Object} jsonObj - 轴网数据对象
+     * @param {Number} [level] - 未使用
+     */
     setAxisGridData:function(jsonObj, level) {
 
         CLOUD.MiniMap.setAxisGridData(jsonObj);
     },
 
+    /**
+     * 构造轴网
+     *
+     * @param {String} name - 小地图名
+     */
     generateAxisGrid: function(name) {
         var miniMap = this.miniMaps[name];
 
@@ -11992,7 +12083,12 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
         }
     },
 
-    // 是否显示隐藏轴网
+    /**
+     * 是否显示隐藏轴网
+     *
+     * @param {String} name - 小地图名
+     * @param {Boolean} enable - 是否显示隐藏， true: 显示， false：隐藏
+     */
     showAxisGrid:function(name, show) {
 
         var miniMap = this.miniMaps[name];
@@ -12006,6 +12102,12 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
         }
     },
 
+    /**
+     * 是否允许触发轴网事件
+     *
+     * @param {String} name - 小地图名
+     * @param {Boolean} enable - 是否允许
+     */
     enableAxisGridEvent: function(name, enable){
 
         var miniMap = this.miniMaps[name];
@@ -12015,6 +12117,12 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
         }
     },
 
+    /**
+     * 是否允许显示相机光标
+     *
+     * @param {String} name - 小地图名
+     * @param {Boolean} enable - 是否允许显示
+     */
     enableMiniMapCameraNode:function(name, enable){
 
         var miniMap = this.miniMaps[name];
@@ -12024,6 +12132,13 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
         }
     },
 
+    /**
+     * 根据轴号定位
+     *
+     * @param {String} name - 小地图名
+     * @param {String} abcName - 字母轴号
+     * @param {String} numeralName - 数字轴号
+     */
     flyBypAxisGridNumber:function(name, abcName, numeralName){
 
         var miniMap = this.miniMaps[name];
@@ -12034,7 +12149,7 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
     },
 
     /**
-     * 根据指定点获得轴网信息
+     * 根据指定点获得轴网信息(变换后的点, 一般来着pick点)
      *
      * @param {THREE.Vector3} point - 指定构件包围盒
      */
@@ -12053,7 +12168,7 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
     /**
      * 根据相交信息获得轴网信息
      *
-     * @param {Object} intersect - 相交信息对象
+     * @param {Object} intersect - 相交信息对象, 来源pick
      */
     getAxisGridInfoByIntersect:function (intersect) {
 
@@ -12067,16 +12182,29 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
     // ------------------ 小地图API -- E ------------------ //
 };
 
+/**
+ * 标注辅助类
+ * @class  CLOUD.Extensions.MarkerHelper
+ * @param {Object} viewer - 模型浏览类对象
+ */
 CLOUD.Extensions.MarkerHelper = function (viewer) {
 
     this.viewer = viewer;
     this.markerClickCallback = null;
 };
 
+/**
+ * @lends CLOUD.Extensions.MarkerHelper.prototype
+ *
+ */
 CLOUD.Extensions.MarkerHelper.prototype = {
 
     constructor: CLOUD.Extensions.MarkerHelper,
 
+    /**
+     * 释放资源
+     *
+     */
     destroy: function () {
 
         this.uninitMarkerEditor();
@@ -12085,7 +12213,10 @@ CLOUD.Extensions.MarkerHelper.prototype = {
         this.viewer = null;
     },
 
-    // 初始化Marker
+    /**
+     * 初始化Marker
+     *
+     */
     initMarkerEditor: function () {
 
         var viewer = this.viewer;
@@ -12105,7 +12236,10 @@ CLOUD.Extensions.MarkerHelper.prototype = {
         }
     },
 
-    // 卸载Marker
+    /**
+     * 卸载Marker
+     *
+     */
     uninitMarkerEditor: function () {
 
         if (this.markerEditor && this.markerEditor.isInitialized()) {
@@ -12115,7 +12249,10 @@ CLOUD.Extensions.MarkerHelper.prototype = {
         }
     },
 
-    // zoom到合适的大小
+    /**
+     * zoom 到  markers 包围盒大小
+     *
+     */
     zoomToSelectedMarkers: function () {
 
         if (this.markerEditor) {
@@ -12132,7 +12269,11 @@ CLOUD.Extensions.MarkerHelper.prototype = {
 
     },
 
-    // 加载标记
+    /**
+     * 加载标记
+     *
+     * @param {Array} markerInfoList - marker 列表
+     */
     loadMarkers: function (markerInfoList) {
 
         if (markerInfoList) {
@@ -12147,7 +12288,13 @@ CLOUD.Extensions.MarkerHelper.prototype = {
 
     },
 
-    // 加载标记
+    /**
+     * 从picker中加载标记
+     *
+     * @param {Object} intersect - pick 选点
+     * @param {Number} shapeType - 形状类型 ({BUBBLE: 0, FLAG: 1, COMMON:2})
+     * @param {Number} state - 颜色状态
+     */
     loadMarkersFromIntersect: function (intersect, shapeType, state) {
 
         if (intersect) {
@@ -12162,7 +12309,10 @@ CLOUD.Extensions.MarkerHelper.prototype = {
 
     },
 
-    // 获得标记列表
+    /**
+     * 获得标记列表
+     *
+     */
     getMarkerInfoList: function () {
 
         if (this.markerEditor) {
@@ -12174,6 +12324,10 @@ CLOUD.Extensions.MarkerHelper.prototype = {
         return null;
     },
 
+    /**
+     * resize
+     *
+     */
     resizeMarkers: function () {
 
         if (this.markerEditor) {
@@ -12183,6 +12337,10 @@ CLOUD.Extensions.MarkerHelper.prototype = {
         }
     },
 
+    /**
+     * 绘制 markers
+     *
+     */
     renderMarkers: function () {
 
         if (this.markerEditor) {
@@ -12192,6 +12350,10 @@ CLOUD.Extensions.MarkerHelper.prototype = {
         }
     },
 
+    /**
+     * 获得所有 marker 的包围盒
+     *
+     */
     getMarkersBoundingBox: function() {
 
         if (this.markerEditor) {
@@ -12201,7 +12363,11 @@ CLOUD.Extensions.MarkerHelper.prototype = {
         }
     },
 
-    // 根据id选择marker
+    /**
+     * 根据 id 选中 marker
+     *
+     * @param {String} id - marker id
+     */
     selectMarkerById: function (id) {
 
         if (this.markerEditor) {
@@ -12211,14 +12377,22 @@ CLOUD.Extensions.MarkerHelper.prototype = {
         }
     },
 
-    // 设置marker click 回调
+    /**
+     * 设置marker click 回调
+     *
+     * @param {function(Object)} callback - 回调函数
+     * @param {Object} callback(Object) - 回调函数参数 ({id: id, userId: userId, shapeType: shapeType, position: position, boundingBox: boundingBox})
+     */
     setMarkerClickCallback: function (callback) {
 
         this.markerClickCallback = callback;
     }
 
 };
-
+/**
+ * DWG批注辅助类
+ * @class  CLOUD.Extensions.DwgHelper
+ */
 CLOUD.Extensions.DwgHelper = function () {
 
     this.dwgContainer = null;
@@ -12238,10 +12412,18 @@ CLOUD.Extensions.DwgHelper = function () {
     this.isDblClickCloseCloud = true;
 };
 
+/**
+ * @lends CLOUD.Extensions.DwgHelper.prototype
+ *
+ */
 CLOUD.Extensions.DwgHelper.prototype = {
 
     constructor: CLOUD.Extensions.DwgHelper,
 
+    /**
+     * 释放资源
+     *
+     */
     destroy: function () {
 
         this.uninitAnnotation();
@@ -12250,7 +12432,12 @@ CLOUD.Extensions.DwgHelper.prototype = {
         this.annotationContainer = null;
     },
 
-    // 设置DWG批注容器, 在使用批注功能前，需要先设置dom容器
+    /**
+     * 设置DWG批注容器, 在使用批注功能前，需要先设置dom容器
+     *
+     * @param {HTMLElement} dwgContainer - dwg 图纸容器
+     * @param {HTMLElement} domContainer - 绘制批注的主容器
+     */
     setDomContainer: function (dwgContainer, annotationContainer) {
 
         this.dwgContainer = dwgContainer;
@@ -12263,7 +12450,12 @@ CLOUD.Extensions.DwgHelper.prototype = {
 
     },
 
-    // 初始化DWG批注
+    /**
+     * 初始化DWG批注
+     *
+     * @param {function(domElement)} [beginEditCallback] - 开始编辑时回调函数
+     * @param {function(domElement)} [endEditCallback] - 结束编辑时回调函数
+     */
     initAnnotation: function (beginEditCallback, endEditCallback) {
 
         var scope = this;
@@ -12298,7 +12490,10 @@ CLOUD.Extensions.DwgHelper.prototype = {
         }
     },
 
-    // 卸载DWG批注资源
+    /**
+     * 卸载DWG批注资源
+     *
+     */
     uninitAnnotation: function () {
 
         if (this.editor && this.editor.isInitialized()) {
@@ -12307,7 +12502,12 @@ CLOUD.Extensions.DwgHelper.prototype = {
         }
     },
 
-    // 设置DWG背景色
+    /**
+     * 设置背景色，支持过渡色
+     *
+     * @param {Color} [startColor] - 过渡色1（16进制颜色值）
+     * @param {Color} [stopColor] - 过渡色2 （16进制颜色值）
+     */
     setAnnotationBackgroundColor: function (startColor, stopColor) {
 
         if (this.editor) {
@@ -12316,7 +12516,13 @@ CLOUD.Extensions.DwgHelper.prototype = {
         }
     },
 
-    // 开始编辑DWG批注
+    /**
+     * 开始编辑DWG批注
+     *
+     * @param {Object} [pointToCenter] - 绝对基准点 {x: x, y: y}, 相对于某个可参考的绝对位置点(根据情况选定)。如果 absBasePoint 未定义，则默认为 {x: 0, y: 0}
+     * @param {function(domElement)} [beginEditCallback] - 开始编辑时回调函数
+     * @param {function(domElement)} [endEditCallback] - 结束编辑时回调函数
+     */
     editAnnotationBegin: function (pointToCenter, beginEditCallback, endEditCallback) {
 
         // 如果没有设置批注模式，则自动进入批注模式
@@ -12329,7 +12535,10 @@ CLOUD.Extensions.DwgHelper.prototype = {
         this.editor.editBegin();
     },
 
-    // 完成编辑DWG批注
+    /**
+     * 完成编辑
+     *
+     */
     editAnnotationEnd: function () {
 
         if (this.editor) {
@@ -12339,7 +12548,11 @@ CLOUD.Extensions.DwgHelper.prototype = {
         }
     },
 
-    // 设置DWG批注类型
+    /**
+     * 设置批注类型
+     *
+     * @param {Int} type - 批注类型（{ARROW: 0, RECTANGLE: 1, CIRCLE: 2, CROSS: 3, CLOUD: 4, TEXT: 5}）
+     */
     setAnnotationType: function (type) {
 
         if (this.editor) {
@@ -12349,6 +12562,12 @@ CLOUD.Extensions.DwgHelper.prototype = {
         }
     },
 
+    /**
+     * 设置批注风格
+     *
+     * @param {Object} style - 批注风格 （{'stroke-width': 3,'stroke-color': '#ff0000','stroke-opacity': 1.0,'fill-color': '#ff0000', 'font-size': 16}）
+     * @param {Object} [updateText] - 是否刷新文本风格
+     */
     setAnnotationStyle: function (style, updateText) {
 
         if (this.editor) {
@@ -12366,7 +12585,24 @@ CLOUD.Extensions.DwgHelper.prototype = {
         }
     },
 
-    // 加载DWG批注
+    /**
+     * 加载批注
+     *
+     * @param {Array} [annotations] - 批注列表
+     *                          ({  id: id,
+     *                              shapeType: shapeType,
+     *                              position: position,
+     *                              size: size,
+     *                              rotation: rotation,
+     *                              shapePoints: shapePoints,
+     *                              originSize: originSize,
+     *                              style: style,
+     *                              text: text
+     *                          })
+     * @param {Object} [absBasePoint] - 绝对基准点 {x: x, y: y}, 相对于某个可参考的绝对位置点(根据情况选定)。如果 absBasePoint 未定义，则默认为 {x: 0, y: 0}
+     * @param {function(domElement)} [beginEditCallback] - 开始编辑时回调函数
+     * @param {function(domElement)} [endEditCallback] - 结束编辑时回调函数
+     */
     loadAnnotations: function (annotations, absBasePoint, beginEditCallback, endEditCallback) {
 
         if (annotations) {
@@ -12383,7 +12619,11 @@ CLOUD.Extensions.DwgHelper.prototype = {
         }
     },
 
-    // 获得DWG批注对象列表
+    /**
+     * 获得批注对象列表
+     *
+     * @return {Array} 批注对象列表
+     */
     getAnnotationInfoList: function () {
 
         if (this.editor) {
@@ -12395,7 +12635,10 @@ CLOUD.Extensions.DwgHelper.prototype = {
         return null;
     },
 
-    // resize
+    /**
+     * resize
+     *
+     */
     resizeAnnotations: function () {
 
         if (this.editor && this.editor.isInitialized()) {
@@ -12405,7 +12648,10 @@ CLOUD.Extensions.DwgHelper.prototype = {
         }
     },
 
-    // 清除批注
+    /**
+     * 状态变化 - 清除批注
+     *
+     */
     clearAnnotations: function () {
 
         if (this.editor && this.editor.isInitialized()) {
@@ -12415,14 +12661,22 @@ CLOUD.Extensions.DwgHelper.prototype = {
         }
     },
 
-    // 特殊处理 - 是否允许双击关闭云图批注
+    /**
+     * 特殊处理 - 是否允许双击关闭云图批注
+     *
+     * @param {Boolean} enable - 是否允许双击封闭云图, true:允许
+     */
     enableDblClickCloseCloud: function(enable) {
 
         this.isDblClickCloseCloud = enable;
 
     },
 
-    // DWG截屏 base64格式png图片
+    /**
+     * 截屏 base64 格式png图片
+     *
+     * @param {function(data)} snapshotCallback - 回调
+     */
     captureAnnotationsScreenSnapshot: function (snapshotCallback) {
 
         var scope = this;
@@ -12451,7 +12705,11 @@ CLOUD.Extensions.DwgHelper.prototype = {
         });
     },
 
-    // 截屏
+    /**
+     * 截屏 base64 格式png图片
+     *
+     * @param {function(data)} snapshotCallback - 回调
+     */
     canvas2image:function(snapshotCallback) {
 
         // DWG不能直接返回截屏图片，故这种方式处理不了DWG，回调函数解决
@@ -12478,6 +12736,11 @@ CLOUD.Extensions.DwgHelper.prototype = {
         this.captureAnnotationsScreenSnapshot(snapshotCallback);
     },
 
+    /**
+     * 设置绝对基准点
+     *
+     * @param {Object} point - 相对某一个绝对位置点的坐标
+     */
     setAbsoluteBasePoint: function(point){
 
         // 如果初始化，则自动初始化
@@ -12490,6 +12753,11 @@ CLOUD.Extensions.DwgHelper.prototype = {
         }
     },
 
+    /**
+     * 设置屏幕基准点
+     *
+     * @param {Object} point - 相对 SVG 容器的坐标
+     */
     setScreenBasePoint: function(point){
 
         // 如果初始化，则自动初始化
@@ -12502,6 +12770,12 @@ CLOUD.Extensions.DwgHelper.prototype = {
         }
     },
 
+    /**
+     * 设置缩放比例
+     *
+     * @param {Float} factorX - x 方向缩放因子
+     * @param {Float} factorY - y 方向缩放因子
+     */
     setZoomFactor: function(factorX, factorY){
 
         factorY = factorY || factorX;
@@ -12514,6 +12788,10 @@ CLOUD.Extensions.DwgHelper.prototype = {
 
 };
 
+/**
+ * 2D批注辅助类
+ * @class  CLOUD.Extensions.AnnotationHelper2D
+ */
 CLOUD.Extensions.AnnotationHelper2D = function () {
 
     this.domContainer = null;
@@ -12531,10 +12809,18 @@ CLOUD.Extensions.AnnotationHelper2D = function () {
     this.isDblClickCloseCloud = false;
 };
 
+/**
+ * @lends CLOUD.Extensions.AnnotationHelper2D.prototype
+ *
+ */
 CLOUD.Extensions.AnnotationHelper2D.prototype = {
 
     constructor: CLOUD.Extensions.AnnotationHelper2D,
 
+    /**
+     * 释放资源
+     *
+     */
     destroy: function () {
         this.uninitAnnotation();
         this.editor = null;
@@ -12545,19 +12831,32 @@ CLOUD.Extensions.AnnotationHelper2D.prototype = {
         this.defaultStyle = null;
     },
 
-    // 设置批注容器, 在使用批注功能前，需要先设置dom容器
+    /**
+     * 设置批注容器, 在使用批注功能前，需要先设置dom容器
+     *
+     * @param {HTMLElement} domContainer - 绘制批注的主容器
+     */
     setDomContainer: function (domContainer) {
         this.domContainer = domContainer;
     },
 
-    // 设置回调, 在使用批注功能前，根据需要设置（如果需要设置，在初始化之前设置）
+    /**
+     * 设置回调, 如果需要设置，在初始化之前设置
+     *
+     * @param {function(domElement)} [beginEditCallback] - 开始编辑时回调函数
+     * @param {function(domElement)} [endEditCallback] - 结束编辑时回调函数
+     * @param {function(domElement)} [stateChangeCallback] - 状态变化时（平移，旋转等操作）回调函数
+     */
     setEditCallback: function (beginEditCallback, endEditCallback, stateChangeCallback) {
         this.beginEditCallback = beginEditCallback;
         this.endEditCallback = endEditCallback;
         this.stateChangeCallback = stateChangeCallback;
     },
 
-    // 初始化, 不用显示调用
+    /**
+     * 初始化, 不用显示调用
+     *
+     */
     initAnnotation: function () {
 
         var scope = this;
@@ -12587,21 +12886,36 @@ CLOUD.Extensions.AnnotationHelper2D.prototype = {
 
     },
 
-    // 卸载
+    /**
+     * 卸载
+     *
+     */
     uninitAnnotation: function () {
         if (this.editor && this.editor.isInitialized()) {
             this.editor.uninit();
         }
     },
 
-    // 设置背景色
+    /**
+     * 设置背景色，支持过渡色
+     *
+     * @param {Color} [startColor] - 过渡色1（16进制颜色值）
+     * @param {Color} [stopColor] - 过渡色2 （16进制颜色值）
+     */
     setAnnotationBackgroundColor: function (startColor, stopColor) {
         // 如果没有初始化，则自动初始化
         this.initAnnotation();
         this.editor.setBackgroundColor(startColor, stopColor);
     },
 
-    // 开始编辑
+    /**
+     * 开始编辑
+     *
+     * @param {Object} [absBasePoint] - 绝对基准点 {x: x, y: y}, 相对于某个可参考的绝对位置点(根据情况选定)。如果 absBasePoint 未定义，则默认为 {x: 0, y: 0}
+     * @param {Object} [screenBasePoint] - 屏幕基准点 {x: x, y: y}, 相对于svg容器。 如果 screenBasePoint 未定义，则默认为svg容器的中心点
+     * @param {Object} [zoomFactor] - 缩放比例 {x: x, y: y}
+     * @remark absBasePoint 和 screenBasePoint 是同一个点在不同参照系下的表达
+     */
     editAnnotationBegin: function (absBasePoint, screenBasePoint, zoomFactor) {
         // 如果没有初始化，则自动初始化
         this.initAnnotation();
@@ -12621,21 +12935,33 @@ CLOUD.Extensions.AnnotationHelper2D.prototype = {
         this.editor.editBegin();
     },
 
-    // 完成编辑
+    /**
+     * 完成编辑
+     *
+     */
     editAnnotationEnd: function () {
         if (this.editor) {
             this.editor.editEnd();
         }
     },
 
-    // 设置批注类型
+    /**
+     * 设置批注类型
+     *
+     * @param {Int} type - 批注类型（{ARROW: 0, RECTANGLE: 1, CIRCLE: 2, CROSS: 3, CLOUD: 4, TEXT: 5}）
+     */
     setAnnotationType: function (type) {
         // 如果没有初始化，则自动初始化
         this.initAnnotation();
         this.editor.setAnnotationType(type);
     },
 
-    // 设置批注风格
+    /**
+     * 设置批注风格
+     *
+     * @param {Object} style - 批注风格 （{'stroke-width': 3,'stroke-color': '#ff0000','stroke-opacity': 1.0,'fill-color': '#ff0000', 'font-size': 16}）
+     * @param {Object} [updateText] - 是否刷新文本风格
+     */
     setAnnotationStyle: function (style, updateText) {
         // 如果没有初始化，则自动初始化
         this.initAnnotation();
@@ -12650,7 +12976,25 @@ CLOUD.Extensions.AnnotationHelper2D.prototype = {
         this.editor.setAnnotationStyle(this.defaultStyle, updateText);
     },
 
-    // 加载批注
+    /**
+     * 加载批注
+     *
+     * @param {Array} [annotations] - 批注列表
+     *                          ({  id: id,
+     *                              shapeType: shapeType,
+     *                              position: position,
+     *                              size: size,
+     *                              rotation: rotation,
+     *                              shapePoints: shapePoints,
+     *                              originSize: originSize,
+     *                              style: style,
+     *                              text: text
+     *                          })
+     * @param {Object} [absBasePoint] - 绝对基准点 {x: x, y: y}, 相对于某个可参考的绝对位置点(根据情况选定)。如果 absBasePoint 未定义，则默认为 {x: 0, y: 0}
+     * @param {Object} [screenBasePoint] - 屏幕基准点 {x: x, y: y}, 相对于svg容器。 如果 screenBasePoint 未定义，则默认为svg容器的中心点
+     * @param {Object} [zoomFactor] - 缩放比例 {x: x, y: y}
+     * @remark absBasePoint 和 screenBasePoint 是同一个点在不同参照系下的表达
+     */
     loadAnnotations: function (annotations, absBasePoint, screenBasePoint, zoomFactor) {
 
         if (annotations) {
@@ -12677,7 +13021,11 @@ CLOUD.Extensions.AnnotationHelper2D.prototype = {
 
     },
 
-    // 获得批注对象列表
+    /**
+     * 获得批注对象列表
+     *
+     * @return {Array} 批注对象列表
+     */
     getAnnotationInfoList: function () {
 
         if (this.editor) {
@@ -12687,7 +13035,11 @@ CLOUD.Extensions.AnnotationHelper2D.prototype = {
         return null;
     },
 
-    // 获得批注对象列表
+    /**
+     * 获得批注信息(带有包围盒信息)
+     *
+     * @return {Object} 批注信息 {boundingBox: boundingBox, annotations: annotations}
+     */
     getAnnotationInfoListWithBox: function () {
 
         if (this.editor) {
@@ -12738,30 +13090,53 @@ CLOUD.Extensions.AnnotationHelper2D.prototype = {
 
     },
 
-    // resize
+    /**
+     * resize
+     *
+     */
     resizeAnnotations: function () {
         if (this.editor && this.editor.isInitialized()) {
             this.editor.onResize();
         }
     },
 
-    // 状态变化
+    /**
+     * 状态变化
+     *
+     */
     renderAnnotations: function () {
         if (this.editor && this.editor.isInitialized()) {
             this.editor.onCameraChange();
         }
     },
 
-    // 特殊处理 - 是否允许双击关闭云图批注
+    /**
+     * 特殊处理 - 是否允许双击关闭云图批注
+     *
+     * @param {Boolean} enable - 是否允许双击封闭云图, true:允许
+     */
     enableDblClickCloseCloud: function (enable) {
         this.isDblClickCloseCloud = enable;
     },
 
-    // 截屏 base64格式png图片
+    /**
+     * 截屏 base64 格式png图片
+     * 在chrome 版本 57.0.2987.133 (64-bit)上截不到图，估计是图片异步加载的问题, 采用回调函数处理。
+     *
+     * @param {base64} dataUrl - base64 背景图
+     * @param {function(data)} callback - 回调
+     * @return 如果定义了callback，则直接返回null，截屏数据作为 callback 函数参数传入，所有需要获得截屏数据之后进行的操作，在callback中处理；
+     *          如果没有定义callback, 则直接返回 base64位图片(可能截不到图)
+     */
     captureAnnotationsScreenSnapshot: function (dataUrl, callback) {
         return this.editor.getScreenSnapshot(dataUrl, callback);
     },
 
+    /**
+     * 设置绝对基准点
+     *
+     * @param {Object} point - 相对某一个绝对位置点的坐标
+     */
     setAbsoluteBasePoint: function (point) {
         // 如果初始化，则自动初始化
         this.initAnnotation();
@@ -12771,6 +13146,11 @@ CLOUD.Extensions.AnnotationHelper2D.prototype = {
         }
     },
 
+    /**
+     * 设置屏幕基准点
+     *
+     * @param {Object} point - 相对 SVG 容器的坐标
+     */
     setScreenBasePoint: function (point) {
         // 如果初始化，则自动初始化
         this.initAnnotation();
@@ -12780,6 +13160,12 @@ CLOUD.Extensions.AnnotationHelper2D.prototype = {
         }
     },
 
+    /**
+     * 设置缩放比例
+     *
+     * @param {Float} factorX - x 方向缩放因子
+     * @param {Float} factorY - y 方向缩放因子
+     */
     setZoomFactor: function (factorX, factorY) {
         factorY = factorY || factorX;
         // 如果初始化，则自动初始化
@@ -12789,6 +13175,11 @@ CLOUD.Extensions.AnnotationHelper2D.prototype = {
 
 };
 
+/**
+ * 3D批注辅助类
+ * @class  CLOUD.Extensions.AnnotationHelper3D
+ * @param {Object} viewer - 模型浏览类对象
+ */
 CLOUD.Extensions.AnnotationHelper3D = function (viewer) {
     this.viewer = viewer;
     this.defaultStyle = {
@@ -12807,10 +13198,18 @@ CLOUD.Extensions.AnnotationHelper3D = function (viewer) {
     this.renderBind = this.renderAnnotations.bind(this);
 };
 
+/**
+ * @lends CLOUD.Extensions.AnnotationHelper3D.prototype
+ *
+ */
 CLOUD.Extensions.AnnotationHelper3D.prototype = {
 
     constructor: CLOUD.Extensions.AnnotationHelper3D,
 
+    /**
+     * 释放资源
+     *
+     */
     destroy: function () {
         this.uninitAnnotation();
         this.editor = null;
@@ -12819,12 +13218,18 @@ CLOUD.Extensions.AnnotationHelper3D.prototype = {
         this.renderBind = null;
     },
 
-    // 是否存在批注
+    /**
+     * 是否存在批注
+     *
+     */
     hasAnnotations: function () {
         return this.editor && this.editor.isInitialized();
     },
 
-    // 初始化批注
+    /**
+     * 初始化, 不用显示调用
+     *
+     */
     initAnnotation: function () {
         var viewer = this.viewer;
         var scope = this;
@@ -12856,7 +13261,10 @@ CLOUD.Extensions.AnnotationHelper3D.prototype = {
         }
     },
 
-    // 卸载批注资源
+    /**
+     * 卸载批注资源
+     *
+     */
     uninitAnnotation: function () {
         if (this.editor && this.editor.isInitialized()) {
             this.viewer.removeCallbacks("resize", this.resizeBind);
@@ -12865,35 +13273,55 @@ CLOUD.Extensions.AnnotationHelper3D.prototype = {
         }
     },
 
-    // 设置批注背景色
+    /**
+     * 设置背景色，支持过渡色
+     *
+     * @param {Color} [startColor] - 过渡色1（16进制颜色值）
+     * @param {Color} [stopColor] - 过渡色2 （16进制颜色值）
+     */
     setAnnotationBackgroundColor: function (startColor, stopColor) {
         if (this.editor) {
             this.editor.setBackgroundColor(startColor, stopColor);
         }
     },
 
-    // 开始批注编辑
+    /**
+     * 开始批注编辑
+     *
+     */
     editAnnotationBegin: function () {
         // 如果没有设置批注模式，则自动进入批注模式
         this.initAnnotation();
         this.editor.editBegin();
     },
 
-    // 完成批注编辑
+    /**
+     * 完成批注编辑
+     *
+     */
     editAnnotationEnd: function () {
         if (this.editor) {
             this.editor.editEnd();
         }
     },
 
-    // 设置批注类型
+    /**
+     * 设置批注类型
+     *
+     * @param {Int} type - 批注类型（{ARROW: 0, RECTANGLE: 1, CIRCLE: 2, CROSS: 3, CLOUD: 4, TEXT: 5}）
+     */
     setAnnotationType: function (type) {
         if (this.editor) {
             this.editor.setAnnotationType(type);
         }
     },
 
-    // 设置批注风格
+    /**
+     * 设置批注风格
+     *
+     * @param {Object} style - 批注风格 （{'stroke-width': 3,'stroke-color': '#ff0000','stroke-opacity': 1.0,'fill-color': '#ff0000', 'font-size': 16}）
+     * @param {Object} [updateText] - 是否刷新文本风格
+     */
     setAnnotationStyle: function (style, updateText) {
         if (this.editor) {
 
@@ -12907,7 +13335,21 @@ CLOUD.Extensions.AnnotationHelper3D.prototype = {
         }
     },
 
-    // 加载批注列表
+    /**
+     * 加载批注列表
+     *
+     * @param {Array} [annotations] - 批注列表
+     *                          ({  id: id,
+     *                              shapeType: shapeType,
+     *                              position: position,
+     *                              size: size,
+     *                              rotation: rotation,
+     *                              shapePoints: shapePoints,
+     *                              originSize: originSize,
+     *                              style: style,
+     *                              text: text
+     *                          })
+     */
     loadAnnotations: function (annotations) {
         if (annotations) {
             this.initAnnotation();
@@ -12917,7 +13359,11 @@ CLOUD.Extensions.AnnotationHelper3D.prototype = {
         }
     },
 
-    // 获得批注对象列表
+    /**
+     * 获得批注对象列表
+     *
+     * @return {Array} 批注对象列表
+     */
     getAnnotationInfoList: function () {
         if (this.editor) {
             return this.editor.getAnnotationInfoList();
@@ -12926,26 +13372,44 @@ CLOUD.Extensions.AnnotationHelper3D.prototype = {
         return null;
     },
 
-    // resize
+    /**
+     * resize
+     *
+     */
     resizeAnnotations: function () {
         if (this.editor && this.editor.isInitialized()) {
             this.editor.onResize();
         }
     },
 
-    // render
+    /**
+     * 状态变化
+     *
+     */
     renderAnnotations: function () {
         if (this.editor && this.editor.isInitialized()) {
             this.editor.onCameraChange();
         }
     },
 
-    // 特殊处理 - 是否允许双击关闭云图批注
+    /**
+     * 特殊处理 - 是否允许双击关闭云图批注
+     *
+     * @param {Boolean} enable - 是否允许双击封闭云图, true:允许
+     */
     enableDblClickCloseCloud: function(enable) {
         this.isDblClickCloseCloud = enable;
     },
 
-    // 截屏 base64格式png图片
+    /**
+     * 截屏 base64 格式png图片
+     * 在chrome 版本 57.0.2987.133 (64-bit)上截不到图，估计是图片异步加载的问题, 采用回调函数处理。
+     *
+     * @param {base64} dataUrl - base64 背景图
+     * @param {function(data)} callback - 回调
+     * @return 如果定义了callback，则直接返回null，截屏数据作为 callback 函数参数传入，所有需要获得截屏数据之后进行的操作，在callback中处理；
+     *          如果没有定义callback, 则直接返回 base64位图片(可能截不到图)
+     */
     captureAnnotationsScreenSnapshot: function (backgroundClr, callback) {
 
         if (callback) {

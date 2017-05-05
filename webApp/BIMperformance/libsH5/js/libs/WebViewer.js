@@ -2,14 +2,38 @@
  * @require /libsH5/js/libs/three.min.js
  */
 
+/**
+ * @namespace CLOUD
+ * @property {string}  Version                - 版本
+ * @require /libsH5/js/libs/three.min.js
+ */
 var CLOUD = CLOUD || {};
 CLOUD.Version = "20170222";
 
+/**
+ * @namespace CLOUD.GlobalData
+ * @property {number}  SceneSize                - 场景大小
+ * @property {string}  TextureResRoot           - 纹理资源路径
+ * @property {object}  SelectionColor           - 默认构件选中颜色
+ * @property {boolean}  DisableAntialias        - 是否禁用反走样
+ * @property {boolean}  EnableDemolishByDClick  - 是否允许双击半透明
+ * @property {boolean}  UseMpkWorker            - 是否使用Worker
+ * @property {string}  MpkWorkerUrl             - Worker导入库地址
+ * @property {boolean}  UseLayerData            - 是否使用分层数据
+ * @property {boolean}  IncrementRender         - 是否开启增量绘制
+ * @property {number}  LimitFrameTime           - 每帧允许的最大绘制时间
+ * @property {number}  maxObjectNumInPool       - 对象池大小
+ * @property {number}  maxDrawCacheNum          - 绘制列表最大缓存数目，大于该数目，会回收缓存资源
+ * @property {number}  OctantDepth              - 八叉树最大深度
+ * @property {number}  MaximumDepth             -
+ * @property {number}  TargetDistance           -
+ * @property {number}  ConcurrencyRequestCount  - 最大请求数 (HTTP, web worker, etc. )
+ * @property {boolean}  ShowOctant              - 是否绘制八叉树节点
+ * @property {boolean}  DisableOctant           - 是否禁止八叉树裁剪数据
+ * @property {boolean}  DEBUG                   - 是否允许调试 (输出日志信息等)
+ */
 CLOUD.GlobalData = {
     SceneSize: 1000,
-    // SceneScale: 2,
-    // LengthUnitScale: 1000,
-    // MinBoxSize: new THREE.Vector3(500, 500, 500),
 
     TextureResRoot: 'images/',
 
@@ -20,6 +44,8 @@ CLOUD.GlobalData = {
 
     UseMpkWorker: true,
     MpkWorkerUrl: "../libs/mpkWorker.min.js", //"../libs/mpkWorker.min.js",
+
+    UseLayerData: true,
 
     IncrementRender: true,
     LimitFrameTime: 250,
@@ -33,10 +59,17 @@ CLOUD.GlobalData = {
     ConcurrencyRequestCount: 8, // Limitation of concurrency request (HTTP, web worker, etc. ) count
     ShowOctant: false,
     DisableOctant: false,
+
+    DirectionalLight: true,
+
     DEBUG: false
 };
 
-// 视角枚举
+/**
+ * 视角枚举
+ * @readonly
+ * @enum {number}
+ */
 CLOUD.EnumStandardView = {
     ISO: 0,
     Top: 1,
@@ -127,12 +160,17 @@ CLOUD.MPKSTATUS = {
     LOADED: 2
 };
 
+/**
+ * 事件枚举
+ * @readonly
+ * @enum {number}
+ */
 CLOUD.EVENTS = {
     ON_LOAD_START: 0,
     ON_LOAD_PROGRESS: 1,
     ON_LOAD_COMPLETE: 2,
-    ON_LOAD_EMPTYSCENE: 3,
-    ON_LOAD_SUBSCENE: 10,
+    // ON_LOAD_EMPTYSCENE: 3,
+    // ON_LOAD_SUBSCENE: 10,
     ON_SELECTION_CHANGED: 100,
     ON_UPDATE_SELECTION_UI: 101
 };
@@ -142,10 +180,18 @@ CLOUD.PrimitiveCount = {
     triangleCount: 0
 };
 
+/**
+ * 通用函数
+ *
+ * @namespace CLOUD.Utils
+ */
 CLOUD.Utils = {
     /**
      * 根据数组构造THREE.Box3对象
      *
+     * @param {Array} arr - 6个float值构成的数组，前3个值对应 min，后3个值对应 max
+     * @param {THREE.Box3} [optionalbox] - 如果指定，则optionalbox即为返回值
+     * @returns {THREE.Box3} 如果 arr 不是数组类型，则返回 null
      */
     box3FromArray: function (arr, optionalbox) {
         if (arr instanceof Array) {
@@ -160,6 +206,8 @@ CLOUD.Utils = {
     /**
      * 根据点数组计算包围盒
      *
+     * @param {Array} points - 点数组，每项由3个float值构成
+     * @returns {THREE.Box3} 点数组构成的包围盒
      */
     computeBBox: function (points) {
         var bbox = new THREE.Box3();
@@ -176,7 +224,8 @@ CLOUD.Utils = {
     /**
      * 合并包围盒
      *
-     * @param {Array} boxs - 包围盒数组
+     * @param {Array} boxs - 包围盒数组，每项可以为 Object 类型（{min : {x:x, y:y, z:z}, max : {x:x, y:y, z:z}}） 或者 THREE.Box3 类型
+     *
      */
     mergeBBox: function (boxs) {
 
@@ -251,7 +300,7 @@ CLOUD.Utils = {
         var platform = navigator.platform; // iPad, iPhone, Linux armv7, Win, Mac
 
         // 暂不考虑 Linux
-        if (platform.indexOf('Win') !== 0 && uA.indexOf('Mac') !== 0) {
+        if (platform.indexOf('Win') !== 0 && platform.indexOf('Mac') !== 0) {
             return true;
         }
 
@@ -337,6 +386,7 @@ CLOUD.DomUtil = {
                 return getOffsetSum(ele);
             }
         };
+
         if (domElement != document) {
 
             // 这种方式的目的是为了让外部直接传入clientX,clientY,然后计算出相对父容器的offsetX,offsetY值,
@@ -369,7 +419,6 @@ CLOUD.DomUtil = {
      * set css class name
      * @param {String} id
      * @param {String} cssName
-     * @returns
      */
     setClassName : function(id, cssName) {
         var dom = document.getElementById(id);
@@ -382,7 +431,6 @@ CLOUD.DomUtil = {
      * add css class name
      * @param {String} id
      * @param {String} cssName
-     * @returns
      */
     addClassName : function(id, cssName) {
         var a, b, c;
@@ -419,7 +467,6 @@ CLOUD.DomUtil = {
      * remove css class name
      * @param {String} id
      * @param {String} cssName
-     * @returns
      */
     removeClassName : function(id, className) {
         var a, b, c;
@@ -449,7 +496,6 @@ CLOUD.DomUtil = {
      * show or hide element
      * @param {String} id
      * @param {Boolean} isShow
-     * @returns
      */
     showOrHideElement : function(id, isShow) {
         var dom = document.getElementById(id);
@@ -2657,8 +2703,9 @@ CLOUD.RenderGroup = function () {
     };
 
     function painterSortStable(a, b) {
-
-        if (a.material.id !== b.material.id) {
+        if ( a.object.renderOrder !== b.object.renderOrder ) {
+            return a.object.renderOrder - b.object.renderOrder;
+        } else if (a.material.id !== b.material.id) {
             return a.material.id - b.material.id;
         } else if (a.z !== b.z) {
             return a.z - b.z;
@@ -2787,16 +2834,27 @@ CLOUD.RenderGroup = function () {
 
             renderer.renderBufferDirect(camera, lights, fog, geometry, material, object, group);
 
-            if ((i % 5000) === 4999) {
+            // if ((i % 5000) === 4999) {
+            //
+            //     timeEnd = Date.now();
+            //     timeElapse = timeEnd - timeStart;
+            //
+            //     if (timeElapse > CLOUD.GlobalData.LimitFrameTime) {
+            //
+            //         renderingIdx = i + 1;
+            //         return false;
+            //     }
+            // }
 
-                timeEnd = Date.now();
-                timeElapse = timeEnd - timeStart;
+            timeEnd = Date.now();
+            timeElapse = timeEnd - timeStart;
 
-                if (timeElapse > CLOUD.GlobalData.LimitFrameTime) {
+            if (timeElapse > CLOUD.GlobalData.LimitFrameTime) {
 
-                    renderingIdx = i + 1;
-                    return false;
-                }
+                //console.log("timeElapse", [timeElapse, i]);
+
+                renderingIdx = i + 1;
+                return false;
             }
         }
 
@@ -7993,8 +8051,11 @@ CLOUD.CameraAnimator = function () {
 
 
 /**
- * 材质状态：
- *  构件 ： 选择、高亮、半透明、隔离
+ * 过滤器，用于构件可见性，材质变更，隔离等处理
+ * 构件状态 ： 选择、高亮、半透明、隔离
+ *
+ * @class  CLOUD.Filter
+ *
  */
 CLOUD.Filter = function () {
 
@@ -8870,9 +8931,9 @@ CLOUD.Filter = function () {
     };
 
     /**
-     * 设置构件隔离条件 eg : conditions: {{'levelName':'F01'},{'categoryId':'21'}}
+     * 设置构件隔离条件
      *
-     * @param {Object} conditions - 隔离条件
+     * @param {Object} conditions - 隔离条件 eg : conditions: [{'levelName':'F01'},{'categoryId':'21'}]
      */
     this.setIsolateCondition = function (conditions) {
         _isolateCondition = conditions;
@@ -9207,6 +9268,7 @@ CLOUD.Filter = function () {
 
             for (var ii = 0, len = _overriderCondition.length; ii < len; ++ii) {
                 var item = _overriderCondition[ii];
+                // 匹配成功，更改材质
                 if (matchCondition(item.condition)) {
                     return _overridedMaterials[item.material];
                 }
@@ -9226,12 +9288,22 @@ CLOUD.Filter = function () {
                 return true;
             }
 
-            for (var ii = 0, len = _isolateCondition.length; ii < len; ++ii) {
-                var item = _isolateCondition[ii];
-                if (matchIsoCondition(item)) {
-                    return null;
+
+            var len = _isolateCondition.length;
+
+            if (len > 0) {
+
+                for (var ii = 0; ii < len; ++ii) {
+                    var item = _isolateCondition[ii];
+                    // 匹配成功，不更改材质
+                    if (matchIsoCondition(item)) {
+                        return null;
+                    }
                 }
+
+                return _overridedMaterials.scene;
             }
+
         }
 
         // 场景材质
@@ -9305,6 +9377,7 @@ CLOUD.Filter = function () {
 
             for (var ii = 0, len = _overriderCondition.length; ii < len; ++ii) {
                 var item = _overriderCondition[ii];
+                // 匹配成功，更改材质
                 if (matchCondition(item.condition)) {
                     return _overridedMaterials[item.material];
                 }
@@ -9324,12 +9397,21 @@ CLOUD.Filter = function () {
                 return true;
             }
 
-            for (var ii = 0, len = _isolateCondition.length; ii < len; ++ii) {
-                var item = _isolateCondition[ii];
-                if (matchIsoCondition(item)) {
-                    return null;
+            var len = _isolateCondition.length;
+
+            if (len > 0) {
+
+                for (var ii = 0; ii < len; ++ii) {
+                    var item = _isolateCondition[ii];
+                    // 匹配成功，不更改材质
+                    if (matchIsoCondition(item)) {
+                        return null;
+                    }
                 }
+
+                return _overridedMaterials.scene;
             }
+
         }
 
         // 场景材质
@@ -9388,6 +9470,7 @@ CLOUD.Filter = function () {
 
             for (var ii = 0, len = _overriderCondition.length; ii < len; ++ii) {
                 var item = _overriderCondition[ii];
+                // 匹配成功，表示需要更改材质
                 if (matchCondition(item.condition)) {
                     return true;
                 }
@@ -9407,11 +9490,18 @@ CLOUD.Filter = function () {
                 return true;
             }
 
-            for (var ii = 0, len = _isolateCondition.length; ii < len; ++ii) {
-                var item = _isolateCondition[ii];
-                if (matchIsoCondition(item)) {
-                    return false;
+            var len = _isolateCondition.length;
+
+            if (len > 0) {
+
+                for (var ii = 0; ii < len; ++ii) {
+                    var item = _isolateCondition[ii];
+                    if (matchIsoCondition(item)) {
+                        return false;
+                    }
                 }
+
+                // return true;
             }
         }
 
@@ -9701,6 +9791,9 @@ CLOUD.Filter = function () {
 
         _isolateSet = null;
         _overriderByScene = false;
+
+        _overriderCondition = null;
+        _isolateCondition = null;
     };
 
     /**
@@ -9786,6 +9879,7 @@ CLOUD.MeshEx.prototype.spawn = function (parameters) {
             this.userData = null;
         }
     }
+
 
     this.visible = true;
     // 适配Three.js
@@ -10881,13 +10975,25 @@ CLOUD.Scene = function () {
     this.meshPool.init({parent: this.rootNode});
     // CLOUD.Logger.timeEnd("ObjectPool");
 
-    this.lightOffset = new THREE.Vector3(-1, -1, -1);
-    this.lightOffset.normalize();
-    this.lampHead = new THREE.DirectionalLight(0xB7B7CE, 0.8);
-    this.lampAssist = new THREE.DirectionalLight(0x333333, 0.8);
-    this.add(new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6));
-    this.add(this.lampHead);
-    this.add(this.lampAssist);
+    if (CLOUD.GlobalData.DirectionalLight) {
+        this.hemisphereLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
+        this.hemisphereLight.position.set(0, 500, 0);
+        this.add(this.hemisphereLight);
+        this.dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+        this.dirLight.color.setHSL( 0.1, 1, 0.95 );
+        this.dirLight.position.set( -1, 0.75, 1 );
+        this.dirLight.position.multiplyScalar( 50 );
+        this.add(this.dirLight);
+    }
+    else {
+        this.lightOffset = new THREE.Vector3(-1, -1, -1);
+        this.lightOffset.normalize();
+        this.lampHead = new THREE.DirectionalLight(0xB7B7CE, 0.8);
+        this.lampAssist = new THREE.DirectionalLight(0x333333, 0.8);
+        this.add(new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6));
+        this.add(this.lampHead);
+        this.add(this.lampAssist);
+    }
 
     this.groupOctreeBox = new THREE.Group();
     this.add(this.groupOctreeBox);
@@ -11600,7 +11706,8 @@ CLOUD.Scene.prototype.prepareScene = function () {
 CLOUD.Scene.prototype.parseRootNode = function (data) {
 
     var rootNode = this.rootNode;
-    var boundingBox = CLOUD.Utils.box3FromArray(data.view.bbox);
+    var dataView = data.view;
+    var boundingBox = CLOUD.Utils.box3FromArray(dataView.bbox);
 
     if (rootNode.boundingBox === null) {
         rootNode.boundingBox = boundingBox;
@@ -11609,18 +11716,18 @@ CLOUD.Scene.prototype.parseRootNode = function (data) {
         var rotation = new THREE.Quaternion();
         var scale = new THREE.Vector3(1,1,1);
 
-        if (data.view.position) {
-            position.fromArray(data.view.position);
+        if (dataView.position) {
+            position.fromArray(dataView.position);
         }
 
-        if (data.view.rotation) {
+        if (dataView.rotation) {
             var euler = new THREE.Euler();
-            euler.fromArray(data.view.rotation);
+            euler.fromArray(dataView.rotation);
             rotation.setFromEuler(euler, false);
         }
 
-        if (data.view.scale) {
-            scale.fromArray(data.view.scale);
+        if (dataView.scale) {
+            scale.fromArray(dataView.scale);
         }
 
         rootNode.matrix.compose(position, rotation, scale);
@@ -11638,13 +11745,19 @@ CLOUD.Scene.prototype.hasVisibleNode = function () {
 };
 
 CLOUD.Scene.prototype.updateLights = function (camera) {
-    var headLamp = this.lampHead;
-    headLamp.position.copy(camera.getWorldDirection()).multiplyScalar(-1);
-    headLamp.updateMatrixWorld(true);
+    if (CLOUD.GlobalData.DirectionalLight) {
+        var dirLight = this.dirLight;
+        dirLight.updateMatrixWorld(true);
+    }
+    else {
+        var headLamp = this.lampHead;
+        headLamp.position.copy(camera.getWorldDirection()).multiplyScalar(-1);
+        headLamp.updateMatrixWorld(true);
 
-    var assistLamp = this.lampAssist;
-    assistLamp.position.copy(headLamp.position).add(this.lightOffset).normalize();
-    assistLamp.updateMatrixWorld();
+        var assistLamp = this.lampAssist;
+        assistLamp.position.copy(headLamp.position).add(this.lightOffset).normalize();
+        assistLamp.updateMatrixWorld();
+    }
 };
 
 CLOUD.Scene.prototype.updateOctreeBox = function (rootNode) {
@@ -11708,7 +11821,7 @@ function intersectObject(object, raycaster, intersects, recursive, filter) {
     if (recursive === true && object.children) {
         // Group
         var children = object.children;
-        if (children.length > 0 && !hit)
+        if (children.length > 0 && (!hit && hit != undefined))
             return;
 
         for (var i = 0, l = children.length; i < l; i++) {
@@ -11834,6 +11947,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     this.movementSpeed = 0.0008 * CLOUD.GlobalData.SceneSize; // 移动速度
     this.defaultMovementSpeed = this.movementSpeed;
     this.minMovementSpeed = 0.01;
+
+    this.minDollyDistance = 2.0;
 
     // This option actually enables dollying in and out; left as "zoom" for
     // backwards compatibility
@@ -12299,14 +12414,9 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         var center = scope.mapWindowToViewport(dollyCenter.x, dollyCenter.y);
         var centerPosition = scope.getHitPoint(center.x, center.y);
         if (centerPosition != null) {
-            //scope.pivot = centerPosition;
-
             if (Math.abs(scale - 1.0) < EPS) {
                 return;
             }
-
-            var minDistance = this.minDistance;
-            var factor = 2 - scale; // 1 - (scale - 1)
 
             var cameraPos = this.camera.position;
             var eye = this.getWorldEye();
@@ -12314,20 +12424,15 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             var dir = new THREE.Vector3();
             dir.subVectors(centerPosition, cameraPos);
 
-            var distance = dir.length();
+            var distance = dir.multiplyScalar(scale - 1).length();
 
             var newCameraPos = new THREE.Vector3();
 
-            if (this.enablePassThrough && scale > 1.0 && distance < minDistance) {
-                // 以minDistance为步进穿透物体
-                var offsetVec = dir.clone().normalize();
-                offsetVec.normalize().multiplyScalar(minDistance);
-                newCameraPos.addVectors(offsetVec, cameraPos);
+            if (Math.abs(distance) < this.minDollyDistance) {
+                newCameraPos.addVectors(cameraPos, dir.normalize().multiplyScalar(this.minDollyDistance));
             }
             else {
-
-                dir.multiplyScalar(-factor);
-                newCameraPos.addVectors(dir, centerPosition);
+                newCameraPos.addVectors(cameraPos, dir);
             }
 
             this.camera.position.copy(newCameraPos);
@@ -12336,7 +12441,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         else {
             scope.dollyByCenter();
         }
-    }
+    };
 
     this.dollyIn = function (dollyScale) {
         if (dollyScale === undefined) {
@@ -12360,8 +12465,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             return;
         }
 
-        var minDistance = this.minDistance;
-        var factor = 2 - scale; // 1 - (scale - 1)
+        var minDistance = this.minDollyDistance;
 
         var cameraPos = this.camera.position;
         var eye = this.getWorldEye();
@@ -12370,33 +12474,19 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         var dir = new THREE.Vector3();
         dir.subVectors(dollyPoint, cameraPos);
 
-        var distance = dir.length();
+        var distance = dir.multiplyScalar(scale - 1).length();
 
         var newCameraPos = new THREE.Vector3();
 
-        if (this.enablePassThrough && scale > 1.0 && distance < minDistance) {
-            // 以minDistance为步进穿透物体
-            var offsetVec = dir.clone();
-
-            offsetVec.normalize().multiplyScalar(minDistance);
-            newCameraPos.addVectors(offsetVec, cameraPos);
-
-            this.camera.position.copy(newCameraPos);
-            this.camera.target.copy(eye.add(newCameraPos));
-
-            // 更新追踪点
-            offsetVec.normalize().multiplyScalar(this.defaultThroughOutDistance);
-            lastTrackingPoint = dollyPoint.clone();
-            lastTrackingPoint.add(offsetVec);
-
-        } else {
-
-            dir.multiplyScalar(-factor);
-            newCameraPos.addVectors(dir, dollyPoint);
-
-            this.camera.position.copy(newCameraPos);
-            this.camera.target.copy(eye.add(newCameraPos));
+        if (Math.abs(distance) < this.minDollyDistance) {
+            newCameraPos.addVectors(cameraPos, dir.normalize().multiplyScalar(this.minDollyDistance));
         }
+        else {
+            newCameraPos.addVectors(cameraPos, dir);
+        }
+
+        this.camera.position.copy(newCameraPos);
+        this.camera.target.copy(eye.add(newCameraPos));
     };
 
     this.dollyByCenter = function () {
@@ -13450,8 +13540,6 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         dollyDelta.subVectors(dollyEnd, dollyStart);
 
         if (Math.abs(dollyDelta.y) < 3) return;
-
-        scope.zoomSpeed = 0.8;
 
         if (dollyDelta.y > 0) {
             scale /= getZoomScale();
@@ -15259,6 +15347,11 @@ CLOUD.FlyEditor.prototype = {
             this.goDown(moveStep);
         }
 
+        // Pitch around axis Z only when axis Z locked.
+        if(this.cameraEditor.isConstrainedAxisZ) {
+            this.deltaPitch = 0;
+        }
+
         if (this.isFirstPerson) {
 
             var worldUp = new THREE.Vector3(0, 1, 0);
@@ -15975,6 +16068,11 @@ CLOUD.SelectPad = function (editor) {
     this.startPt = new THREE.Vector2();
     this.position = new THREE.Vector2();
 
+    this.click = false;
+    this.clickCallback = null;
+
+    this.intersect = null;
+
     var scope = this;
 
     this.init = function () {
@@ -15983,7 +16081,6 @@ CLOUD.SelectPad = function (editor) {
 
         this.padInit();
 
-        // var viewport = document.getElementById('viewport');
         var viewport = this.editor.slaveEditor.domElement;
         viewport.appendChild(this.pad);
 
@@ -15998,11 +16095,6 @@ CLOUD.SelectPad = function (editor) {
     };
 
     this.padInit = function () {
-        // var viewport = document.getElementById('viewport');
-        // var width = viewport.clientWidth;
-        // var height = viewport.clientHeight;
-        // var size = width > height ? height : width;
-
         if (this.pad != null) {
             this.pad.style.backgroundImage = "url(images/selectPad.png)";
             this.pad.style.backgroundSize = '100%';
@@ -16035,6 +16127,8 @@ CLOUD.SelectPad = function (editor) {
         var cameraEditor = this.editor.slaveEditor.cameraEditor;
         var pickHelper = this.editor.pickHelper;
 
+        var scope = this;
+
         var mouse = cameraEditor.mapWindowToViewport(screenX, screenY);
         this.editor.slaveEditor.scene.pick(mouse, cameraEditor.camera, function (intersect) {
             if (!intersect) {
@@ -16042,6 +16136,7 @@ CLOUD.SelectPad = function (editor) {
                     cameraEditor.updateView(true);
                 }
                 pickHelper.onObjectSelected(null, false);
+                scope.intersect = null;
                 return;
             }
 
@@ -16051,9 +16146,11 @@ CLOUD.SelectPad = function (editor) {
             pickHelper.filter.setSelectedIds();
             if (pickHelper.filter.addSelectedId(userId, intersect.object.userData, true)) {
                 pickHelper.onObjectSelected(intersect, false);
+                scope.intersect = intersect;
             }
             else {
                 pickHelper.onObjectSelected(null, false);
+                scope.intersect = null;
             }
             cameraEditor.updateView(true);
         });
@@ -16062,8 +16159,10 @@ CLOUD.SelectPad = function (editor) {
     this.onTouchStart = function (event) {
         if (event.touches.length == 1) {
             event.stopPropagation();
+            event.preventDefault();
             this.startPt.set(event.touches[0].clientX, event.touches[0].clientY);
-            //requestAnimationFrame(step);
+
+            this.click = true;
         }
     };
 
@@ -16084,13 +16183,22 @@ CLOUD.SelectPad = function (editor) {
             this.startPt.set(event.touches[0].clientX, event.touches[0].clientY);
 
             this.pick();
+
+            this.click = false;
         }
     };
 
     this.onTouchEnd = function () {
         event.stopPropagation();
-        //this.padInit();
-        //cancelAnimationFrame(step);
+
+        if (this.click) {
+            if (this.clickCallback != null) {
+                this.clickCallback(this.intersect);
+            }
+            else {
+                console.log("selectPad click", this.intersect);
+            }
+        }
     };
 
     this.padInitBind = this.padInit.bind(this);
@@ -16110,7 +16218,7 @@ CLOUD.Loader.Url = function (serverUrl, databagId) {
 };
 
 CLOUD.Loader.Url.prototype.projectUrl = function () {
-    return this.serverUrl +"config/"+ this.databagId + "/config.json";
+    return this.serverUrl + this.databagId + "/config.json";
 };
 
 CLOUD.Loader.Url.prototype.sceneUrl = function (idx) {
@@ -16128,7 +16236,7 @@ CLOUD.Loader.Url.prototype.userIdUrl = function () {
 
 CLOUD.Loader.Url.prototype.octreeUrl = function (idx) {
     idx = idx || 'o';
-    return this.serverUrl +"file/"+ this.databagId + "/scene/index_" + idx;
+    return this.serverUrl + this.databagId + "/scene/index_" + idx;
 };
 
 CLOUD.Loader.Url.prototype.symbolUrl = function () {
@@ -16314,7 +16422,7 @@ CLOUD.Loader.OctreeNode = function(oId, depth) {
     this.childOctants = new Array();
     this.min = null;
     this.max = null;
-    this.depth = 0;
+    this.depth = depth || 0;
     this.center = null;
     this.size = -1;   // square length of octant size
     // used in generate priority factor F = size / (sqDistanceToCamera * cosTheta)
@@ -17474,11 +17582,13 @@ CLOUD.Model = function (manager, serverUrl, databagId, texturePath) {
     this.sceneArray = null;
     this.sceneCount = 0;
     this.mpkArray = null;
-    this.mpkCount = 0;
-    this.symbolCount = 0;
+    // this.mpkCount = 0;
+    // this.symbolCount = 0;
+    // this.octree_o = 1;
+    // this.octree_i = 1;
 
     this.taskCount = 0;
-    this.maxTaskCount = 5;   // TODO: change the way to flag resource loading finish flag.
+    this.maxTaskCount = 0;   // TODO: change the way to flag resource loading finish flag.
     this.containsCamera = false;
     this.load_complete = false;
 
@@ -17488,104 +17598,201 @@ CLOUD.Model = function (manager, serverUrl, databagId, texturePath) {
     this.userWorker = false;//(typeof window.Worker === "function");
     this.notifyProgress = true;
 
-    this.highPriorityNodes = [];
-    this.lowPriorityNodes = [];
+    this.nodePriority = {
+        high:[],
+        medium:[],
+        low:[]
+    };
 };
 
 CLOUD.Model.prototype = Object.create(THREE.LoadingManager.prototype);
 CLOUD.Model.prototype.constructor = CLOUD.Model;
 
+CLOUD.Model.prototype.destroy = function () {
+
+    // this.cfgInfo = null;
+    this.loader = null;
+    this.userIdReader = null;
+    this.userDataReader = null;
+    this.octreeLoader = null;
+    this.octreeRootNode = null;
+    this.octreeRootNodeI = null;
+    this.visibleOctant = null;
+    this.materialReader = null;
+    this.symbolReader = null;
+    this.sceneArray = null;
+    this.mpkArray = null;
+
+    this.modelUrl = null;
+    this.filter = null;
+    this.pool = null;
+    this.manager = null;
+
+    this.clearCache();
+    this.cache = null;
+
+    this.clearNodePriority();
+    this.nodePriority = null;
+};
+
+CLOUD.Model.prototype.clearCells = function () {
+    this.cache.cells = {};
+};
+
+CLOUD.Model.prototype.clearCache = function () {
+
+    var cache = this.cache;
+    var geometries = cache.geometries;
+    var materials = cache.materials;
+
+    var geometry, material;
+
+    for (var id in geometries) {
+        geometry = geometries[id];
+        geometry.dispose();
+    }
+
+    for (var id in materials) {
+        material = materials[id];
+        material.dispose();
+    }
+
+    cache.cells = {};
+    cache.geometries = {};
+    cache.materials = {};
+    cache.instancedMaterials = {};
+};
+
+CLOUD.Model.prototype.clearNodePriority = function () {
+    var nodePriority = this.nodePriority;
+    nodePriority.high = [];
+    nodePriority.medium = [];
+    nodePriority.low = [];
+};
+
 CLOUD.Model.prototype.load = function (notifyProgress) {
 
     var scope = this;
     var modelUrl = this.modelUrl;
-    // var filter = this.filter;
+    var manager = this.manager;
+    var scene = manager.scene;
+    var loader = this.loader;
 
     this.notifyProgress = notifyProgress;
 
+    manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_START});
+
     // var cfgLoader = new CLOUD.Loader.ConfigLoader(this);
-    this.loader.setResponseType("");
-    this.loader.setCrossOrigin(this.crossOrigin);
-    this.loader.load(modelUrl.projectUrl(), function (text) {
+    loader.setResponseType("");
+    loader.setCrossOrigin(this.crossOrigin);
+    loader.load(modelUrl.projectUrl(), function (text) {
         var cfg = JSON.parse(text);
+        var metadata = cfg.metadata;
+
         // scope.cfgInfo = cfg;
-        scope.sceneCount = cfg.metadata.scenes;
-        scope.mpkCount = cfg.metadata.mpks;
-        scope.symbolCount = cfg.metadata.symbol;
-        scope.sceneArray = new Array(scope.sceneCount);
+        var sceneCount = scope.sceneCount = metadata.scenes;
+        var mpkCount = metadata.mpks;
+        var symbolCount = metadata.symbol;
+        var octreeCount_o = metadata.octree_o;
+        var octreeCount_i = metadata.octree_i;
+        var materialCount = metadata.material || 0;
+        var userDataCount = metadata.userdata || 0;// userdata
+        var userIdCount = metadata.userId || 1;// userId
+
+        scope.sceneArray = new Array(sceneCount);
+
+        scope.maxTaskCount = 0;
+        scope.maxTaskCount += 1; //sceneCount;
+        if (mpkCount > 0) {
+            scope.maxTaskCount += mpkCount - 1;
+        }
+        scope.maxTaskCount += symbolCount;
+        scope.maxTaskCount += octreeCount_o;
+        scope.maxTaskCount += octreeCount_i;
+        scope.maxTaskCount += materialCount;
+        scope.maxTaskCount += userDataCount;
+        scope.maxTaskCount += userIdCount;
+
         //scope.mpkArray = new Array(scope.mpkCount);
-        scope.manager.scene.parseRootNode(cfg);
+        scene.parseRootNode(cfg);
         scope.load_complete = false;
 
-        if (scope.mpkCount > 0) {
-            scope.maxTaskCount += scope.mpkCount - 1;
-            // scope.maxTaskCount += scope.mpkCount;
-        }
+        // if (scope.mpkCount > 0) {
+        //     scope.maxTaskCount += scope.mpkCount - 1;
+        //     // scope.maxTaskCount += scope.mpkCount;
+        // }
 
         var sceneId = 0;
 
-        scope.loader.setResponseType("arraybuffer");
-        scope.loader.load(modelUrl.sceneUrl(sceneId), function (data) {
+        loader.setResponseType("arraybuffer");
+        loader.load(modelUrl.sceneUrl(sceneId), function (data) {
             var sceneReader = new CLOUD.Loader.SceneReader(data);
 
-            if (sceneReader.header.blockId < scope.sceneCount) {
+            if (sceneReader.header.blockId < sceneCount) {
                 scope.sceneArray[sceneReader.header.blockId] = sceneReader;
             }
 
             sceneReader = null;
-            scope.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_START, sceneId: sceneId});
+            // scope.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_START, sceneId: sceneId});
+
+            scope.onTaskFinished();
         });
 
         // Add MPKs to task manager
-        var mpkCount = scope.mpkCount;
-        for (var j = 0; j < mpkCount; ++j) {
-            scope.taskManager.addMpkTask(j);
-        }
-        scope.taskManager.processMpkTasks(scope.onTaskFinished);
+        scope.processMpkTasks(mpkCount);
 
         // Material
         // scope.materialLoader.setBaseUrl(scope.getTexturePath());
-        // scope.loader.setCrossOrigin(scope.crossOrigin);
-        scope.loader.setResponseType("arraybuffer");
-        scope.loader.load(modelUrl.materialUrl(), function (data) {
+        // loader.setCrossOrigin(scope.crossOrigin);
+        loader.setResponseType("arraybuffer");
+        loader.load(modelUrl.materialUrl(), function (data) {
             scope.parseMaterial(data);
             scope.onTaskFinished();
         });
 
-
         // TODO: maxTaskCount should not be assigned with hard code at initialization (5).
-        if (scope.symbolCount > 0) {
-            scope.loader.setResponseType("arraybuffer");
-            scope.loader.load(modelUrl.symbolUrl(), function (data) {
+        if (symbolCount > 0) {
+            loader.setResponseType("arraybuffer");
+            loader.load(modelUrl.symbolUrl(), function (data) {
                 scope.parseSymbol(data);
                 scope.onTaskFinished();
             });
-        } else {
-            scope.maxTaskCount -= 1;
         }
 
-        scope.loader.setResponseType("arraybuffer");
-        scope.loader.load(modelUrl.userIdUrl(), function (data) {
-            scope.parseUserId(data);
-            scope.onTaskFinished();
-        });
+        // load spatial index
+        var octreeLoader = scope.octreeLoader;
+        if(octreeCount_o > 0) {
+            octreeLoader.load(modelUrl.octreeUrl('o'), function (rootNode) {
+                scope.octreeRootNode = rootNode;
+                //CLOUD.Logger.log("octreeLoader outer layer.");
+                scope.onTaskFinished();
+            });
+        }
 
-        scope.loader.setResponseType("");
-        scope.loader.load(modelUrl.userDataUrl(), function (data) {
-            scope.parseUserData(data);
-            scope.onTaskFinished();
-        });
-    });
+        if(octreeCount_i > 0) {
+            octreeLoader.load(modelUrl.octreeUrl('i'), function (rootNode) {
+                scope.octreeRootNodeI = rootNode;
+                //CLOUD.Logger.log("octreeLoader inner layer.");
+                scope.onTaskFinished();
+            });
+        }
 
-    // load spatial index
-    var octreeLoader = this.octreeLoader;
-    octreeLoader.load(modelUrl.octreeUrl('o'), function (rootNode) {
-        scope.octreeRootNode = rootNode;
-        //CLOUD.Logger.log("octreeLoader outer layer.");
-    });
-    octreeLoader.load(modelUrl.octreeUrl('i'), function (rootNode) {
-        scope.octreeRootNodeI = rootNode;
-        //CLOUD.Logger.log("octreeLoader inner layer.");
+        if (userIdCount > 0) {
+            loader.setResponseType("arraybuffer");
+            loader.load(modelUrl.userIdUrl(), function (data) {
+                scope.parseUserId(data);
+                scope.onTaskFinished();
+            });
+        }
+
+        if (userDataCount > 0) {
+            loader.setResponseType("");
+            loader.load(modelUrl.userDataUrl(), function (data) {
+                scope.parseUserData(data);
+                scope.onTaskFinished();
+            });
+        }
+
     });
 };
 
@@ -17593,12 +17800,15 @@ CLOUD.Model.prototype.loadMpk = function (mpkId, callback) {
 
     var scope = this;
     var modelUrl = this.modelUrl;
+    var loader = this.loader;
+    var mpkWorkerUrl = CLOUD.GlobalData.MpkWorkerUrl;
 
-    //var mpkCount = this.mpkCount;
-    this.loader.setResponseType("arraybuffer");
-    this.loader.load(modelUrl.mpkUrl(mpkId), function (data) {
-        if (scope.userWorker) {
-            var worker = new Worker(CLOUD.GlobalData.MpkWorkerUrl);
+    if (this.userWorker) {
+
+        loader.setResponseType("arraybuffer");
+        loader.load(modelUrl.mpkUrl(mpkId), function (data) {
+
+            var worker = new Worker(mpkWorkerUrl);
             worker.onmessage = function (event) {
                 //var mpkReader = event.data[0];
                 //if (mpkReader.header.blockId < mpkCount) {
@@ -17612,19 +17822,39 @@ CLOUD.Model.prototype.loadMpk = function (mpkId, callback) {
                         scope.referencedMeshCache[key] = result[key];
                     }
                 }
+
                 callback();
+
                 // TODO: Notify Progress
                 scope.onTaskFinished();
             };
 
             //worker.postMessage( {"msg": data, result:scope.result});
             worker.postMessage({"msg": data});
-        } else {
+        });
+
+    } else {
+
+        loader.setResponseType("arraybuffer");
+        loader.load(modelUrl.mpkUrl(mpkId), function (data) {
             scope.parseMpk(data);
             callback();
             scope.onTaskFinished();
-        }
-    });
+        });
+    }
+
+};
+
+CLOUD.Model.prototype.processMpkTasks = function (mpkCount) {
+
+    // Add MPKs to task manager
+    var taskManager = this.taskManager;
+
+    for (var j = 0; j < mpkCount; ++j) {
+        taskManager.addMpkTask(j);
+    }
+
+    taskManager.processMpkTasks(this.onTaskFinished);
 };
 
 CLOUD.Model.prototype.onTaskFinished = function () {
@@ -17642,54 +17872,20 @@ CLOUD.Model.prototype.onTaskFinished = function () {
     //     scope.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_PROGRESS, progress: progress});
     // }
 
+    var manager = this.manager;
+
     if (this.notifyProgress) {
         var progress = {
             total: this.maxTaskCount,
             loaded: this.taskCount
         };
-        this.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_PROGRESS, progress: progress});
+        manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_PROGRESS, progress: progress});
     }
 
     if (this.taskCount >= this.maxTaskCount) {
         this.load_complete = true;
-        this.manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_COMPLETE});
+        manager.dispatchEvent({type: CLOUD.EVENTS.ON_LOAD_COMPLETE});
     }
-};
-
-CLOUD.Model.prototype.destroy = function () {
-
-    var geometry, material;
-
-    for (var id in this.cache.geometries) {
-        geometry = this.cache.geometries[id];
-        geometry.dispose();
-    }
-
-    for (var id in this.cache.materials) {
-        material = this.cache.materials[id];
-        material.dispose();
-    }
-
-    this.cache = {
-        cells: {},
-        geometries: {},
-        materials: {},
-        instancedMaterials: {}
-    };
-
-    this.cache = null;
-    // this.cfgInfo = null;
-    this.loader = null;
-    this.userIdReader = null;
-    this.userDataReader = null;
-    this.octreeLoader = null;
-    this.octreeRootNode = null;
-    this.octreeRootNodeI = null;
-    this.visibleOctant = null;
-    this.materialReader = null;
-    this.symbolReader = null;
-    this.sceneArray = null;
-    this.mpkArray = null;
 };
 
 // CLOUD.Model.prototype.getTexturePath = function () {
@@ -17710,6 +17906,7 @@ CLOUD.Model.prototype.parseMaterial = function (data) {
 
     var materialReader = this.materialReader;
     var len = materialReader.count;
+    var materials = this.cache.materials;
 
     if (len < 0) {
         return;
@@ -17756,15 +17953,17 @@ CLOUD.Model.prototype.parseMaterial = function (data) {
                 materialParameters.shininess = materialData.shininess;
             }
 
+            var shaderPhong = CLOUD.ShaderMaterial.ShaderLib.phong_cust_clip;
+
             material = new THREE.MeshPhongMaterial(materialParameters);
             material.type = 'phong_cust_clip';
-            material.uniforms = CLOUD.ShaderMaterial.ShaderLib.phong_cust_clip.uniforms;
-            material.vertexShader = CLOUD.ShaderMaterial.ShaderLib.phong_cust_clip.vertexShader;
-            material.fragmentShader = CLOUD.ShaderMaterial.ShaderLib.phong_cust_clip.fragmentShader;
+            material.uniforms = shaderPhong.uniforms;
+            material.vertexShader = shaderPhong.vertexShader;
+            material.fragmentShader = shaderPhong.fragmentShader;
         }
 
         material.name = i;
-        this.cache.materials[i] = material;
+        materials[i] = material;
         materialParameters = null;
     }
 
@@ -17812,9 +18011,10 @@ CLOUD.Model.prototype.parseUserData = function (data) {
  * @param {Object} reader - sceneReader or symbolReader ： 如果 itemParent === null或undefined 为sceneReader， 否则为 symbolReader
  * @param {Int} cellId - 八叉树单元ID
  * @param {Object} item - 数据项
- * @param {Object} itemParent - 父节点参数项 {matrix : xxx, ItemId : xxx, originalId: xxx},
+ * @param {Object} itemParent - 父节点参数项 {matrix : xxx, ItemId : xxx, originalId: xxx}
+ * @param {string} categoryId - 分类编码 id
  */
-CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent, customPriority) {
+CLOUD.Model.prototype.readMeshInfo = function (reader, cellId, item, itemParent, categoryId, cellDepth) {
 
     var cacheCell = this.cache.cells[cellId];
     var cacheGeometries = this.cache.geometries;
@@ -17867,7 +18067,7 @@ CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent, cus
     //     materialId: item.materialId
     // };
 
-    // this.pushMeshNode(cellId, nodeId, cacheCell[nodeId]);
+    // this.pushNodeInfo(cellId, nodeId, cacheCell[nodeId]);
 
     var nodeInfo = {
         nodeId: nodeId,
@@ -17876,17 +18076,18 @@ CLOUD.Model.prototype.readMesh = function (reader, cellId, item, itemParent, cus
         meshId: meshInfo.meshId,
         matrix: matrixCache,
         materialId: item.materialId,
-        customPriority: customPriority
+        categoryId: categoryId,
+        cellDepth: cellDepth
     };
 
     cacheCell.push(nodeInfo);
 
-    this.pushMeshNode(nodeInfo);
+    // this.pushNodeInfo(nodeInfo);
 
     meshInfo = null;
 };
 
-CLOUD.Model.prototype.readSymbol = function (id, cellId, itemParent, customPriority) {
+CLOUD.Model.prototype.readSymbolInfo = function (id, cellId, itemParent, categoryId, cellDepth) {
 
     if (this.symbolReader == null) {
         return;
@@ -17904,7 +18105,7 @@ CLOUD.Model.prototype.readSymbol = function (id, cellId, itemParent, customPrior
                 continue;
             }
 
-            this.readMesh(this.symbolReader, cellId, item, itemParent, customPriority);
+            this.readMeshInfo(this.symbolReader, cellId, item, itemParent, categoryId, cellDepth);
         }
     }
 };
@@ -17966,7 +18167,7 @@ CLOUD.Model.prototype.getMeshNodeAttribute = function (sceneOrSymbolReader, item
 
 CLOUD.Model.prototype.calcVisibleOctant = function (camera) {
 
-    if (!(this.octreeRootNode && this.octreeRootNodeI)) {
+    if (!(this.octreeRootNode)) {
         CLOUD.Logger.log("octree load is not finish!");
         return 0;
     }
@@ -17984,23 +18185,27 @@ CLOUD.Model.prototype.calcVisibleOctant = function (camera) {
     var target = camera.target;
     var camDir = new THREE.Vector3(target.x - cameraPos.x, target.y - cameraPos.y, target.z - cameraPos.z);
     camDir.normalize();
-    var octantSize = new THREE.Vector3();
+    // var octantSize = new THREE.Vector3();
 
-    if (this.containsCamera) {
+    var outer; // 0: 内部，1：外部
+
+    if (this.containsCamera && this.octreeRootNodeI != null) {
         // Inner cell should get higher priority than outer, while generally the pool is large enough in this case.
         this.octreeRootNodeI.intersectFrustumWithPriority(frustum, depth, cameraPos, camDir, true, depthCriteria, this.visibleOctant);
         CLOUD.Logger.log("Inner: ", this.visibleOctant.length);
         this.octreeRootNode.intersectFrustumWithPriority(frustum, depth, cameraPos, camDir, true, depthCriteria, this.visibleOctant);
+        outer = false;
     } else {
         // Outer cell only
         this.octreeRootNode.intersectFrustumWithPriority(frustum, depth, cameraPos, camDir, false, depthCriteria, this.visibleOctant);
         CLOUD.Logger.log("Outer: ", this.visibleOctant.length);
+        outer = true;
     }
     //CLOUD.Logger.log("visibleOctant", visibleOctant.join(','));
     var cellCount = this.visibleOctant.length;
     CLOUD.Logger.log("Total Octant Count: ", this.visibleOctant.length);
 
-    return cellCount;
+    return {cellCount: cellCount, outer:outer};
 };
 
 CLOUD.Model.prototype.sortVisibleOctant = function (camera) {
@@ -18037,7 +18242,7 @@ CLOUD.Model.prototype.sortVisibleOctant = function (camera) {
 
 };
 
-CLOUD.Model.prototype.readItemData = function (sceneReader, idx, cellId, customPriority) {
+CLOUD.Model.prototype.readItemData = function (sceneReader, idx, cellId, categoryId, cellDepth) {
 
     var item = sceneReader.getItemInfo(idx);
 
@@ -18055,21 +18260,22 @@ CLOUD.Model.prototype.readItemData = function (sceneReader, idx, cellId, customP
             userDataId: item.userDataId
         };
 
-        this.readSymbol(item.attrIndex, cellId, itemParent, customPriority);
+        this.readSymbolInfo(item.attrIndex, cellId, itemParent, categoryId, cellDepth);
         itemParent = null;
 
     } else {
 
-        this.readMesh(sceneReader, cellId, item, null, customPriority);
+        this.readMeshInfo(sceneReader, cellId, item, null, categoryId, cellDepth);
 
     }
 };
 
-CLOUD.Model.prototype.prepare = function (camera, clearPool, updateList) {
+CLOUD.Model.prototype.prepare = function (camera, clearPool) {
 
     var sceneCount = this.sceneArray ? this.sceneArray.length : 0;
 
     if (sceneCount < 1) {
+        CLOUD.Logger.log("model load not started!");
         return;
     }
 
@@ -18077,6 +18283,7 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool, updateList) {
     // here do scene prepare after all of them loaded.
     // TODO: on-demand loading resource like mesh package, scene and material etc.
     if (!this.load_complete) {
+        console.log("model is not loaded!");
         return;
     }
 
@@ -18090,73 +18297,78 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool, updateList) {
     CLOUD.Logger.time("prepareScene");
 
     var cellCount = 0;
+    var disableOctant = CLOUD.GlobalData.DisableOctant;
+    var useLayerData = CLOUD.GlobalData.UseLayerData;
+
+    var priorityCategories;
 
     // FRUSTUM Querying Cost < 1 ms
     // CLOUD.Logger.time("frustum");
-    if (CLOUD.GlobalData.DisableOctant) {
+    if (disableOctant) {
+
         cellCount = sceneReader.header.cellCount;
+
+        if (cellCount === 0) {
+            return;
+        }
+
     } else {
-        cellCount = this.calcVisibleOctant(camera);
-    }
 
-    if (cellCount === 0) return;
+        var octantParam = this.calcVisibleOctant(camera);
+        cellCount = octantParam.cellCount;
+        var outer = octantParam.outer;
 
-    // begin sort
-    if (!CLOUD.GlobalData.DisableOctant) {
+        if (cellCount === 0) {
+            return;
+        }
+
+        // begin sort
         this.sortVisibleOctant(camera);
+        //end of simple prioritized algorithm
+        // CLOUD.Logger.timeEnd("frustum");
+        // END OF FRUSTUM Querying Cost < 1 ms
+
+        if (outer) {
+            priorityCategories = this.manager.highPriorityCategories.outer;
+        } else {
+            priorityCategories = this.manager.highPriorityCategories.inner;
+        }
     }
-    //end of simple prioritized algorithm
-    // CLOUD.Logger.timeEnd("frustum");
-    // END OF FRUSTUM Querying Cost < 1 ms
 
     var pool = this.pool;
-    var filter = this.filter;
-    var databagId = this.databagId;
     var cacheCells = this.cache.cells;
-    var cacheGeometries = this.cache.geometries;
-    var cacheMaterials = this.cache.materials;
-    var highPriorityCategories = this.manager.highPriorityCategories;
 
     if (clearPool) {
-
         // console.log("enter pool clear");
         pool.clear();
     }
 
-    this.customPriorityNodes = [];
-    this.highPriorityNodes = [];
-    this.lowPriorityNodes = [];
-    var highPriorityNodes = this.highPriorityNodes;
-    var lowPriorityNodes = this.lowPriorityNodes;
-    var customPriorityNodes = this.customPriorityNodes;
+    // 清除优先级集合
+    this.clearNodePriority();
+
+    // console.time("pushNodeInfo");
 
     for (var i = 0; i < cellCount; ++i) {
 
-        var cellId;
+        var cellId, cellDepth = 0;
 
-        if (CLOUD.GlobalData.DisableOctant) {
+        if (disableOctant) {
             cellId = i;
         } else {
             cellId = this.visibleOctant[i].octantId;
+            cellDepth = this.visibleOctant[i].depth;
         }
 
         var cacheCell = cacheCells[cellId];
 
-        if (cacheCell) {
-
-            for (var j = 0, len = cacheCell.length; j < len; ++j ) {
-                this.pushMeshNode(cacheCell[j]);
-            }
-
-        } else {
+        if (cacheCell === undefined) {
 
             // 缓存node数据
-            cacheCells[cellId] = [];
+            cacheCell = cacheCells[cellId] = [];
 
             var cell = sceneReader.getCellInfo(cellId);
 
-            // 自定义Category优先级
-            if (highPriorityCategories) {
+            if (useLayerData) {
 
                 var layerCount = cell.layerCount;
                 var layerIdxBuffer = cell.layerIdxBuffer;
@@ -18171,17 +18383,10 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool, updateList) {
                         end = layerIdxBuffer[k + 1];
                     }
 
-                    if (highPriorityCategories[categoryBuffer[k]]) {
+                    var categoryId = categoryBuffer[k];
 
-                        for (var j = start; j < end; ++j) {
-                            this.readItemData(sceneReader, j, cellId, true);
-                        }
-
-                    } else {
-
-                        for (var j = start; j < end; ++j) {
-                            this.readItemData(sceneReader, j, cellId);
-                        }
+                    for (var j = start; j < end; ++j) {
+                        this.readItemData(sceneReader, j, cellId, categoryId, cellDepth);
                     }
 
                 }
@@ -18189,50 +18394,44 @@ CLOUD.Model.prototype.prepare = function (camera, clearPool, updateList) {
             } else {
 
                 for (var j = cell.itemIndex; j < cell.itemCount; ++j) {
-                    this.readItemData(sceneReader, j, cellId);
+                    this.readItemData(sceneReader, j, cellId, undefined, cellDepth);
                 }
             }
+
+        }
+
+        for (var j = 0, len = cacheCell.length; j < len; ++j ) {
+            this.pushNodeInfo(cacheCell[j], priorityCategories);
         }
     }
 
-    // if (updateList) {
-    //
-    //     this.updateMeshNodes(highPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
-    //     this.updateMeshNodes(customPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
-    //     this.updateMeshNodes(lowPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
-    //
-    // } else {
-    //
-    //     this.updateMeshNodes(highPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
-    //     this.updateMeshNodes(customPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
-    //
-    // }
+    // console.timeEnd("pushNodeInfo");
 
-    this.updateMeshNodes(highPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
-    this.updateMeshNodes(customPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
-    this.updateMeshNodes(lowPriorityNodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId);
+    // console.time("updateMeshNodes");
+    this.updateMeshNodes();
+    // console.timeEnd("updateMeshNodes");
 
     CLOUD.Logger.log("mesh count:", pool.counter);
     CLOUD.Logger.timeEnd("prepareScene");
 };
 
-CLOUD.Model.prototype.clearCells = function () {
-    this.cache.cells = {};
-};
-
-CLOUD.Model.prototype.pushMeshNode = function (node) {
+CLOUD.Model.prototype.pushNodeInfo = function (nodeInfo, priorityCategories) {
 
     var filter = this.filter;
-    var userId = node.userId;
-    var userData = node.userData;
-    var customPriority = node.customPriority;
+    var userId = nodeInfo.userId;
+    var userData = nodeInfo.userData;
+    var fileId = userData.sceneId;
+    //var categoryId = nodeInfo.categoryId;
+    var categoryId = userData ? userData.categoryId : undefined;
 
-    var highPriorityNodes = this.highPriorityNodes;
-    var lowPriorityNodes = this.lowPriorityNodes;
-    var customPriorityNodes = this.customPriorityNodes;
+    var nodePriorityHigh = this.nodePriority.high;
+    var nodePriorityMedium = this.nodePriority.medium;
+    var nodePriorityLow = this.nodePriority.low;
+
+    var mediumPriority = false;
 
     // 文件过滤
-    if (userData && filter.hasFileFilter(userData.sceneId)) {
+    if (userData && filter.hasFileFilter(fileId)) {
         return;
     }
 
@@ -18244,73 +18443,79 @@ CLOUD.Model.prototype.pushMeshNode = function (node) {
     // 材质过滤
     var isHighlight = filter.hasHighlightMaterial(userId, userData);
 
-    if (isHighlight) {
-        highPriorityNodes.push(node);
-    } else if (customPriority){
-        customPriorityNodes.push(node);
-    } else {
-        lowPriorityNodes.push(node);
+    if (priorityCategories && categoryId && priorityCategories[categoryId]) {
+        mediumPriority = true;
     }
 
+    if (isHighlight) {
+        nodePriorityHigh.push(nodeInfo);
+    } else if (mediumPriority){
+        nodePriorityMedium.push(nodeInfo);
+    } else {
+        nodePriorityLow.push(nodeInfo);
+    }
 };
 
-CLOUD.Model.prototype.updateMeshNodes = function (nodes, pool, filter, cacheCells, cacheGeometries, cacheMaterials, databagId) {
+CLOUD.Model.prototype.updateMeshNodes = function () {
 
-    // var pool = this.pool;
-    // var filter = this.filter;
-    // var databagId = this.databagId;
+    var pool = this.pool;
+    var filter = this.filter;
+    var bagId = this.databagId;
 
-    // var cacheCells = cache.cells;
-    // var cacheGeometries = cache.geometries;
-    // var cacheMaterials = cache.materials;
+    var cache = this.cache;
+    var cacheGeometries = cache.geometries;
+    var cacheMaterials = cache.materials;
 
-    var len = nodes.length;
+    var nodePriority = this.nodePriority;
+    var priorityNodesSet = [nodePriority.high, nodePriority.medium, nodePriority.low];
+    // var priorityNodesSet = [nodePriority.medium];
 
-    if (len < 1) {
-        return;
-    }
+    for (var j = 0, count = priorityNodesSet.length; j < count; ++j) {
 
-    for (var i = 0; i < len; ++i) {
+        var priorityNodes = priorityNodesSet[j];
 
-        var cacheNode = nodes[i];
-        var nodeId = cacheNode.nodeId;
-        var userId = cacheNode.userId;
-        var userData = cacheNode.userData;
-        var meshId = cacheNode.meshId;
-        var matrix = cacheNode.matrix;
+        for (var i = 0, len = priorityNodes.length; i < len; ++i) {
 
-        var geometry = cacheGeometries[meshId];
-        var materialId = cacheNode.materialId;
+            var cacheNode = priorityNodes[i];
+            var nodeId = cacheNode.nodeId;
+            var userId = cacheNode.userId;
+            var userData = cacheNode.userData;
+            var meshId = cacheNode.meshId;
+            var matrix = cacheNode.matrix;
 
-        // 材质过滤
-        var overridedMaterial = filter.getOverridedMaterialById(userId, userData);
-        var material;
+            var geometry = cacheGeometries[meshId];
+            var materialId = cacheNode.materialId;
 
-        if (overridedMaterial) {
-            material = overridedMaterial;
-        } else {
-            material = cacheMaterials[materialId];
+            // 材质过滤
+            var material = filter.getOverridedMaterialById(userId, userData);
+            material = material || cacheMaterials[materialId];
+
+            var parameters = {
+                databagId: bagId,
+                nodeId: nodeId,
+                userId: userId,
+                userData: userData,
+                geometry: geometry,
+                matrix: matrix,
+                material: material
+            };
+
+            var meshNode = pool.get(parameters);
+            if (meshNode) {
+                meshNode.renderOrder = CLOUD.GlobalData.MaximumDepth - cacheNode.cellDepth;
+            }
+            parameters = null;
         }
-
-        var parameters = {
-            databagId: databagId,
-            nodeId: nodeId,
-            userId: userId,
-            userData: userData,
-            geometry: geometry,
-            matrix: matrix,
-            material: material
-        };
-
-        pool.get(parameters);
-        parameters = null;
     }
 
+    priorityNodesSet = null;
 };
 /**
- * @author Liwei.Ma
+ * 模型管理类
+ *
+ * @class  CLOUD.ModelManager
+ *
  */
-
 CLOUD.ModelManager = function () {
 
     // THREE.LoadingManager.call(this);
@@ -18322,6 +18527,8 @@ CLOUD.ModelManager = function () {
 
     // Does camera locate inside the scene bound scope
     this.containsCamera = false;
+
+    this.highPriorityCategories = {inner: {}, outer: {}};
 };
 
 CLOUD.ModelManager.prototype.calculateCameraModelRelation = function (cameraPos) {
@@ -18364,7 +18571,7 @@ CLOUD.ModelManager.prototype.destroy = function () {
     this.models = {};
 };
 
-CLOUD.ModelManager.prototype.prepareScene = function (camera, updateList) {
+CLOUD.ModelManager.prototype.prepareScene = function (camera) {
 
     var clearPool = true;
     var counter = 0;
@@ -18381,7 +18588,7 @@ CLOUD.ModelManager.prototype.prepareScene = function (camera, updateList) {
             counter++;
 
             var model = models[id];
-            model.prepare(camera, clearPool, updateList);
+            model.prepare(camera, clearPool);
         }
     }
 
@@ -18416,7 +18623,9 @@ CLOUD.ModelManager.prototype.getGlobalTransform = function () {
 };
 
 /**
- * @param parameters {databagId, serverUrl, debug}
+ * 加载模型
+ *
+ * @param {object} parameters 加载配置项,包含 databagId, serverUrl, debug
  */
 CLOUD.ModelManager.prototype.load = function (parameters) {
 
@@ -18555,7 +18764,7 @@ CLOUD.ModelManager.prototype.hasModel = function () {
    return false;
 };
 
-CLOUD.ModelManager.prototype.setHighPriorityCategories = function (categories) {
+CLOUD.ModelManager.prototype.setCategoriesToHighPriority = function (categories, side) {
 
     var len = categories.length;
 
@@ -18563,11 +18772,20 @@ CLOUD.ModelManager.prototype.setHighPriorityCategories = function (categories) {
         return;
     }
 
-    this.highPriorityCategories = {};
+    var highPriorityCategories = this.highPriorityCategories[side] = {};
 
     for (var i = 0; i < len; ++i) {
-        this.highPriorityCategories[categories[i]] = true;
+        highPriorityCategories[categories[i]] = true;
     }
+};
+
+CLOUD.ModelManager.prototype.clearCategoriesFromHighPriority = function (side) {
+    this.highPriorityCategories[side] = {};
+};
+
+CLOUD.ModelManager.prototype.clearAllCategoriesFromHighPriority = function () {
+    this.clearCategoriesFromHighPriority("inner");
+    this.clearCategoriesFromHighPriority("outer");
 };
 
 THREE.EventDispatcher.prototype.apply(CLOUD.ModelManager.prototype);
@@ -20242,6 +20460,12 @@ CLOUD.ClipPlaneService.prototype = {
 
     },
 }
+/**
+ * 模型浏览类
+ *
+ * @class  CLOUD.Viewer
+ *
+ */
 CLOUD.Viewer = function () {
     "use strict";
 
@@ -20250,8 +20474,8 @@ CLOUD.Viewer = function () {
     this.renderer = null;
 
     // 增量绘制
-    this.requestRenderCount = 0;
-    this.requestRenderMaxCount = 10000;
+    this.countRenderRequest = 0;
+    this.maxCountRenderRequest = 10000;
     this.rendering = false;
     this.incrementRenderHandle = 0;
 
@@ -20273,6 +20497,10 @@ CLOUD.Viewer = function () {
     this.addRenderFinishedCallback(this.calculationPlanesBind);
 };
 
+/**
+ * @lends CLOUD.Viewer.prototype
+ *
+ */
 CLOUD.Viewer.prototype = {
 
     constructor: CLOUD.Viewer,
@@ -20281,6 +20509,8 @@ CLOUD.Viewer.prototype = {
     /**
      * 注册回调函数
      *
+     * @param {String} type - 回调函数类型
+     * @param {function()} callback - 回调函数
      */
     addCallbacks: function (type, callback) {
 
@@ -20299,6 +20529,8 @@ CLOUD.Viewer.prototype = {
     /**
      * 取消某类型回调函数注册
      *
+     * @param {String} type - 回调函数类型
+     * @param {function()} callback - 回调函数
      */
     removeCallbacks: function (type, callback) {
 
@@ -20362,15 +20594,16 @@ CLOUD.Viewer.prototype = {
     /**
      * 注册 render 回调函数
      *
+     * @param {function()} callback - render 回调函数
      */
     addRenderCallback: function (callback) {
         this.addCallbacks("render", callback);
     },
 
-    // 取消注册
     /**
      * 取消 render 回调注册
      *
+     * @param {function()} callback - render 回调函数
      */
     removeRenderCallback: function (callback) {
         this.removeCallbacks("render", callback);
@@ -20395,6 +20628,7 @@ CLOUD.Viewer.prototype = {
     /**
      * 取消 render Finished 注册
      *
+     * @param {function()} callback - render finished 回调函数
      */
     removeRenderFinishedCallback: function (callback) {
         this.removeCallbacks("renderFinished", callback);
@@ -20555,10 +20789,10 @@ CLOUD.Viewer.prototype = {
         // 增量绘制
         if (incrementRenderEnabled && scope.renderer.IncrementRender) {
 
-            ++this.requestRenderCount;
+            ++this.countRenderRequest;
 
-            if (this.requestRenderCount > this.requestRenderMaxCount)
-                this.requestRenderCount = 0;
+            if (this.countRenderRequest > this.maxCountRenderRequest)
+                this.countRenderRequest = 0;
 
             if (this.rendering) {
                 return;
@@ -20614,7 +20848,7 @@ CLOUD.Viewer.prototype = {
 
                     // console.timeEnd(timeTag);
 
-                    if (!isFinished && renderId === scope.requestRenderCount) {
+                    if (!isFinished && renderId === scope.countRenderRequest) {
 
                         scope.incrementRenderHandle = requestAnimationFrame(incrementRender(renderId, false));
 
@@ -20624,7 +20858,7 @@ CLOUD.Viewer.prototype = {
 
                         // CLOUD.Logger.timeEnd("incrementRender");
 
-                        if (renderId !== scope.requestRenderCount) {
+                        if (renderId !== scope.countRenderRequest) {
                             scope.render();
                         } else {
 
@@ -20636,20 +20870,11 @@ CLOUD.Viewer.prototype = {
                 }
             }
 
-            this.incrementRenderHandle = requestAnimationFrame(incrementRender(scope.requestRenderCount, true));
+            this.incrementRenderHandle = requestAnimationFrame(incrementRender(scope.countRenderRequest, true));
 
             if (isUpdateRenderList) {
-
-                // var timeTag = "prepareScene_";
-                // timeTag += scope.requestRenderCount;
-                //
-                // console.time(timeTag);
                 modelManager.prepareScene(camera);
-                // console.timeEnd(timeTag);
-
             }
-
-            // modelManager.prepareScene(camera, isUpdateRenderList);
 
             this.onRenderCallback();
 
@@ -20933,7 +21158,7 @@ CLOUD.Viewer.prototype = {
      * 缩放到选中构件包围盒大小
      *
      * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
-     ** @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
+     * @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
      */
     zoomToSelection: function (margin, ratio) {
         var box = this.renderer.computeSelectionBBox();
@@ -20950,7 +21175,7 @@ CLOUD.Viewer.prototype = {
      *
      * @param {THREE.Box3} box - 包围盒（世界坐标系）
      * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
-     ** @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
+     * @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
      */
     zoomToBBox: function (box, margin, ratio) {
 
@@ -21445,7 +21670,7 @@ CLOUD.Viewer.prototype = {
     /**
      * 设置octree 深度
      *
-     * @param {Int} depth - 深度
+     * @param {number} depth - 深度
      */
     setOctantDepth: function (depth) {
         CLOUD.GlobalData.OctantDepth = depth;
@@ -21454,7 +21679,7 @@ CLOUD.Viewer.prototype = {
     /**
      * 重置对象池大小
      *
-     * @param {Int} size - 对象池对象数
+     * @param {number} size - 对象池对象数
      */
     resizePool: function (size) {
         CLOUD.GlobalData.maxObjectNumInPool = size;
@@ -21464,10 +21689,53 @@ CLOUD.Viewer.prototype = {
     /**
      * 设置高优先级
      *
-     * @param {object} categories - 高优先级category
+     * @param {array} categories - 高优先级category
+     * @param {number} region - 内外部（0：内部，1：外部）
      */
-    setHighPriorityCategories: function (categories) {
-        this.modelManager.setHighPriorityCategories(categories);
+    setCategoriesToHighPriority: function (categories, region) {
+        var side = (region == 0) ? "inner": "outer";
+        this.modelManager.setCategoriesToHighPriority(categories, side);
+    },
+
+    /**
+     * 清除内部或者外部 category 高优先级
+     *
+     * @param {number} region - 内外部（0：内部，1：外部）
+     */
+    clearCategoriesFromHighPriority: function (region) {
+        var side = (region == 0) ? "inner": "outer";
+        this.modelManager.clearCategoriesFromHighPriority(side);
+    },
+
+    /**
+     * 清除内外部 category 高优先级
+     *
+     */
+    clearAllCategoriesFromHighPriority: function () {
+        this.modelManager.clearAllCategoriesFromHighPriority();
+    },
+
+    /**
+     * 按条件隔离构件
+     *
+     * @param {array} conditions    - 多个条件对象数组，单个数组取交集，多个数组取并集
+     *                                  [{"categoryId":-2001340},{"specialty":"AR"},{"categoryId":-2321500,"levelName":"F03"}]
+     * @param {string} state        - 隔离的方式 "hide"：其他隐藏，"translucent"：其他半透明
+     */
+    isolate:function (conditions, state) {
+
+        var filter = this.getFilters();
+
+        if (state === "hide") {
+
+            filter.setVisibleConditions(conditions);
+
+        } else if (state === "translucent") {
+
+            filter.setIsolateCondition(conditions);
+
+        }
+
     }
 
 };
