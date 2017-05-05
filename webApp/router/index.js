@@ -459,18 +459,35 @@ var AppRoute = Backbone.Router.extend({
 
 	//重置数据
 	reset: function() {
-
+		
 		if (App.Comm.isIEModel()) {
 			return false;
 		} else {
 			if (App.Project && App.Project.Settings && App.Project.Settings.Viewer) {
 				App.Project.Settings.Viewer.destroy();
 				App.Project.Settings.Viewer = null;
-			}
-			if (App.ResourceModel && App.ResourceModel.Settings && App.ResourceModel.Settings.Viewer) {
+				if(App.ResourceModel && App.ResourceModel.Settings && App.ResourceModel.Settings.Viewer){
+					App.ResourceModel.Settings.Viewer = null;
+				}
+			}else if (App.ResourceModel && App.ResourceModel.Settings && App.ResourceModel.Settings.Viewer) {
 				App.ResourceModel.Settings.Viewer.destroy();
 				App.ResourceModel.Settings.Viewer = null;
+				if(App.Project && App.Project.Settings && App.Project.Settings.Viewer){
+					App.Project.Settings.Viewer = null;
+				}
 			}
+
+
+
+			
+			// if (App.Project && App.Project.Settings && App.Project.Settings.Viewer) {
+			// 	App.Project.Settings.Viewer.destroy();
+			// 	App.Project.Settings.Viewer = null;
+			// }
+			// if (App.ResourceModel && App.ResourceModel.Settings && App.ResourceModel.Settings.Viewer) {
+			// 	App.ResourceModel.Settings.Viewer.destroy();
+			// 	App.ResourceModel.Settings.Viewer = null;
+			// }
 
 			//_.require('/static/dist/libs/libsH5.js');
 			$("head").append('<script type="text/javascript" src="/static/dist/libs/libsH5.js"></script>');

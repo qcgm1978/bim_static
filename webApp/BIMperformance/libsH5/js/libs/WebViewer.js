@@ -337,7 +337,6 @@ CLOUD.DomUtil = {
                 return getOffsetSum(ele);
             }
         };
-
         if (domElement != document) {
 
             // 这种方式的目的是为了让外部直接传入clientX,clientY,然后计算出相对父容器的offsetX,offsetY值,

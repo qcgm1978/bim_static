@@ -941,7 +941,9 @@
           var ProjectContainer = new App.Project.ProjectContainer;
           ProjectContainer.resetProperNull();
         }else{
-          App.Project.resetModelNull();
+          if(App.Project.resetModelNull){
+            App.Project.resetModelNull();
+          }
         }
         // if(App.Project.ProjectContainer){
         //   var ProjectContainer = new App.Project.ProjectContainer;
