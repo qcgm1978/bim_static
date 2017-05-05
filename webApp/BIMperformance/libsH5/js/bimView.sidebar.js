@@ -55,7 +55,10 @@
         self.el._dom.sidebar.addClass('open')
         self.el._dom.sidebar.find('#filter').show().siblings().hide();
         if(viewer){
-
+          if(App.Project==undefined)
+          {
+            return;
+          }
           if(App.Project.currentQATab=="process"||
               App.Project.currentQATab=="open"||
               App.Project.currentQATab=="dis")
