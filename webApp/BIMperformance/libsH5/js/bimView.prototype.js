@@ -301,6 +301,10 @@
             break;
           case "more":
             $this.toggleClass('selected').siblings('[data-group=' + group + ']').removeClass('selected');
+            var firstColorNode = $this.find(".subBar").find("i")[0];
+            firstColorNode.className = "bar-item m-red";
+            $(firstColorNode).attr("data-color","m-red");
+            $(firstColorNode).attr("data-param","#DA0015");
             if (fn == 'more') {
               var flag = self.getTranslucentStatus();
               $this.find('.m-translucent').toggleClass('selected', flag);
