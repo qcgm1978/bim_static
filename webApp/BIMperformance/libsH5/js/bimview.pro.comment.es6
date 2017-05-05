@@ -54,8 +54,8 @@
 			}
 		}
 
-		if (location.href.indexOf("resources") > -1) {
-			App.Project.Settings.Viewer = App.ResourceModel.Settings.Viewer;
+		if (location.href.indexOf("resources") > -1) {///为什么复制
+			App.Project.Settings.Viewer = App.ResourceModel.Settings.Viewer;///为什么复制
 			App.Project.Settings.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;
 			App.Project.Settings.versionId = App.ResourceModel.Settings.CurrentVersion.id;
 		}
