@@ -211,11 +211,11 @@
           //  span = '<span class="treeText selected">'+itemName+'</span>'
           // }else{
           //   if(_opt.type=='classCode'){
-          //     span = '<span class="treeText" title="'+item['code']+'">'+itemName+'</span>'
+          //     span = '<span class="treeText" title="'+item['code']+'">'+itemName+'<span class="treeColor">('+itemClassCodeNumber+')</span></span>'
           //   }else if(_opt.name=="specialty"){
-          //     span = '<span class="treeText" mcode="'+item['specialtyCode']+'">'+itemName+'</span>'
+          //     span = '<span class="treeText" mcode="'+item['specialtyCode']+'">'+itemName+'<span class="treeColor">('+itemClassCodeNumber+')</span></span>'
           //   }else{
-          //     span = '<span class="treeText">'+itemName+'</span>'
+          //     span = '<span class="treeText">'+itemName+'<span class="treeColor">('+itemClassCodeNumber+')</span></span>'
           //   }
 
           // }
