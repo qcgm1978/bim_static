@@ -60,6 +60,83 @@
 				.move { height: 100%; }
 			}
 		}
+		.notesBox{
+			width: 100%;
+			height: 100%;
+			border: #ccc solid 1px;
+			border-top: 0;
+			padding: 20px;
+			display: none;
+			.searchConditionBox{
+				width: 100%;
+			    height: 62px;
+			    .searchConditionBoxTop{
+			    	width: 100%;
+			    	height: 30px;
+			    	position: relative;
+			    	.modelLine{
+			    	    position: absolute;
+			    	    left: 60px;
+			    	    right: 2px;
+			    	    border-top: 1px #ddd solid;
+			    	    top: 11px;
+			    	}
+			    	.searchTextBox{
+			    		line-height: 20px;
+			    		color: #8E8E8E;
+			    	}
+			    }
+			    .searchConditionBoxBottom{
+			    	width: 100%;
+			    	height: 32px;
+			    	.searchBoxS{
+			    		float: left;
+			    		height: 32px;
+			    		margin-right: 16px;
+			    		span{
+			    			display: inline-block;
+			    			line-height: 32px;
+			    			float: left;
+			    			margin-right: 10px;
+			    		}
+	    				.dateBox { display: inline-block; position: relative; width: 120px;float: left;margin-right: 10px;
+	    					#dateEnd { width: 178px; }
+	    					.iconCal { background: url(../comm/images/commIcon.png) no-repeat 6px -232px; position: absolute; right: 1px; width: 28px; height: 28px; top: 1px; background-color: #eee; border-left: 1px #ccc solid; }
+	    					input { height: 30px; line-height: 30px; padding-left: 8px; broder: 1px #ddd solid; width: 120px; padding-right: 30px; box-sizing: border-box; }
+	    				}
+			    		.keyTextInputBox{
+			    			float: left;
+			    			height: 32px;
+			    			input{
+			    				border: #ccc solid 1px;
+			    				height: 30px;
+			    				line-height: 30px;
+			    				padding: 0 10px;
+			    				outline: none;
+			    			}
+			    			select{
+			    				border: #ccc solid 1px;
+			    				height: 30px;
+			    				line-height: 30px;
+			    				outline: none;
+			    			}
+			    		}
+			    		button{
+		    				border: 0;
+		    				background: none;
+		    				width: 100px;
+		    				height: 30px;
+		    				line-height: 30px;
+		    				background: #3E82F7;
+		    				font-size: 16px;
+		    				color: #fff;
+		    				border-radius: 2px;
+		    				outline: none;
+		    			}
+			    	}
+			    }
+			}
+		}
 	}
 	#projectContainer { height: 100%; margin-top: -37px; padding-top: 37px; position: relative;
 		#projectDesignContainer { height: 100%; position: relative; }
