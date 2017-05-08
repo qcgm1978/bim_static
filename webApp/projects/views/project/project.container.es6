@@ -401,7 +401,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	//切换模型浏览器 和 文件浏览器
 	switchFileMoldel(event) {
-
 		var $target = $(event.target),
 			type = $target.data("type"),
 			$projectContainer = $("#projectContainer"),
@@ -416,7 +415,15 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$projectContainer.find(".leftNav").show();
 
 			$projectCotent.removeClass("showPropety");
-
+			//批注盒子
+			var notesBox = $(".notesBox");
+			var projectCotent = $(".projectCotent");
+			if(notesBox){
+				notesBox.css("display","none");
+			}
+			if(projectCotent){
+				projectCotent.css("display","block");
+			}
 			//内容
 			$projectContainer.find(".fileContainer").show();
 			$projectContainer.find(".modelContainer").hide();
@@ -435,7 +442,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			//隐藏下拉
 			$target.addClass("selected").siblings().removeClass("selected");
 
-		} else {
+		} else if(type == "model"){
 
 			if (!typeof(Worker)) {
 				alert("请使用现代浏览器查看模型");
@@ -447,7 +454,31 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			} else {
 				this.fetchModelIdByProject();
 			}
+			//批注盒子
+			$projectContainer.find(".leftNav").show();
+			$projectContainer.find(".projectCotent").show();
+			$projectContainer.find(".notesBox").hide();
 			//隐藏下拉
+			$target.addClass("selected").siblings().removeClass("selected");
+		}else if(type=="notes"){
+			var leftNav = $(".leftNav");
+			var rightProperty = $(".rightProperty");
+			var projectCotent = $(".projectCotent");
+			var notesBox = $(".notesBox");
+			if(leftNav){
+				leftNav.css("display","none");
+			}
+			if(rightProperty){
+				rightProperty.css("display","none");
+			}
+			if(projectCotent){
+				projectCotent.css("display","none");
+			}
+			if(notesBox){
+				notesBox.css("display","block");
+			}
+			var NotesSearchCondition = new App.Project.NotesSearchCondition;
+			notesBox.html(NotesSearchCondition.render().el);
 			$target.addClass("selected").siblings().removeClass("selected");
 		}
 		window.Global.DemoEnv("modelTab"); //add by wuweiwei

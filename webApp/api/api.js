@@ -377,6 +377,7 @@ App.API = {
 		downloadsFeedBack:"platform/advice/feedback/zipdownload/{adviceId}",//下载建议反馈附件列表的接口
 		downloadsOneFeedBack:"platform/advice/feedback/download/{attachmentId}",//下载建议反馈单个附件列表的接口
 
+		getNotesList:"sixD/viewPoint/list",//获取批注列表的方法
 	},
 
 	DEBUGURL: {
