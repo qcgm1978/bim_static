@@ -477,8 +477,12 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			if(notesBox){
 				notesBox.css("display","block");
 			}
-			var NotesSearchCondition = new App.Project.NotesSearchCondition;
-			notesBox.html(NotesSearchCondition.render().el);
+			if(!App.Project.Settings.NotesDatas){
+				var NotesSearchCondition = new App.Project.NotesSearchCondition;
+				notesBox.html(NotesSearchCondition.render().el);
+				var NotesListView = new App.Project.NotesListView;
+				notesBox.append(NotesListView.render().el);
+			}
 			$target.addClass("selected").siblings().removeClass("selected");
 		}
 		window.Global.DemoEnv("modelTab"); //add by wuweiwei

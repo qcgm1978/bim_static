@@ -66,10 +66,15 @@
 			border: #ccc solid 1px;
 			border-top: 0;
 			padding: 20px;
+			position: relative;
 			display: none;
 			.searchConditionBox{
-				width: 100%;
 			    height: 62px;
+			    position: absolute;
+			    left: 20px;
+			    top: 20px;
+			    right: 20px;
+			    z-index: 10;
 			    .searchConditionBoxTop{
 			    	width: 100%;
 			    	height: 30px;
@@ -135,6 +140,63 @@
 		    			}
 			    	}
 			    }
+			}
+			.notesContentBox{
+				width: 100%;
+				height: 100%;
+				padding-top: 82px;
+				.notesContentContainerBox{
+					width: 100%;
+					height: 100%;
+					position: relative;
+					.pagingBox{position: absolute;bottom: 0px;left:20px;right: 20px;line-height: 40px;
+						.sumDesc { float: left; margin-left: 20px; }
+						.listPagination { float: right; margin-right: 20px; }
+						.pagination {margin: 0px;}
+					}
+					.notesContentBoxTop{
+						width: 100%;
+						height: 30px;
+						border-bottom: #ccc solid 1px;
+						position: absolute;
+						left: 0;
+						top: 0;
+						span{
+							display: inline-block;
+							font-size: 16px;
+							color: #8E8E8E;
+							margin-right: 24px;
+							float: left;
+						}
+						label{
+							color:#8E8E8E;
+							display: inline-block;
+							float: left;
+							margin-top: 4px;
+							margin-left: 6px;
+						}
+						input{
+							float: left;
+							margin-top:6px;
+							outline: none;
+						}
+					}
+					.notesContentBoxBottom{
+						width: 100%;
+						height: 100%;
+						padding-top: 32px;
+						.leftNotesListBox{
+							width: 540px;
+							height: 100%;
+							float: left;
+						}
+						.rightNotesCommentListBox{
+							width: auto;
+							height: 100%;
+							float: left;
+						}
+					}
+				}
 			}
 		}
 	}

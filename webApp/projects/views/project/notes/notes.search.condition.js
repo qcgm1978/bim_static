@@ -119,6 +119,6 @@ App.Project.NotesSearchCondition = Backbone.View.extend({
 			"opTimeStart":this.default.searchStartDate,
 			"opTimeEnd":this.default.searchEndDate,
 		}
-		App.Project.NotesCollection.getNotesListHandle(searchData);
+		App.Project.NotesCollection.getNotesListHandle(searchData);//共用了获取批注列表的方法
 	}
 })
