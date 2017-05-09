@@ -1,7 +1,7 @@
-App.Project.NotesToMeView = Backbone.View.extend({
+App.Project.NotesCommentView = Backbone.View.extend({
 	tagName: "div",
-	className: "notesContentBoxTop",
-	template:_.templateUrl("/projects/tpls/project/notes/project.notes.to.me.html",true),
+	className: "commetnListBox",
+	template:_.templateUrl("/projects/tpls/project/notes/project.notes.comment.list.html",true),
 	default:{
 	},
 	render: function() {
@@ -15,7 +15,6 @@ App.Project.NotesToMeView = Backbone.View.extend({
 			var searchData = {
 				"toMeBool":target.prop("checked"),
 			}
-			App.Project.NotesCollection.defaults.toMeBool = target.prop("checked");
 			App.Project.NotesCollection.getNotesListHandle(searchData);//共用了获取批注列表的方法
 		})
 	}

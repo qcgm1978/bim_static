@@ -1,0 +1,30 @@
+<div class="notesListComponentTop">
+	<%if(obj.hostType == 0){%>
+		<i class="notesTypeIcon icon_model_type"></i>
+	<%}else if(obj.hostType == 1){%>
+		<i class="notesTypeIcon icon_single_type"></i>
+	<%}else if(obj.hostType == 2){%>
+		<i class="notesTypeIcon icon_drawing_type"></i>
+	<%}%>
+	<div class="notesThumbnailBox"><img src="<%= obj.pic %>"></div>
+	<dl class="notesDescBox">
+		<dt>
+			<div class="notesDescTextBox"><%= obj.name %></div>
+			<a href="javascript:;"></a>
+		</dt>
+		<dd><%= obj.creatorName %> <%= new Date(createTime).format("yyyy-MM-dd hh:mm") %></dd>
+	</dl>
+</div>
+<div class="notesListComponentDown">
+	<div class="notesHandle">
+		<a href="javascript:;">查看模型</a>
+		<i>|</i>
+		<a href="javascript:;">编辑</a>
+		<i>|</i>
+		<a href="javascript:;">删除</a>
+		<i>|</i>
+		<a href="javascript:;">分享</a>
+	</div>
+	<span><%= obj.versionName %></span>
+</div>
+<input type="hidden" data-notesid="<%= obj.id %>">
