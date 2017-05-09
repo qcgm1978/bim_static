@@ -16218,7 +16218,7 @@ CLOUD.Loader.Url = function (serverUrl, databagId) {
 };
 
 CLOUD.Loader.Url.prototype.projectUrl = function () {
-    return this.serverUrl +"config/"+ this.databagId + "/config.json";
+    return this.serverUrl + this.databagId + "/config.json";
 };
 
 CLOUD.Loader.Url.prototype.sceneUrl = function (idx) {
@@ -16236,7 +16236,7 @@ CLOUD.Loader.Url.prototype.userIdUrl = function () {
 
 CLOUD.Loader.Url.prototype.octreeUrl = function (idx) {
     idx = idx || 'o';
-    return this.serverUrl +"file/"+ this.databagId + "/scene/index_" + idx;
+    return this.serverUrl + this.databagId + "/scene/index_" + idx;
 };
 
 CLOUD.Loader.Url.prototype.symbolUrl = function () {
@@ -17694,7 +17694,7 @@ CLOUD.Model.prototype.load = function (notifyProgress) {
         var mpkCount = metadata.mpks;
         var symbolCount = metadata.symbol;
         var octreeCount_o = metadata.octree_o;
-        var octreeCount_i = metadata.octree_i;
+        var octreeCount_i = metadata.octree_i || 0;
         var materialCount = metadata.material || 0;
         var userDataCount = metadata.userdata || 0;// userdata
         var userIdCount = metadata.userId || 1;// userId
@@ -17704,7 +17704,7 @@ CLOUD.Model.prototype.load = function (notifyProgress) {
         scope.maxTaskCount = 0;
         scope.maxTaskCount += 1; //sceneCount;
         if (mpkCount > 0) {
-            scope.maxTaskCount += mpkCount - 1;
+            scope.maxTaskCount += mpkCount;
         }
         scope.maxTaskCount += symbolCount;
         scope.maxTaskCount += octreeCount_o;
