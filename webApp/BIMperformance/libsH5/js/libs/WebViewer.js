@@ -17694,7 +17694,7 @@ CLOUD.Model.prototype.load = function (notifyProgress) {
         var mpkCount = metadata.mpks;
         var symbolCount = metadata.symbol;
         var octreeCount_o = metadata.octree_o;
-        var octreeCount_i = metadata.octree_i;
+        var octreeCount_i = metadata.octree_i || 0;
         var materialCount = metadata.material || 0;
         var userDataCount = metadata.userdata || 0;// userdata
         var userIdCount = metadata.userId || 1;// userId
@@ -17704,7 +17704,7 @@ CLOUD.Model.prototype.load = function (notifyProgress) {
         scope.maxTaskCount = 0;
         scope.maxTaskCount += 1; //sceneCount;
         if (mpkCount > 0) {
-            scope.maxTaskCount += mpkCount - 1;
+            scope.maxTaskCount += mpkCount;
         }
         scope.maxTaskCount += symbolCount;
         scope.maxTaskCount += octreeCount_o;
