@@ -6,7 +6,7 @@
 	<%}else if(obj.hostType == 2){%>
 		<i class="notesTypeIcon icon_drawing_type"></i>
 	<%}%>
-	<div class="notesThumbnailBox"><img src="<%= obj.pic %>"></div>
+	<div class="notesThumbnailBox"><a href="<%= obj.pic %>" title="<%= obj.name %>" data-lightbox="example-1"><img src="<%= obj.pic %>"></a></div>
 	<dl class="notesDescBox">
 		<dt>
 			<div class="notesDescTextBox"><%= obj.name %></div>
