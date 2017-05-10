@@ -414,16 +414,9 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$projectContainer.find(".rightProperty").removeClass("showPropety");
 			$projectContainer.find(".leftNav").show();
 
-			$projectCotent.removeClass("showPropety");
+			$projectCotent.removeClass("showPropety").show();
 			//批注盒子
-			var notesBox = $(".notesBox");
-			var projectCotent = $(".projectCotent");
-			if(notesBox){
-				notesBox.css("display","none");
-			}
-			if(projectCotent){
-				projectCotent.css("display","block");
-			}
+			$projectContainer.find(".notesBox").hide();
 			//内容
 			$projectContainer.find(".fileContainer").show();
 			$projectContainer.find(".modelContainer").hide();
@@ -461,22 +454,12 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			//隐藏下拉
 			$target.addClass("selected").siblings().removeClass("selected");
 		}else if(type=="notes"){
-			var leftNav = $(".leftNav");
-			var rightProperty = $(".rightProperty");
-			var projectCotent = $(".projectCotent");
-			var notesBox = $(".notesBox");
-			if(leftNav){
-				leftNav.css("display","none");
-			}
-			if(rightProperty){
-				rightProperty.css("display","none");
-			}
-			if(projectCotent){
-				projectCotent.css("display","none");
-			}
-			if(notesBox){
-				notesBox.css("display","block");
-			}
+			var notesBox = $projectContainer.find(".notesBox");
+			$projectContainer.find(".leftNav").hide();
+			$projectContainer.find(".rightProperty").removeClass("showPropety");
+			$(".projectContainerApp .projectHeader .projectTab").hide();
+			$projectCotent.removeClass("showPropety").hide();
+			notesBox.show();
 			if(!App.Project.Settings.NotesDatas){
 				var NotesSearchCondition = new App.Project.NotesSearchCondition;
 				notesBox.html(NotesSearchCondition.render().el);
@@ -490,7 +473,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	//切换
 	typeContentChange() {
-
 		var $projectContainer = $("#projectContainer"),
 			$projectCotent = $projectContainer.find(".projectCotent"),
 			mRight = $projectCotent.data("mRight") || 398;
@@ -506,7 +488,11 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		$projectContainer.find(".modelContainer").show();
 		//模型tab
 		$(".projectContainerApp .projectHeader .projectTab").show();
-
+		if($("#viewpointInput").data("viewpoint")){
+          App.Project.NotesCollection.renderModelCallBackHandle();
+        }else{
+          viewer.zoomToBuilding(0, 1.15);
+        }
 		//销毁上传
 		App.Comm.upload.destroy();
 

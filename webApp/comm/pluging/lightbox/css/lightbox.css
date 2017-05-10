@@ -164,19 +164,63 @@ body.lb-disable-scrolling {
 .lb-data {
   padding: 0 4px;
   color: #ccc;
+  height: 30px;
 }
 
 .lb-data .lb-details {
   width: 85%;
+  height: 100%;
+  line-height: 30px;
   float: left;
   text-align: left;
-  line-height: 1.1em;
+  color: #fff;
 }
 
 .lb-data .lb-caption {
-  font-size: 13px;
-  font-weight: bold;
-  line-height: 1em;
+  width: 100%;
+  height: 30px;
+  font-size: 14px;
+  line-height: 30px;
+  display: inline-block!important;
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+}
+.lb-data .lb-closeContainer{
+  float: right;
+  width: 15%;
+  height: 100%;
+  position: relative;
+  line-height: 30px;
+}
+.lb-data .lb-closeContainer span{
+  width: 28px;
+  height: 100%;
+  display: inline-block;
+  font-size: 14px;
+  color: #208AEE;
+  position: absolute!important;
+  top:0;
+  cursor: pointer;
+}
+.lb-data .lb-closeContainer i{
+  display: inline-block;
+  width: 3px;
+  height: 100%;
+  text-align: center;
+  color: #ccc;
+  font-style: normal;
+  font-size: 14px;
+  position: absolute;
+  right: 64px;
+  top: 0;
+}
+.lb-data .lb-closeContainer span.downloadImg{
+  right: 74px;
+}
+.lb-data .lb-closeContainer span.lookModel{
+  width: 56px;
+  right: 0;
 }
 
 .lb-data .lb-number {
@@ -213,15 +257,16 @@ body.lb-disable-scrolling {
   opacity: 1;
 }
 
-.lb-data .downloadImg{
-      position: fixed;
-    top: 0px; 
-    font-size: 20px;
-    color: #ccc;
-    top: 23px;
-    right: 60px;
-    cursor: pointer;
-}
-.lb-data .downloadImg:hover{
-  color:#fff;
-}
+// .lb-data .downloadImg{
+//     position: fixed;
+//     // top: 0px; 
+//     // top: 23px;
+//     font-size: 20px;
+//     color: #ccc;
+//     right: 60px;
+//     bottom: 0;
+//     cursor: pointer;
+// }
+// .lb-data .downloadImg:hover{
+//   color:#fff;
+// }
