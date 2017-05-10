@@ -77,6 +77,16 @@ App.Project = {
 
 	//检查点标记点击事件
 	markerClick: function(marker) {
+		//add by wuweiwei begin 2017-5-10
+		if(App.prevMarker!=undefined)
+		{
+			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds();//选中与否
+			App.Project.resetProperNull();//清空属性面板的内容
+			App.Project.Settings.Viewer.viewer.render();			
+		}
+		App.prevMarker = marker!=null ? marker : undefined;
+		//add by wuweiwei end 
+
 		var id = marker? marker.id:"",
 			userId=marker? marker.userId:"",
 			data={};
