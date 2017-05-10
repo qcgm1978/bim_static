@@ -242,11 +242,16 @@
           for(i=0;i<len;i++)
           {
               $m_lbl = $($lis[i]).find(".m-lbl");
-              checkAfter = document.defaultView.getComputedStyle($m_lbl[0] , "after");
-              if(checkAfter.content=="") /*未勾选*/
+              try
               {
-                  return false;
-              }
+                checkAfter = document.defaultView.getComputedStyle($m_lbl[0] , "after");
+                if(checkAfter.content=="") /*未勾选*/
+                {
+                    return false;
+                }                  
+              }catch(e)
+              {;}
+
           }
           return true;
       }
@@ -261,11 +266,16 @@
           for(i=0;i<len;i++)
           {
               $m_lbl = $($lis[i]).find(".m-lbl");
-              checkAfter = document.defaultView.getComputedStyle($m_lbl[0] , "after");
-              if(checkAfter.content!="") /*勾选*/
+              try
               {
-                  return true;
-              }
+                checkAfter = document.defaultView.getComputedStyle($m_lbl[0] , "after");
+                if(checkAfter.content!="") /*勾选*/
+                {
+                    return true;
+                }
+              }catch(e)
+              {;}
+
           }
           return false;
       }

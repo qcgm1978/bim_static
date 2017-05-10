@@ -572,6 +572,11 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				viewer = App.Project.Settings.Viewer,
 				isIsolateState = viewer.viewer.getFilters().isIsolateState(),
 				selectedIds = viewer.getSelectedIds();
+				console.log("selectedIds:",selectedIds);
+				if(selectedIds==null)
+				{
+					selectedIds = [];
+				}
 			if (isIsolateState) {
 				$('#isolation').show();
 			} else {
