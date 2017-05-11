@@ -66,7 +66,7 @@ App.Project.NotesCollection={
 					$("#leftNotesListBox").html('<li class="loading">暂无评论</li>');
 				}else{
 					$content.find(".loading").remove();
-				 	$("#leftNotesListBox li").eq(0).click();//如果有批注默认去第一个批注的评论
+				 	// $("#leftNotesListBox li").eq(0).click();//如果有批注默认去第一个批注的评论
 					$content.find(".listPagination").empty().pagination(pageCount, {
 					    items_per_page: response.data.pageItemCount,
 					    current_page: response.data.pageIndex - 1,

@@ -490,8 +490,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		$(".projectContainerApp .projectHeader .projectTab").show();
 		if($("#viewpointInput").data("viewpoint")){
           App.Project.NotesCollection.renderModelCallBackHandle();
-        }else{
-          viewer.zoomToBuilding(0, 1.15);
         }
 		//销毁上传
 		App.Comm.upload.destroy();
