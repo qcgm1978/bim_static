@@ -17,7 +17,13 @@
 </div>
 <div class="notesListComponentDown">
 	<div class="notesHandle">
-		<a href="javascript:;">查看模型</a>
+		<%if(obj.hostType == 0){%>
+			<a href="javascript:;">查看模型</a>
+		<%}else if(obj.hostType == 1){%>
+			<a href="/static/dist/app/project/single/filePreview.html?id=<%= obj.fileVersionId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank">查看单模型</a>
+		<%}else if(obj.hostType == 2){%>
+			<a href="/static/dist/app/project/single/filePreview.html?id=<%= obj.fileVersionId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank">查看图纸</a>
+		<%}%>
 		<i>|</i>
 		<a href="javascript:;">编辑</a>
 		<i>|</i>
@@ -27,4 +33,4 @@
 	</div>
 	<span><%= obj.versionName %></span>
 </div>
-<input type="hidden" data-notesid="<%= obj.id %>">
+<input type="hidden" data-notesid="<%= obj.id %>" data-viewpointid="<%= obj.viewPoint %>">

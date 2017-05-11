@@ -15,6 +15,7 @@ App.Project.NotesToMeView = Backbone.View.extend({
 			var searchData = {
 				"toMeBool":target.prop("checked"),
 			}
+			App.Project.NotesCollection.defaults.pageIndexNotes = 1;
 			App.Project.NotesCollection.defaults.toMeBool = target.prop("checked");
 			App.Project.NotesCollection.getNotesListHandle(searchData);//共用了获取批注列表的方法
 		})

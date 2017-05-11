@@ -22,13 +22,28 @@ App.Project.NotesListView = Backbone.View.extend({
 	notesClickHandle(evt){//点击每个批注执行的方法
 		var target = $(evt.target).closest("li");
 		var notesId = target.children("input").data("notesid");
-		if(!target.hasClass('notesSelectClass')){
-			target.siblings().removeClass("notesSelectClass").end().addClass('notesSelectClass');
-		}
-		if(notesId){//如果当前点击的批注存在id则去获取批注评论的列表
-			App.Project.NotesCollection.getCommentListHandle({
-				"viewpointId":notesId
-			});
+		var viewpointInput = $("#viewpointInput");
+		if(evt.target.tagName == "A"){
+			if(evt.target.innerText == "查看模型"){
+				viewpointInput.attr("data-viewpoint",target.children("input").data("viewpointid"));
+				App.Project.NotesCollection.clickModelHandle();//执行查看模型方法
+			}
+			return false;
+		}else if(evt.target.tagName !== "IMG"){
+			if(!target.hasClass('notesSelectClass')){
+				var target = $(evt.target).closest("li");
+				var notesId = target.children("input").data("notesid");
+				if(!target.hasClass('notesSelectClass')){
+					target.siblings().removeClass("notesSelectClass").end().addClass('notesSelectClass');
+				}
+				if(notesId){//如果当前点击的批注存在id则去获取批注评论的列表
+					App.Project.NotesCollection.defaults.viewpointId = notesId;
+					App.Project.NotesCollection.defaults.pageIndexComment=1;
+					App.Project.NotesCollection.getCommentListHandle();
+				}
+			}
+		}else if(evt.target.tagName == "IMG"){
+			viewpointInput.attr("data-viewpoint",target.children("input").data("viewpointid"));
 		}
 	},
 	initCommentHandle(){//进入之后初始化批注评论结构
