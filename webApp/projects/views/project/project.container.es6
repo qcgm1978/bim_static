@@ -581,16 +581,19 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		});
 
 		viewer.on("click", function(model) {
+			//单击构建显示属性页签 add by wuweiwei 2017-5-11
+			if(App.Project.Settings.projectNav!="quality" && App.Project.Settings.projectNav!="cost" && App.Project.Settings.projectNav!="plan")
+			{
+				App.Project.renderModelContentByType("design");
+			}
+			
 			//取消计划高亮
 			var result = that.cancelhighlightPlan(),
 				viewer = App.Project.Settings.Viewer,
 				isIsolateState = viewer.viewer.getFilters().isIsolateState(),
 				selectedIds = viewer.getSelectedIds();
 				console.log("selectedIds:",selectedIds);
-				if(selectedIds==null)
-				{
-					selectedIds = [];
-				}
+
 			if (isIsolateState) {
 				$('#isolation').show();
 			} else {

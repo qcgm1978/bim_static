@@ -77,13 +77,31 @@ App.Project = {
 
 	//检查点标记点击事件
 	markerClick: function(marker) {
+		console.log("marker:",marker);
 		//add by wuweiwei begin 2017-5-10
 		if(App.prevMarker!=undefined)
 		{
 			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds();//选中与否
 			App.Project.resetProperNull();//清空属性面板的内容
-			App.Project.Settings.Viewer.viewer.render();			
+			App.Project.Settings.Viewer.viewer.render();
 		}
+		/*
+		if(App.prevMarker==undefined)
+		{
+			App.prevMarker = marker!=null ? marker : undefined;
+		}
+		else
+		{
+			if(App.prevMarker && marker && App.prevMarker.id != marker.id)
+			{
+				App.prevMarker = marker.id;
+			}
+			else
+			{
+				App.prevMarker = undefined;
+			}
+		}
+		*/
 		App.prevMarker = marker!=null ? marker : undefined;
 		//add by wuweiwei end 
 
@@ -115,7 +133,7 @@ App.Project = {
 					if(tr.length>0){
 						tr.addClass('selected');
 					}else{//如果当前列表有翻页执行的方法
-						data=App.Project.catchPageData('process',{id:id});//内存中取数据
+						data=App.Project.catchPageData('open',{id:id});//内存中取数据
 						App.Project.qualityTab.OpeningAcceptanceOptions.pageIndex = data.pageIndex;
 						App.Project.QualityAttr.OpeningAcceptanceCollection.reset();
 						App.Project.QualityAttr.OpeningAcceptanceCollection.push({data:data});
@@ -1830,7 +1848,7 @@ App.Project = {
 	},
 
 	//根据类型渲染数据
-	renderModelContentByType: function() {
+	renderModelContentByType: function(_type) { //参数_type用于单击模型时传递"design"
 
 		var type = App.Project.Settings.projectNav,
 			$rightPropertyContent = $("#projectContainer .rightPropertyContent");
@@ -1838,6 +1856,12 @@ App.Project = {
 
 		$rightPropertyContent.children('div').hide();
 		App.Project.isShowMarkers('other');
+		
+		if(_type!=undefined) //add by wuweiwei 2017-5-11
+		{
+			type = _type;	
+		}
+		console.log(type);
 		//设计
 		if (type == "design") {
 			$rightPropertyContent.find(".singlePropetyBox").remove();

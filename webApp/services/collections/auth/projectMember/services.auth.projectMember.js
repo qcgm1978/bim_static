@@ -101,7 +101,7 @@ App.Services.projectMember = {
 				_member=_.map(_member,function(item){
 					return item={
 						name:item.name,
-						project:item.org[0]?item.org[0].namePath:null,
+						project:item.orgNamePath,
 						id:item.id, //成员ID
 						outer:item.outer
 					}
@@ -109,7 +109,7 @@ App.Services.projectMember = {
 				_org=_.map(_org,function(item){
 					return item={
 						name:item.name,
-						project: item.parent == null ? "" : item.parent.namePath,
+						project: item.orgNamePath,
 						id:item.id, //成员ID
 						outer:item.outer,
 						org:true
