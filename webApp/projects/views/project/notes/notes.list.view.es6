@@ -23,10 +23,10 @@ App.Project.NotesListView = Backbone.View.extend({
 		var target = $(evt.target).closest("li");
 		var notesId = target.children("input").data("notesid");
 		var viewpointInput = $("#viewpointInput");
+		viewpointInput.attr("data-viewpoint",target.children("input").data("viewpointid"));
 		if(evt.target.tagName == "A"){
 			var $data = target.find("input");
 			if(evt.target.innerText == "查看模型"){
-				viewpointInput.attr("data-viewpoint",target.children("input").data("viewpointid"));
 				App.Project.NotesCollection.clickModelHandle();//执行查看模型方法
 				return false;
 			}else if(evt.target.innerText == "编辑"){
@@ -50,10 +50,9 @@ App.Project.NotesListView = Backbone.View.extend({
 					App.Project.NotesCollection.defaults.viewpointId = notesId;
 					App.Project.NotesCollection.defaults.pageIndexComment=1;
 					App.Project.NotesCollection.getCommentListHandle();
+					App.Project.NotesCollection.defaults.hosttype = target.children("input").data("hosttype");//当前点击的批注是什么类型的
 				}
 			}
-		}else if(evt.target.tagName == "IMG"){
-			viewpointInput.attr("data-viewpoint",target.children("input").data("viewpointid"));
 		}
 	},
 	editNotesHandle($li) {//编辑批注的方法
@@ -187,11 +186,12 @@ App.Project.NotesListView = Backbone.View.extend({
 				type: "delete"
 			}
 			App.Comm.ajax(data, (data) => {
-				if (data.code == 0) {
-					App.Project.NotesCollection.getNotesListHandle();//共用了获取批注列表的方法
-				} else {
-					alert(data.message);
-				}
+				App.Project.NotesCollection.getNotesListHandle();//共用了获取批注列表的方法
+				// if (data.code == 0) {
+				// 	App.Project.NotesCollection.getNotesListHandle();//共用了获取批注列表的方法
+				// } else {
+				// 	alert(data.message);
+				// }
 			})
 		});
 	},

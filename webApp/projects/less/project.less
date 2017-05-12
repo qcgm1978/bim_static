@@ -360,6 +360,104 @@
 										.commentScroll{
 											width: 100%;
 											height: 100%;
+											ul{
+												width: 100%;
+												height: auto;
+												li{
+													width: 100%;
+													margin-top: 16px;
+													border-bottom: #ccc solid 1px;
+													padding-bottom: 16px;
+													position: relative;
+													.deleteNotesCommentBtn{
+														position: absolute;
+														right: 0;
+														top: 0;
+														color: #208AEE;
+														display: none;
+													}
+													&:hover .deleteNotesCommentBtn{
+														display: inline-block;
+													}
+													.commentThumbnailBox{
+														width: 40px;
+														height: 40px;
+														float: left;
+														background: #D8D8D8;
+														img{
+															width: 100%;
+															height: 100%;
+														}
+													}
+													.commentDescBox{
+														width: auto;
+														height: auto;
+														padding-left: 56px;
+														p{
+															height: 20px;
+															line-height: 15px;
+															font-family: PingFangSC-Regular;
+															color: #8E8E8E;
+														}
+														h2{
+															height: 20px;
+															line-height: 24px;
+															font-family: PingFangSC-Regular;
+															font-size: 14px;
+															color: #3A3A3A;
+														}
+														.commentDescListBox{
+															width: 100%;
+															min-height:90px;
+															height: auto;
+															margin-top: 16px;
+															.commentDescComponentBox{
+																width: 49%;
+																min-width:330px;
+																height: 90px;
+																border:#ccc solid 1px;
+																padding: 10px;
+																.attachmentThumbnailBox{
+																	width: 96px;
+																	height: 72px;
+																	float: left;
+																	img{
+																		width: 100%;
+																		height: 100%;
+																	}
+																}
+																.attachmentDescBox{
+																	font-family: PingFangSC-Regular;
+																	padding-left: 112px;
+																	.attachmentDescNameBox{
+																		min-height: 48px;
+																		height: auto;
+																		color: #3A3A3A;
+																	}
+																	.attachmentDescSizeBox{
+																		height: 24px;
+																		line-height: 24px;
+																		color: #8E8E8E;
+																	}
+																}
+																&:nth-child(odd){
+																	float: left;
+																}
+																&:nth-child(even){
+																	float: right;
+																}
+															}
+															.commentDescComponentNullBox{
+																min-width:330px;
+																height: 90px;
+																text-align: center;
+																font-size: 14px;
+																line-height: 90px;
+															}
+														}
+													}
+												}
+											}
 										}
 									}
 								}
@@ -371,12 +469,24 @@
 									bottom: 0;
 									z-index: 10;
 									.textareaBox{
-										textarea{
+										width: 100%;
+										height: 70px;
+										.atBox{
 											width: 100%;
-											height: 70px;
-											font-size: 14px;
-											color: #3A3A3A;
+											height: 100%;
+											.atList{
+												position: absolute!important;
+												left: 50px!important;
+												top: 30px!important;
+											}
+											textarea{
+												width: 100%;
+												height: 100%;
+												font-size: 14px;
+												color: #3A3A3A;
+											}
 										}
+										
 									}
 									.uploadListBox{
 										width: 100%;
@@ -403,7 +513,7 @@
 													background: #D8D8D8;
 													img{
 														width: 100%;
-														height: 10%;
+														height: 100%;
 													}
 												}
 												.imgThumbnailType{
@@ -444,6 +554,9 @@
 											float: left;
 											height: 24px;
 											margin-top: 6px;
+											input{
+												display: none;
+											}
 											a{
 												display: inline-block;
 												width: 24px;
@@ -451,6 +564,13 @@
 											}
 											a.uploadImg{
 												background: url("../images/uploadImg.png") center no-repeat;
+											}
+											a.uploadFile{
+												background: url("../images/uploadfile.png") center no-repeat;
+												margin: 0 16px;
+											}
+											a.uploadsnapshot{
+												background: url("../images/uploadSnapshot.png") center no-repeat;
 											}
 										}
 										.uploadBtn{
@@ -1079,5 +1199,100 @@
 .versionNoheaderShow{
 	.showContentList{
 		display: block;
+	}
+}
+.addModelBgHtmlDom{
+	position: absolute;
+	z-index: 1000;
+	left: 0;
+	top: 0;
+	background: rgba(0, 0, 0, 0.5);
+}
+.addModelHtmlDom{
+	position: absolute;
+	z-index: 1005;
+	left: 0;
+	top: 0;
+	.addModelHtmlDomBox{
+		width: 100%;
+		height: 100%;
+		position: relative;
+		background: #fff;
+		border-radius: 2px;
+		.addModelHtmlDomTitleBox{
+			width: 100%;
+			height: 40px;
+			position: absolute;
+			left: 0;
+			top: 0;
+			background: #208AEE;
+			line-height: 40px;
+			padding: 0 16px;
+			span{
+				display: inline-block;
+				float: left;
+				font-family: PingFangSC-Regular;
+				font-size: 14px;
+				color: #FFFFFF;
+			}
+			a{
+				display: inline-block;
+				float: right;
+				position: relative;
+				width: 14px;
+				height: 14px;
+				margin-top: 10px;
+				&::before, &::after {
+				  content: '';
+				  position: absolute;
+				  width: 14px;
+				  top: 6px;
+				  right:0;
+				  height: 3px;
+				  border-radius: 5px;
+				  background: #ffffff;
+				}
+				&::before {
+				  transform: rotate(45deg);
+				}
+				&::after {
+				  transform: rotate(-45deg);
+				}
+			}
+		}
+		.addModelHtmlDomContentBox{
+			width: 100%;
+			height: 100%;
+			padding-top: 40px;
+		}
+	}
+}
+.notesCommentAddModelDialogBox{
+	width: 100%;
+	height: 100%;
+	.dialogModelBox{
+		width: 100%;
+		height: 100%;
+		.projectCotent{
+			width: 100%;
+			height: 100%;
+			display: block!important;
+			.modelContainer{
+				width: 100%;
+				height: 100%;
+				.modelContainerScroll{
+					width: 100%;
+					height: 100%;
+					.modelContainerContent{
+						width: 100%;
+						height: 100%;
+						canvas{
+							width: 100%;	
+							height: 100%!important;		
+						}
+					}
+				}
+			}
+		}
 	}
 }

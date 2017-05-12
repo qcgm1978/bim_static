@@ -1,1 +1,38 @@
-<% console.log(this.model) %>
+<div class="commentThumbnailBox">
+	<img src="/platform/user/<%= this.model.creatorId%>/photo">
+</div>
+<div class="commentDescBox">
+	<p><%= this.model.creatorName %> <%= new Date(this.model.createTime).format("yyyy-MM-dd hh:mm") %></p>
+	<h2><%= this.model.text%></h2>
+	<div class="commentDescListBox" id="commentDescListBox">
+		<%if(this.model.attachments && this.model.attachments.length>0){%>
+			<%for(var i=0,len=this.model.attachments.length;i<len;i++){%>
+				<%if(this.model.attachments[i].type == 1){%>
+					<div class="commentDescComponentBox" id="<%= this.model.attachments[i].id%>">
+						<div class="attachmentThumbnailBox"><img src="<%= this.model.attachments[i].pictureUrl%>"></div>
+						<div class="attachmentDescBox">
+							<div class="attachmentDescNameBox"><%= this.model.attachments[i].description%></div>
+							<div class="attachmentDescSizeBox">[图片]</div>
+						</div>
+					</div>
+				<%}else if(this.model.attachments[i].type == 3){%>
+
+				<%}else if(this.model.attachments[i].type == 4 || this.model.attachments[i].type == 5){%>
+					<div class="commentDescComponentBox" id="<%= this.model.attachments[i].id%>">
+						<div class="attachmentThumbnailBox"><img src="<%= this.model.attachments[i].pictureUrl%>"></div>
+						<div class="attachmentDescBox">
+							<div class="attachmentDescNameBox"></div>
+							<div class="attachmentDescSizeBox"></div>
+						</div>
+					</div>
+				<%}%>
+			<%}%>
+		<%}else{%>
+			<div class="commentDescComponentNullBox">评论附件为空</div>
+		<%}%>
+	</div>
+</div>
+<%if(this.model.creatorId == App.Comm.user("userId")){%>
+	<a href="javascript:;" data-id="<%= this.model.id%>" data-viewpointid="<%= this.model.viewpointId%>" class="deleteNotesCommentBtn">删除</a>
+<%}%>
+<input type="hidden" data-viewpointid="<%= this.model.viewpointId%>">

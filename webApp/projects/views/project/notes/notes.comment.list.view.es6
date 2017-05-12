@@ -12,6 +12,11 @@ App.Project.NotesCommentView = Backbone.View.extend({
 		this.$el.html(this.template);
 		return this;
 	},
+	initAddCommentHandle(){//初始化添加批注评论方法
+		var addCommentBox = this.$("#addCommentBox");
+		var AddCommentView = new App.Project.AddCommentView();
+		addCommentBox.html(AddCommentView.render().el);
+	},
 	addOne(model){//初始化复选框事件
 		var data = model.toJSON();
 		var commentComponentBox = this.$("#commentComponentBox");
@@ -21,6 +26,7 @@ App.Project.NotesCommentView = Backbone.View.extend({
 	},
 	resetList(){//重置加载
 		this.$("#commentComponentBox").html('<li class="loading">正在加载，请稍候……</li>');
+		this.initAddCommentHandle();//初始化添加批注评论方法
 	},
 	bindScroll:function(){//绑定滚动条
 		if(this.$el.find("div.commentScroll").hasClass('mCustomScrollbar')){

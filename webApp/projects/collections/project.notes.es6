@@ -6,7 +6,8 @@ App.Project.NotesCollection={
 		pageIndexNotes:1,
 		pageIndexComment:1,
 		toMeBool:true,
-		viewpointId:''
+		viewpointId:'',
+		hosttype:0,
 	},
 	//获取批注列表的方法
 	GetNotesListCollection: new(Backbone.Collection.extend({
