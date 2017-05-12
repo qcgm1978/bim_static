@@ -79,30 +79,11 @@ App.Project = {
 	markerClick: function(marker) {
 		console.log("marker:",marker);
 		//add by wuweiwei begin 2017-5-10
-		if(App.prevMarker!=undefined)
-		{
-			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds();//选中与否
-			App.Project.resetProperNull();//清空属性面板的内容
-			App.Project.Settings.Viewer.viewer.render();
-		}
-		/*
-		if(App.prevMarker==undefined)
-		{
-			App.prevMarker = marker!=null ? marker : undefined;
-		}
-		else
-		{
-			if(App.prevMarker && marker && App.prevMarker.id != marker.id)
-			{
-				App.prevMarker = marker.id;
-			}
-			else
-			{
-				App.prevMarker = undefined;
-			}
-		}
-		*/
-		App.prevMarker = marker!=null ? marker : undefined;
+
+		App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds();//选中与否
+		App.Project.resetProperNull();//清空属性面板的内容
+		App.Project.Settings.Viewer.viewer.render();
+
 		//add by wuweiwei end 
 
 		var id = marker? marker.id:"",
@@ -1848,7 +1829,7 @@ App.Project = {
 	},
 
 	//根据类型渲染数据
-	renderModelContentByType: function(_type) { //参数_type用于单击模型时传递"design"
+	renderModelContentByType: function() {
 
 		var type = App.Project.Settings.projectNav,
 			$rightPropertyContent = $("#projectContainer .rightPropertyContent");
@@ -1857,11 +1838,6 @@ App.Project = {
 		$rightPropertyContent.children('div').hide();
 		App.Project.isShowMarkers('other');
 		
-		if(_type!=undefined) //add by wuweiwei 2017-5-11
-		{
-			type = _type;	
-		}
-		console.log(type);
 		//设计
 		if (type == "design") {
 			$rightPropertyContent.find(".singlePropetyBox").remove();

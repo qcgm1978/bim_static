@@ -8,7 +8,7 @@
  * @require /libsH5/js/libs/three.min.js
  */
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20170222";
+CLOUD.Version = "20170511";
 
 /**
  * @namespace CLOUD.GlobalData
@@ -15038,7 +15038,8 @@ CLOUD.FlyEditor = function (cameraEditor, scene, domElement) {
 
     this.timeoutId = null;
 
-    this.isLockCameraHeight = true;
+    // Allow pan when Axis Z locked
+    this.isLockCameraHeight = false;
     this.lockCameraHeight = 0;
 
     //this.clock = new THREE.Clock();
@@ -15396,16 +15397,17 @@ CLOUD.FlyEditor.prototype = {
             this.deltaYaw = 0.0;
 
             // 俯仰
-            if (this.constrainPitch) {
-                if (this.pitchDeltaTotal < this.pitchMax && this.pitchDeltaTotal > this.pitchMin) {
+            if (this.deltaPitch !== 0) {
+                if (this.constrainPitch) {
+                    if (this.pitchDeltaTotal < this.pitchMax && this.pitchDeltaTotal > this.pitchMin) {
+                        this.goPitch(-this.deltaPitch);
+                        this.deltaPitch = 0.0;
+                    }
+                } else {
                     this.goPitch(-this.deltaPitch);
                     this.deltaPitch = 0.0;
                 }
-            } else {
-                this.goPitch(-this.deltaPitch);
-                this.deltaPitch = 0.0;
             }
-
             // 钳制总仰角
             this.pitchDeltaTotal = THREE.Math.clamp(this.pitchDeltaTotal, this.pitchMin, this.pitchMax);
         }
@@ -17692,8 +17694,8 @@ CLOUD.Model.prototype.load = function (notifyProgress) {
         // scope.cfgInfo = cfg;
         var sceneCount = scope.sceneCount = metadata.scenes;
         var mpkCount = metadata.mpks;
-        var symbolCount = metadata.symbol;
-        var octreeCount_o = metadata.octree_o;
+        var symbolCount = metadata.symbol || 0;
+        var octreeCount_o = metadata.octree_o || 1;
         var octreeCount_i = metadata.octree_i || 0;
         var materialCount = metadata.material || 0;
         var userDataCount = metadata.userdata || 0;// userdata
