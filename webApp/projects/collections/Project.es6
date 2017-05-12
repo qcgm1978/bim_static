@@ -1829,7 +1829,7 @@ App.Project = {
 	},
 
 	//根据类型渲染数据
-	renderModelContentByType: function(_type) { //参数_type用于单击模型时传递"design"
+	renderModelContentByType: function() {
 
 		var type = App.Project.Settings.projectNav,
 			$rightPropertyContent = $("#projectContainer .rightPropertyContent");
@@ -1838,11 +1838,6 @@ App.Project = {
 		$rightPropertyContent.children('div').hide();
 		App.Project.isShowMarkers('other');
 		
-		if(_type!=undefined) //add by wuweiwei 2017-5-11
-		{
-			type = _type;	
-		}
-		console.log(type);
 		//设计
 		if (type == "design") {
 			$rightPropertyContent.find(".singlePropetyBox").remove();
