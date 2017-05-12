@@ -4,9 +4,36 @@ App.Project.NotesCommentComponentView = Backbone.View.extend({
 	template:_.templateUrl("/projects/tpls/project/notes/project.notes.comment.component.html"),
 	default:{
 	},
+	events:{
+		"click .deleteNotesCommentBtn":"deleteNotesCommentHandle",//删除批注的快照
+	},
 	render: function() {
 		this.$el.html(this.template(this.model));
 		return this;
 	},
+	deleteNotesCommentHandle(evt){//删除批注的快照
+		var notesId = $(evt.target).data("id");
+		var viewpointid = $(evt.target).data("viewpointid");
+		$.confirm("确认删除该评论么？", function() {
+			var pars = {
+				projectId:parseInt(App.Project.Settings.projectId),
+				viewPointId:viewpointid,
+				commentId:notesId,
+				
+			}
+			var data = {
+				URLtype: "deleteNotesComment",
+				data: pars,
+				type: "delete"
+			}
+			App.Comm.ajax(data, (data) => {
+				if (data.code == 0) {
+					App.Project.NotesCollection.getCommentListHandle();//共用了获取批注评论列表的方法
+				} else {
+					alert(data.message);
+				}
+			})
+		});
+	}
 	
 })
