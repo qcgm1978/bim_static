@@ -187,6 +187,24 @@
           self.pub('loaded', res);
         },
         click: function(res) {
+          var intersect = res.intersect;        
+
+          if (!intersect) {
+              self.viewer.showPickedInformation(null);
+              return;
+          }       
+
+          // 如果需要显示轴网信息，则获得轴网信息
+          //var helper = this.getMiniMapObject();
+          //helper.getAxisGridInfoByIntersect(intersect);
+
+          // 是否允许显示信息
+          if (intersect.innnerDebugging) {
+              self.viewer.showPickedInformation(intersect);
+          } else {
+              self.viewer.showPickedInformation(null);
+          }
+
           self.pub('click', res);
         },
         empty: function(res) {
