@@ -565,7 +565,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		});
 
 		viewer.on("click", function(model) {
-			
+
 			//取消计划高亮
 			var result = that.cancelhighlightPlan(),
 				viewer = App.Project.Settings.Viewer,
