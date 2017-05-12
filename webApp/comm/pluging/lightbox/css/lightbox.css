@@ -212,15 +212,16 @@ body.lb-disable-scrolling {
   font-style: normal;
   font-size: 14px;
   position: absolute;
-  right: 64px;
+  right: 78px;
   top: 0;
 }
 .lb-data .lb-closeContainer span.downloadImg{
-  right: 74px;
+  right: 88px;
 }
 .lb-data .lb-closeContainer span.lookModel{
-  width: 56px;
+  width: 70px;
   right: 0;
+  text-align: left;
 }
 
 .lb-data .lb-number {

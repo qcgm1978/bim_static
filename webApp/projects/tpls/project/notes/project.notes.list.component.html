@@ -6,7 +6,7 @@
 	<%}else if(obj.hostType == 2){%>
 		<i class="notesTypeIcon icon_drawing_type"></i>
 	<%}%>
-	<div class="notesThumbnailBox"><a href="<%= obj.pic %>" title="<%= obj.name %>" data-lightbox="example-1"><img src="<%= obj.pic %>"></a></div>
+	<div class="notesThumbnailBox"><a href="<%= obj.pic %>" data-openurl="/static/dist/app/project/single/filePreview.html?id=<%= obj.fileVersionId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" data-notestype="<%= obj.hostType %>" title="<%= obj.name %>" data-lightbox="example-1"><img src="<%= obj.pic %>"></a></div>
 	<dl class="notesDescBox">
 		<dt>
 			<div class="notesDescTextBox"><%= obj.name %></div>
@@ -24,13 +24,15 @@
 		<%}else if(obj.hostType == 2){%>
 			<a href="/static/dist/app/project/single/filePreview.html?id=<%= obj.fileVersionId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank">查看图纸</a>
 		<%}%>
-		<i>|</i>
-		<a href="javascript:;">编辑</a>
-		<i>|</i>
-		<a href="javascript:;">删除</a>
-		<i>|</i>
-		<a href="javascript:;">分享</a>
+		<i></i>
+		<%if(editDeleteBool){%>
+			<a href="javascript:;" class="iconEdit">编辑</a>
+			<i></i>
+			<a href="javascript:;" class="iconDel">删除</a>
+			<i></i>
+		<%}%>
+		<a href="javascript:;" class="iconShare">分享</a>
 	</div>
 	<span><%= obj.versionName %></span>
 </div>
-<input type="hidden" data-notesid="<%= obj.id %>" data-viewpointid="<%= obj.viewPoint %>">
+<input type="hidden" data-notestype="<%= obj.type %>" data-notesname="<%= obj.name %>" data-notescretorname="<%= obj.creatorName %>" data-notescretortime="<%= obj.createTime %>" data-notesimgsrc="<%= obj.pic %>" data-notesid="<%= obj.id %>" data-viewpointid="<%= obj.viewPoint %>">

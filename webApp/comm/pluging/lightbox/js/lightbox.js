@@ -154,7 +154,15 @@
     }); 
     this.$lightbox.find('.lb-loader, .lookModel').on('click', function(event) {//点击查看模型执行的方法
         self.end();
-        App.Project.NotesCollection.clickModelHandle();
+        var openurl = $(event.target).data("openurl");
+        if($(event.target).html() == "查看模型"){
+          App.Project.NotesCollection.clickModelHandle();
+        }else if($(event.target).html() == "查看单模型"){
+          window.open(openurl,'_blank');
+        }else if($(event.target).html() == "查看图纸"){
+          window.open(openurl,'_blank');
+        }
+        // App.Project.NotesCollection.clickModelHandle();
         // var url = $(event.target).closest("#lightbox").find("img.lb-image").prop("src");
         // window.location.href=url;
         
@@ -212,7 +220,7 @@
     function addToAlbum($link) {
       self.album.push({
         link: $link.attr('href'),
-        title: $link.attr('data-title') || $link.attr('title')
+        title: $link.attr('data-title') || $link.attr('title'),
       });
     }
 
@@ -247,6 +255,17 @@
     // Position Lightbox
     var top  = $window.scrollTop() + this.options.positionFromTop;
     var left = $window.scrollLeft();
+    var notesType = $link.attr('data-notestype') || $link.attr('notesType');
+    var openurl = $link.attr('data-openurl') || $link.attr('openurl');
+    if(notesType){
+      if(notesType == 0){
+        this.$lightbox.find(".lookModel").html("查看模型");
+      }else if(notesType == 1){
+        this.$lightbox.find(".lookModel").html("查看单模型").attr("data-openurl",openurl);
+      }else if(notesType == 2){
+        this.$lightbox.find(".lookModel").html("查看图纸").attr("data-openurl",openurl);
+      }
+    }
     this.$lightbox.css({
       top: top + 'px',
       left: left + 'px'
