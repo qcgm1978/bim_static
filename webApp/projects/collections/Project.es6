@@ -79,30 +79,11 @@ App.Project = {
 	markerClick: function(marker) {
 		console.log("marker:",marker);
 		//add by wuweiwei begin 2017-5-10
-		if(App.prevMarker!=undefined)
-		{
-			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds();//选中与否
-			App.Project.resetProperNull();//清空属性面板的内容
-			App.Project.Settings.Viewer.viewer.render();
-		}
-		/*
-		if(App.prevMarker==undefined)
-		{
-			App.prevMarker = marker!=null ? marker : undefined;
-		}
-		else
-		{
-			if(App.prevMarker && marker && App.prevMarker.id != marker.id)
-			{
-				App.prevMarker = marker.id;
-			}
-			else
-			{
-				App.prevMarker = undefined;
-			}
-		}
-		*/
-		App.prevMarker = marker!=null ? marker : undefined;
+
+		App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds();//选中与否
+		App.Project.resetProperNull();//清空属性面板的内容
+		App.Project.Settings.Viewer.viewer.render();
+
 		//add by wuweiwei end 
 
 		var id = marker? marker.id:"",
