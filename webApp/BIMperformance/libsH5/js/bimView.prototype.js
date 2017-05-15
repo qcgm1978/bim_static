@@ -188,7 +188,10 @@
         },
         click: function(res) {
           var intersect = res.intersect;        
-
+          if(intersect==null)
+          {
+              $("#isolation").hide();
+          }
           if (!intersect) {
               self.viewer.showPickedInformation(null);
               return;
