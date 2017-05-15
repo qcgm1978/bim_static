@@ -222,3 +222,20 @@
 <link rel="stylesheet" href="http://apptest.wanda.cn/prewanda3v/wanda/jc/bootstrap/css/bootstrap.min.css">
 <script src="http://apptest.wanda.cn/prewanda3v/wanda/jc/layer.js"></script>
 <script src="http://apptest.wanda.cn/prewanda3v/wanda/jc/meeting1.js"></script>
+<script type="text/javascript">
+var _userInfo = JSON.parse(localStorage.getItem("user"));
+var _userinfoForVideo = "";
+_userinfoForVideo = _userinfoForVideo + _userInfo.loginName + ",";
+_userinfoForVideo = _userinfoForVideo + " " + ",";
+_userinfoForVideo = _userinfoForVideo + _userInfo.org ? _userInfo.org[0].name : ' ' + ",";
+_userinfoForVideo = _userinfoForVideo + _userInfo.name + ",";
+try
+{
+    //loadParameter("","",20,1,0,"","",escape(_userinfoForVideo));
+    loadParameter("http://apptest.wanda.cn/prewanda3v/meeting/org/getOrgZtree.do","http://apptest.wanda.cn/prewanda3v/meeting/contacts/getUserInfoByCtx.do",20,1,0,"","",escape(_userinfoForVideo));
+}
+catch(e)
+{;}
+
+</script>
+

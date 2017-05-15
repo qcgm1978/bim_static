@@ -8,7 +8,7 @@
  * @require /libsH5/js/libs/three.min.js
  */
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20170511";
+CLOUD.Version = "20170512";
 
 /**
  * @namespace CLOUD.GlobalData
@@ -13674,6 +13674,10 @@ CLOUD.PickHelper.prototype = {
                 if (!event.ctrlKey) {
                     scope.filter.setSelectedIds();
                 }
+
+                intersect.innnerDebugging = event.altKey ? true : false;
+                intersect.cx = screenX;
+                intersect.cy = screenY;
                 
                 if (scope.filter.addSelectedId(userId, intersect.object.userData, true)) {
 
@@ -20497,6 +20501,10 @@ CLOUD.Viewer = function () {
     this.isRecalculationPlanes = false;
     this.calculationPlanesBind = this.calculationPlanes.bind(this);
     this.addRenderFinishedCallback(this.calculationPlanesBind);
+
+    // 内部 debug 使用
+    this.debugInfoDiv = null;
+    this.lastDebugInfoDivShow = false;
 };
 
 /**
@@ -21738,6 +21746,150 @@ CLOUD.Viewer.prototype = {
 
         }
 
+    },
+
+    /**
+     * 显示Pick构件信息
+     *
+     * @param {Object} intersect - 相交信息对象, 来源pick
+     */
+    showPickedInformation : function (intersect) {
+
+        var divWidth = 340, divHeight = 320;
+        var scope = this;
+
+        function hideDiv() {
+
+            var info = scope.debugInfoDiv;
+
+            if (info && info.style.display !== "none") {
+                info.style.display = "none";
+                //info.parentNode.removeChild(info);
+
+                if (scope.lastDebugInfoDivShow) {
+                    info.removeEventListener('dblclick', hideDiv, false);
+                    scope.lastDebugInfoDivShow = false;
+                }
+            }
+        }
+
+        function adjustLocation(div, posX, posY) {
+
+            if (!div) return;
+
+            if (div.style.display != "none") {
+                var oLeft, oTop;
+
+                var tmpX = posX + divWidth;
+                var tmpY = posY + divHeight;
+
+                if (posX !== undefined && posY !== undefined) {
+                    if (window.innerWidth) {
+
+                        if (tmpX > window.innerWidth) {
+                            oLeft = window.pageXOffset + (posX - divWidth) + "px";
+                        } else {
+                            oLeft = window.pageXOffset + posX + "px";
+                        }
+
+                        if (tmpY > window.innerHeight) {
+                            oTop = window.pageYOffset + (posY - divHeight) + "px";
+                        } else {
+                            oTop = window.pageYOffset + posY + "px";
+                        }
+
+                        //oLeft = window.pageXOffset + posX + "px";
+                        //oTop = window.pageYOffset + posY + "px";
+                    } else {
+                        var dde = document.documentElement;
+                        oLeft = dde.scrollLeft + posX + "px";
+                        oTop = dde.scrollTop + posY + "px";
+                    }
+                } else {
+                    // 居中
+                    if (window.innerWidth) {
+                        oLeft = window.pageXOffset + (window.innerWidth - divWidth) / 2 + "px";
+                        oTop = window.pageYOffset + (window.innerHeight - divHeight) / 2 + "px";
+                    } else {
+                        var dde = document.documentElement;
+                        oLeft = dde.scrollLeft + (dde.offsetWidth - divWidth) / 2 + "px";
+                        oTop = dde.scrollTop + (dde.offsetHeight - divHeight) / 2 + "px";
+                    }
+                }
+
+                div.style.left = oLeft;
+                div.style.top = oTop;
+            }
+        }
+
+        if (!intersect) {
+            hideDiv();
+            return;
+        }
+
+        var cx = intersect.cx, cy = intersect.cy;
+
+        if (!this.debugInfoDiv) {
+            this.debugInfoDiv = document.createElement("div");
+            this.debugInfoDiv.id = "debugPickedInfo";
+            this.debugInfoDiv.style.display = "block";
+            this.debugInfoDiv.style.position = "absolute";
+            this.debugInfoDiv.style.width = divWidth + "px";
+            this.debugInfoDiv.style.height = divHeight + "px";
+            this.debugInfoDiv.style.backgroundColor = "#ffffdd";
+            this.debugInfoDiv.style.borderWidth = "2px";
+            this.debugInfoDiv.style.borderStyle = "solid";
+            this.debugInfoDiv.style.opacity = "0.8";
+
+            document.body.appendChild(this.debugInfoDiv);
+        }
+
+        this.debugInfoDiv.style.display = "";
+
+        // 支持面板一直显示
+        if (!this.lastDebugInfoDivShow) {
+            this.lastDebugInfoDivShow = true;
+            this.debugInfoDiv.addEventListener('dblclick', hideDiv, false);
+        }
+
+        var axisGridInfo = intersect.axisGridInfo;
+        var position = intersect.worldPosition;
+
+        // 加些样式
+        var html = "";
+        html += "<span>&#9830;&nbsp;&nbsp;Base Information</span><ul style='width:340px;list-style:none'>";
+        html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;border-bottom: 1px solid #ccc;float:left;width:80px;height:66px;text-align:left;line-height:66px'>ID</li>";
+        html += "<li style='border:1px solid #ccc;float:left;width:200px;height:66px;text-align:left;'>" + intersect.userId + "</li>";
+        html += "</ul>";
+
+        html += "</br><span>&#9830;&nbsp;&nbsp;Position</span><ul style='width:340px;list-style:none'>";
+        html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px'>X</li>";
+        html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px;border-right: 1px solid #ccc'>" + position.x + "</li>";
+        html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px'>Y</li>";
+        html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px;border-right: 1px solid #ccc'>" + position.y + "</li>";
+        html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px;border-bottom: 1px solid #ccc'>Z</li>";
+        html += "<li style='border:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px'>" + position.z + "</li>";
+        html += "</ul>";
+
+        if (axisGridInfo) {
+
+            html += "</br><span>&#9830;&nbsp;&nbsp;Axis Grid Information</span><ul style='width:340px;list-style:none'>";
+            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px'>distanceX</li>";
+            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px;border-right: 1px solid #ccc'>(" + axisGridInfo.numeralName + ", " + axisGridInfo.offsetX + ")</li>";
+            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px;border-bottom: 1px solid #ccc'>distanceY</li>";
+            html += "<li style='border:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px'>(" + axisGridInfo.abcName + ", " + axisGridInfo.offsetY + ")</li>";
+            html += "</ul>";
+        } else {
+
+            html += "</br><span>&#9830;&nbsp;&nbsp;Axis Grid Information</span><ul style='width:340px;list-style:none'>";
+            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px;border-bottom: 1px solid #ccc'>message</li>";
+            html += "<li style='border:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px'><span style='color: red'> not exist axis grid!!!</span></li>";
+            html += "</ul>";
+        }
+
+        this.debugInfoDiv.innerHTML = html + "<br /><br />";
+
+        adjustLocation(this.debugInfoDiv, cx, cy);
     }
 
 };

@@ -19,7 +19,8 @@ App.Services.step1 = Backbone.View.extend({
       this.$el.addClass('step1in3');
     }else if(typeof name=='string'){
       $.ajax({
-        url: "platform//auth/user?name="+name
+        //url: "platform/auth/user?name="+name
+        url: "platform/auth/search/user?name="+name //modify by wuweiwei 2017-5-12
       }).done(function(data){
         // console.log(data);
         if(data.code == 0){
