@@ -195,8 +195,8 @@
           }       
 
           // 如果需要显示轴网信息，则获得轴网信息
-          //var helper = this.getMiniMapObject();
-          //helper.getAxisGridInfoByIntersect(intersect);
+          var helper = self.getMiniMapObject();
+          helper.getAxisGridInfoByIntersect(intersect);
 
           // 是否允许显示信息
           if (intersect.innnerDebugging) {
