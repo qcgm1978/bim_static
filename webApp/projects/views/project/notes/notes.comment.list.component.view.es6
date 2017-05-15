@@ -5,11 +5,19 @@ App.Project.NotesCommentComponentView = Backbone.View.extend({
 	default:{
 	},
 	events:{
-		"click .deleteNotesCommentBtn":"deleteNotesCommentHandle",//删除批注的快照
+		"click .deleteNotesCommentBtn":"deleteNotesCommentHandle",//删除批注的评论
+		"click .commentLookModel":"commentLookModelHandle",//评论里面的查看模型方法
+		"click .attachmentThumbnailBox":"commentLookModelHandle",//评论里面的查看模型方法
 	},
 	render: function() {
 		this.$el.html(this.template(this.model));
 		return this;
+	},
+	commentLookModelHandle(event){//评论里面的查看模型方法
+		var target = $(event.target);
+		var viewpointInput = $("#viewpointInput");
+		viewpointInput.attr("data-viewpoint",target.data("viewpointid"));
+		App.Project.NotesCollection.clickModelHandle();//执行查看模型方法
 	},
 	deleteNotesCommentHandle(evt){//删除批注的快照
 		var notesId = $(evt.target).data("id");

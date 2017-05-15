@@ -1,13 +1,15 @@
 /**
  * @require /projects/collections/Project.es6
  */
-App.Project.NotesCollection={
+App.Project.NotesCollection = {
 	defaults:{
 		pageIndexNotes:1,
 		pageIndexComment:1,
 		toMeBool:true,
 		viewpointId:'',
 		hosttype:0,
+		attachments:[],//评论上传附件的列表
+		atUserArrs:[],//@用户的列表
 	},
 	//获取批注列表的方法
 	GetNotesListCollection: new(Backbone.Collection.extend({
@@ -139,5 +141,17 @@ App.Project.NotesCollection={
 		if(viewpoint && App.Project.Settings.Viewer){
 			App.Project.Settings.Viewer.setCamera(viewpoint);
 		}
+	},
+	uploadsnapshotCallbackHandle(data){//当视点插入完成之后执行的方法
+		var html = "";
+		var commentAttachmentListBox = $("#commentAttachmentListBox");
+		html += '<li>'
+					+'<div class="imgThumbnailBox"><img src="'+data.pictureUrl+'"></div>'
+					+'<span class="imgThumbnailType">[快照]</span>'
+					+'<span class="imgThumbnailName">'+data.description+'</span>'
+					+'<a href="javascript:;" data-id="'+data.id+'" class="deleteUploadImg">删除</a>'
+				+'</li>';
+		commentAttachmentListBox.prepend(html);
+		App.Project.NotesCollection.defaults.attachments.push(data.id);
 	},
 }

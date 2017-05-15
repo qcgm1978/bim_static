@@ -1,20 +1,17 @@
 App.Project.AddCommentView = Backbone.View.extend({
 	tagName: "div",
 	className: "addCommentBox",
-	template:_.templateUrl("/projects/tpls/project/notes/project.notes.add.comment.html"),
-	default:{
-		attachments:[],
-		atUserArrs:[],
-	},
+	template:_.templateUrl("/projects/tpls/project/notes/project.notes.add.comment.html",true),
 	events:{
 		"click .uploadTypeBtn .uploadImg":"uploadImgHandle",//点击评论上传图片按钮执行的方法
+		"click .uploadTypeBtn .uploadFile":"uploadImgHandle",//点击评论上传图片按钮执行的方法
 		"change .uploadTypeBtn .fileButton":"fileButtonHandle",//点击评论上传图片按钮执行的方法
 		"click .deleteUploadImg":"deleteUploadImgHandle",//点击删除上传图片的方法
 		"click .uploadBtn":"uploadBtnHandle",//点击评论按钮执行的方法
 		"click .uploadTypeBtn .uploadsnapshot":"uploadsnapshotHandle",//点击插入模型批注视角按钮执行的方法
 	},
 	render: function() {
-		this.$el.html(this.template({hosttype:App.Project.NotesCollection.defaults.hosttype}));
+		this.$el.html(this.template);
 		this.atHandle();//at用户方法
 		return this;
 	},
@@ -34,7 +31,7 @@ App.Project.AddCommentView = Backbone.View.extend({
 			},
 			callback: function($item) {
 				//点击单个用户回调
-				_this.default.atUserArrs.push({
+				App.Project.NotesCollection.defaults.atUserArrs.push({
 					userId: $item.data("uid") + "",
 					userName: $item.find(".name").text().trim()
 				});
@@ -54,14 +51,16 @@ App.Project.AddCommentView = Backbone.View.extend({
 	},
 	fileButtonHandle() {//提交
 		$("#commentUploadImageForm").submit();
+		$("#commentAttachmentListBox").prepend("<li class='loading'>上传中....</li>")
 	},
-	uploadSuccess(event) {//图片上传成功之后的方法
+	uploadSuccess(event) {//图片上传成功之后的方法 accept="image/*"
 		var that = this;
 		$("#commentUploadIframe").on("load", function(event) {
-			var data = JSON.parse(this.contentDocument.body.innerText);
+			var data = JSON.parse(this.contentDocument.body.innerText);//获取ifrem里面的文本
 			var commentAttachmentListBox = $("#commentAttachmentListBox");
 			var html="";
 			if (data.code == 0) {
+				commentAttachmentListBox.find(".loading").remove();
 				data = data.data;
 				html += '<li>'
 							+'<div class="imgThumbnailBox"><img src="'+data.pictureUrl+'"></div>';
@@ -69,22 +68,22 @@ App.Project.AddCommentView = Backbone.View.extend({
 					html += '<span class="imgThumbnailType">[图片]</span>';
 				}else if(data.type==3){
 
-				}else if(data.type==4 || data.type==4){
-
+				}else if(data.type==4 || data.type==5){
+					
 				}
 				html +=	'<span class="imgThumbnailName">'+data.description+'</span>'
 						+'<a href="javascript:;" data-id="'+data.id+'" class="deleteUploadImg">删除</a>'
 					+'</li>';
-				commentAttachmentListBox.append(html);
-				that.default.attachments.push(data.id);
+				commentAttachmentListBox.prepend(html);
+				App.Project.NotesCollection.defaults.attachments.push(data.id);
 				that.bindCommentScroll();
 			}
 		});
 	},
 	deleteUploadImgHandle(target){//点击删除上传图片的方法
-		for (var i = 0,len=this.default.attachments.length; i<len; i++) {
-			if(this.default.attachments[i]==$(event.target).data("id")){
-				this.default.attachments.splice(i,1);
+		for (var i = 0,len=App.Project.NotesCollection.defaults.attachments.length; i<len; i++) {
+			if(App.Project.NotesCollection.defaults.attachments[i]==$(event.target).data("id")){
+				App.Project.NotesCollection.defaults.attachments.splice(i,1);
 				$(event.target).closest("li").remove();
 			}
 		}
@@ -97,14 +96,14 @@ App.Project.AddCommentView = Backbone.View.extend({
 		//开始配置@用户列表的方法
 		var texts = this.$(".textareaBox textarea").val().trim().split('@'),
 			textsUniq = [],
-			atUserArrs = [];
+			uploadAtUserArrs = [];
 		for (var i = 1; i < texts.length; i++) {
 			_.contains(textsUniq, texts[i].split(' ')[0]) ? '' : textsUniq.push(texts[i].split(' ')[0]);
 		}
 		for (var j = 0; j < textsUniq.length; j++) {
-			for (var k = 0; k < this.default.atUserArrs.length; k++) {
-				if (this.default.atUserArrs[k]['userName'] == textsUniq[j]) {
-					atUserArrs.push(this.default.atUserArrs[k]);
+			for (var k = 0; k < App.Project.NotesCollection.defaults.atUserArrs.length; k++) {
+				if (App.Project.NotesCollection.defaults.atUserArrs[k]['userName'] == textsUniq[j]) {
+					uploadAtUserArrs.push(App.Project.NotesCollection.defaults.atUserArrs[k]);
 					break;
 				}
 			}
@@ -115,9 +114,9 @@ App.Project.AddCommentView = Backbone.View.extend({
 				projectId: parseInt(App.Project.Settings.projectId),
 				viewPointId: App.Project.NotesCollection.defaults.viewpointId,
 				text: this.$(".textareaBox textarea").val().trim(),
-				attachments: this.default.attachments,//评论附件id列表
+				attachments: App.Project.NotesCollection.defaults.attachments,//评论附件id列表
 				projectVersionId: parseInt(App.Project.Settings.versionId),
-				receivers: this.default.atUserArrs,// 消息接收者列表
+				receivers: uploadAtUserArrs,// 消息接收者列表
 			},
 			data = {
 				URLtype: "createComment",
@@ -138,6 +137,8 @@ App.Project.AddCommentView = Backbone.View.extend({
 		App.Comm.ajax(data, (data) => {
 			if (data.code == 0) {
 				App.Project.NotesCollection.getCommentListHandle({viewpointId:data.data.viewpointId});
+				App.Project.NotesCollection.defaults.atUserArrs = [];
+				App.Project.NotesCollection.defaults.attachments = [];
 			}
 		})
 	},
@@ -159,8 +160,8 @@ App.Project.AddCommentView = Backbone.View.extend({
 		$("#closeDialogModelBtn").on("click",function(){
 			$(".addModelBgHtmlDom").fadeOut();
 			$(".addModelHtmlDom").fadeOut();
-			var projectContainer = $("#projectContainer");
-			projectContainer[0].appendChild($("#dialogModelBox .projectCotent")[0]);
+			var modelContainerContent = $("#projectContainer .modelContainerContent");
+			modelContainerContent[0].appendChild($("#dialogModelBox .bim")[0]);
 			$(".addModelBgHtmlDom").remove();
 			$(".addModelHtmlDom").remove();
 		})
@@ -172,7 +173,7 @@ App.Project.AddCommentView = Backbone.View.extend({
 	},
 	typeContentChange(){
 		var dialogModelBox = $("#dialogModelBox");
-		dialogModelBox[0].appendChild($("#projectContainer .projectCotent")[0]);
+		dialogModelBox[0].appendChild($("#projectContainer .bim")[0]);
 		App.Project.NotesCollection.renderModelCallBackHandle();
 	},
 	fetchModelIdByProject: function() {

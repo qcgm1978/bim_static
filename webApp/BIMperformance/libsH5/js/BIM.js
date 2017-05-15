@@ -11,7 +11,7 @@
       new bimView.sidebar.init(_opt, obj);
       obj.on('loaded', function() {
         $('.modelSidebar').addClass('show');
-        if($("#viewpointInput").data("viewpoint")){
+        if($("#viewpointInput").data("viewpoint")){//
           App.Project.NotesCollection.renderModelCallBackHandle();
         }else{
           viewer.zoomToBuilding(0, 1.15);

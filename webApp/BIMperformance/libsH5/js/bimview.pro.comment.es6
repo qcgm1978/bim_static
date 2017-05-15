@@ -65,8 +65,10 @@
 			$comment.find(".fullLoading").show();
 		}
 
-		$("#comment .navBar .item.project").click();
-
+		// $("#comment .navBar .item.project").click();
+		if($(".m-camera").hasClass("selected")){
+			$("#comment .navBar .item.save").click();
+		}
 	}
 
 
@@ -267,7 +269,19 @@
 							return;
 						}
 						//保存
-						CommentApi.saveCommentStart(null, 'viewPoint', null);
+						if($("#dialogModelBox") && $("#dialogModelBox").children(".bim")&&$("#dialogModelBox").children(".bim").length>0){
+							CommentApi.saveCommentStart(null, "commentViewPoint", (data) => {
+								if(App.Project.NotesCollection && App.Project.NotesCollection.uploadsnapshotCallbackHandle){
+									App.Project.NotesCollection.uploadsnapshotCallbackHandle({
+										pictureUrl: data.pic,
+										description: data.name,
+										id: data.id
+									});
+								}
+							})
+						}else{
+							CommentApi.saveCommentStart(null, 'viewPoint', null);//commentViewPoint
+						}
 					}
 				}
 
@@ -754,8 +768,16 @@
 
 				//评论视点
 				commentViewPoint() {
-
 					CommentApi.saveCommentStart(null, "commentViewPoint", (data) => {
+						if(App.Project.NotesCollection && App.Project.NotesCollection.uploadsnapshotCallbackHandle){
+							App.Project.NotesCollection.uploadsnapshotCallbackHandle({
+								pictureUrl: data.pic,
+								description: data.name,
+								id: data.id
+							});
+						}
+					})
+					/*CommentApi.saveCommentStart(null, "commentViewPoint", (data) => {
 
 						//上传地址或者评论视点后
 						CommentApi.afterUploadAddressViewPoint.call(this, {
@@ -766,7 +788,7 @@
 
 						//显示
 						$(".modelSidebar").addClass("show open");
-					});
+					});*/
 				},
 
 				//保存位置
@@ -777,7 +799,13 @@
 						//上传地址或者评论视点后
 						CommentApi.afterUploadAddressViewPoint.call(this, data);
 						//显示
-						$(".modelSidebar").addClass("show open");
+						// $(".modelSidebar").addClass("show open");
+						//显示
+						if($(".modelSidebar").hasClass("open")){
+							$(".modelSidebar").addClass("show open");
+						}else{
+							$(".modelSidebar").addClass("show");
+						}
 					});
 					$("#topSaveTip .btnSave").click();
 				},
@@ -1197,7 +1225,13 @@
 									if (cate != "viewPoint") {
 										App.Project.Settings.Viewer.commentEnd();
 										//收起导航
-										$(".modelSidebar").addClass("show open");
+										// $(".modelSidebar").addClass("show open");
+										//显示
+										if($(".modelSidebar").hasClass("open")){
+											$(".modelSidebar").addClass("show open");
+										}else{
+											$(".modelSidebar").addClass("show");
+										}
 									} else{
 										//App.Project.Settings.Viewer.viewer.extensionHelper.annotationHelper.annotationEditor.addDomEventListeners();///
 									}
@@ -1268,7 +1302,12 @@
 				$topSaveTip.on("click", ".btnCanel", function() {
 					App.Project.Settings.Viewer.commentEnd();
 					//显示
-					$(".modelSidebar").addClass("show open");
+					if($(".modelSidebar").hasClass("open")){
+						$(".modelSidebar").addClass("show open");
+					}else{
+						$(".modelSidebar").addClass("show");
+					}
+					
 
 				});
 			},
@@ -1284,7 +1323,7 @@
 						projectId: App.Project.Settings.projectId,
 						name: dialog.element.find(".name").val().trim(),
 						type: dialog.type,
-						viewPointId: $comment.find('.remarkCount.current').data("id"),
+						viewPointId: App.Project.NotesCollection.defaults.viewpointId,
 						viewPoint: commentData.camera
 					};
 
@@ -1375,7 +1414,7 @@
 								dialog.close();
 
 								//显示
-								$(".modelSidebar").addClass("show open");
+								// $(".modelSidebar").addClass("show open");
 
 								$("#topSaveTip .btnCanel").click();
 

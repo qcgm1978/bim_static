@@ -22,7 +22,9 @@ App.Project.NotesListView = Backbone.View.extend({
 	notesClickHandle(evt){//点击每个批注执行的方法
 		var target = $(evt.target).closest("li");
 		var notesId = target.children("input").data("notesid");
+		var hosttype = target.children("input").data("hosttype");
 		var viewpointInput = $("#viewpointInput");
+		this.initAddCommentHandle();//初始化添加批注评论方法
 		viewpointInput.attr("data-viewpoint",target.children("input").data("viewpointid"));
 		if(evt.target.tagName == "A"){
 			var $data = target.find("input");
@@ -52,8 +54,16 @@ App.Project.NotesListView = Backbone.View.extend({
 					App.Project.NotesCollection.getCommentListHandle();
 					App.Project.NotesCollection.defaults.hosttype = target.children("input").data("hosttype");//当前点击的批注是什么类型的
 				}
+				if(hosttype == 0){
+					$("a.uploadsnapshot").css("display","inline-block");
+				}
 			}
 		}
+	},
+	initAddCommentHandle(){//初始化添加批注评论方法
+		var addCommentBox = this.$("#addCommentBox");
+		var AddCommentView = new App.Project.AddCommentView();
+		addCommentBox.html(AddCommentView.render().el);
 	},
 	editNotesHandle($li) {//编辑批注的方法
 		var _this = this;
