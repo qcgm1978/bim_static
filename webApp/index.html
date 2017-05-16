@@ -225,10 +225,13 @@
 <script type="text/javascript">
 var _userInfo = JSON.parse(localStorage.getItem("user"));
 var _userinfoForVideo = "";
+var _temp = "";
 _userinfoForVideo = _userinfoForVideo + _userInfo.loginName + ",";
 _userinfoForVideo = _userinfoForVideo + " " + ",";
-_userinfoForVideo = _userinfoForVideo + _userInfo.org ? _userInfo.org[0].name : ' ' + ",";
-_userinfoForVideo = _userinfoForVideo + _userInfo.name + ",";
+_temp = _userInfo.org ? _userInfo.org[0].name : ' ';
+_userinfoForVideo = _userinfoForVideo + _temp + ',';
+_userinfoForVideo = _userinfoForVideo + _userInfo.name;
+console.log(_userinfoForVideo);
 try
 {
     //loadParameter("","",20,1,0,"","",escape(_userinfoForVideo));
