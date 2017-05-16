@@ -2,15 +2,19 @@ App.Project.NotesCommentView = Backbone.View.extend({
 	tagName: "div",
 	className: "commetnListBox",
 	template:_.templateUrl("/projects/tpls/project/notes/project.notes.comment.list.html",true),
-	default:{
-	},
 	initialize() {//初始化
 		this.listenTo(App.Project.NotesCollection.GetCommentListCollection, "add", this.addOne);
 		this.listenTo(App.Project.NotesCollection.GetCommentListCollection, "reset", this.resetList);
 	},
 	render: function() {
 		this.$el.html(this.template);
+		this.initAddCommentHandle();//初始化添加评论模块
 		return this;
+	},
+	initAddCommentHandle(){//初始化添加批注评论方法
+		var addCommentBox = this.$("#addCommentBox");
+		var AddCommentView = new App.Project.AddCommentView();
+		addCommentBox.html(AddCommentView.render().el);
 	},
 	addOne(model){//初始化复选框事件
 		var data = model.toJSON();

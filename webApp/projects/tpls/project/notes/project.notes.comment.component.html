@@ -9,7 +9,11 @@
 			<%for(var i=0,len=this.model.attachments.length;i<len;i++){%>
 				<%if(this.model.attachments[i].type == 1){%>
 					<div class="commentDescComponentBox" id="<%= this.model.attachments[i].id%>">
-						<div class="attachmentThumbnailBox"><img src="<%= this.model.attachments[i].pictureUrl%>"></div>
+						<div class="attachmentThumbnailBox">
+							<a href="<%= this.model.attachments[i].pictureUrl %>" title="<%= this.model.attachments[i].description %>" data-type="<%= this.model.attachments[i].type %>" data-lightbox="example-1">
+								<img src="<%= this.model.attachments[i].pictureUrl%>">
+							</a>
+						</div>
 						<div class="attachmentDescBox">
 							<div class="attachmentDescNameBox"><%= this.model.attachments[i].description%></div>
 							<div class="attachmentDescSizeBox">[图片]</div>
@@ -18,7 +22,7 @@
 				<%}else if(this.model.attachments[i].type == 3){%>
 					<div class="commentDescComponentBox" id="<%= this.model.attachments[i].id%>">
 						<div class="attachmentThumbnailBox" data-viewpointid="<%= this.model.attachments[i].data%>">
-							<a href="<%= this.model.attachments[i].pictureUrl %>" title="<%= this.model.attachments[i].name %>" data-lightbox="example-1">
+							<a href="<%= this.model.attachments[i].pictureUrl %>" title="<%= this.model.attachments[i].description %>" data-lightbox="example-1">
 								<img src="<%= this.model.attachments[i].pictureUrl%>">
 							</a>
 						</div>

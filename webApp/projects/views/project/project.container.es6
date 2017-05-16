@@ -455,18 +455,20 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$target.addClass("selected").siblings().removeClass("selected");
 		}else if(type=="notes"){
 			var notesBox = $projectContainer.find(".notesBox");
-			$projectContainer.find(".leftNav").hide();
-			$projectContainer.find(".rightProperty").removeClass("showPropety");
-			$(".projectContainerApp .projectHeader .projectTab").hide();
-			$projectCotent.removeClass("showPropety").hide();
-			notesBox.show();
-			if(!App.Project.Settings.NotesDatas){
-				var NotesSearchCondition = new App.Project.NotesSearchCondition;
-				notesBox.html(NotesSearchCondition.render().el);
-				var NotesListView = new App.Project.NotesListView;
-				notesBox.append(NotesListView.render().el);
+			$projectContainer.find(".leftNav").hide();//关闭左侧树的模块
+			if($projectCotent.hasClass("showPropety")){//关闭右边列表模块
+				$projectCotent.removeClass("showPropety");
 			}
-			$target.addClass("selected").siblings().removeClass("selected");
+			$projectCotent.hide();//关闭右边列表模块
+			$projectContainer.find(".rightProperty").removeClass("showPropety");//关闭右侧属性模块
+			notesBox.show();//批注页面展示
+			$target.addClass("selected").siblings().removeClass("selected");//导航切换到批注上面
+			if(!App.Project.Settings.NotesDatas){
+				var NotesSearchCondition = new App.Project.NotesSearchCondition;//顶部搜索功能
+				var NotesContentView = new App.Project.NotesContentView;//批注内容区域
+				notesBox.html(NotesSearchCondition.render().el);
+				notesBox.append(NotesContentView.render().el);
+			}
 		}
 		window.Global.DemoEnv("modelTab"); //add by wuweiwei
 	},

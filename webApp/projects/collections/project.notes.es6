@@ -62,29 +62,32 @@ App.Project.NotesCollection = {
 			type:"POST",
 			contentType:"application/json",
 			success:function(collection, response, options){
-				var $content = $(".leftNotesListBox");
-				var pageCount = response.data.totalItemCount;
-				$content.find(".sumDesc").html('共 ' + pageCount + ' 条批注');
-				if(pageCount == 0){
-					$("#leftNotesListBox").html('<li class="loading">暂无评论</li>');
-				}else{
-					$content.find(".loading").remove();
-				 	// $("#leftNotesListBox li").eq(0).click();//如果有批注默认去第一个批注的评论
-					$content.find(".listPagination").empty().pagination(pageCount, {
-					    items_per_page: response.data.pageItemCount,
-					    current_page: response.data.pageIndex - 1,
-					    num_edge_entries: 3, //边缘页数
-					    num_display_entries: 5, //主体页数
-					    link_to: 'javascript:void(0);',
-					    itemCallback: function(pageIndex) {
-					        //加载数据
-					        App.Project.NotesCollection.defaults.pageIndexNotes = pageIndex + 1;
-					        App.Project.NotesCollection.defaults.pageIndexComment=1;
-					        App.Project.NotesCollection.getNotesListHandle();
-					    },
-					    prev_text: "上一页",
-					    next_text: "下一页"
-					});
+				if(response.code == 0){
+					var $content = $(".leftNotesListBox");
+					var pageCount = response.data.totalItemCount;
+					$content.find(".sumDesc").html('共 ' + pageCount + ' 条批注');
+					if(response.data.items.length == 0){
+						$("#leftNotesListBox").html('<li class="loading">暂无批注</li>');
+					}else{
+						$content.find(".loading").remove();
+					 	$("#leftNotesListBox li").eq(0).click();//如果有批注默认去第一个批注的评论
+						$content.find(".listPagination").empty().pagination(pageCount, {
+						    items_per_page: response.data.pageItemCount,
+						    current_page: response.data.pageIndex - 1,
+						    num_edge_entries: 3, //边缘页数
+						    num_display_entries: 5, //主体页数
+						    link_to: 'javascript:void(0);',
+						    itemCallback: function(pageIndex) {
+						        //加载数据
+						        App.Project.NotesCollection.defaults.pageIndexNotes = pageIndex + 1;
+						        App.Project.NotesCollection.defaults.pageIndexComment=1;
+						        App.Project.NotesCollection.getNotesListHandle();
+						    },
+						    prev_text: "上一页",
+						    next_text: "下一页"
+						});
+					}
+					App.Project.Settings.NotesDatas = response.data.items;
 				}
 				return response.data;
 			}
@@ -95,7 +98,7 @@ App.Project.NotesCollection = {
 		var defaultData = {
 			"viewpointId":App.Project.NotesCollection.defaults.viewpointId,
 			"pageIndex":App.Project.NotesCollection.defaults.pageIndexComment,
-			"pageItemCount":1
+			"pageItemCount":3
 		};
 		var extendData = $.extend({},defaultData,parmer);
 		App.Project.NotesCollection.GetCommentListCollection.reset();
@@ -108,7 +111,7 @@ App.Project.NotesCollection = {
 				var pageCount = response.data.totalItemCount;
 				$("#commentNumberBox").html('共 ' + pageCount + ' 条评论');
 				$("#listPagination").html("");
-				if(pageCount == 0){
+				if(response.data.items == 0){
 					commentComponentBox.find(".loading").html('暂无评论');
 				}else{
 					commentComponentBox.find(".loading").remove();

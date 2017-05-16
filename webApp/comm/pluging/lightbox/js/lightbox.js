@@ -256,16 +256,22 @@
     var top  = $window.scrollTop() + this.options.positionFromTop;
     var left = $window.scrollLeft();
     var notesType = $link.attr('data-notestype') || $link.attr('notesType');
+    var type = $link.attr('data-type') || $link.attr('type');
     var openurl = $link.attr('data-openurl') || $link.attr('openurl');
-    if(notesType){
-      if(notesType == 0){
-        this.$lightbox.find(".lookModel").html("查看模型");
-      }else if(notesType == 1){
+    var openurl = $link.attr('data-openurl') || $link.attr('openurl');
+    this.$lightbox.find(".lookModel").html("查看模型");
+    this.$lightbox.find(".lookModel").siblings('i').show();
+    if(type && type == 1){
+      this.$lightbox.find(".lookModel").html("");
+      this.$lightbox.find(".lookModel").siblings('i').hide();
+    }else if(notesType){
+      if(notesType == 1){
         this.$lightbox.find(".lookModel").html("查看单模型").attr("data-openurl",openurl);
       }else if(notesType == 2){
         this.$lightbox.find(".lookModel").html("查看图纸").attr("data-openurl",openurl);
       }
     }
+    
     this.$lightbox.css({
       top: top + 'px',
       left: left + 'px'

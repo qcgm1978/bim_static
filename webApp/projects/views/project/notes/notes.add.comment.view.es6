@@ -49,15 +49,20 @@ App.Project.AddCommentView = Backbone.View.extend({
 		}
 		return this.$(".fileButton").click();
 	},
-	fileButtonHandle() {//提交
-		$("#commentUploadImageForm").submit();
-		$("#commentAttachmentListBox").prepend("<li class='loading'>上传中....</li>")
+	fileButtonHandle(evt) {//提交
+		var commentAttachmentListBox = this.$("#commentAttachmentListBox");
+		commentAttachmentListBox.find(".loading").remove();
+		commentAttachmentListBox.prepend("<li class='loading'>上传中....</li>");
+		if(evt.target.files.length>0){
+			$("#commentUploadImageForm").submit();
+		}
+		
 	},
 	uploadSuccess(event) {//图片上传成功之后的方法 accept="image/*"
 		var that = this;
 		$("#commentUploadIframe").on("load", function(event) {
 			var data = JSON.parse(this.contentDocument.body.innerText);//获取ifrem里面的文本
-			var commentAttachmentListBox = $("#commentAttachmentListBox");
+			var commentAttachmentListBox = that.$("#commentAttachmentListBox");
 			var html="";
 			if (data.code == 0) {
 				commentAttachmentListBox.find(".loading").remove();
@@ -86,6 +91,11 @@ App.Project.AddCommentView = Backbone.View.extend({
 				App.Project.NotesCollection.defaults.attachments.splice(i,1);
 				$(event.target).closest("li").remove();
 			}
+		}
+		if(App.Project.NotesCollection.defaults.attachments.length == 0){
+			var commentAttachmentListBox = this.$("#commentAttachmentListBox");
+			commentAttachmentListBox.find(".loading").remove();
+			commentAttachmentListBox.prepend("<li class='loading'>暂无评论附件</li>")
 		}
 	},
 	uploadBtnHandle(event){//点击评论按钮执行的方法
@@ -136,9 +146,12 @@ App.Project.AddCommentView = Backbone.View.extend({
 		//创建
 		App.Comm.ajax(data, (data) => {
 			if (data.code == 0) {
+				$btnEnter.html("评论").attr("data-issubmit", false);
 				App.Project.NotesCollection.getCommentListHandle({viewpointId:data.data.viewpointId});
 				App.Project.NotesCollection.defaults.atUserArrs = [];
 				App.Project.NotesCollection.defaults.attachments = [];
+				this.$(".textareaBox textarea").val("");
+				this.$("#commentAttachmentListBox").html("<li class='loading'>暂无附件</li>")
 			}
 		})
 	},
