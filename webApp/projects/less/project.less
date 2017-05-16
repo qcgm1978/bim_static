@@ -424,6 +424,9 @@
 																border:#ccc solid 1px;
 																padding: 10px;
 																margin-bottom: 8px;
+																a.canDownloadFile:hover{
+																	text-decoration: none;
+																}
 																.attachmentThumbnailBox{
 																	width: 96px;
 																	height: 72px;
@@ -544,11 +547,15 @@
 												.imgThumbnailName{
 													float: left;
 													width: auto;
-													min-width: 370px;
-													padding-right: 16px;
+													min-width: 220px;
 													overflow: hidden;
 													text-overflow:ellipsis;
 													white-space: nowrap;
+												}
+												.imgThumbnailSize{
+													float: left;
+													width: auto;
+													margin: 0 8px;
 												}
 												.deleteUploadBtn{
 													width: 16px;
@@ -558,6 +565,10 @@
 													right: 0;
 													top: 0;
 													display: none;
+												}
+												a{
+													display: inline-block;
+													float:right;
 												}
 											}
 											li.loading{

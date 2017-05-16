@@ -31,13 +31,75 @@
 							<div class="attachmentDescSizeBox">[快照]<a href="javascript:;" data-viewpointid="<%= this.model.attachments[i].data%>" class="commentLookModel">查看模型</a></div>
 						</div>
 					</div>
-				<%}else if(this.model.attachments[i].type == 4 || this.model.attachments[i].type == 5){%>
-					<div class="commentDescComponentBox" id="<%= this.model.attachments[i].id%>">
-						<div class="attachmentThumbnailBox"><img src="<%= this.model.attachments[i].pictureUrl%>"></div>
-						<div class="attachmentDescBox">
-							<div class="attachmentDescNameBox"></div>
-							<div class="attachmentDescSizeBox"></div>
-						</div>
+				<%}else if(this.model.attachments[i].type == 4){%>
+					<div class="commentDescComponentBox">
+						<a href="javascript:;" class="canDownloadFile" data-viewpointid="<%= this.model.viewpointId%>" data-attachmentid="<%= this.model.attachments[i].id%>">
+							<div class="attachmentThumbnailBox"><img src="../../../images/word.png"></div>
+							<div class="attachmentDescBox">
+								<div class="attachmentDescNameBox"><%= this.model.attachments[i].description%></div>
+								<div class="attachmentDescSizeBox"><%= App.Comm.formatSize(this.model.attachments[i].length)%></div>
+							</div>
+						</a>
+					</div>
+				<%}else if(this.model.attachments[i].type == 5){%>
+					<div class="commentDescComponentBox">
+						<a href="javascript:;" class="canDownloadFile" data-viewpointid="<%= this.model.viewpointId%>" data-attachmentid="<%= this.model.attachments[i].id%>">
+							<div class="attachmentThumbnailBox"><img src="../../../images/ppt.png"></div>
+							<div class="attachmentDescBox">
+								<div class="attachmentDescNameBox"><%= this.model.attachments[i].description%></div>
+								<div class="attachmentDescSizeBox"><%= App.Comm.formatSize(this.model.attachments[i].length)%></div>
+							</div>
+						</a>
+					</div>
+				<%}else if(this.model.attachments[i].type == 6){%>
+					<div class="commentDescComponentBox">
+						<a href="javascript:;" class="canDownloadFile" data-viewpointid="<%= this.model.viewpointId%>" data-attachmentid="<%= this.model.attachments[i].id%>">
+							<div class="attachmentThumbnailBox"><img src="../../../images/excel.png"></div>
+							<div class="attachmentDescBox">
+								<div class="attachmentDescNameBox"><%= this.model.attachments[i].description%></div>
+								<div class="attachmentDescSizeBox"><%= App.Comm.formatSize(this.model.attachments[i].length)%></div>
+							</div>
+						</a>
+					</div>
+				<%}else if(this.model.attachments[i].type == 7){%>
+					<div class="commentDescComponentBox">
+						<a href="javascript:;" class="canDownloadFile" data-viewpointid="<%= this.model.viewpointId%>" data-attachmentid="<%= this.model.attachments[i].id%>">
+							<div class="attachmentThumbnailBox"><img src="../../../images/pdf.png"></div>
+							<div class="attachmentDescBox">
+								<div class="attachmentDescNameBox"><%= this.model.attachments[i].description%></div>
+								<div class="attachmentDescSizeBox"><%= App.Comm.formatSize(this.model.attachments[i].length)%></div>
+							</div>
+						</a>
+					</div>
+				<%}else if(this.model.attachments[i].type == 8){%>
+					<div class="commentDescComponentBox">
+						<a href="javascript:;" class="canDownloadFile" data-viewpointid="<%= this.model.viewpointId%>" data-attachmentid="<%= this.model.attachments[i].id%>">
+							<div class="attachmentThumbnailBox"><img src="../../../images/dwg.png"></div>
+							<div class="attachmentDescBox">
+								<div class="attachmentDescNameBox"><%= this.model.attachments[i].description%></div>
+								<div class="attachmentDescSizeBox"><%= App.Comm.formatSize(this.model.attachments[i].length)%></div>
+							</div>
+						</a>
+					</div>
+				<%}else if(this.model.attachments[i].type == 9){%>
+					<div class="commentDescComponentBox">
+						<a href="javascript:;" class="canDownloadFile" data-viewpointid="<%= this.model.viewpointId%>" data-attachmentid="<%= this.model.attachments[i].id%>">
+							<div class="attachmentThumbnailBox"><img src="../../../images/rvt.png"></div>
+							<div class="attachmentDescBox">
+								<div class="attachmentDescNameBox"><%= this.model.attachments[i].description%></div>
+								<div class="attachmentDescSizeBox"><%= App.Comm.formatSize(this.model.attachments[i].length)%></div>
+							</div>
+						</a>
+					</div>
+				<%}else if(this.model.attachments[i].type == 10){%>
+					<div class="commentDescComponentBox">
+						<a href="javascript:;" class="canDownloadFile" data-viewpointid="<%= this.model.viewpointId%>" data-attachmentid="<%= this.model.attachments[i].id%>">
+							<div class="attachmentThumbnailBox"><img src="../../../images/default.png"></div>
+							<div class="attachmentDescBox">
+								<div class="attachmentDescNameBox"><%= this.model.attachments[i].description%></div>
+								<div class="attachmentDescSizeBox"><%= App.Comm.formatSize(this.model.attachments[i].length)%></div>
+							</div>
+						</a>
 					</div>
 				<%}%>
 			<%}%>

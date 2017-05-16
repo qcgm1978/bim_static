@@ -53,7 +53,8 @@ App.Project.NotesCollection = {
 			"opTimeStart":"",
 			"opTimeEnd":"",
 			"pageIndex":App.Project.NotesCollection.defaults.pageIndexNotes,
-			"pageItemCount":8
+			"pageItemCount":8,
+			"type":1
 		};
 		var extendData = $.extend({},defaultData,parmer);
 		App.Project.NotesCollection.GetNotesListCollection.reset();

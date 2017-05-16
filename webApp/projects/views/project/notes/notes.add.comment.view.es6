@@ -4,8 +4,9 @@ App.Project.AddCommentView = Backbone.View.extend({
 	template:_.templateUrl("/projects/tpls/project/notes/project.notes.add.comment.html",true),
 	events:{
 		"click .uploadTypeBtn .uploadImg":"uploadImgHandle",//点击评论上传图片按钮执行的方法
-		"click .uploadTypeBtn .uploadFile":"uploadImgHandle",//点击评论上传图片按钮执行的方法
-		"change .uploadTypeBtn .fileButton":"fileButtonHandle",//点击评论上传图片按钮执行的方法
+		"click .uploadTypeBtn .uploadFile":"uploadFileHandle",//点击评论上传文件按钮执行的方法
+		"change .uploadTypeBtn .fileButton":"fileButtonHandle",//点击评论上传按钮执行的方法
+		"change .uploadTypeBtn .uploadFileButton":"fileButtonHandle",//点击评论上传按钮执行的方法
 		"click .deleteUploadImg":"deleteUploadImgHandle",//点击删除上传图片的方法
 		"click .uploadBtn":"uploadBtnHandle",//点击评论按钮执行的方法
 		"click .uploadTypeBtn .uploadsnapshot":"uploadsnapshotHandle",//点击插入模型批注视角按钮执行的方法
@@ -41,13 +42,38 @@ App.Project.AddCommentView = Backbone.View.extend({
 	uploadImgHandle(evt){//点击评论上传图片按钮执行的方法
 		var viewPointId = App.Project.NotesCollection.defaults.viewpointId;
 		var url = "sixD/" + App.Project.Settings.projectId + "/viewPoint/" + viewPointId + "/comment/pic";
-		$("#commentUploadImageForm").prop("action", url);
+		var commentUploadImageForm = $("#commentUploadImageForm");
+		var uploadImgDom = $('<input type="file" name="uploadImg" class="fileButton" value="上传图片" accept="image/*" />');
+		if(commentUploadImageForm.find(".uploadFileButton").length>0){
+			commentUploadImageForm.find(".uploadFileButton").remove();
+		}
+		if(commentUploadImageForm.find(".fileButton").length==0){
+			commentUploadImageForm.prepend(uploadImgDom).prop("action", url);
+		}
 		//上传完成
 		if (!this.bindUpload) {
 			this.uploadSuccess();
 			this.bindUpload = true;
 		}
 		return this.$(".fileButton").click();
+	},
+	uploadFileHandle(){//点击评论上传文件按钮执行的方法
+		var viewPointId = App.Project.NotesCollection.defaults.viewpointId;
+		var url = "sixD/" + App.Project.Settings.projectId + "/viewPoint/" + viewPointId + "/comment/doc";
+		var commentUploadImageForm = $("#commentUploadImageForm");
+		var uploadFileButton = $('<input type="file" name="uploadFile" class="uploadFileButton" value="上传文件" />');
+		if(commentUploadImageForm.find(".fileButton").length>0){
+			commentUploadImageForm.find(".fileButton").remove();
+		}
+		if(commentUploadImageForm.find(".uploadFileButton").length==0){
+			commentUploadImageForm.prepend(uploadFileButton).prop("action", url);
+		}
+		//上传完成
+		if (!this.bindUpload) {
+			this.uploadSuccess();
+			this.bindUpload = true;
+		}
+		return this.$(".uploadFileButton").click();
 	},
 	fileButtonHandle(evt) {//提交
 		var commentAttachmentListBox = this.$("#commentAttachmentListBox");
@@ -67,18 +93,47 @@ App.Project.AddCommentView = Backbone.View.extend({
 			if (data.code == 0) {
 				commentAttachmentListBox.find(".loading").remove();
 				data = data.data;
-				html += '<li>'
-							+'<div class="imgThumbnailBox"><img src="'+data.pictureUrl+'"></div>';
-				if(data.type==1){
-					html += '<span class="imgThumbnailType">[图片]</span>';
-				}else if(data.type==3){
-
-				}else if(data.type==4 || data.type==5){
-					
+				html += '<li>';
+				switch(data.type){
+					case 1:
+						html += '<div class="imgThumbnailBox"><img src="'+data.pictureUrl+'"></div>'+
+								'<span class="imgThumbnailType">[图片]</span>';
+						break;
+					case 4:
+						html += '<div class="imgThumbnailBox"><img src="../../../images/word.png"></div>'+
+								'<span class="imgThumbnailType">[word]</span>';
+						break;
+					case 5:
+						html += '<div class="imgThumbnailBox"><img src="../../../images/ppt.png"></div>'+
+								'<span class="imgThumbnailType">[ppt]</span>';
+						break;
+					case 6:
+						html += '<div class="imgThumbnailBox"><img src="../../../images/excel.png"></div>'+
+								'<span class="imgThumbnailType">[excel]</span>';
+						break;
+					case 7:
+						html += '<div class="imgThumbnailBox"><img src="../../../images/pdf.png"></div>'+
+								'<span class="imgThumbnailType">[pdf]</span>';
+						break;
+					case 8:
+						html += '<div class="imgThumbnailBox"><img src="../../../images/dwg.png"></div>'+
+								'<span class="imgThumbnailType">[dwg]</span>';
+						break;
+					case 9:
+						html += '<div class="imgThumbnailBox"><img src="../../../images/rvt.png"></div>'+
+								'<span class="imgThumbnailType">[rvt]</span>';
+						break;
+					case 10:
+						html += '<div class="imgThumbnailBox"><img src="../../../images/default.png"></div>'+
+								'<span class="imgThumbnailType">[文档]</span>';
+						break;
+					default:
+						break;
 				}
-				html +=	'<span class="imgThumbnailName">'+data.description+'</span>'
-						+'<a href="javascript:;" data-id="'+data.id+'" class="deleteUploadImg">删除</a>'
-					+'</li>';
+				html +=	'<span class="imgThumbnailName">'+data.description+'</span>'+
+						'<span class="imgThumbnailSize">'+App.Comm.formatSize(data.length)+'</span>'+
+						'<a href="javascript:;" data-id="'+data.id+'" class="deleteUploadImg">删除</a>'+
+					'</li>';
 				commentAttachmentListBox.prepend(html);
 				App.Project.NotesCollection.defaults.attachments.push(data.id);
 				that.bindCommentScroll();
