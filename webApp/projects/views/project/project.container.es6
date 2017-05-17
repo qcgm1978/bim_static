@@ -406,14 +406,10 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$projectContainer = $("#projectContainer"),
 			$projectCotent = $projectContainer.find(".projectCotent");
 		App.Project.Settings.fetchNavType = type;
-
-
 		if (type == "file") {
-
 			//左右侧
 			$projectContainer.find(".rightProperty").removeClass("showPropety");
 			$projectContainer.find(".leftNav").show();
-
 			$projectCotent.removeClass("showPropety").show();
 			//批注盒子
 			$projectContainer.find(".notesBox").hide();
@@ -422,7 +418,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$projectContainer.find(".modelContainer").hide();
 			//模型tab
 			$(".projectContainerApp .projectHeader .projectTab").hide();
-
 			//绑定上传
 			var status = App.Project.Settings.CurrentVersion.status;
 			if (status != 9 && status != 4 && status != 7) {
@@ -432,44 +427,38 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			} else {
 				//$(".fileContainer .btnFileUpload").hide(); note by wuweiwei
 			}
-			//隐藏下拉
-			$target.addClass("selected").siblings().removeClass("selected");
-
 		} else if(type == "model"){
-
 			if (!typeof(Worker)) {
 				alert("请使用现代浏览器查看模型");
 				return;
 			}
+			$projectContainer.find(".notesBox").hide();
+			$projectContainer.find(".leftNav").hide();//关闭左侧树的模块
+			$projectContainer.find(".fileContainer").hide();
 			//加载过数据后 直接切换 否则 加载数据
 			if (App.Project.Settings.DataModel && App.Project.Settings.DataModel.sourceId) {
 				this.typeContentChange();
 			} else {
 				this.fetchModelIdByProject();
 			}
-			//批注盒子
-			$projectContainer.find(".leftNav").show();
-			$projectContainer.find(".projectCotent").show();
-			$projectContainer.find(".notesBox").hide();
-			//隐藏下拉
-			$target.addClass("selected").siblings().removeClass("selected");
+			$projectCotent.show();
 		}else if(type=="notes"){
-			var notesBox = $projectContainer.find(".notesBox");
+			$projectCotent.addClass("showPropety").hide();
 			$projectContainer.find(".leftNav").hide();//关闭左侧树的模块
-			if($projectCotent.hasClass("showPropety")){//关闭右边列表模块
-				$projectCotent.removeClass("showPropety");
-			}
-			$projectCotent.hide();//关闭右边列表模块
 			$projectContainer.find(".rightProperty").removeClass("showPropety");//关闭右侧属性模块
+			$projectContainer.find(".fileContainer").hide();
+			$projectContainer.find(".modelContainer").hide();
+			var notesBox = $projectContainer.find(".notesBox");
 			notesBox.show();//批注页面展示
 			$target.addClass("selected").siblings().removeClass("selected");//导航切换到批注上面
-			if(!App.Project.Settings.NotesDatas){
+			if(!App.Project.Settings.NotesDatas || App.Project.Settings.NotesDatas.length==0){
 				var NotesSearchCondition = new App.Project.NotesSearchCondition;//顶部搜索功能
 				var NotesContentView = new App.Project.NotesContentView;//批注内容区域
 				notesBox.html(NotesSearchCondition.render().el);
 				notesBox.append(NotesContentView.render().el);
 			}
 		}
+		$target.addClass("selected").siblings().removeClass("selected");
 		window.Global.DemoEnv("modelTab"); //add by wuweiwei
 	},
 
@@ -481,7 +470,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 		//左右侧
 		$projectContainer.find(".leftNav").hide();
-
 		$projectCotent.addClass("showPropety");
 		$projectContainer.find(".rightProperty").addClass("showPropety").width(mRight);
 

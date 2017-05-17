@@ -4,8 +4,8 @@
 <div class="commentDescBox">
 	<p><%= this.model.creatorName %> <%= new Date(this.model.createTime).format("yyyy-MM-dd hh:mm") %></p>
 	<h2><%= this.model.text%></h2>
-	<div class="commentDescListBox" id="commentDescListBox">
-		<%if(this.model.attachments && this.model.attachments.length>0){%>
+	<%if(this.model.attachments && this.model.attachments.length>0){%>
+		<div class="commentDescListBox" id="commentDescListBox">
 			<%for(var i=0,len=this.model.attachments.length;i<len;i++){%>
 				<%if(this.model.attachments[i].type == 1){%>
 					<div class="commentDescComponentBox" id="<%= this.model.attachments[i].id%>">
@@ -103,10 +103,8 @@
 					</div>
 				<%}%>
 			<%}%>
-		<%}else{%>
-			<div class="commentDescComponentNullBox">评论附件为空</div>
-		<%}%>
-	</div>
+		</div>
+	<%}%>
 </div>
 <%if(this.model.creatorId == App.Comm.user("userId")){%>
 	<a href="javascript:;" data-id="<%= this.model.id%>" data-viewpointid="<%= this.model.viewpointId%>" class="deleteNotesCommentBtn">删除</a>
