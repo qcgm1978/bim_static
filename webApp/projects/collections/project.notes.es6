@@ -1,13 +1,15 @@
 /**
  * @require /projects/collections/Project.es6
  */
-App.Project.NotesCollection={
+App.Project.NotesCollection = {
 	defaults:{
 		pageIndexNotes:1,
 		pageIndexComment:1,
 		toMeBool:true,
 		viewpointId:'',
 		hosttype:0,
+		attachments:[],//评论上传附件的列表
+		atUserArrs:[],//@用户的列表
 	},
 	//获取批注列表的方法
 	GetNotesListCollection: new(Backbone.Collection.extend({
@@ -51,7 +53,8 @@ App.Project.NotesCollection={
 			"opTimeStart":"",
 			"opTimeEnd":"",
 			"pageIndex":App.Project.NotesCollection.defaults.pageIndexNotes,
-			"pageItemCount":8
+			"pageItemCount":8,
+			"type":1
 		};
 		var extendData = $.extend({},defaultData,parmer);
 		App.Project.NotesCollection.GetNotesListCollection.reset();
@@ -60,29 +63,32 @@ App.Project.NotesCollection={
 			type:"POST",
 			contentType:"application/json",
 			success:function(collection, response, options){
-				var $content = $(".leftNotesListBox");
-				var pageCount = response.data.totalItemCount;
-				$content.find(".sumDesc").html('共 ' + pageCount + ' 条批注');
-				if(pageCount == 0){
-					$("#leftNotesListBox").html('<li class="loading">暂无评论</li>');
-				}else{
+				if(response.code == 0){
+					var $content = $(".leftNotesListBox");
+					var pageCount = response.data.totalItemCount;
+					$content.find(".sumDesc").html('共 ' + pageCount + ' 条批注');
 					$content.find(".loading").remove();
-				 	// $("#leftNotesListBox li").eq(0).click();//如果有批注默认去第一个批注的评论
-					$content.find(".listPagination").empty().pagination(pageCount, {
-					    items_per_page: response.data.pageItemCount,
-					    current_page: response.data.pageIndex - 1,
-					    num_edge_entries: 3, //边缘页数
-					    num_display_entries: 5, //主体页数
-					    link_to: 'javascript:void(0);',
-					    itemCallback: function(pageIndex) {
-					        //加载数据
-					        App.Project.NotesCollection.defaults.pageIndexNotes = pageIndex + 1;
-					        App.Project.NotesCollection.defaults.pageIndexComment=1;
-					        App.Project.NotesCollection.getNotesListHandle();
-					    },
-					    prev_text: "上一页",
-					    next_text: "下一页"
-					});
+					if(response.data.items.length == 0){
+						$("#leftUlNotesListBox").html('<li class="clickItem loading">暂无批注</li>');
+					}else{
+						$content.find(".listPagination").empty().pagination(pageCount, {
+						    items_per_page: response.data.pageItemCount,
+						    current_page: response.data.pageIndex - 1,
+						    num_edge_entries: 3, //边缘页数
+						    num_display_entries: 5, //主体页数
+						    link_to: 'javascript:void(0);',
+						    itemCallback: function(pageIndex) {
+						        //加载数据
+						        App.Project.NotesCollection.defaults.pageIndexNotes = pageIndex + 1;
+						        App.Project.NotesCollection.defaults.pageIndexComment=1;
+						        App.Project.NotesCollection.getNotesListHandle();
+						    },
+						    prev_text: "上一页",
+						    next_text: "下一页"
+						});
+					}
+					$("#leftNotesListBox li").eq(0).click();//如果有批注默认去第一个批注的评论
+					App.Project.Settings.NotesDatas = response.data.items;
 				}
 				return response.data;
 			}
@@ -93,7 +99,7 @@ App.Project.NotesCollection={
 		var defaultData = {
 			"viewpointId":App.Project.NotesCollection.defaults.viewpointId,
 			"pageIndex":App.Project.NotesCollection.defaults.pageIndexComment,
-			"pageItemCount":1
+			"pageItemCount":3
 		};
 		var extendData = $.extend({},defaultData,parmer);
 		App.Project.NotesCollection.GetCommentListCollection.reset();
@@ -106,7 +112,7 @@ App.Project.NotesCollection={
 				var pageCount = response.data.totalItemCount;
 				$("#commentNumberBox").html('共 ' + pageCount + ' 条评论');
 				$("#listPagination").html("");
-				if(pageCount == 0){
+				if(response.data.items == 0){
 					commentComponentBox.find(".loading").html('暂无评论');
 				}else{
 					commentComponentBox.find(".loading").remove();
@@ -139,5 +145,17 @@ App.Project.NotesCollection={
 		if(viewpoint && App.Project.Settings.Viewer){
 			App.Project.Settings.Viewer.setCamera(viewpoint);
 		}
+	},
+	uploadsnapshotCallbackHandle(data){//当视点插入完成之后执行的方法
+		var html = "";
+		var commentAttachmentListBox = $("#commentAttachmentListBox");
+		html += '<li>'
+					+'<div class="imgThumbnailBox"><img src="'+data.pictureUrl+'"></div>'
+					+'<span class="imgThumbnailType">[快照]</span>'
+					+'<span class="imgThumbnailName">'+data.description+'</span>'
+					+'<a href="javascript:;" data-id="'+data.id+'" class="deleteUploadImg">删除</a>'
+				+'</li>';
+		commentAttachmentListBox.prepend(html);
+		App.Project.NotesCollection.defaults.attachments.push(data.id);
 	},
 }

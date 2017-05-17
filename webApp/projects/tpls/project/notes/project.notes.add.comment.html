@@ -2,17 +2,14 @@
 	<textarea></textarea>
 </div>
 <div class="uploadListBox" id="uploadListBox">
-	<ul id="commentAttachmentListBox"></ul>
+	<ul id="commentAttachmentListBox"><li class='loading'>暂无评论附件</li></ul>
 </div>
 <div class="addCommentBottomBox">
 	<div class="uploadTypeBtn">
 		<form id="commentUploadImageForm" name="commentUploadImageForm" method="post" target="upload-iframe" enctype="multipart/form-data" encoding="multipart/form-data">
-		    <input type="file" name="uploadImg" class="fileButton" value="上传图片" accept="image/*" />
 		    <a href="javascript:;" class="uploadImg"></a>
 		    <a href="javascript:;" class="uploadFile"></a>
-		    <%if(obj.hosttype == 0){%>
-		   		<a href="javascript:;" class="uploadsnapshot"></a>
-		    <%}%>
+		    <a href="javascript:;" class="uploadsnapshot"></a>
 		</form>
 		<iframe id="commentUploadIframe" name="upload-iframe" style="display: none;"></iframe>
 	</div>
