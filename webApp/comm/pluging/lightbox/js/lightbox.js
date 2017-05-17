@@ -258,10 +258,13 @@
     var notesType = $link.attr('data-notestype') || $link.attr('notesType');
     var type = $link.attr('data-type') || $link.attr('type');
     var openurl = $link.attr('data-openurl') || $link.attr('openurl');
-    var openurl = $link.attr('data-openurl') || $link.attr('openurl');
+    var imbox = $link.attr('data-imbox') || $link.attr('imbox');
     this.$lightbox.find(".lookModel").html("查看模型");
     this.$lightbox.find(".lookModel").siblings('i').show();
-    if(type && type == 1){
+    if(imbox){
+      this.$lightbox.find(".lookModel").html("");
+      this.$lightbox.find(".lookModel").siblings('i').hide();
+    }else if(type && type == 1){
       this.$lightbox.find(".lookModel").html("");
       this.$lightbox.find(".lookModel").siblings('i').hide();
     }else if(notesType){

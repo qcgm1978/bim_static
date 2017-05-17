@@ -193,12 +193,16 @@ App.Project.NotesListDomView = Backbone.View.extend({
 				type: "delete"
 			}
 			App.Comm.ajax(data, (data) => {
-				App.Project.NotesCollection.getNotesListHandle();//共用了获取批注列表的方法
-				// if (data.code == 0) {
-				// 	App.Project.NotesCollection.getNotesListHandle();//共用了获取批注列表的方法
-				// } else {
-				// 	alert(data.message);
-				// }
+				if (data.code == 0) {
+					App.Project.NotesCollection.getNotesListHandle();//共用了获取批注列表的方法
+					// var commentComponentBox = $("#commentComponentBox");
+					// if(commentComponentBox.find("li").length==0){
+
+					// }
+					App.Project.NotesCollection.getNotesListHandle();//共用了获取批注列表的方法
+				} else {
+					alert(data.message);
+				}
 			})
 		});
 	},

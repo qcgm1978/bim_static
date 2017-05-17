@@ -98,6 +98,7 @@ App.ResourceModel.ListNav = Backbone.View.extend({
             //加载完成后加载
 			App.ResourceModel.Settings.Viewer.on("loaded", function() {
 				$('#lockAxisZ').show();
+				$(".toolsBar > i.m-camera").hide();
 			});
 			App.ResourceModel.Settings.Viewer.on("click", function(model) {
 				var viewer = App.ResourceModel.Settings.Viewer,

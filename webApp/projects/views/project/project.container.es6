@@ -443,6 +443,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			}
 			$projectCotent.show();
 		}else if(type=="notes"){
+			$(".projectContainerApp .projectHeader .projectTab").hide();
 			$projectCotent.addClass("showPropety").hide();
 			$projectContainer.find(".leftNav").hide();//关闭左侧树的模块
 			$projectContainer.find(".rightProperty").removeClass("showPropety");//关闭右侧属性模块

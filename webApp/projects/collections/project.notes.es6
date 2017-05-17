@@ -160,5 +160,20 @@ App.Project.NotesCollection = {
 				+'</li>';
 		commentAttachmentListBox.prepend(html);
 		App.Project.NotesCollection.defaults.attachments.push(data.id);
+		this.bindCommentScroll();
+	},
+	bindCommentScroll:function(){//绑定滚动条
+		if($("#uploadListBox").hasClass('mCustomScrollbar')){
+			$("#uploadListBox").mCustomScrollbar("update");
+		}else{
+			$("#uploadListBox").mCustomScrollbar({
+				theme: 'minimal-dark',
+				axis: 'y',
+				keyboard: {
+					enable: true
+				},
+				scrollInertia: 0,
+			}); 
+		}
 	},
 }

@@ -11,6 +11,7 @@
 
 			opts = {
 				width: 284,
+				height:109,
 				showTitle: false,
 				cssClass: "confirm",
 				showClose: false,

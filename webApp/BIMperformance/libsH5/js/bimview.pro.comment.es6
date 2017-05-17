@@ -1307,7 +1307,9 @@
 					}else{
 						$(".modelSidebar").addClass("show");
 					}
-					
+					if($(".toolsBar > i.m-camera").hasClass("selected")){
+						$(".toolsBar > i.m-camera").removeClass("selected")
+					}
 
 				});
 			},
@@ -1391,7 +1393,6 @@
 								imgData.data.isAdd = true;
 								//创建视点 才添加 colleciton
 								if (cate == "viewPoint") {
-
 									//项目
 									if ($comment.find(".navBar .project").hasClass("selected")) {
 										if (dialog.type == 1) {
@@ -1425,6 +1426,9 @@
 							}
 
 						});
+						if($(".toolsBar > i.m-camera").hasClass("selected")){
+							$(".toolsBar > i.m-camera").removeClass("selected")
+						}
 
 					} else {
 						alert(data.message);

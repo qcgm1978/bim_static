@@ -198,8 +198,10 @@ App.Project.AddCommentView = Backbone.View.extend({
 				App.Project.NotesCollection.getCommentListHandle({viewpointId:data.data.viewpointId});
 				App.Project.NotesCollection.defaults.atUserArrs = [];
 				App.Project.NotesCollection.defaults.attachments = [];
-				this.$(".textareaBox textarea").val("");
-				this.$("#commentAttachmentListBox").html();
+				this.$("#commentAttachmentListBox").html("");
+				this.$(".textareaBox textarea").val("请输入评论内容");
+				App.Project.NotesCollection.defaults.pageIndexComment=1;
+				App.Project.NotesCollection.getCommentListHandle();//共用了获取批注评论列表的方法
 			}
 		})
 	},
