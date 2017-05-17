@@ -1,3 +1,10 @@
+.nullDataBox{
+	width: 100%;
+	text-align: center;
+	line-height: 145px;
+	font-size: 14px;
+	color: #ccc;
+}
 .projectHeader { height: 37px; background-color: #f5f5f5; border-bottom: 1px #ccc solid; position: relative; z-index: 999;
 	.projectTab { float: right; height: 37px; position: relative; z-index: 3000; display: none;
 		.item { float: left; height: 100%; line-height: 37px; width: 35px; font-size: 16px; position: relative; text-align: center; margin-right: 40px; cursor: pointer;
@@ -63,8 +70,6 @@
 		.notesBox{
 			width: 100%;
 			height: 100%;
-			border: #ccc solid 1px;
-			border-top: 0;
 			padding: 20px;
 			position: relative;
 			display: none;
@@ -190,16 +195,26 @@
 							height: 100%;
 							float: left;
 							position: relative;
-							padding-bottom: 56px;
+							padding-bottom: 44px;
+							border-right: #ccc solid 1px;
+							border-left: #ccc solid 1px;
+							border-bottom: #ccc solid 1px;
+							div.loading{
+								width: 100%;
+								height: 30px;
+								line-height: 30px;
+								top:50%;
+								margin-top: -15px;
+								text-align: center;
+								left: 0;
+								position: absolute;
+							}
 							.scrollBox{
 								width: 100%;
 								height: 100%;
 								ul.leftUlNotesListBox{
 									width: 100%;
 									height: auto;
-									border-right: #ccc solid 1px;
-									border-left: #ccc solid 1px;
-									// border-bottom: #ccc solid 1px;
 									li{
 										width: 100%;
 										height: 125px;
@@ -324,7 +339,7 @@
 								.mCSB_9_scrollbar_vertical{
 									right: -16px;
 								}
-								#mCSB_3_scrollbar_vertical{
+								.mCSB_scrollTools_vertical{
 									.mCSB_draggerContainer{
 										background: transparent!important;
 									}
@@ -335,10 +350,21 @@
 							width: auto;
 							height: 100%;
 							padding-left: 556px;
+							border-bottom: #ccc solid 1px;
 							.commetnListBox{
 								width: 100%;
 								height: 100%;
 								position: relative;
+								div.loading{
+									width: 100%;
+									height: 30px;
+									line-height: 30px;
+									top:50%;
+									margin-top: -15px;
+									text-align: center;
+									left: 0;
+									position: absolute;
+								}
 								.commentNumberBox{
 									width: 100%;
 									height: 32px;
@@ -599,7 +625,7 @@
 												height: 24px;
 											}
 											a.uploadImg{
-												background: url("../images/uploadImg.png") center no-repeat;
+												background: url("../images/uploadimg.png") center no-repeat;
 											}
 											a.uploadFile{
 												background: url("../images/uploadfile.png") center no-repeat;
@@ -607,7 +633,7 @@
 											}
 											a.uploadsnapshot{
 												display: none;
-												background: url("../images/uploadSnapshot.png") center no-repeat;
+												background: url("../images/uploadsnapshot.png") center no-repeat;
 											}
 										}
 										.uploadBtn{

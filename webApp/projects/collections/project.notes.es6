@@ -67,11 +67,10 @@ App.Project.NotesCollection = {
 					var $content = $(".leftNotesListBox");
 					var pageCount = response.data.totalItemCount;
 					$content.find(".sumDesc").html('共 ' + pageCount + ' 条批注');
+					$content.find(".loading").remove();
 					if(response.data.items.length == 0){
-						$("#leftNotesListBox").html('<li class="loading">暂无批注</li>');
+						$("#leftUlNotesListBox").html('<li class="clickItem loading">暂无批注</li>');
 					}else{
-						$content.find(".loading").remove();
-					 	$("#leftNotesListBox li").eq(0).click();//如果有批注默认去第一个批注的评论
 						$content.find(".listPagination").empty().pagination(pageCount, {
 						    items_per_page: response.data.pageItemCount,
 						    current_page: response.data.pageIndex - 1,
@@ -88,6 +87,7 @@ App.Project.NotesCollection = {
 						    next_text: "下一页"
 						});
 					}
+					$("#leftNotesListBox li").eq(0).click();//如果有批注默认去第一个批注的评论
 					App.Project.Settings.NotesDatas = response.data.items;
 				}
 				return response.data;
