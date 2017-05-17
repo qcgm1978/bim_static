@@ -6,15 +6,25 @@ App.Project.NotesSearchCondition = Backbone.View.extend({
 		versionIds:[],
 		searchKeyText:'',
 		searchVersionId:"",
-		searchStartDate:'',
-		searchEndDate:'',
 		notesDateStar:'',
 		notesDateEnd:''
+	},
+	events:{
+		"click .clearStartTime":"clearStartTime",
+		"click .clearEndTime":"clearEndTime",
 	},
 	render: function() { 
 		this.getVersionIdHandle();//获取版本id列表
 		this.initDateHandle();//初始化页面上的数据
 		return this;
+	},
+	clearStartTime:function(){
+		this.$('#notesDateStar').val('');
+		App.Project.NotesCollection.defaults.opTimeStart = "";
+	},
+	clearEndTime:function(){
+		this.$('#notesDateEnd').val('');
+		App.Project.NotesCollection.defaults.opTimeEnd = "";
 	},
 	initDateHandle:function(){//初始化页面上的数据
 		var _this = this;
@@ -29,8 +39,6 @@ App.Project.NotesSearchCondition = Backbone.View.extend({
         formatStartDate = y+'-'+m+'-'+d;
         this.default.notesDateStar = formatStartDate;//渲染页面的开始时间
         this.default.notesDateEnd = formatEndDate;//渲染页面的结束时间
-        this.default.searchStartDate = formatStartDate;//搜索的时候使用的开始时间
-        this.default.searchEndDate = formatEndDate;//搜索的时候使用的结束时间
 	},
 	bindDateHandle:function(){//给时间输入框绑定事件插件
 		var _this = this;
@@ -43,8 +51,7 @@ App.Project.NotesSearchCondition = Backbone.View.extend({
 		}).on("changeDate",function(ev){
 			var _dateStr=new Date(ev.date.getTime()).format('yyyy-MM-dd');
 			_this.$('#notesDateEnd').datetimepicker('setStartDate',_dateStr);
-			_this.$('#notesDateEnd').val();
-			_this.default.searchStartDate = _dateStr;
+			App.Project.NotesCollection.defaults.opTimeStart = _dateStr;
 		});
 		this.$('#notesDateEnd').datetimepicker({
 			language: 'zh-CN',
@@ -55,8 +62,7 @@ App.Project.NotesSearchCondition = Backbone.View.extend({
 		}).on("changeDate",function(ev){
 			var _dateStr=new Date(ev.date.getTime()).format('yyyy-MM-dd');
 			_this.$('#notesDateStar').datetimepicker('setEndDate',_dateStr);
-			_this.$('#notesDateStar').val();
-			_this.default.searchEndDate = _dateStr;
+			App.Project.NotesCollection.defaults.opTimeEnd = _dateStr;
 		});
 		this.$(".dateBox .iconCal").on("click",function() {
 		    $(this).next().focus();
@@ -93,7 +99,7 @@ App.Project.NotesSearchCondition = Backbone.View.extend({
 		var _this = this;
 		var selectDom = this.$(".keyTextInputBox select");
 		selectDom.on("change",function(){
-			_this.default.searchVersionId = $(this).find('option:selected').attr('versionId')?$(this).find('option:selected').attr('versionId'):"";
+			App.Project.NotesCollection.defaults.projectVersionId = $(this).find('option:selected').attr('versionId')?$(this).find('option:selected').attr('versionId'):"";
 		})
 	},
 	bindKeyHandle:function(){//给关键词输入框绑定事件
@@ -102,7 +108,7 @@ App.Project.NotesSearchCondition = Backbone.View.extend({
 		keyDome.on("keyup",function(event){
 			var target = $(event.target);
 			var targetVal = target.val().trim();
-			_this.default.searchKeyText = targetVal?targetVal:"";
+			App.Project.NotesCollection.defaults.content = targetVal?targetVal:"";
 		})
 	},
 	bindSearchBtnHandle:function(){//给搜索按钮绑定点击事件
@@ -113,13 +119,7 @@ App.Project.NotesSearchCondition = Backbone.View.extend({
 		})
 	},
 	loadListHandle:function(){//通过搜索获取批注列表的方法
-		var searchData = {
-			"projectVersionId":this.default.searchVersionId,
-			"content":this.default.searchKeyText,
-			"opTimeStart":this.default.searchStartDate,
-			"opTimeEnd":this.default.searchEndDate,
-		}
 		App.Project.NotesCollection.defaults.pageIndexNotes = 1;
-		App.Project.NotesCollection.getNotesListHandle(searchData);//共用了获取批注列表的方法
+		App.Project.NotesCollection.getNotesListHandle();//共用了获取批注列表的方法
 	}
 })

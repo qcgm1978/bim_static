@@ -494,7 +494,6 @@ App.INBox.comment = {
 					if (!App.INBox.default.statusStr) {
 						this.$(".reMarkListScroll").mCustomScrollbar("scrollTo","bottom");
 					}else{
-						debugger;
 						this.$(".reMarkListScroll").mCustomScrollbar("update");
 					}
 					return;

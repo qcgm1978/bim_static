@@ -5,6 +5,10 @@ App.Project.NotesCollection = {
 	defaults:{
 		pageIndexNotes:1,
 		pageIndexComment:1,
+		projectVersionId:"",
+		content:"",
+		opTimeStart:"",
+		opTimeEnd:"",
 		toMeBool:true,
 		viewpointId:'',
 		hosttype:0,
@@ -48,12 +52,12 @@ App.Project.NotesCollection = {
 		var defaultData = {
 			"projectId":App.Project.Settings.projectId,
 			"toMeBool":App.Project.NotesCollection.defaults.toMeBool,
-			"projectVersionId":"",
-			"content":"",
-			"opTimeStart":"",
-			"opTimeEnd":"",
+			"projectVersionId":App.Project.NotesCollection.defaults.projectVersionId,
+			"content":App.Project.NotesCollection.defaults.content,
+			"opTimeStart":App.Project.NotesCollection.defaults.opTimeStart,
+			"opTimeEnd":App.Project.NotesCollection.defaults.opTimeEnd,
 			"pageIndex":App.Project.NotesCollection.defaults.pageIndexNotes,
-			"pageItemCount":8,
+			"pageItemCount":15,
 			"type":1
 		};
 		var extendData = $.extend({},defaultData,parmer);
@@ -99,7 +103,7 @@ App.Project.NotesCollection = {
 		var defaultData = {
 			"viewpointId":App.Project.NotesCollection.defaults.viewpointId,
 			"pageIndex":App.Project.NotesCollection.defaults.pageIndexComment,
-			"pageItemCount":3
+			"pageItemCount":15
 		};
 		var extendData = $.extend({},defaultData,parmer);
 		App.Project.NotesCollection.GetCommentListCollection.reset();
@@ -151,7 +155,6 @@ App.Project.NotesCollection = {
 		var commentAttachmentListBox = $("#commentAttachmentListBox");
 		html += '<li>'
 					+'<div class="imgThumbnailBox"><img src="'+data.pictureUrl+'"></div>'
-					+'<span class="imgThumbnailType">[快照]</span>'
 					+'<span class="imgThumbnailName">'+data.description+'</span>'
 					+'<a href="javascript:;" data-id="'+data.id+'" class="deleteUploadImg">删除</a>'
 				+'</li>';

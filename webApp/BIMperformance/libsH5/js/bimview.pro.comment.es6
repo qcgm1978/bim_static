@@ -1314,13 +1314,14 @@
 
 			//保存批注
 			saveComment(type, dialog, commentData, callback, cate) {
-
+				
 				if (dialog.isSubmit) {
 					return;
 				}
 				var $element = dialog.element,
 					pars = {
 						projectId: App.Project.Settings.projectId,
+						versionId: App.Project.Settings.versionId,
 						name: dialog.element.find(".name").val().trim(),
 						type: dialog.type,
 						viewPointId: App.Project.NotesCollection.defaults.viewpointId,
@@ -1365,7 +1366,7 @@
 				App.Comm.ajax(data, (data) => {
 
 					if (data.code == 0) {
-
+						App.Project.Settings.NotesDatas = [];
 						data = data.data;
 						//赋值id
 						commentData.id = data.id;

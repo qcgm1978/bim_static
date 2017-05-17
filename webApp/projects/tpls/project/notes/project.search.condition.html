@@ -24,14 +24,16 @@
 	</div>
 	<div class="searchBoxS">
 		<span class="searchLabel">时间：</span>
-		<div class="firstDate dateBox" style="position: relative;">
+		<div class="firstDate dateBox data" style="position: relative;">
+			<i class="icon-remove add-on clearStartTime"></i>
 		    <i class="iconCal add-on"></i>
-		    <input readonly="true" placeholder="开始时间" id="notesDateStar" class="span2" type="text" value="<%= obj.default.notesDateStar %>">
+		    <input readonly="true" placeholder="开始时间" id="notesDateStar" type="text" value="">
 		</div>
 		<span class="searchLabel">—至—</span>
-		<div class="firstDate dateBox">
-		    <i class="iconCal"></i>
-		    <input readonly="true" placeholder="结束时间" id="notesDateEnd" class="span2" type="text" value="<%= obj.default.notesDateEnd %>">
+		<div class="firstDate dateBox data">
+		    <i class="icon-remove add-on clearEndTime"></i>
+		    <i class="iconCal add-on"></i>
+		    <input readonly="true" placeholder="结束时间" id="notesDateEnd" type="text" value="">
 		</div>
 	</div>
 	<div class="searchBoxS">
