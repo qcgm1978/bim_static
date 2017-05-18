@@ -992,7 +992,8 @@ dwgViewer.prototype = {
     var modBar = $('<div class="modelBar">' +
       '  <i class="bar-item m-fit2d" title="原始大小" data-fn="fit"></i>' +
       //'  <i class="bar-item m-zoom" title="缩放" data-fn="zoom"></i>' +
-      '  <i class="bar-item m-zoomRect" title="框选缩放" data-fn="rectZoom"></i>'
+      '  <i class="bar-item m-zoomRect" title="框选缩放" data-fn="rectZoom"></i>' +
+      (this._opt.isComment && '<i class="bar-item m-camera" title="快照" data-fn="comment" ></i>' || '') +
       '  <div class="modelSelect">' +
       '    <span class="cur"></span>' +
       '  </div>' +
