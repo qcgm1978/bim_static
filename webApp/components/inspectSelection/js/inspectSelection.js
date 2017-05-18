@@ -48,7 +48,7 @@
 	strVar2 += "                        <ul class=\"myDropList\">";
 	strVar2 += "                            <li class=\"myItem\" data-val=''>全部<\/li>";
 	strVar2 += "                            <% _.each(userData,function(item,index){ if(index!=0){%>";
-	strVar2 += "                            <li class=\"myItem\" data-val='<%=index%>'><%=item%><\/li>";
+	strVar2 += "                            <li class=\"myItem\" data-val='<%=item.value%>'><%=item.text%><\/li>";
 	strVar2 += "                            <% } }) %>";
 	strVar2 += "                        <\/ul>";
 	strVar2 += "                    <% } %>";
@@ -205,11 +205,43 @@
 			ourl = a;
 		}
 	}
-	var mapData = {
+	var mapData;
+	mapData = {
+		/*
 		processCategory: ['', '工程桩', '基坑支护', '地下防水', '梁柱节点', '钢结构悬挑构件', '幕墙', '外保温',
 			'采光顶', '步行街吊顶风口', '卫生间防水', '屋面防水', '屋面虹吸雨排', '消防泵房', '给水泵房',
 			'湿式报警阀室', '空调机房', '冷冻机房', '变配电室', '发电机房', '慧云机房', '电梯机房', '电梯底坑',
 			'吊顶', '地面', '中庭栏杆', '竖井'
+		],
+		*/
+		processCategory: ['', 
+		{value:1,text:'工程桩'},
+		{value:2,text:'基坑支护'},
+		{value:3,text:'地下室外墙防水'},
+		{value:27,text:'地下室底板防水'},
+		{value:4,text:'梁柱节点'},
+		{value:5,text:'钢结构悬挑构件'},
+		{value:6,text:'幕墙'},
+		{value:7,text:'外保温'},
+		{value:8,text:'采光顶'},
+		{value:9,text:'步行街吊顶风口'},
+		{value:10,text:'卫生间防水'},
+		{value:11,text:'屋面防水'},
+		{value:12,text:'屋面虹吸雨排'},
+		{value:13,text:'消防泵房'},
+		{value:14,text:'给水泵房'},
+		{value:15,text:'湿式报警阀室'},
+		{value:16,text:'空调机房'},
+		{value:17,text:'冷冻机房'},
+		{value:18,text:'变配电室'},
+		{value:19,text:'发电机房'},
+		{value:20,text:'慧云机房'},
+		{value:21,text:'电梯机房'}, 
+		{value:22,text:'电梯底坑'},
+		{value:23,text:'吊顶'},
+		{value:24,text:'地面'},
+		{value:25,text:'中庭栏杆'},
+		{value:26,text:'竖井'}
 		],
 		openCategory: ['', '幕墙',
 			'采光顶', '步行街吊顶风口', '卫生间防水', '屋面防水', '屋面虹吸雨排', '消防泵房', '给水泵房',
