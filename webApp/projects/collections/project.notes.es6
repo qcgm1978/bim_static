@@ -135,6 +135,9 @@ App.Project.NotesCollection = {
 					    next_text: "下一页"
 					});
 				}
+				if(App.Project.NotesCollection.defaults.hosttype != 0){
+					$("a.uploadsnapshot").css("display","none");
+				}
 				return response.data;
 			}
 		})
@@ -190,7 +193,6 @@ App.Project.NotesCollection = {
 					filterObj[item.cateType] = item;
 					delete item.cateType;
 				});
-				debugger;
 				App.Project.Settings.Viewer.loadComment({
 					filter: filterObj
 				});
