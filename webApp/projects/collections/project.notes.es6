@@ -167,10 +167,41 @@ App.Project.NotesCollection = {
           App.Project.NotesCollection.renderModelCallBackHandle();
         }
 	},
-	renderModelCallBackHandle(viewpoint){//批注里面查看模型执行的方法
+	renderModelCallBackHandle(){//批注里面查看模型执行的方法
 		if($("#viewpointInput").attr("data-viewpoint") && App.Project.Settings.Viewer){
-          App.Project.Settings.Viewer.setCamera($("#viewpointInput").attr("data-viewpoint"));
+			App.Project.Settings.Viewer.setCamera($("#viewpointInput").attr("data-viewpoint"));
+			this.setFiterHandle();
         }
+	},
+	setFiterHandle(){
+		var filterObj = {};
+		var viewpointfilter = $("#viewpointInput").attr("data-viewpointfilter");
+		var getFilterData = {
+			URLtype: "getFilter",
+			data: {
+				projectId: App.Project.Settings.projectId,
+				viewPointId: viewpointfilter
+			}
+		}
+		App.Comm.ajax(getFilterData, (data) => {
+			if (data.code == 0) {
+				$.each(data.data.filters, function (i, item) {
+					item = JSON.parse(item);
+					filterObj[item.cateType] = item;
+					delete item.cateType;
+				});
+				debugger;
+				App.Project.Settings.Viewer.loadComment({
+					filter: filterObj
+				});
+			}else{
+				$.tip({
+					message: "获取数据失败",
+					timeout: 3000,
+					type: "alarm"
+				});
+			}
+		})
 	},
 	uploadsnapshotCallbackHandle(data){//当视点插入完成之后执行的方法
 		var html = "";

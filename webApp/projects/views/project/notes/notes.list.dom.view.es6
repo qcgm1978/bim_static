@@ -24,12 +24,11 @@ App.Project.NotesListDomView = Backbone.View.extend({
 		var viewpointInput = $("#viewpointInput");
 		var rightNotesCommentListBox = $("#rightNotesCommentListBox");
 		var commetnListBox = rightNotesCommentListBox.children('div.commetnListBox');
-		if(evt.target.tagName != "LI"){
-			viewpointInput.attr("data-viewpoint",target.children("input").data("viewpointid"));
-		}
 		if(evt.target.tagName == "A"){
 			var $data = target.find("input");
-			if(evt.target.innerText == "查看模型"){
+			if(evt.target.innerText == "查看模型"&&!$(evt.target).data("hosttype")){
+				viewpointInput.attr("data-viewpoint",target.children("input").data("viewpointid"));
+				viewpointInput.attr("data-viewpointfilter",notesId);
 				App.Project.NotesCollection.clickModelHandle();//执行查看模型方法
 				return false;
 			}else if(evt.target.innerText == "编辑"){
@@ -42,6 +41,9 @@ App.Project.NotesListDomView = Backbone.View.extend({
 				this.shareNotesHandle($data);//删除批注的方法
 				return false;
 			}
+		}else if(evt.target.tagName == "IMG"){
+			viewpointInput.attr("data-viewpoint",target.children("input").data("viewpointid"));
+			viewpointInput.attr("data-viewpointfilter",notesId);
 		}else if(evt.target.tagName !== "IMG"){
 			if(!target.hasClass('notesSelectClass')){
 				target.siblings().removeClass("notesSelectClass").end().addClass('notesSelectClass');

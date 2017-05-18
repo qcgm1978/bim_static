@@ -21,14 +21,14 @@
 					</div>
 				<%}else if(this.model.attachments[i].type == 3){%>
 					<div class="commentDescComponentBox" id="<%= this.model.attachments[i].id%>">
-						<div class="attachmentThumbnailBox" data-viewpointid="<%= this.model.attachments[i].data%>">
+						<div class="attachmentThumbnailBox" data-id="<%= this.model.id%>" data-viewpointid="<%= this.model.attachments[i].data%>">
 							<a href="<%= this.model.attachments[i].pictureUrl %>" title="<%= this.model.attachments[i].description %>" data-lightbox="example-1">
 								<img src="<%= this.model.attachments[i].pictureUrl%>">
 							</a>
 						</div>
 						<div class="attachmentDescBox">
 							<div class="attachmentDescNameBox"><%= this.model.attachments[i].description%></div>
-							<div class="attachmentDescSizeBox">[快照]<a href="javascript:;" data-viewpointid="<%= this.model.attachments[i].data%>" class="commentLookModel">查看模型</a></div>
+							<div class="attachmentDescSizeBox">[快照]<a href="javascript:;" data-viewpointid="<%= this.model.attachments[i].data%>" data-id="<%= this.model.id%>" class="commentLookModel">查看模型</a></div>
 						</div>
 					</div>
 				<%}else if(this.model.attachments[i].type == 4){%>

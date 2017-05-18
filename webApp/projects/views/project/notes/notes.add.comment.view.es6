@@ -78,9 +78,19 @@ App.Project.AddCommentView = Backbone.View.extend({
 	fileButtonHandle(evt) {//提交
 		var commentAttachmentListBox = this.$("#commentAttachmentListBox");
 		commentAttachmentListBox.find(".loading").remove();
-		commentAttachmentListBox.prepend("<li class='loading'>上传中....</li>");
+		
 		if(evt.target.files.length>0){
-			$("#commentUploadImageForm").submit();
+			var size = evt.target.files[0].size;
+			if(size <= 52428800){
+				commentAttachmentListBox.prepend("<li class='loading'>上传中....</li>");
+				$("#commentUploadImageForm").submit();
+			}else{
+				$.tip({
+					message: "最大支持50兆",
+					timeout: 3000,
+					type: "alarm"
+				})
+			}
 		}
 		
 	},
