@@ -1307,7 +1307,9 @@
 					}else{
 						$(".modelSidebar").addClass("show");
 					}
-					
+					if($(".toolsBar > i.m-camera").hasClass("selected")){
+						$(".toolsBar > i.m-camera").removeClass("selected")
+					}
 
 				});
 			},
@@ -1321,7 +1323,7 @@
 				var $element = dialog.element,
 					pars = {
 						projectId: App.Project.Settings.projectId,
-						versionId: App.Project.Settings.versionId,
+						projectVersionId: parseInt(App.Project.Settings.versionId),
 						name: dialog.element.find(".name").val().trim(),
 						type: dialog.type,
 						viewPointId: App.Project.NotesCollection.defaults.viewpointId,
@@ -1391,7 +1393,6 @@
 								imgData.data.isAdd = true;
 								//创建视点 才添加 colleciton
 								if (cate == "viewPoint") {
-
 									//项目
 									if ($comment.find(".navBar .project").hasClass("selected")) {
 										if (dialog.type == 1) {
@@ -1425,6 +1426,9 @@
 							}
 
 						});
+						if($(".toolsBar > i.m-camera").hasClass("selected")){
+							$(".toolsBar > i.m-camera").removeClass("selected")
+						}
 
 					} else {
 						alert(data.message);
@@ -1586,7 +1590,7 @@
 				App.Comm.ajax(data, function(data) {
 
 					if (data.code == 0) {
-						obj.url = "http://" + location.host + "/" + data.data.url;
+						obj.url = "http://" + location.host + "/#projects/"+data.data.projectId+"/"+data.data.projectVersionId+"?viewpointId="+obj.id;
 						var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.share.dialog.html')(obj),
 							opts = {
 								title: "分享快照",

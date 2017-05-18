@@ -159,6 +159,7 @@ App.Project = {
 		App.Project.Settings.Viewer.on("loaded", function() {
 
 			$('#lockAxisZ').show();
+			$('.modelBar > i.m-camera').hide();
 		});
 
 		App.Project.Settings.Viewer.on("click", function(model) {

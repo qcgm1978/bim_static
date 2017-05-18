@@ -12,6 +12,7 @@ App.Project.ProjectApp = Backbone.View.extend({
 	render: function() { 
 		//nav
 		this.$el.html(new App.Project.ProjectContainer().render().$el); 
+		
 		return this;
 	}, 
 	

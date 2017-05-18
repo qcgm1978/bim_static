@@ -91,8 +91,8 @@ App.Project.NotesCollection = {
 						    next_text: "下一页"
 						});
 					}
-					$("#leftNotesListBox li").eq(0).click();//如果有批注默认去第一个批注的评论
 					App.Project.Settings.NotesDatas = response.data.items;
+					self.initListDomHandle();//点击事件初始化
 				}
 				return response.data;
 			}
@@ -139,16 +139,38 @@ App.Project.NotesCollection = {
 			}
 		})
 	},
+	initListDomHandle(){
+		var leftNotesListBox = $("#leftNotesListBox");
+		var clickLiBox = leftNotesListBox.find("li");
+		var shareInput = leftNotesListBox.find("input[data-notesid=1091438027071488]");
+		var closestLiBox = shareInput.closest('li');
+		if(App.Project.Settings.viewpointShareUrlId){
+			if(shareInput.length==0){
+				$.tip({
+					message: "分享链接失效，自动跳到第一条批注",
+					timeout: 3000,
+					type: "alarm"
+				})
+				clickLiBox.eq(0).click();//如果有批注默认去第一个批注的评论
+			}else{
+				closestLiBox.click();
+				$("div.scrollBox").mCustomScrollbar("scrollTo",closestLiBox.offset().top);
+			}
+		}else{
+			clickLiBox.eq(0).click();//如果有批注默认去第一个批注的评论
+		}
+	},
 	clickModelHandle(){//点击查看模型执行的方法
         var fileNav = $(".fileNav span.model");
         fileNav.click();
+		if($("#viewpointInput").attr("data-viewpoint") && App.Project.Settings.Viewer){
+          App.Project.NotesCollection.renderModelCallBackHandle();
+        }
 	},
-	renderModelCallBackHandle(){//批注里面查看模型执行的方法
-    	var hideInput = $("#viewpointInput");
-		var viewpoint = hideInput.data("viewpoint");
-		if(viewpoint && App.Project.Settings.Viewer){
-			App.Project.Settings.Viewer.setCamera(viewpoint);
-		}
+	renderModelCallBackHandle(viewpoint){//批注里面查看模型执行的方法
+		if($("#viewpointInput").attr("data-viewpoint") && App.Project.Settings.Viewer){
+          App.Project.Settings.Viewer.setCamera($("#viewpointInput").attr("data-viewpoint"));
+        }
 	},
 	uploadsnapshotCallbackHandle(data){//当视点插入完成之后执行的方法
 		var html = "";
@@ -160,5 +182,20 @@ App.Project.NotesCollection = {
 				+'</li>';
 		commentAttachmentListBox.prepend(html);
 		App.Project.NotesCollection.defaults.attachments.push(data.id);
+		this.bindCommentScroll();
+	},
+	bindCommentScroll:function(){//绑定滚动条
+		if($("#uploadListBox").hasClass('mCustomScrollbar')){
+			$("#uploadListBox").mCustomScrollbar("update");
+		}else{
+			$("#uploadListBox").mCustomScrollbar({
+				theme: 'minimal-dark',
+				axis: 'y',
+				keyboard: {
+					enable: true
+				},
+				scrollInertia: 0,
+			}); 
+		}
 	},
 }

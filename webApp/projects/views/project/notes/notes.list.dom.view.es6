@@ -24,7 +24,9 @@ App.Project.NotesListDomView = Backbone.View.extend({
 		var viewpointInput = $("#viewpointInput");
 		var rightNotesCommentListBox = $("#rightNotesCommentListBox");
 		var commetnListBox = rightNotesCommentListBox.children('div.commetnListBox');
-		viewpointInput.attr("data-viewpoint",target.children("input").data("viewpointid"));
+		if(evt.target.tagName != "LI"){
+			viewpointInput.attr("data-viewpoint",target.children("input").data("viewpointid"));
+		}
 		if(evt.target.tagName == "A"){
 			var $data = target.find("input");
 			if(evt.target.innerText == "查看模型"){
@@ -42,9 +44,7 @@ App.Project.NotesListDomView = Backbone.View.extend({
 			}
 		}else if(evt.target.tagName !== "IMG"){
 			if(!target.hasClass('notesSelectClass')){
-				if(!target.hasClass('notesSelectClass')){
-					target.siblings().removeClass("notesSelectClass").end().addClass('notesSelectClass');
-				}
+				target.siblings().removeClass("notesSelectClass").end().addClass('notesSelectClass');
 				if(notesId){//如果当前点击的批注存在id则去获取批注评论的列表
 					commetnListBox.show();
 					rightNotesCommentListBox.find(".nullDataBox").remove();
@@ -155,7 +155,7 @@ App.Project.NotesListDomView = Backbone.View.extend({
 		}
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
-				obj.url = "http://" + location.host + "/" + data.data.url;
+				obj.url = "http://" + location.host + "/#projects/"+data.data.projectId+"/"+data.data.projectVersionId+"?viewpointId="+data.data.viewpointId;
 				var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.share.dialog.html')(obj),
 					opts = {
 						title: "分享快照",
@@ -194,11 +194,6 @@ App.Project.NotesListDomView = Backbone.View.extend({
 			}
 			App.Comm.ajax(data, (data) => {
 				App.Project.NotesCollection.getNotesListHandle();//共用了获取批注列表的方法
-				// if (data.code == 0) {
-				// 	App.Project.NotesCollection.getNotesListHandle();//共用了获取批注列表的方法
-				// } else {
-				// 	alert(data.message);
-				// }
 			})
 		});
 	},
@@ -219,7 +214,7 @@ App.Project.NotesListDomView = Backbone.View.extend({
 	},
 	bindScroll:function(){//绑定滚动条
 		if($("div.scrollBox").hasClass('mCustomScrollbar')){
-			this.$(".reMarkListScroll").mCustomScrollbar("update");
+			$("div.scrollBox").mCustomScrollbar("update");
 		}else{
 			$("div.scrollBox").mCustomScrollbar({
 				theme: 'minimal-dark',

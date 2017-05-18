@@ -49,6 +49,7 @@ App.Project.NotesCommentComponentView = Backbone.View.extend({
 			}
 			App.Comm.ajax(data, (data) => {
 				if (data.code == 0) {
+					App.Project.NotesCollection.defaults.pageIndexComment=1;
 					App.Project.NotesCollection.getCommentListHandle();//共用了获取批注评论列表的方法
 				} else {
 					alert(data.message);

@@ -33,6 +33,11 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		//加载文件
 		this.$el.find(".projectCotent").append(new App.Project.FileContainer().render().el);
 		this.$el.find(".projectCotent").append('<div class="modelContainer"> <div class="modelContainerScroll"><div class="modelContainerContent"></div></div> </div>');
+		if(window.location.href.indexOf("?") != -1){
+			var fileNav = this.$el.find(".fileNav span.notes");
+			App.Project.Settings.viewpointShareUrlId = window.location.href.substr(window.location.href.indexOf("=")+1);
+			fileNav.click();
+		}
 		return this;
 	},
 
@@ -403,7 +408,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	switchFileMoldel(event) {
 		var $target = $(event.target),
 			type = $target.data("type"),
-			$projectContainer = $("#projectContainer"),
+			$projectContainer = this.$el.find("#projectContainer"),
 			$projectCotent = $projectContainer.find(".projectCotent");
 		App.Project.Settings.fetchNavType = type;
 		if (type == "file") {
@@ -443,12 +448,13 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			}
 			$projectCotent.show();
 		}else if(type=="notes"){
+			this.$el.find(".projectContainerApp .projectHeader .projectTab").hide();
 			$projectCotent.addClass("showPropety").hide();
 			$projectContainer.find(".leftNav").hide();//关闭左侧树的模块
 			$projectContainer.find(".rightProperty").removeClass("showPropety");//关闭右侧属性模块
 			$projectContainer.find(".fileContainer").hide();
 			$projectContainer.find(".modelContainer").hide();
-			var notesBox = $projectContainer.find(".notesBox");
+			var notesBox = this.$el.find(".notesBox");
 			notesBox.show();//批注页面展示
 			$target.addClass("selected").siblings().removeClass("selected");//导航切换到批注上面
 			if(!App.Project.Settings.NotesDatas || App.Project.Settings.NotesDatas.length==0){
@@ -478,9 +484,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		$projectContainer.find(".modelContainer").show();
 		//模型tab
 		$(".projectContainerApp .projectHeader .projectTab").show();
-		if($("#viewpointInput").data("viewpoint")){
-          App.Project.NotesCollection.renderModelCallBackHandle();
-        }
 		//销毁上传
 		App.Comm.upload.destroy();
 
@@ -674,7 +677,9 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				type: "classCode"
 			});
 			$('#lockAxisZ').show();
-
+			if($("#viewpointInput").data("viewpoint") && App.Project.Settings.Viewer){
+	          App.Project.NotesCollection.renderModelCallBackHandle();
+	        }
 			/*add by wuweiwei init filter checkbox state*/
 			$($("#specialty .itemContent")[0]).find(".m-lbl").addClass("m-lbl-2");
 		});

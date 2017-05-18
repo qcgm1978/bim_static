@@ -89,8 +89,7 @@ App.Project.AddCommentView = Backbone.View.extend({
 		$("#commentUploadIframe").on("load", function(event) {
 			var data = JSON.parse(this.contentDocument.body.innerText);//获取ifrem里面的文本
 			var commentAttachmentListBox = that.$("#commentAttachmentListBox");
-			var html="";//+
-								//'<span class="imgThumbnailType">[图片]</span>'
+			var html="";
 			if (data.code == 0) {
 				commentAttachmentListBox.find(".loading").remove();
 				data = data.data;
@@ -100,25 +99,25 @@ App.Project.AddCommentView = Backbone.View.extend({
 						html += '<div class="imgThumbnailBox"><img src="'+data.pictureUrl+'"></div>';
 						break;
 					case 4:
-						html += '<div class="imgThumbnailBox"><img src="../../../images/word.png"></div>';
+						html += '<div class="imgThumbnailBox"><img src="/static/dist/images/projects/images/word.png"></div>';
 						break;
 					case 5:
-						html += '<div class="imgThumbnailBox"><img src="../../../images/ppt.png"></div>';
+						html += '<div class="imgThumbnailBox"><img src="/static/dist/images/projects/images/ppt.png"></div>';
 						break;
 					case 6:
-						html += '<div class="imgThumbnailBox"><img src="../../../images/excel.png"></div>';
+						html += '<div class="imgThumbnailBox"><img src="/static/dist/images/projects/images/excel.png"></div>';
 						break;
 					case 7:
-						html += '<div class="imgThumbnailBox"><img src="../../../images/pdf.png"></div>';
+						html += '<div class="imgThumbnailBox"><img src="/static/dist/images/projects/images/pdf.png"></div>';
 						break;
 					case 8:
-						html += '<div class="imgThumbnailBox"><img src="../../../images/dwg.png"></div>';
+						html += '<div class="imgThumbnailBox"><img src="/static/dist/images/projects/images/dwg.png"></div>';
 						break;
 					case 9:
-						html += '<div class="imgThumbnailBox"><img src="../../../images/rvt.png"></div>';
+						html += '<div class="imgThumbnailBox"><img src="/static/dist/images/projects/images/rvt.png"></div>';
 						break;
 					case 10:
-						html += '<div class="imgThumbnailBox"><img src="../../../images/default.png"></div>';
+						html += '<div class="imgThumbnailBox"><img src="/static/dist/images/projects/images/default.png"></div>';
 						break;
 					default:
 						break;
@@ -198,8 +197,10 @@ App.Project.AddCommentView = Backbone.View.extend({
 				App.Project.NotesCollection.getCommentListHandle({viewpointId:data.data.viewpointId});
 				App.Project.NotesCollection.defaults.atUserArrs = [];
 				App.Project.NotesCollection.defaults.attachments = [];
-				this.$(".textareaBox textarea").val("");
-				this.$("#commentAttachmentListBox").html();
+				this.$("#commentAttachmentListBox").html("");
+				this.$(".textareaBox textarea").val("请输入评论内容");
+				App.Project.NotesCollection.defaults.pageIndexComment=1;
+				App.Project.NotesCollection.getCommentListHandle();//共用了获取批注评论列表的方法
 			}
 		})
 	},
