@@ -439,8 +439,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			}
 			//模型tab
 			$(".projectContainerApp .projectHeader .projectTab").show();
-			$projectContainer.find(".notesBox").hide();
-			$projectContainer.find(".leftNav").hide();//关闭左侧树的模块
 			$projectContainer.find(".fileContainer").hide();
 			//加载过数据后 直接切换 否则 加载数据
 			if (App.Project.Settings.DataModel && App.Project.Settings.DataModel.sourceId) {
@@ -482,6 +480,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		$projectContainer.find(".rightProperty").addClass("showPropety").width(mRight);
 
 		//内容
+		$projectContainer.find(".notesBox").hide();
 		$projectContainer.find(".fileContainer").hide();
 		$projectContainer.find(".modelContainer").show();
 		

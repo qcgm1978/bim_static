@@ -147,10 +147,12 @@ App.Project.NotesCollection = {
 					    next_text: "下一页"
 					});
 				}
-				var leftNotesListBox = $("#leftNotesListBox");
-				var shareInput = leftNotesListBox.find("input[data-notesid="+App.Project.Settings.viewpointShareUrlId+"]");
-				var closestLiBox = shareInput.closest('li');
-				$("div.scrollBox").mCustomScrollbar("scrollTo",closestLiBox.offset().top);
+				if(App.Project.Settings.viewpointShareUrlId){
+					var leftNotesListBox = $("#leftNotesListBox");
+					var shareInput = leftNotesListBox.find("input[data-notesid="+App.Project.Settings.viewpointShareUrlId+"]");
+					var closestLiBox = shareInput.closest('li');
+					$("div.scrollBox").mCustomScrollbar("scrollTo",closestLiBox.offset().top);
+				}
 				if(App.Project.NotesCollection.defaults.hosttype != 0){
 					$("a.uploadsnapshot").css("display","none");
 				}

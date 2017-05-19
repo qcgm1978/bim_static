@@ -141,7 +141,11 @@ App.Project.NotesListDomView = Backbone.View.extend({
 				dialog.close();
 				App.Project.NotesCollection.getNotesListHandle();//共用了获取批注列表的方法
 			} else {
-				alert(data.message);
+				$.tip({
+					message: "超过了最大字数512",
+					timeout: 3000,
+					type: "alarm"
+				});
 				dialog.isSubmit = false;
 				dialog.element.find(".ok").text("保存");
 			}
