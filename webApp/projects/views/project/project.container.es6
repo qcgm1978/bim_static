@@ -437,6 +437,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				alert("请使用现代浏览器查看模型");
 				return;
 			}
+			//模型tab
+			$(".projectContainerApp .projectHeader .projectTab").show();
 			$projectContainer.find(".notesBox").hide();
 			$projectContainer.find(".leftNav").hide();//关闭左侧树的模块
 			$projectContainer.find(".fileContainer").hide();
@@ -448,7 +450,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			}
 			$projectCotent.show();
 		}else if(type=="notes"){
-			this.$el.find(".projectContainerApp .projectHeader .projectTab").hide();
+			$(".projectContainerApp .projectHeader .projectTab").hide();
 			$projectCotent.addClass("showPropety").hide();
 			$projectContainer.find(".leftNav").hide();//关闭左侧树的模块
 			$projectContainer.find(".rightProperty").removeClass("showPropety");//关闭右侧属性模块
@@ -482,8 +484,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		//内容
 		$projectContainer.find(".fileContainer").hide();
 		$projectContainer.find(".modelContainer").show();
-		//模型tab
-		$(".projectContainerApp .projectHeader .projectTab").show();
+		
 		//销毁上传
 		App.Comm.upload.destroy();
 

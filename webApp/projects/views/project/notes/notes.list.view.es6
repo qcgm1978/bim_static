@@ -21,7 +21,7 @@ App.Project.NotesContentView = Backbone.View.extend({
 	},
 	initNotesCommentHandle(){//进入之后初始化批注评论结构
 		var rightNotesCommentListBox = this.$("#rightNotesCommentListBox");
-		var NotesCommentView = new App.Project.NotesCommentView;//右侧批注评论的视图组件
-		rightNotesCommentListBox.html(NotesCommentView.render().el);
+		var NotesCommentContentView = new App.Project.NotesCommentContentView;//右侧批注评论的视图组件
+		rightNotesCommentListBox.append(NotesCommentContentView.render().el);
 	},
 })

@@ -49,14 +49,12 @@ App.Project.NotesListDomView = Backbone.View.extend({
 				target.siblings().removeClass("notesSelectClass").end().addClass('notesSelectClass');
 				if(notesId){//如果当前点击的批注存在id则去获取批注评论的列表
 					commetnListBox.show();
-					rightNotesCommentListBox.find(".nullDataBox").remove();
 					App.Project.NotesCollection.defaults.viewpointId = notesId;
 					App.Project.NotesCollection.defaults.pageIndexComment=1;
 					App.Project.NotesCollection.getCommentListHandle();
 					App.Project.NotesCollection.defaults.hosttype = target.children("input").data("hosttype");//当前点击的批注是什么类型的
 				}else{
 					commetnListBox.hide();
-					rightNotesCommentListBox.append('<div class="nullDataBox">批注评论为空</div>');
 				}
 				if(hosttype == 0){
 					$("a.uploadsnapshot").css("display","inline-block");
