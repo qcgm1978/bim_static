@@ -847,7 +847,6 @@
 
 		/*合并参数*/
 		this.Settings = $.extend(defaults, options);
-
 		 
 		/*设置cookie*/
 		if (this.Settings.appKey && this.Settings.token && !this.initCookie(this.Settings.host || ourl, this.Settings.appKey, this.Settings.token)) {
