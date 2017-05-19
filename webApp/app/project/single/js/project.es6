@@ -302,6 +302,7 @@ App.Project = {
 			isComment: true,
 			sourceId: modelId,
 			callback:function(){
+				var viewpointid = window.location.search;
 				if(viewpointid.indexOf("standardLibs")!=-1){
 					$(".modelBar > i.m-camera").css("color","rgba(255,255,255,.2)");
 					$(".modelBar > i.m-camera").attr("data-noclick",true);
