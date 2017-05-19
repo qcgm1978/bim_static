@@ -105,12 +105,6 @@ App.Project.NotesCollection = {
 					App.Project.Settings.NotesDatas = response.data.items;
 					self.initListDomHandle();//点击事件初始化
 				}
-				if(App.Project.Settings.viewpointShareUrlId){
-					var leftNotesListBox = $("#leftNotesListBox");
-					var shareInput = leftNotesListBox.find("input[data-notesid="+App.Project.Settings.viewpointShareUrlId+"]");
-					var closestLiBox = shareInput.closest('li');
-					$("div.scrollBox").mCustomScrollbar("scrollTo",closestLiBox.offset().top);
-				}
 				return response.data;
 			}
 		})
@@ -160,6 +154,12 @@ App.Project.NotesCollection = {
 					    next_text: "下一页"
 					});
 				}
+				if(App.Project.Settings.viewpointShareUrlId){
+					var leftNotesListBox = $("#leftNotesListBox");
+					var closestLiBox = leftNotesListBox.find("li[data-notesid="+App.Project.Settings.viewpointShareUrlId+"]");
+					$("div.scrollBox").mCustomScrollbar("scrollTo","notes_"+App.Project.Settings.viewpointShareUrlId);
+					// $("div.scrollBox").mCustomScrollbar("update");
+				}
 				if(App.Project.NotesCollection.defaults.hosttype != 0){
 					$("a.uploadsnapshot").css("display","none");
 				}
@@ -170,10 +170,9 @@ App.Project.NotesCollection = {
 	initListDomHandle(){
 		var leftNotesListBox = $("#leftNotesListBox");
 		var clickLiBox = leftNotesListBox.find("li");
-		var shareInput = leftNotesListBox.find("input[data-notesid="+App.Project.Settings.viewpointShareUrlId+"]");
-		var closestLiBox = shareInput.closest('li');
+		var closestLiBox = leftNotesListBox.find("li[data-notesid="+App.Project.Settings.viewpointShareUrlId+"]");
 		if(App.Project.Settings.viewpointShareUrlId){
-			if(shareInput.length==0){
+			if(closestLiBox.length==0){
 				$.tip({
 					message: "分享链接失效，自动跳到第一条批注",
 					timeout: 3000,
