@@ -297,13 +297,11 @@ App.Project = {
 	//渲染dwg 文件
 	renderDwg(modelId) {
 		$("#modelBox").addClass("dwg");
-
 		App.Project.Settings.Viewer = new dwgViewer({
 			element: $("#modelBox"),
 			isComment: true,
 			sourceId: modelId,
 			callback:function(){
-				var viewpointid = window.location.search;
 				if(viewpointid.indexOf("standardLibs")!=-1){
 					$(".modelBar > i.m-camera").css("color","rgba(255,255,255,.2)");
 					$(".modelBar > i.m-camera").attr("data-noclick",true);
