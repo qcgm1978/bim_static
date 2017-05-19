@@ -412,6 +412,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$projectCotent = $projectContainer.find(".projectCotent");
 		App.Project.Settings.fetchNavType = type;
 		if (type == "file") {
+			App.Project.Settings.NotesDatas = [];
 			//左右侧
 			$projectContainer.find(".rightProperty").removeClass("showPropety");
 			$projectContainer.find(".leftNav").show();
@@ -439,7 +440,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			}
 			//模型tab
 			$(".projectContainerApp .projectHeader .projectTab").show();
-			$projectContainer.find(".fileContainer").hide();
 			//加载过数据后 直接切换 否则 加载数据
 			if (App.Project.Settings.DataModel && App.Project.Settings.DataModel.sourceId) {
 				this.typeContentChange();
@@ -527,7 +527,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		var that = this;
 
 		this.typeContentChange();
-
 		//渲染模型属性
 		//App.Project.renderModelContentByType();
 		//return;

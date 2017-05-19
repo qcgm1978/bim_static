@@ -11,6 +11,9 @@ App.Project.AddCommentView = Backbone.View.extend({
 		"click .uploadBtn":"uploadBtnHandle",//点击评论按钮执行的方法
 		"click .uploadTypeBtn .uploadsnapshot":"uploadsnapshotHandle",//点击插入模型批注视角按钮执行的方法
 	},
+	default:{
+		flag:true
+	},
 	render: function() {
 		this.$el.html(this.template);
 		this.atHandle();//at用户方法
@@ -201,18 +204,22 @@ App.Project.AddCommentView = Backbone.View.extend({
 		}
 		$btnEnter.html("保存中").attr("data-issubmit", true);
 		//创建
-		App.Comm.ajax(data, (data) => {
-			if (data.code == 0) {
-				$btnEnter.html("评论").attr("data-issubmit", false);
-				App.Project.NotesCollection.getCommentListHandle({viewpointId:data.data.viewpointId});
-				App.Project.NotesCollection.defaults.atUserArrs = [];
-				App.Project.NotesCollection.defaults.attachments = [];
-				this.$("#commentAttachmentListBox").html("");
-				this.$(".textareaBox textarea").val("");
-				App.Project.NotesCollection.defaults.pageIndexComment=1;
-				App.Project.NotesCollection.getCommentListHandle();//共用了获取批注评论列表的方法
-			}
-		})
+		if(this.default.flag){
+			App.Comm.ajax(data, (data) => {
+				if (data.code == 0) {
+					this.default.flag = true;
+					$btnEnter.html("评论").attr("data-issubmit", false);
+					App.Project.NotesCollection.getCommentListHandle({viewpointId:data.data.viewpointId});
+					App.Project.NotesCollection.defaults.atUserArrs = [];
+					App.Project.NotesCollection.defaults.attachments = [];
+					this.$("#commentAttachmentListBox").html("");
+					this.$(".textareaBox textarea").val("");
+					App.Project.NotesCollection.defaults.pageIndexComment=1;
+					App.Project.NotesCollection.getCommentListHandle();//共用了获取批注评论列表的方法
+				}
+			})
+		}
+		
 	},
 	uploadsnapshotHandle(){//点击插入模型批注视角按钮执行的方法
 		var _this = this;

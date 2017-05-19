@@ -669,8 +669,9 @@ App.INBox.comment = {
 
 			events: {
 				"click .delTalk": "delTalk",
-				"click .showPosition": "showPosition",
-				"click .showCommentPoint": "showCommentPoint"
+				"click a.downLoad":"downLoadHandle"
+				// "click .showPosition": "showPosition",
+				// "click .showCommentPoint": "showCommentPoint"
 			},
 
 			initialize() {
@@ -683,13 +684,22 @@ App.INBox.comment = {
 			render() {
 
 				var data = this.model.toJSON();
-
 				this.$el.html(this.template(data));
 
 				return this;
 
 			},
-
+			downLoadHandle(event){
+				var target = $(event.target).closest('a.downLoad');
+				if(target.data("attachmentid")){
+					var projectid = parseInt(App.Project.Settings.projectId);
+					var viewpointid = $(event.target).closest("a.downLoad").data("viewpointid");
+					var attachmentid = $(event.target).closest("a.downLoad").data("attachmentid");
+					var downloadUrl = window.location.origin+"/sixD/"+projectid+"/viewPoint/"+viewpointid+"/comment/"+attachmentid+"/download";
+					window.open(downloadUrl,"_blank");
+				}
+				return;
+			},
 			//显示位置
 			showPosition(event) {
 

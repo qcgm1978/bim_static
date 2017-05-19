@@ -69,6 +69,7 @@ App.Project.NotesCollection = {
 			success:function(collection, response, options){
 				if(response.code == 0){
 					var $content = $(".leftNotesListBox");
+					var rightNotesCommentListBox = $("#rightNotesCommentListBox");
 					var pageCount = response.data.totalItemCount;
 					$content.find(".sumDesc").html('共 ' + pageCount + ' 条批注');
 					$content.find(".loading").remove();
@@ -78,7 +79,13 @@ App.Project.NotesCollection = {
 						$content.find(".scrollBox").hide();
 						$content.find(".pagingBox").hide();
 						$content.find(".nullDataBox").show();
+						rightNotesCommentListBox.find(".commentNumberBox").hide();
+						rightNotesCommentListBox.find(".commentListBox").hide();
+						rightNotesCommentListBox.find("#addCommentBox").hide();
+						rightNotesCommentListBox.find(".nullDataBox").show();
+
 					}else{
+						$content.find(".nullDataBox").hide();
 						$content.find(".listPagination").empty().pagination(pageCount, {
 						    items_per_page: response.data.pageItemCount,
 						    current_page: response.data.pageIndex - 1,
@@ -97,6 +104,12 @@ App.Project.NotesCollection = {
 					}
 					App.Project.Settings.NotesDatas = response.data.items;
 					self.initListDomHandle();//点击事件初始化
+				}
+				if(App.Project.Settings.viewpointShareUrlId){
+					var leftNotesListBox = $("#leftNotesListBox");
+					var shareInput = leftNotesListBox.find("input[data-notesid="+App.Project.Settings.viewpointShareUrlId+"]");
+					var closestLiBox = shareInput.closest('li');
+					$("div.scrollBox").mCustomScrollbar("scrollTo",closestLiBox.offset().top);
 				}
 				return response.data;
 			}
@@ -146,12 +159,6 @@ App.Project.NotesCollection = {
 					    prev_text: "上一页",
 					    next_text: "下一页"
 					});
-				}
-				if(App.Project.Settings.viewpointShareUrlId){
-					var leftNotesListBox = $("#leftNotesListBox");
-					var shareInput = leftNotesListBox.find("input[data-notesid="+App.Project.Settings.viewpointShareUrlId+"]");
-					var closestLiBox = shareInput.closest('li');
-					$("div.scrollBox").mCustomScrollbar("scrollTo",closestLiBox.offset().top);
 				}
 				if(App.Project.NotesCollection.defaults.hosttype != 0){
 					$("a.uploadsnapshot").css("display","none");
