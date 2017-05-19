@@ -107,7 +107,7 @@ App.Project.NotesCollection = {
 		var defaultData = {
 			"viewpointId":App.Project.NotesCollection.defaults.viewpointId,
 			"pageIndex":App.Project.NotesCollection.defaults.pageIndexComment,
-			"pageItemCount":15
+			"pageItemCount":100
 		};
 		var extendData = $.extend({},defaultData,parmer);
 		App.Project.NotesCollection.GetCommentListCollection.reset();

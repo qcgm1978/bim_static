@@ -162,6 +162,11 @@ App.Project = {
 				var viewpointidStr = viewpointid.substr(viewpointid.indexOf("viewpointid")+12);
 				App.Project.Settings.Viewer.viewer.setCamera(window.atob(viewpointidStr));
 			}
+			if(viewpointid.indexOf("standardLibs")!=-1){
+				$(".modelBar > i.m-camera").css("color","rgba(255,255,255,.2)");
+				$(".modelBar > i.m-camera").attr("data-noclick",true);
+				$(".modelBar > i.m-camera").removeClass('bar-item');
+			}
 			$('#lockAxisZ').show();
 		});
 
@@ -291,15 +296,21 @@ App.Project = {
 	},
 	//渲染dwg 文件
 	renderDwg(modelId) {
-
 		$("#modelBox").addClass("dwg");
 
 		App.Project.Settings.Viewer = new dwgViewer({
 			element: $("#modelBox"),
 			isComment: true,
-			sourceId: modelId
+			sourceId: modelId,
+			callback:function(){
+				var viewpointid = window.location.search;
+				if(viewpointid.indexOf("standardLibs")!=-1){
+					$(".modelBar > i.m-camera").css("color","rgba(255,255,255,.2)");
+					$(".modelBar > i.m-camera").attr("data-noclick",true);
+					$(".modelBar > i.m-camera").removeClass('bar-item');
+				}
+			}
 		});
-
 	},
 
 	//模型属性 dwg 图纸
@@ -771,6 +782,7 @@ App.Project = {
 			var $element = dialog.element,
 				pars = {
 					projectId: App.Project.Settings.projectId,
+					projectVersionId: parseInt(App.Project.Settings.projectVersionId),
 					name: dialog.element.find(".name").val().trim(),
 					type: dialog.type,
 					viewPoint: commentData.camera

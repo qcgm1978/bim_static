@@ -32,10 +32,14 @@ App.Project.NotesListDomView = Backbone.View.extend({
 				App.Project.NotesCollection.clickModelHandle();//执行查看模型方法
 				return false;
 			}else if(evt.target.innerText == "编辑"){
-				this.editNotesHandle($data);//编辑批注的方法
+				if(!$(evt.target).hasClass('noCan')){
+					this.editNotesHandle($data);//编辑批注的方法
+				}
 				return false;
 			}else if(evt.target.innerText == "删除"){
-				this.deleteNotes(notesId);//删除批注的方法
+				if(!$(evt.target).hasClass('noCan')){
+					this.deleteNotes(notesId);//删除批注的方法
+				}
 				return false;
 			}else if(evt.target.innerText == "分享"){
 				this.shareNotesHandle($data);//删除批注的方法
