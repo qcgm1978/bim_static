@@ -72,8 +72,12 @@ App.Project.NotesCollection = {
 					var pageCount = response.data.totalItemCount;
 					$content.find(".sumDesc").html('共 ' + pageCount + ' 条批注');
 					$content.find(".loading").remove();
+					$content.find(".scrollBox").show();
+					$content.find(".pagingBox").show();
 					if(response.data.items.length == 0){
-						$("#leftUlNotesListBox").html('<li class="clickItem loading">暂无批注</li>');
+						$content.find(".scrollBox").hide();
+						$content.find(".pagingBox").hide();
+						$content.find(".nullDataBox").show();
 					}else{
 						$content.find(".listPagination").empty().pagination(pageCount, {
 						    items_per_page: response.data.pageItemCount,
@@ -112,13 +116,21 @@ App.Project.NotesCollection = {
 			type:"POST",
 			contentType:"application/json",
 			success:function(collection, response, options){
+				var commetnListBox = $(".commentBox");
 				var commentComponentBox = this.$("#commentComponentBox");
 				var pageCount = response.data.totalItemCount;
 				$("#commentNumberBox").html('共 ' + pageCount + ' 条评论');
 				$("#listPagination").html("");
 				if(response.data.items == 0){
-					commentComponentBox.find(".loading").html('暂无评论');
+					commetnListBox.find(".commentNumberBox").hide();
+					commetnListBox.find(".commentListBox").hide();
+					commetnListBox.find("#addCommentBox").show();
+					commetnListBox.find(".nullDataBox").show();
 				}else{
+					commetnListBox.find(".commentNumberBox").show();
+					commetnListBox.find(".commentListBox").show();
+					commetnListBox.find("#addCommentBox").show();
+					commetnListBox.find(".nullDataBox").hide();
 					commentComponentBox.find(".loading").remove();
 					$("#listPagination").empty().pagination(pageCount, {
 					    items_per_page: response.data.pageItemCount,
