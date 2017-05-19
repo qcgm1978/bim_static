@@ -224,13 +224,13 @@ fis.match('/static/dist/libs/commLibCss.css', {
 
 
 //合并裤文件
-// fis.match('/libsH5/**.{js,es6}', {
-//   //packTo: '/static/dist/libs/libsH5_'+v+'.js'
-//   packTo: '/static/dist/libs/libsH5.js'
-// });
-// fis.match('/libsH5/**.{js,es6}', {
-//   release: '/static/dist/libs/libsH5.js'
-// });
+fis.match('/libsH5/**.{js,es6}', {
+  //packTo: '/static/dist/libs/libsH5_'+v+'.js'
+  packTo: '/static/dist/libs/libsH5_oldversion.js'
+});
+fis.match('/libsH5/**.{js,es6}', {
+  release: '/static/dist/libs/libsH5_oldversion.js'
+});
 
 
 fis.match('/libsH5/**.{less,css}', {
