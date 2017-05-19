@@ -26,7 +26,7 @@
 <%}else{%>
     
     <%if(suffix=='rvt' ||suffix=='rfa' ||suffix=='dwg'  || suffix=='rte'   ){%>
-        <a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id=<%=fileVersionId%>&projectId=<%=projectId%>&projectVersionId=<%=App.ResourceModel.Settings.CurrentVersion.id%>" target="_blank" data-isfolder="<%=folder%>" class="text overflowEllipsis">
+        <a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id=<%=fileVersionId%>&projectId=<%=projectId%>&projectVersionId=<%=App.ResourceModel.Settings.CurrentVersion.id%>&standardLibs=standardLibs" target="_blank" data-isfolder="<%=folder%>" class="text overflowEllipsis">
            <%= App.ResourceModel.getName(name)  %>
         </a>
       <%}else{%>

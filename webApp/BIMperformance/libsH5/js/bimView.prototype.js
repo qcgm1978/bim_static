@@ -317,8 +317,10 @@
             if (fn) self[fn]();
             break;
           case "filter":
-            $this.toggleClass('selected').siblings('[data-group=' + group + ']').removeClass('selected');
-            bimView.sidebar[fn](!isSelected, self);
+            if(!$this.data("noclick")){
+                $this.toggleClass('selected').siblings('[data-group=' + group + ']').removeClass('selected');
+                bimView.sidebar[fn](!isSelected, self);
+            }
             break;
           case "more":
             $this.toggleClass('selected').siblings('[data-group=' + group + ']').removeClass('selected');
