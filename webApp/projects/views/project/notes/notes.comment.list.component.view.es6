@@ -25,12 +25,14 @@ App.Project.NotesCommentComponentView = Backbone.View.extend({
 		var target = $(event.target);
 		var viewpointInput = $("#viewpointInput");
 		viewpointInput.attr("data-viewpoint",target.data("viewpointid"));
+		viewpointInput.attr("data-viewpointfilter",target.data("id"));
 		App.Project.NotesCollection.clickModelHandle();//执行查看模型方法
 	},
 	commentImgHandle(event){
 		var target = $(event.target).closest("div.attachmentThumbnailBox");
 		var viewpointInput = $("#viewpointInput");
 		viewpointInput.attr("data-viewpoint",target.data("viewpointid"));
+		viewpointInput.attr("data-viewpointfilter",target.data("id"));
 	},
 	deleteNotesCommentHandle(evt){//删除批注的快照
 		var notesId = $(evt.target).data("id");

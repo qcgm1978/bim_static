@@ -157,9 +157,12 @@ App.Project = {
 
 		App.Project.Settings.modelId = modelId;
 		App.Project.Settings.Viewer.on("loaded", function() {
-
+			var viewpointid = window.location.search;
+			if(viewpointid.indexOf("viewpointid")!=-1){
+				var viewpointidStr = viewpointid.substr(viewpointid.indexOf("viewpointid")+12);
+				App.Project.Settings.Viewer.viewer.setCamera(window.atob(viewpointidStr));
+			}
 			$('#lockAxisZ').show();
-			$('.modelBar > i.m-camera').hide();
 		});
 
 		App.Project.Settings.Viewer.on("click", function(model) {
