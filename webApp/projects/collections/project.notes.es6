@@ -146,6 +146,9 @@ App.Project.NotesCollection = {
 					    prev_text: "上一页",
 					    next_text: "下一页"
 					});
+					var shareInput = leftNotesListBox.find("input[data-notesid="+App.Project.Settings.viewpointShareUrlId+"]");
+					var closestLiBox = shareInput.closest('li');
+					$("div.scrollBox").mCustomScrollbar("scrollTo",closestLiBox.offset().top);
 				}
 				if(App.Project.NotesCollection.defaults.hosttype != 0){
 					$("a.uploadsnapshot").css("display","none");
@@ -157,7 +160,7 @@ App.Project.NotesCollection = {
 	initListDomHandle(){
 		var leftNotesListBox = $("#leftNotesListBox");
 		var clickLiBox = leftNotesListBox.find("li");
-		var shareInput = leftNotesListBox.find("input[data-notesid=1091438027071488]");
+		var shareInput = leftNotesListBox.find("input[data-notesid="+App.Project.Settings.viewpointShareUrlId+"]");
 		var closestLiBox = shareInput.closest('li');
 		if(App.Project.Settings.viewpointShareUrlId){
 			if(shareInput.length==0){
@@ -169,7 +172,6 @@ App.Project.NotesCollection = {
 				clickLiBox.eq(0).click();//如果有批注默认去第一个批注的评论
 			}else{
 				closestLiBox.click();
-				$("div.scrollBox").mCustomScrollbar("scrollTo",closestLiBox.offset().top);
 			}
 		}else{
 			clickLiBox.eq(0).click();//如果有批注默认去第一个批注的评论

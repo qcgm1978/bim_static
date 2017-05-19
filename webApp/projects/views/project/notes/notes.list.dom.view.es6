@@ -26,7 +26,18 @@ App.Project.NotesListDomView = Backbone.View.extend({
 		var commetnListBox = rightNotesCommentListBox.children('div.commetnListBox');
 		if(evt.target.tagName == "A"){
 			var $data = target.find("input");
-			if(evt.target.innerText == "查看模型"&&!$(evt.target).data("hosttype")){
+			if($(evt.target).hasClass('openMore')){
+				if($(evt.target).hasClass("upIcon")){
+					$(evt.target).removeClass("upIcon");
+					$(evt.target).siblings(".notesDescTextBox").css("height","40px");
+					$(evt.target).siblings(".notesDescTextBox").css("display","-webkit-box");
+				}else{
+					$(evt.target).addClass("upIcon");
+					$(evt.target).siblings(".notesDescTextBox").css("height","auto");
+					$(evt.target).siblings(".notesDescTextBox").css("display","block");
+				}
+				
+			}else if(evt.target.innerText == "查看模型"&&!$(evt.target).data("hosttype")){
 				viewpointInput.attr("data-viewpoint",target.children("input").data("viewpointid"));
 				viewpointInput.attr("data-viewpointfilter",notesId);
 				App.Project.NotesCollection.clickModelHandle();//执行查看模型方法
@@ -104,6 +115,7 @@ App.Project.NotesListDomView = Backbone.View.extend({
 			pars = {
 				viewPointId: dialog.id,
 				projectId: App.Project.Settings.projectId,
+				projectVersionId: parseInt(App.Project.Settings.versionId),
 				name: dialog.element.find(".name").val().trim(),
 				type: dialog.type
 			};
