@@ -103,6 +103,11 @@ App.Project.NotesCollection = {
 						});
 					}
 					App.Project.Settings.NotesDatas = response.data.items;
+					if(App.Project.Settings.viewpointShareUrlId){
+						var leftNotesListBox = $("#leftNotesListBox");
+						var closestLiBox = leftNotesListBox.find("li.notes_"+App.Project.Settings.viewpointShareUrlId);
+						$("div.scrollBox").mCustomScrollbar("scrollTo","bottom");
+					}
 					self.initListDomHandle();//点击事件初始化
 				}
 				return response.data;
@@ -154,12 +159,6 @@ App.Project.NotesCollection = {
 					    next_text: "下一页"
 					});
 				}
-				if(App.Project.Settings.viewpointShareUrlId){
-					var leftNotesListBox = $("#leftNotesListBox");
-					var closestLiBox = leftNotesListBox.find("li[data-notesid="+App.Project.Settings.viewpointShareUrlId+"]");
-					$("div.scrollBox").mCustomScrollbar("scrollTo","notes_"+App.Project.Settings.viewpointShareUrlId);
-					// $("div.scrollBox").mCustomScrollbar("update");
-				}
 				if(App.Project.NotesCollection.defaults.hosttype != 0){
 					$("a.uploadsnapshot").css("display","none");
 				}
@@ -170,7 +169,7 @@ App.Project.NotesCollection = {
 	initListDomHandle(){
 		var leftNotesListBox = $("#leftNotesListBox");
 		var clickLiBox = leftNotesListBox.find("li");
-		var closestLiBox = leftNotesListBox.find("li[data-notesid="+App.Project.Settings.viewpointShareUrlId+"]");
+		var closestLiBox = leftNotesListBox.find("li.notes_"+App.Project.Settings.viewpointShareUrlId);
 		if(App.Project.Settings.viewpointShareUrlId){
 			if(closestLiBox.length==0){
 				$.tip({
