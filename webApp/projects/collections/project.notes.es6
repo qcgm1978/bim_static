@@ -103,11 +103,6 @@ App.Project.NotesCollection = {
 						});
 					}
 					App.Project.Settings.NotesDatas = response.data.items;
-					if(App.Project.Settings.viewpointShareUrlId){
-						var leftNotesListBox = $("#leftNotesListBox");
-						var closestLiBox = leftNotesListBox.find("li.notes_"+App.Project.Settings.viewpointShareUrlId);
-						$("div.scrollBox").mCustomScrollbar("scrollTo","bottom");
-					}
 					self.initListDomHandle();//点击事件初始化
 				}
 				return response.data;
@@ -180,6 +175,7 @@ App.Project.NotesCollection = {
 				clickLiBox.eq(0).click();//如果有批注默认去第一个批注的评论
 			}else{
 				closestLiBox.click();
+				$(".notesScrollBox").mCustomScrollbar("scrollTo","bottom");
 			}
 		}else{
 			clickLiBox.eq(0).click();//如果有批注默认去第一个批注的评论
