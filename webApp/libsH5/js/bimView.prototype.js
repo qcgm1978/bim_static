@@ -256,7 +256,7 @@
             var bar = bimView.model.colorBar;
             var content = $('<div class="colorBar"></div>')
             $.each(bar, function(i, item) {
-              var tmpHtml = $('<i class="bar-item ' + item.icon + '" title="' + item.title + '" data-id="' + item.fn + '" data-type="' + item.type + '" data-group="' + item.group + '"></i>');
+              var tmpHtml = $('<i class="bar-item ' + item.icon + '" data-id="' + item.fn + '" data-type="' + item.type + '" data-group="' + item.group + '"></i>');
               if (fn && fn == item.fn || !fn && i == 0) {
                 tmpHtml.addClass('selected')
               }

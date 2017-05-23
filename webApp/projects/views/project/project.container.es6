@@ -35,7 +35,11 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		this.$el.find(".projectCotent").append('<div class="modelContainer"> <div class="modelContainerScroll"><div class="modelContainerContent"></div></div> </div>');
 		if(window.location.href.indexOf("?") != -1){
 			var fileNav = this.$el.find(".fileNav span.notes");
-			App.Project.Settings.viewpointShareUrlId = window.location.href.substring(window.location.href.indexOf("=")+1,window.location.href.indexOf("&"));
+			if(window.location.href.indexOf("&") != -1){
+				App.Project.Settings.viewpointShareUrlId = window.location.href.substring(window.location.href.indexOf("=")+1,window.location.href.indexOf("&"));
+			}else{
+				App.Project.Settings.viewpointShareUrlId = window.location.href.substr(window.location.href.indexOf("=")+1);
+			}
 			setTimeout(function(){
 				fileNav.click();
 			},500);
@@ -417,7 +421,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$projectCotent = $projectContainer.find(".projectCotent");
 		App.Project.Settings.fetchNavType = type;
 		if (type == "file") {
-			App.Project.Settings.NotesDatas = [];
 			//左右侧
 			$projectContainer.find(".rightProperty").removeClass("showPropety");
 			$projectContainer.find(".leftNav").show();
@@ -462,7 +465,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			var notesBox = this.$el.find(".notesBox");
 			notesBox.show();//批注页面展示
 			$target.addClass("selected").siblings().removeClass("selected");//导航切换到批注上面
-			if(!App.Project.Settings.NotesDatas || App.Project.Settings.NotesDatas.length==0){
+			if(!App.Project.Settings.NotesDatas || localStorage.getItem("NotesDatas")=="undefined"){
 				var NotesSearchCondition = new App.Project.NotesSearchCondition;//顶部搜索功能
 				var NotesContentView = new App.Project.NotesContentView;//批注内容区域
 				notesBox.html(NotesSearchCondition.render().el);

@@ -50,6 +50,7 @@ App.Project.NotesCollection = {
 	getNotesListHandle(parmer){//获取批注列表的方法
 		var self = this;
 		var defaultData = {
+  			"id":"",
 			"projectId":App.Project.Settings.projectId,
 			"toMeBool":App.Project.NotesCollection.defaults.toMeBool,
 			"projectVersionId":App.Project.NotesCollection.defaults.projectVersionId,
@@ -103,6 +104,7 @@ App.Project.NotesCollection = {
 						});
 					}
 					App.Project.Settings.NotesDatas = response.data.items;
+					localStorage.setItem("NotesDatas",response.data.items);
 					self.initListDomHandle();//点击事件初始化
 				}
 				return response.data;
@@ -175,7 +177,7 @@ App.Project.NotesCollection = {
 				clickLiBox.eq(0).click();//如果有批注默认去第一个批注的评论
 			}else{
 				closestLiBox.click();
-				$(".notesScrollBox").mCustomScrollbar("scrollTo","bottom");
+				$(".notesScrollBox").mCustomScrollbar("scrollTo",".notes_"+App.Project.Settings.viewpointShareUrlId);
 			}
 		}else{
 			clickLiBox.eq(0).click();//如果有批注默认去第一个批注的评论
