@@ -29,6 +29,30 @@
     <link rel="styleSheet" href="./topNav/css/topNav.less"/>
     <link rel="stylesheet" href="./bodyContent/css/bottomBar.less"/>
     <link href="../../../favico.ico" rel="shortcut icon"/>
+    <style type="text/css">
+    ul.navHeader li.videoIcon{
+        width:35px;
+        height:50px;
+        margin-left:10px;
+    }
+    #meetingOpenAndmeetingCount{
+        width:35px;
+        height:50px;
+        position: relative;
+        cursor: pointer;
+    }
+    #meetingMsgCount{
+        position: absolute;
+        left:18px;
+        top:7px;
+    }
+    #meetingOpen{
+        width:35px;
+        height:50px;
+        background-image: url(static/dist/images/comm/images/video-icon.png); 
+        background-repeat: no-repeat;
+    }
+    </style>
 </head>
 <body>
 <div id="topBar">
@@ -46,6 +70,12 @@
             <i class="icon-angle-down hoverClass"></i>
         </li>
         <!--<li class="imbox"><a href="#inbox" target="_blank"><i></i><span id='messageCount'></span></a></li>-->
+        <li class="videoIcon">
+            <div id="meetingOpenAndmeetingCount" style="">
+                <div id="meetingMsgCount"></div>
+                <div id="meetingOpen"></div>
+            </div>
+        </li>
         <li class="menuNav">
             <i class="image-online-more hoverClass"></i>
             <span class="edgeNum count"><span class="messageCounter">0</span></span>
@@ -225,7 +255,8 @@
         margin-left:310px!important;
     }
 </style>
-<div id="meetingOpenAndmeetingCount"></div>
+
+<!-- <div id="meetingOpenAndmeetingCount"></div> -->
 
 </body>
 </html>
@@ -251,7 +282,7 @@ try
     //loadParameter("","",20,1,0,"","",escape(_userinfoForVideo));
     //loadParameter("http://apptest.wanda.cn/prewanda3v/meeting/org/getOrgZtree.do","http://apptest.wanda.cn/prewanda3v/meeting/contacts/getUserInfoByCtx.do",20,1,0,"","",escape(_userinfoForVideo));
     //loadParameter("http://139.217.12.173/platform/video/org","http://139.217.12.173/platform/video/user",20,1,0,"","",escape(_userinfoForVideo));
-    loadParameter("1c8b03f055a9444fbf82ed58cd0ea019","1c8b03f055a9444fbf82ed58cd0ea019",20,1,0,"","",escape(_userinfoForVideo));
+    loadParameter("1c8b03f055a9444fbf82ed58cd0ea019",1,20,1,0,"","",escape(_userinfoForVideo));
 }
 catch(e)
 {;}
