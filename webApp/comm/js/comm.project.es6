@@ -103,7 +103,7 @@ var CommProject = {
                 etag: this._$etag,
                 projectId: this._$projectId,
                 projectVersionId:  this._$projectVersionId,
-                checkPointType: _cat,
+                checkPointType: _cat.text, //modify by wuweiwei
                 floor: _floors
             }
         }).done(function (res) {
