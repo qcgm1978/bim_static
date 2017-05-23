@@ -13,7 +13,7 @@ var CommProject = {
     filterRule: {
         //单文件：过滤出检查点所在构件所在的文件
         //单独类型：singleRule
-        single: '梁柱节点,地下防水,步行街吊顶风口,卫生间防水,外保温,采光顶,工程桩,基坑支护,钢结构悬挑构件,幕墙,屋面防水,屋面虹吸雨排,消防泵房,给水泵房,湿式报警阀室,空调机房,冷冻机房,变配电室,发电机房,慧云机房,电梯机房,电梯底坑,吊顶,地面,中庭栏杆,竖井',
+        single: '梁柱节点,地下防水,地下室外墙防水,地下室底板防水,步行街吊顶风口,卫生间防水,外保温,采光顶,工程桩,基坑支护,钢结构悬挑构件,幕墙,屋面防水,屋面虹吸雨排,消防泵房,给水泵房,湿式报警阀室,空调机房,冷冻机房,变配电室,发电机房,慧云机房,电梯机房,电梯底坑,吊顶,地面,中庭栏杆,竖井',
 
         concat:'采光顶,地下防水,步行街吊顶风口,卫生间防水,外保温,钢结构悬挑构件,幕墙,工程桩,基坑支护,屋面防水,屋面虹吸雨排,消防泵房,给水泵房,湿式报警阀室,空调机房,冷冻机房,变配电室,发电机房,慧云机房,电梯机房,电梯底坑,吊顶,地面,中庭栏杆,竖井',
 
@@ -95,6 +95,7 @@ var CommProject = {
         if (_.isArray(_floors)) {
             _floors = _floors.join(',');
         }
+        _cat = typeof(_cat)=="string" ? _cat : _cat.text; //add by wuweiwei 2017-5-23
         App.Comm.ajax({
             URLtype: "modelFilterRule",
             data: {
@@ -103,7 +104,7 @@ var CommProject = {
                 etag: this._$etag,
                 projectId: this._$projectId,
                 projectVersionId:  this._$projectVersionId,
-                checkPointType: _cat.text, //modify by wuweiwei
+                checkPointType: _cat, //modify by wuweiwei 2017-5-23
                 floor: _floors
             }
         }).done(function (res) {
