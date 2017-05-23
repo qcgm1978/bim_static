@@ -35,8 +35,13 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		this.$el.find(".projectCotent").append('<div class="modelContainer"> <div class="modelContainerScroll"><div class="modelContainerContent"></div></div> </div>');
 		if(window.location.href.indexOf("?") != -1){
 			var fileNav = this.$el.find(".fileNav span.notes");
-			App.Project.Settings.viewpointShareUrlId = window.location.href.substr(window.location.href.indexOf("=")+1);
-			fileNav.click();
+			App.Project.Settings.viewpointShareUrlId = window.location.href.substring(window.location.href.indexOf("=")+1,window.location.href.indexOf("&"));
+			setTimeout(function(){
+				fileNav.click();
+			},500);
+		}
+		if(window.location.href.indexOf("&") != -1){
+			App.Project.Settings.viewpointSharePageNum = window.location.href.substr(window.location.href.indexOf("&")+16);
 		}
 		return this;
 	},
@@ -412,6 +417,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$projectCotent = $projectContainer.find(".projectCotent");
 		App.Project.Settings.fetchNavType = type;
 		if (type == "file") {
+			App.Project.Settings.NotesDatas = [];
 			//左右侧
 			$projectContainer.find(".rightProperty").removeClass("showPropety");
 			$projectContainer.find(".leftNav").show();
@@ -439,16 +445,13 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			}
 			//模型tab
 			$(".projectContainerApp .projectHeader .projectTab").show();
-			$projectContainer.find(".notesBox").hide();
-			$projectContainer.find(".leftNav").hide();//关闭左侧树的模块
-			$projectContainer.find(".fileContainer").hide();
 			//加载过数据后 直接切换 否则 加载数据
 			if (App.Project.Settings.DataModel && App.Project.Settings.DataModel.sourceId) {
 				this.typeContentChange();
 			} else {
 				this.fetchModelIdByProject();
 			}
-			$projectCotent.show();
+			// $projectCotent.show();
 		}else if(type=="notes"){
 			$(".projectContainerApp .projectHeader .projectTab").hide();
 			$projectCotent.addClass("showPropety").hide();
@@ -482,8 +485,10 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		$projectContainer.find(".rightProperty").addClass("showPropety").width(mRight);
 
 		//内容
+		$projectContainer.find(".notesBox").hide();
 		$projectContainer.find(".fileContainer").hide();
 		$projectContainer.find(".modelContainer").show();
+		$projectContainer.find(".projectCotent").show();
 		
 		//销毁上传
 		App.Comm.upload.destroy();
@@ -515,7 +520,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			} else {
 				alert(data.message);
 			}
-
+			
 		});
 	},
 
@@ -528,7 +533,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		var that = this;
 
 		this.typeContentChange();
-
 		//渲染模型属性
 		//App.Project.renderModelContentByType();
 		//return;

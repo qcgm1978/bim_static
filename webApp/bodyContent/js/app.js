@@ -11,10 +11,10 @@ App.BodyContent.App=Backbone.View.extend({
     render:function(){
         this.$el.html(this.template);
         this.getMonthLinkDataFun();//获取本月更多链接的方法
+        this.checkAuthorityHandle();//检查当前用户的权限方法
         return this;
     },
-	//获取本月更多链接的方法
-	getMonthLinkDataFun:function(){
+	getMonthLinkDataFun:function(){//获取本月更多链接的方法
 		var _this = this;
 		var pdata = {
             URLtype: "relLink",
@@ -29,4 +29,12 @@ App.BodyContent.App=Backbone.View.extend({
         	}
         });
 	},
+    checkAuthorityHandle:function(){//检查当前用户的权限方法
+        var tipDialogBg = $('<div class="tipDialogBgBox" id="tipDialogBgBox"></div>');
+        var tipDialogBox = $('<div class="tipDialogBox" id="tipDialogBox"></div>');
+        var TipDialogV = new App.BodyContent.App.TipDialogV;
+        $("body").append(tipDialogBg);
+        $("body").append(tipDialogBox);
+        $("#tipDialogBox").html(TipDialogV);
+    }
 });

@@ -35,6 +35,9 @@ var dwgViewer = function(options) {
     });
     self._opt.element.append(container);
     self.addControll(modelTab, container);
+    if(self._opt.callback()){
+      self._opt.callback()
+    }
   }
   var dwgView = self.dwgView = {
 

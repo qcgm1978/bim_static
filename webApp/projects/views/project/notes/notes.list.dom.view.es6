@@ -1,6 +1,6 @@
 App.Project.NotesListDomView = Backbone.View.extend({
 	tagName: "div",
-	className: "scrollBox",
+	className: "notesScrollBox",
 	template:_.templateUrl("/projects/tpls/project/notes/project.notes.list.dom.html",true),
 	events:{
 		"click .clickItem":"notesClickHandle",//点击每个批注执行的方法
@@ -15,7 +15,11 @@ App.Project.NotesListDomView = Backbone.View.extend({
 		return this;
 	},
 	loadNotesListHandle(){//进入进来 获取批注列表的方法
-		App.Project.NotesCollection.getNotesListHandle();//共用了获取批注列表的方法
+		var data = {}
+		if(App.Project.Settings.viewpointSharePageNum){
+			data.pageIndex = parseInt(App.Project.Settings.viewpointSharePageNum);
+		}
+		App.Project.NotesCollection.getNotesListHandle(data);//共用了获取批注列表的方法
 	},
 	notesClickHandle(evt){//点击每个批注执行的方法
 		var target = $(evt.target).closest("li");
@@ -26,7 +30,18 @@ App.Project.NotesListDomView = Backbone.View.extend({
 		var commetnListBox = rightNotesCommentListBox.children('div.commetnListBox');
 		if(evt.target.tagName == "A"){
 			var $data = target.find("input");
-			if(evt.target.innerText == "查看模型"&&!$(evt.target).data("hosttype")){
+			if($(evt.target).hasClass('openMore')){
+				if($(evt.target).hasClass("upIcon")){
+					$(evt.target).removeClass("upIcon");
+					$(evt.target).siblings(".notesDescTextBox").css("height","40px");
+					$(evt.target).siblings(".notesDescTextBox").css("display","-webkit-box");
+				}else{
+					$(evt.target).addClass("upIcon");
+					$(evt.target).siblings(".notesDescTextBox").css("height","auto");
+					$(evt.target).siblings(".notesDescTextBox").css("display","block");
+				}
+				
+			}else if(evt.target.innerText == "查看模型"&&!$(evt.target).data("hosttype")){
 				viewpointInput.attr("data-viewpoint",target.children("input").data("viewpointid"));
 				viewpointInput.attr("data-viewpointfilter",notesId);
 				App.Project.NotesCollection.clickModelHandle();//执行查看模型方法
@@ -104,6 +119,7 @@ App.Project.NotesListDomView = Backbone.View.extend({
 			pars = {
 				viewPointId: dialog.id,
 				projectId: App.Project.Settings.projectId,
+				projectVersionId: parseInt(App.Project.Settings.versionId),
 				name: dialog.element.find(".name").val().trim(),
 				type: dialog.type
 			};
@@ -129,7 +145,11 @@ App.Project.NotesListDomView = Backbone.View.extend({
 				dialog.close();
 				App.Project.NotesCollection.getNotesListHandle();//共用了获取批注列表的方法
 			} else {
-				alert(data.message);
+				$.tip({
+					message: "超过了最大字数512",
+					timeout: 3000,
+					type: "alarm"
+				});
 				dialog.isSubmit = false;
 				dialog.element.find(".ok").text("保存");
 			}
@@ -159,7 +179,7 @@ App.Project.NotesListDomView = Backbone.View.extend({
 		}
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
-				obj.url = "http://" + location.host + "/#projects/"+data.data.projectId+"/"+data.data.projectVersionId+"?viewpointId="+data.data.viewpointId;
+				obj.url = "http://" + location.host + "/#projects/"+data.data.projectId+"/"+data.data.projectVersionId+"?viewpointId="+data.data.viewpointId+"&currentPageNum="+App.Project.NotesCollection.defaults.pageIndexNotes;
 				var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.share.dialog.html')(obj),
 					opts = {
 						title: "分享快照",
@@ -211,23 +231,9 @@ App.Project.NotesListDomView = Backbone.View.extend({
 		}
 		var NotesListComponentView = new App.Project.NotesListComponentView({model:data});//批注列表单个组件的视图
 		leftUlNotesListBox.append(NotesListComponentView.render().el);
-		this.bindScroll();
+		App.Comm.initScroll($(".notesScrollBox"), "y");
 	},
 	resetList(){//重置加载
 		this.$("#leftUlNotesListBox").html('<li class="loading">正在加载，请稍候……</li>');
-	},
-	bindScroll:function(){//绑定滚动条
-		if($("div.scrollBox").hasClass('mCustomScrollbar')){
-			$("div.scrollBox").mCustomScrollbar("update");
-		}else{
-			$("div.scrollBox").mCustomScrollbar({
-				theme: 'minimal-dark',
-				axis: 'y',
-				keyboard: {
-					enable: true
-				},
-				scrollInertia: 0,
-			}); 
-		}
 	},
 })

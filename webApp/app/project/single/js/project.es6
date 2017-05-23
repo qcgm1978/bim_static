@@ -297,7 +297,6 @@ App.Project = {
 	//渲染dwg 文件
 	renderDwg(modelId) {
 		$("#modelBox").addClass("dwg");
-
 		App.Project.Settings.Viewer = new dwgViewer({
 			element: $("#modelBox"),
 			isComment: true,

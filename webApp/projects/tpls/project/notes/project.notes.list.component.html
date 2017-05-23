@@ -10,7 +10,9 @@
 	<dl class="notesDescBox">
 		<dt>
 			<div class="notesDescTextBox"><%= obj.name %></div>
-			<a href="javascript:;"></a>
+			<%if(obj.name.length>50){%>
+				<a href="javascript:;" class="openMore"></a>
+			<%}%>
 		</dt>
 		<dd><%= obj.creatorName %> <%= new Date(createTime).format("yyyy-MM-dd hh:mm") %></dd>
 	</dl>
@@ -25,15 +27,15 @@
 			<a href="/static/dist/app/project/single/filePreview.html?id=<%= obj.fileVersionId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank">查看图纸</a>
 		<%}%>
 		<i></i>
-		<%if(editDeleteBool){%>
-			<a href="javascript:;" class="iconEdit noCan">编辑</a>
-			<i></i>
-			<a href="javascript:;" class="iconDel noCan">删除</a>
-			<i></i>
-		<%}else{%>
+		<%if(obj.editDeleteBool){%>
 			<a href="javascript:;" class="iconEdit">编辑</a>
 			<i></i>
 			<a href="javascript:;" class="iconDel">删除</a>
+			<i></i>
+		<%}else{%>
+			<a href="javascript:;" class="iconEdit noCan">编辑</a>
+			<i></i>
+			<a href="javascript:;" class="iconDel noCan">删除</a>
 			<i></i>
 		<%}%>
 		<a href="javascript:;" class="iconShare">分享</a>

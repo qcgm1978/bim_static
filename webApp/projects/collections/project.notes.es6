@@ -69,6 +69,7 @@ App.Project.NotesCollection = {
 			success:function(collection, response, options){
 				if(response.code == 0){
 					var $content = $(".leftNotesListBox");
+					var rightNotesCommentListBox = $("#rightNotesCommentListBox");
 					var pageCount = response.data.totalItemCount;
 					$content.find(".sumDesc").html('共 ' + pageCount + ' 条批注');
 					$content.find(".loading").remove();
@@ -78,7 +79,13 @@ App.Project.NotesCollection = {
 						$content.find(".scrollBox").hide();
 						$content.find(".pagingBox").hide();
 						$content.find(".nullDataBox").show();
+						rightNotesCommentListBox.find(".commentNumberBox").hide();
+						rightNotesCommentListBox.find(".commentListBox").hide();
+						rightNotesCommentListBox.find("#addCommentBox").hide();
+						rightNotesCommentListBox.find(".nullDataBox").show();
+
 					}else{
+						$content.find(".nullDataBox").hide();
 						$content.find(".listPagination").empty().pagination(pageCount, {
 						    items_per_page: response.data.pageItemCount,
 						    current_page: response.data.pageIndex - 1,
@@ -157,10 +164,9 @@ App.Project.NotesCollection = {
 	initListDomHandle(){
 		var leftNotesListBox = $("#leftNotesListBox");
 		var clickLiBox = leftNotesListBox.find("li");
-		var shareInput = leftNotesListBox.find("input[data-notesid=1091438027071488]");
-		var closestLiBox = shareInput.closest('li');
+		var closestLiBox = leftNotesListBox.find("li.notes_"+App.Project.Settings.viewpointShareUrlId);
 		if(App.Project.Settings.viewpointShareUrlId){
-			if(shareInput.length==0){
+			if(closestLiBox.length==0){
 				$.tip({
 					message: "分享链接失效，自动跳到第一条批注",
 					timeout: 3000,
@@ -169,7 +175,7 @@ App.Project.NotesCollection = {
 				clickLiBox.eq(0).click();//如果有批注默认去第一个批注的评论
 			}else{
 				closestLiBox.click();
-				$("div.scrollBox").mCustomScrollbar("scrollTo",closestLiBox.offset().top);
+				$(".notesScrollBox").mCustomScrollbar("scrollTo","bottom");
 			}
 		}else{
 			clickLiBox.eq(0).click();//如果有批注默认去第一个批注的评论
