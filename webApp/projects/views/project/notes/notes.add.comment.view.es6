@@ -159,8 +159,9 @@ App.Project.AddCommentView = Backbone.View.extend({
 		}
 	},
 	uploadBtnHandle(event){//点击评论按钮执行的方法
+		var _this = this;
 		var $btnEnter = $(event.target);
-		if($btnEnter.data("issubmit")){
+		if(!this.default.flag){
 			return;
 		}
 		//开始配置@用户列表的方法
@@ -202,20 +203,20 @@ App.Project.AddCommentView = Backbone.View.extend({
 			});
 			return;
 		}
-		$btnEnter.html("保存中").attr("data-issubmit", true);
+		$btnEnter.html("保存中");
 		//创建
 		if(this.default.flag){
+			this.default.flag = false;
 			App.Comm.ajax(data, (data) => {
 				if (data.code == 0) {
-					this.default.flag = true;
-					$btnEnter.html("评论").attr("data-issubmit", false);
-					App.Project.NotesCollection.getCommentListHandle({viewpointId:data.data.viewpointId});
+					_this.default.flag = true;
+					$btnEnter.html("评论");
 					App.Project.NotesCollection.defaults.atUserArrs = [];
 					App.Project.NotesCollection.defaults.attachments = [];
 					this.$("#commentAttachmentListBox").html("");
 					this.$(".textareaBox textarea").val("");
 					App.Project.NotesCollection.defaults.pageIndexComment=1;
-					App.Project.NotesCollection.getCommentListHandle();//共用了获取批注评论列表的方法
+					App.Project.NotesCollection.getCommentListHandle({viewpointId:data.data.viewpointId});
 				}
 			})
 		}

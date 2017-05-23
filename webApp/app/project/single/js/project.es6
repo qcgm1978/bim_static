@@ -649,8 +649,9 @@ App.Project = {
 		$(".bim .commentBar").append(topSaveHtml);
 
 		//事件初始化
-		SingleComment.initEvent();
-
+		if($(".m-camera").hasClass("selected")){
+			SingleComment.initEvent();
+		}
 
 	}
 
@@ -677,7 +678,6 @@ App.Project = {
 	dwgViewer.prototype.saveCommentDwg = function() {
 		var that = this;
 		this.dwgView.getCommentData(function(data) { 
-			 
 			data.image = data.image.replace('data:image/png;base64,', '');
 			that.data = data;
 			SingleComment.saveCommentDialog(); 
@@ -698,6 +698,9 @@ App.Project = {
 			//取消
 			$topSaveTip.on("click", ".btnCanel", function() {
 				App.Project.Settings.Viewer.commentEnd();
+				if($(".modelBar > i.m-camera").hasClass("selected")){
+					$(".modelBar > i.m-camera").removeClass("selected")
+				}
 				//显示
 				$(".bim .modelBar").show();
 			});
@@ -817,7 +820,7 @@ App.Project = {
 			App.ajax(data, (data) => {
 
 				if (data.code == 0) {
-
+					localStorage.setItem("NotesDatas",undefined);
 					data = data.data;
 					//赋值id
 					commentData.id = data.id;
@@ -850,7 +853,9 @@ App.Project = {
 						}
 
 					});
-
+					if($(".modelBar > i.m-camera").hasClass("selected")){
+						$(".modelBar > i.m-camera").removeClass("selected")
+					}
 				} else {
 					//失败
 					alert('超过了最大字数512'||data.message);
@@ -918,8 +923,9 @@ App.Project = {
 			App.ajax(data, function(data) {
 
 				if (data.code == 0) {
+					obj.url = "http://" + location.host + "/#projects/"+data.data.projectId+"/"+data.data.projectVersionId+"?viewpointId="+obj.id;
 					//obj.url = data.data.url;
-					obj.url = "http://" + location.host + "/" + data.data.url;
+					// obj.url = "http://" + location.host + "/" + data.data.url;
 					var dialogHtml = App.Project.templateUrl('/libsH5/tpls/comment/bimview.share.dialog.html')(obj),
 						opts = {
 							title: "分享快照",

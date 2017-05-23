@@ -1368,7 +1368,7 @@
 				App.Comm.ajax(data, (data) => {
 
 					if (data.code == 0) {
-						App.Project.Settings.NotesDatas = [];
+						App.Project.Settings.NotesDatas = undefined;
 						data = data.data;
 						//赋值id
 						commentData.id = data.id;

@@ -16,6 +16,9 @@ App.Project.NotesListDomView = Backbone.View.extend({
 	},
 	loadNotesListHandle(){//进入进来 获取批注列表的方法
 		var data = {}
+		if(window.location.href.indexOf("type") != -1){
+			data.id = App.Project.Settings.viewpointShareUrlId;
+		}
 		if(App.Project.Settings.viewpointSharePageNum){
 			data.pageIndex = parseInt(App.Project.Settings.viewpointSharePageNum);
 		}
