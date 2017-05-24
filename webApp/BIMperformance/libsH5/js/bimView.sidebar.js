@@ -73,10 +73,12 @@
           viewer.filter(category);
           viewer.filter(classCode);
           viewer.exitComment();
+          /* note by wuweiwei 2017-5-24
           viewer.filter({
             ids: ['10.01'],
             type: "classCode"
-          })
+          });
+          */
         }
       }else{
         self.el._dom.sidebar.removeClass('open');

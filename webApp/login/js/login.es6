@@ -29,7 +29,7 @@ var Login = {
 		{
 			Login.doMain = ip;
 		}
-		if(location.host == "bim-demo.wanda.cn")
+		if(location.host == "bim-demo.wanda.cn" || name == "AuthUser_AuthToken1")
 		{
 			exp.setTime(exp.getTime() + 365 * 24 * 60 * 60 * 1000);
 		}
