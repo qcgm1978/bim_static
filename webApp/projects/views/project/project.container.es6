@@ -572,7 +572,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				viewer = App.Project.Settings.Viewer,
 				isIsolateState = viewer.viewer.getFilters().isIsolateState(),
 				selectedIds = viewer.getSelectedIds();
-				console.log("selectedIds:",selectedIds);
 
 			if (isIsolateState) {
 				$('#isolation').show();
@@ -648,10 +647,9 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 		//分享
 		if (App.Project.Settings.type == "token" && location.hash.indexOf("share") > 0 || App.Project.Settings.viewPintId) {
-
 			viewer.on("loaded", function() {
 				//加载数据
-				$(".modelSidebar  .bar-item.m-camera").click();
+				// $(".modelSidebar  .bar-item.m-camera").click();我的消息 定位批注问题
 			});
 
 		}

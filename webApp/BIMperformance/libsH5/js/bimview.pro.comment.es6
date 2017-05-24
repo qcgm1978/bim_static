@@ -1369,6 +1369,7 @@
 
 					if (data.code == 0) {
 						App.Project.Settings.NotesDatas = undefined;
+						App.Project.NotesCollection.resetUrlHandle();// 重置地址栏地址 单不刷新页面
 						data = data.data;
 						//赋值id
 						commentData.id = data.id;

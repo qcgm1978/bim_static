@@ -9,6 +9,7 @@ App.Project.NotesToMeView = Backbone.View.extend({
 	},
 	initCheckHandle(){//初始化复选框事件
 		this.$(".allNotes").on("click",function(){
+			App.Project.NotesCollection.resetUrlHandle();// 重置地址栏地址 单不刷新页面
 			App.Project.NotesCollection.getNotesListHandle();//共用了获取批注列表的方法
 		})
 		this.$("#toMe").on("change",function(evt){
@@ -18,6 +19,7 @@ App.Project.NotesToMeView = Backbone.View.extend({
 			}
 			App.Project.NotesCollection.defaults.pageIndexNotes = 1;
 			App.Project.NotesCollection.defaults.toMeBool = target.prop("checked");
+			App.Project.NotesCollection.resetUrlHandle();// 重置地址栏地址 单不刷新页面
 			App.Project.NotesCollection.getNotesListHandle(searchData);//共用了获取批注列表的方法
 		})
 	}
