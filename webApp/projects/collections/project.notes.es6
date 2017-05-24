@@ -251,4 +251,12 @@ App.Project.NotesCollection = {
 			}); 
 		}
 	},
+	resetUrlHandle(){// 重置地址栏地址 单不刷新页面
+		if(window.location.href.indexOf("?")!=-1){
+			var newUrl = window.location.href.substr(0,window.location.href.lastIndexOf("/"));
+				history.pushState("","",newUrl);
+				App.Project.Settings.viewpointShareUrlId = undefined;
+				App.Project.Settings.viewpointSharePageNum = 1;
+		}
+	}
 }

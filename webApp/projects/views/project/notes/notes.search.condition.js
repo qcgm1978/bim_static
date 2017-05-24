@@ -120,6 +120,7 @@ App.Project.NotesSearchCondition = Backbone.View.extend({
 	},
 	loadListHandle:function(){//通过搜索获取批注列表的方法
 		App.Project.NotesCollection.defaults.pageIndexNotes = 1;
+		App.Project.NotesCollection.resetUrlHandle();// 重置地址栏地址 单不刷新页面
 		App.Project.NotesCollection.getNotesListHandle();//共用了获取批注列表的方法
 	}
 })

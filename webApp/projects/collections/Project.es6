@@ -1631,21 +1631,21 @@ App.Project = {
 		//设置项目可查看的属性
 		this.setPropertyByAuth();
 
-		//api 页面 默认加载模型 && App.Project.Settings.loadType == "model"
-		if (App.Project.Settings.type == "token" ) {
-			$(".fileNav .notes").click();
-			//分享
-			// if (window.location.href.indexOf("share") > 10) {
-			// 	//初始化分享
-			// 	App.Project.Share.init();
-			// }
-		}
+		// //api 页面 默认加载模型 && App.Project.Settings.loadType == "model"
+		// if (App.Project.Settings.type == "token" ) {
+		// 	$(".fileNav .notes").click();
+		// 	//分享
+		// 	// if (window.location.href.indexOf("share") > 10) {
+		// 	// 	//初始化分享
+		// 	// 	App.Project.Share.init();
+		// 	// }
+		// }
 
-		//存在viewpintid
-		if (App.Project.Settings.viewPintId) {
-			$(".fileNav .notes").click();
+		// //存在viewpintid
+		// if (App.Project.Settings.viewPintId) {
+		// 	$(".fileNav .notes").click();
 
-		}
+		// }
 		window.Global.DemoEnv("projectDocBtn"); /*add by wuweiwei*/
 	},
 
