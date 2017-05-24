@@ -7,9 +7,11 @@ App.Project.NotesContentView = Backbone.View.extend({
 		this.initToMeHandle();//初始化是否与我相关组件
 		this.initNotesListHandle();//初始化批注列表页面结构功能
 		this.initNotesCommentHandle()//进入之后初始化批注评论结构.
-		window.addEventListener("storage", function(event){ 
-			App.Project.NotesCollection.resetUrlHandle();// 重置地址栏地址 单不刷新页面 
-        });    
+		if(window.location.href.indexOf("type=") != -1 || window.location.href.indexOf("viewpointId=") != -1){
+			window.addEventListener("storage", function(event){ 
+				App.Project.NotesCollection.resetUrlHandle();// 重置地址栏地址 单不刷新页面 
+	        });  
+		}
 		return this;
 	},
 	initToMeHandle(){//初始化是否与我相关组件
