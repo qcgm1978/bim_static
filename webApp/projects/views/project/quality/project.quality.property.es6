@@ -291,7 +291,18 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 
 	//获取材料设备
 	getData(pageIndex, projectId, projectVersionId) {
-
+		var get27Class = function(value){
+			//value is mapData in Project.es6 
+			var processCategory = App.Project.mapData.processCategory;
+			var i;
+			for(i=0;i<processCategory.length;i++)
+			{
+				if(processCategory[i].value == value)
+				{
+					return processCategory[i].text;
+				}
+			}
+		}
 		var type = App.Project.Settings.property,
 			pageSize = App.Comm.Settings.pageItemCount,
 			that = this,
@@ -321,7 +332,8 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			App.Project.QualityAttr.ProcessAcceptanceCollection.projectVersionId = projectVersionId;
 
 			if(that.ProcessAcceptanceOptions.category){
-				App.Project.currentProsCat=App.Project.mapData.processCategory[that.ProcessAcceptanceOptions.category];
+				//App.Project.currentProsCat=App.Project.mapData.processCategory[that.ProcessAcceptanceOptions.category]; note by wuweiwei
+				App.Project.currentProsCat=get27Class(that.ProcessAcceptanceOptions.category);
 				App.Project.currentProsCheckFloor=that.ProcessAcceptanceOptions.floor;
 			}
 
