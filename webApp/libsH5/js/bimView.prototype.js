@@ -849,7 +849,10 @@
           var ProjectContainer = new App.Project.ProjectContainer;
           ProjectContainer.resetProperNull();
         }else{
-          App.Project.resetModelNull();
+          if(App.Project.resetModelNull)
+          {
+            App.Project.resetModelNull();
+          }
         }
         // if(App.Project.ProjectContainer){
         //   var ProjectContainer = new App.Project.ProjectContainer;
@@ -861,7 +864,7 @@
         
       }
       if(App.Index){
-        App.Index.setAttrNull();
+        App.Index.setAttrNull&&App.Index.setAttrNull();
       }
       if(App.ResourceModel){
         var ListNav = new App.ResourceModel.ListNav;
