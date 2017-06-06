@@ -3,8 +3,8 @@ App.Project.NotesCommentContentView = Backbone.View.extend({
 	className: "commentBox",
 	template:_.templateUrl("/projects/tpls/project/notes/project.notes.comment.content.html",true),
 	initialize() {//初始化
-		this.listenTo(App.Project.NotesCollection.GetCommentListCollection, "add", this.addOne);
 		this.listenTo(App.Project.NotesCollection.GetCommentListCollection, "reset", this.resetList);
+		this.listenTo(App.Project.NotesCollection.GetCommentListCollection, "add", this.addOne);
 	},
 	render: function() {
 		this.$el.html(this.template);

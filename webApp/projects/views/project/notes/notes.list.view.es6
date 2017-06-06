@@ -2,6 +2,9 @@ App.Project.NotesContentView = Backbone.View.extend({
 	tagName: "div",
 	className: "notesContentBox",
 	template:_.templateUrl("/projects/tpls/project/notes/project.notes.content.html",true),
+	default:{
+
+	},
 	render: function() {
 		this.$el.html(this.template);//渲染批注内容部分结构
 		this.initToMeHandle();//初始化是否与我相关组件
@@ -26,7 +29,10 @@ App.Project.NotesContentView = Backbone.View.extend({
 	},
 	initNotesCommentHandle(){//进入之后初始化批注评论结构
 		var rightNotesCommentListBox = this.$("#rightNotesCommentListBox");
-		var NotesCommentContentView = new App.Project.NotesCommentContentView;//右侧批注评论的视图组件
-		rightNotesCommentListBox.append(NotesCommentContentView.render().el);
+		if(this.default.NotesCommentContentView){
+			this.default.NotesCommentContentView.remove();
+		}
+		this.default.NotesCommentContentView = new App.Project.NotesCommentContentView;//右侧批注评论的视图组件
+		rightNotesCommentListBox.append(this.default.NotesCommentContentView.render().el);
 	},
 })
