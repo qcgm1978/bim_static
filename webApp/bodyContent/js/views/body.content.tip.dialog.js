@@ -37,6 +37,8 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
         			_this.$el.find("a.yesKnow").hide();
         			_this.$el.find("a.nowToComplete").attr("href",learnStatus.ptpurl);
         			dialogMessage.html(html);
+                    $("#tipDialogBgBox").show();
+                    $("#tipDialogBox").show();
         		}else if(learnStatus.beforeStationStatus == 1){//通过了上岗
         			var endDateObj = new Date(learnStatus.endDate);
         			var endDate = endDateObj.getTime();
@@ -51,10 +53,11 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
         				html = '您在岗培训还差<i>'+learnStatus.lessnum+'</i>课时(共<span>'+learnStatus.totalnum+'</span>课时)就可以完成啦！请最晚于<i id="endStr">'+endDateStr+'</i>之前完成剩余课时的学习，加油哦'
         				dialogMessage.html(html);
         				_this.$el.find("a.nowToComplete").attr("href",learnStatus.ptpurl);
+                        $("#tipDialogBgBox").show();
+                        $("#tipDialogBox").show();
         			}
         		}
-                $("#tipDialogBgBox").show();
-                $("#tipDialogBox").show();
+                
         	}else{
         		alert(data.message);
         	}
