@@ -35,6 +35,6 @@ App.BodyContent.App=Backbone.View.extend({
         var TipDialogV = new App.BodyContent.App.TipDialogV;
         $("body").append(tipDialogBg);
         $("body").append(tipDialogBox);
-        $("#tipDialogBox").html(TipDialogV);
+        $("#tipDialogBox").html(TipDialogV.render().el);
     }
 });

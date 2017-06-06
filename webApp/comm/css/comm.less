@@ -253,3 +253,85 @@ ul li.loading { text-align: center; font-size: 14px; padding-top: 30px; color: #
 	display:block;
 	cursor:pointer;
 }
+
+.tipDialogBgBox{
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	z-index: 1000;
+	left: 0;
+	top: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: none;
+}
+.tipDialogBox{
+	width: 476px;
+	height: 170px;
+	position: absolute;
+	z-index: 1001;
+	left: 50%;
+	top: 50%;
+	padding: 20px;
+	border-radius:5px;
+	background-color: #fff;
+	transform: translate(-238px, -85px);
+	-ms-transform: translate(-238px, -85px);
+	-webkit-transform: translate(-238px, -85px);
+	-o-transform: translate(-238px, -85px);
+	-moz-transform: translate(-238px, -85px);
+	display: none;
+}
+.tipDialogBox .divBox{
+	width: 100%;
+	height: 100%;
+}
+.tipDialogBox .divBox .tipLeftLogoBox{
+	width: 130px;
+	height: 130px;
+	float: left;
+	margin-right: 20px;
+}
+.tipDialogBox .divBox .tipLeftLogoBox img{
+	width: 100%;
+	height: 100%;
+}
+.tipDialogBox .divBox .tipRightLogoBox{
+	width: 286px;
+	height: 100%;
+	padding-top: 10px;
+	float: right;
+}
+.tipDialogBox .divBox .tipRightLogoBox p{
+	height: 88px;
+	font-size: 14px;
+	color: #333;
+	line-height: 20px;
+}
+.tipDialogBox .divBox .tipRightLogoBox p i{
+	font-style: normal;
+	color: #ff3333;
+	font-weight: bold;
+}
+.tipDialogBox .divBox .tipRightLogoBox .tipDialogButton{
+	width: 100%;
+	text-align: right;
+	font-size: 12px;
+	height: 34px;
+	line-height: 34px;
+	a{
+		text-decoration: none;
+		display: inline-block;
+		&.yesKnow{
+			color: #999;
+		}
+		&.nowToComplete{
+			padding: 0 16px;
+			height: 32px;
+			line-height: 32px;
+			color: #1491ff;
+			border: #1491ff solid 1px;
+			border-radius:5px;
+			margin-left: 20px;
+		}
+	}
+}
