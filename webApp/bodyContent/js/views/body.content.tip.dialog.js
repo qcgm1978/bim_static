@@ -36,6 +36,8 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
         			_this.$el.find("a.yesKnow").hide();
         			_this.$el.find("a.nowToComplete").attr("href",learnStatus.ptpurl);
         			dialogMessage.html(html);
+                    $("#tipDialogBgBox").show();
+                    $("#tipDialogBox").show();
         		}else if(learnStatus.beforeStationStatus == 1){//通过了上岗
         			var currentTime = learnStatus.currentTime;
         			var endDateObj = new Date(learnStatus.endDate);
