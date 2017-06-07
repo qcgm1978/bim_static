@@ -272,7 +272,7 @@
         }, 
         loadLib: function () {//google。ie第二次进来执行
             var self = this,
-                srciptUrl = ourl + '/static/dist/libs/libsH5_oldversion.js',
+                srciptUrl = ourl + '/static/dist/libs/libsH5.js',
                 commjs = ourl + '/static/dist/comm/comm_20160313.js',
                 libStyle = ourl + '/static/dist/libs/libsH5_20160313.css',
                 libStyle2 = ourl + '/static/dist/comm/comm_20160313.css',
