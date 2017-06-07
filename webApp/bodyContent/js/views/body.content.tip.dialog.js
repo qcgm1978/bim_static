@@ -7,8 +7,8 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
     template:_.templateUrl("/bodyContent/tpls/bodyContent.tipDialog.html",true),
     render:function(){
         this.$el.html(this.template);
-        this.getTipDataHandle();//获取提示信息的方法
-        this.initHandle();//初始化事件
+        // this.getTipDataHandle();//获取提示信息的方法
+        // this.initHandle();//初始化事件
         return this;
     },
     initHandle:function(){//初始化事件
