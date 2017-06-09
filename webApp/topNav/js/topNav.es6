@@ -57,13 +57,13 @@ App.TopNav = {
 			indexTrainingItem.hide();
 			indexTrainingAuthenItem.hide();
 		}
-		indexAuthenticationItem.on("click",function(evt){
+		myTrain.on("click",function(evt){
 			window.open("http://bimrzuat.wanda-dev.cn/wdsso/wdEnter.jsp?m=pxda&userName="+App.Global.User.name,"_blank");
 		})
-		indexTrainingItem.on("click",function(evt){
+		indexAuthenticationItem.on("click",function(evt){
 			window.open("http://bimrzuat.wanda-dev.cn/wdsso/wdEnter.jsp?m=rzjg&userName="+App.Global.User.name,"_blank");
 		})
-		myTrain.on("click",function(evt){
+		indexTrainingItem.on("click",function(evt){
 			window.open("http://bimrzuat.wanda-dev.cn/wdsso/wdEnter.jsp?m=pxgl&userName="+App.Global.User.name,"_blank");
 		})
 
