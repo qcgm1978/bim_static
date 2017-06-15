@@ -16,6 +16,9 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
     	this.$el.find("a.yesKnow").on("click",function(){
     		_this.closeDialog();//关闭弹出框
     	})
+        // this.$el.find("a.nowToComplete").on("click",function(){
+        //     window.location.href = "#login";
+        // })
     },
     closeDialog:function(){//关闭弹出框
     	$("#tipDialogBgBox").hide();
@@ -53,7 +56,7 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
                             }
                             html = '您在岗培训还差<i>'+learnStatus.lessnum+'</i>课时(共<span>'+learnStatus.totalnum+'</span>课时)就可以完成啦！请最晚于<i id="endStr">'+endDateStr+'</i>之前完成剩余课时的学习，加油哦'
                             dialogMessage.html(html);
-                            _this.$el.find("a.nowToComplete").attr("href",learnStatus.pturl);
+                            _this.$el.find("a.nowToComplete").attr("href","http://bimrzuat.wanda-dev.cn"+learnStatus.pturl);
                             $("#tipDialogBgBox").show();
                             $("#tipDialogBox").show();
                         }
