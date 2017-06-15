@@ -34,7 +34,7 @@
         width:35px;
         height:50px;
         margin-left:20px;
-        
+        position: relative;
     }
     #meetingOpenAndmeetingCount{
         width:35px;
@@ -53,7 +53,7 @@
         text-align: center;
         z-index: 1000;
     }
-    .videoIcon,#meetingOpen{
+    #meetingOpenAndmeetingCount,#meetingOpen{
         width:26px;
         height:18px;
         background-image: url(static/dist/images/comm/images/video-icon.png); 
@@ -303,14 +303,15 @@ try
     //loadParameter("http://apptest.wanda.cn/prewanda3v/meeting/org/getOrgZtree.do","http://apptest.wanda.cn/prewanda3v/meeting/contacts/getUserInfoByCtx.do",20,1,0,"","",escape(_userinfoForVideo));
     //loadParameter("http://139.217.12.173/platform/video/org","http://139.217.12.173/platform/video/user",20,1,0,"","",escape(_userinfoForVideo));
 
-    loadParameter("1c8b03f055a9444fbf82ed58cd0ea019",1,1,20,1,0,"","",escape(_userinfoForVideo));
-
     function loadMeetingMsgCount(count){
         if(count==0)
         {
-            $("#meetingMsgCount").hide();
+            console.log(111);
+            //$("#meetingMsgCount").hide();
         }
     }
+
+    loadParameter("1c8b03f055a9444fbf82ed58cd0ea019",1,1,20,1,0,"","",escape(_userinfoForVideo));
     
 }
 catch(e)
