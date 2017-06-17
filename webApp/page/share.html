@@ -9,6 +9,15 @@
 <script type="text/javascript">
 var ua = navigator.userAgent;
 var hash = location.hash;
+App = {};
+App.Storage = {
+	setData : function(key,value){
+		window.localStorage[key] = value;
+	},
+	getData : function(key){
+		return window.localStorage[key];
+	}
+}
 
 var Url = {
 	getParam : function(key){
