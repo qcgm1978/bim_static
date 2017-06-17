@@ -14,11 +14,15 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
     initHandle:function(){//初始化事件
     	var _this = this;
     	this.$el.find("a.yesKnow").on("click",function(){
-    		_this.closeDialog();//关闭弹出框
-    	})
-        // this.$el.find("a.nowToComplete").on("click",function(){
-        //     window.location.href = "#login";
-        // })
+            _this.closeDialog();//关闭弹出框
+        })
+        
+        this.$el.find("a.nowToComplete").on("click",function(){//#/logout
+            if(!_this.$el.find("a.yesKnow").hasClass('canLookBtn')){
+                _this.closeDialog();//立即参与培训 之后页面退到登录页面
+                window.location.href = "#/logout";
+            }
+        }) 
     },
     closeDialog:function(){//关闭弹出框
     	$("#tipDialogBgBox").hide();
@@ -38,7 +42,7 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
                 if(learnStatus){
                     if(learnStatus.beforeStationStatus == 0){//未通过上岗
                         html = '您的上岗培训还差<i>'+learnStatus.lessnum+'</i>课时(共<span>'+learnStatus.totalnum+'</span>课时)就可以完成啦!请您尽快完成剩余学时的学习哦!'
-                        _this.$el.find("a.yesKnow").hide();
+                        _this.$el.find("a.yesKnow").hide().removeClass("canLookBtn");
                         _this.$el.find("a.nowToComplete").attr("href","http://bimrzuat.wanda-dev.cn"+learnStatus.pturl);
                         dialogMessage.html(html);
                         $("#tipDialogBgBox").show();
@@ -52,7 +56,7 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
                         var endDateStr = getFullYear+"年"+getMonth+"月"+getDay+"日";
                         if(learnStatus.onStationStatus == 0){//在岗未通过
                             if(currentTime>endDate){//是否在规定日期完成培训
-                                _this.$el.find("a.yesKnow").hide();
+                                _this.$el.find("a.yesKnow").hide().removeClass("canLookBtn");;
                             }
                             html = '您在岗培训还差<i>'+learnStatus.lessnum+'</i>课时(共<span>'+learnStatus.totalnum+'</span>课时)就可以完成啦！请最晚于<i id="endStr">'+endDateStr+'</i>之前完成剩余课时的学习，加油哦'
                             dialogMessage.html(html);
