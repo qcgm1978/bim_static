@@ -40,25 +40,25 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
                 var currentTime = data.data.currentTime;
         		var learnStatus = data.data.learnStatus;
                 if(learnStatus){
-                    if(learnStatus.beforeStationStatus == 0){//未通过上岗
-                        html = '您的上岗培训还差<i>'+learnStatus.lessnum+'</i>课时(共<span>'+learnStatus.totalnum+'</span>课时)就可以完成啦!请您尽快完成剩余学时的学习哦!'
+                    if(learnStatus.beforestationstatus == 0){//未通过上岗
+                        html = '您的上岗培训还差<i>'+learnStatus.bslessnum+'</i>课时(共<span>'+learnStatus.bstotalnum+'</span>课时)就可以完成啦!请您尽快完成剩余学时的学习哦!'
                         _this.$el.find("a.yesKnow").hide().removeClass("canLookBtn");
                         _this.$el.find("a.nowToComplete").attr("href","http://bimrzuat.wanda-dev.cn"+learnStatus.pturl);
                         dialogMessage.html(html);
                         $("#tipDialogBgBox").show();
                         $("#tipDialogBox").show();
-                    }else if(learnStatus.beforeStationStatus == 1){//通过了上岗
-                        var endDateObj = new Date(learnStatus.endDate);
+                    }else if(learnStatus.beforestationstatus == 1){//通过了上岗
+                        var endDateObj = new Date(learnStatus.enddate);
                         var endDate = endDateObj.getTime();
                         var getFullYear = endDateObj.getFullYear();
                         var getMonth = (endDateObj.getMonth()+1)>=10?endDateObj.getMonth()+1:"0"+(endDateObj.getMonth()+1);
                         var getDay = endDateObj.getDate()>=10?endDateObj.getDate():"0"+endDateObj.getDate();
                         var endDateStr = getFullYear+"年"+getMonth+"月"+getDay+"日";
-                        if(learnStatus.onStationStatus == 0){//在岗未通过
+                        if(learnStatus.onstationstatus == 0){//在岗未通过
                             if(currentTime>endDate){//是否在规定日期完成培训
-                                _this.$el.find("a.yesKnow").hide().removeClass("canLookBtn");;
+                                _this.$el.find("a.yesKnow").hide().removeClass("canLookBtn");
                             }
-                            html = '您在岗培训还差<i>'+learnStatus.lessnum+'</i>课时(共<span>'+learnStatus.totalnum+'</span>课时)就可以完成啦！请最晚于<i id="endStr">'+endDateStr+'</i>之前完成剩余课时的学习，加油哦'
+                            html = '您在岗培训还差<i>'+learnStatus.oslessnum+'</i>课时(共<span>'+learnStatus.ostotalnum+'</span>课时)就可以完成啦！请最晚于<i id="endStr">'+endDateStr+'</i>之前完成剩余课时的学习，加油哦'
                             dialogMessage.html(html);
                             _this.$el.find("a.nowToComplete").attr("href","http://bimrzuat.wanda-dev.cn"+learnStatus.pturl);
                             $("#tipDialogBgBox").show();
