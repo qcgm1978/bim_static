@@ -43,7 +43,7 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
         		var learnStatus = data.data.learnStatus;
                 if(learnStatus){
                     if(learnStatus.beforestationstatus == 0){//未通过上岗
-                        html = '您的上岗培训还差<i>'+learnStatus.bslessnum+'</i>课时(共<span>'+learnStatus.bstotalnum+'</span>课时)就可以完成啦!请您尽快完成剩余学时的学习哦!'
+                        html = '您的上岗培训还差<i>'+learnStatus.bslessnum+'</i>个内容(共<span>'+learnStatus.bstotalnum+'</span>个内容)就可以完成啦!请您尽快完成剩余学时的学习哦!'
                         _this.$el.find("a.yesKnow").hide().removeClass("canLookBtn");
                         _this.$el.find("a.nowToComplete").attr("href","http://bimrzuat.wanda-dev.cn"+learnStatus.pturl);
                         dialogMessage.html(html);
@@ -60,7 +60,7 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
                             if(currentTime>endDate){//是否在规定日期完成培训
                                 _this.$el.find("a.yesKnow").hide().removeClass("canLookBtn");
                             }
-                            html = '您在岗培训还差<i>'+learnStatus.oslessnum+'</i>课时(共<span>'+learnStatus.ostotalnum+'</span>课时)就可以完成啦！请最晚于<i id="endStr">'+endDateStr+'</i>之前完成剩余课时的学习，加油哦'
+                            html = '您在岗培训还差<i>'+learnStatus.oslessnum+'</i>个内容(共<span>'+learnStatus.ostotalnum+'</span>个内容)就可以完成啦！请最晚于<i id="endStr">'+endDateStr+'</i>之前完成剩余内容的学习，加油哦'
                             dialogMessage.html(html);
                             _this.$el.find("a.nowToComplete").attr("href","http://bimrzuat.wanda-dev.cn"+learnStatus.pturl);
                             $("#tipDialogBgBox").show();
