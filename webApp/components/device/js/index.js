@@ -620,8 +620,9 @@
             });
             viewer.on('click',function(){
                 $('#isolation').show();
-            })
-            viewer.viewer.setMarkerClickCallback(function(marker){
+            });
+            //viewer.viewer.setMarkerClickCallback(function(marker){
+            viewer.getMakerObject().setMarkerClickCallback(function(marker){
                 var id = marker? marker.id:"",
                     userId=marker? marker.userId:"",
                     data={};
