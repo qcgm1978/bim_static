@@ -23,20 +23,24 @@ App.Project.NotesListDomView = Backbone.View.extend({
 		return this;
 	},
 	getPageNumHandler(){//当时分享过来的时候 如果不存在分页就通过批注id去获取页数
-		var data = {
-
+		var parsm = {
+			projectId:App.Project.Settings.shareProjectId,
+			viewPointId:App.Project.Settings.viewpointShareUrlId,
+			pageItemCount:15,
 		}
-		/*App.Project.NotesCollection.GetCommentListCollection.fetch({
-			data:JSON.stringify(extendData),
-			type:"POST",
-			contentType:"application/json",
-			success:function(collection, response, options){
-				if(response.code == 0){
-					App.Project.Settings.viewpointSharePageNum = response.data;
-					this.loadNotesListHandle();//进入进来 获取批注列表的方法
-				}
+		var data = {
+			URLtype: "getNotesPage",
+			data: parsm,
+			type: "get",
+		}
+		App.Comm.ajax(data, (data) => {
+			if (data.code == 0) {
+				App.Project.Settings.viewpointSharePageNum = data.data;
+				this.loadNotesListHandle();//进入进来 获取批注列表的方法
+			} else {
+				alert(data.message);
 			}
-		})*/
+		})
 	},
 	loadNotesListHandle(){//进入进来 获取批注列表的方法
 		var data = {}

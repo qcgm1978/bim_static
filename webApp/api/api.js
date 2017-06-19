@@ -380,6 +380,7 @@ App.API = {
 		getNotesList:"sixD/viewPoint/list",//获取批注列表的方法
 		getCommentList:"sixD/viewPoint/comment/list",//获取批注评论列表的方法
 		deleteNotesComment:"sixD/{projectId}/viewPoint/{viewPointId}/comment/{commentId}",//删除批注地下的评论的接口
+		getNotesPage:"sixD/viewPoint/query/pageNum",//获取单个批注在列表当中的位置信息
 	},
 
 	DEBUGURL: {
