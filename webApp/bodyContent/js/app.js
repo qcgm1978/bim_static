@@ -10,8 +10,10 @@ App.BodyContent.App=Backbone.View.extend({
 
     render:function(){
         this.$el.html(this.template);
+        if(localStorage.getItem("yesKnow") == "false"){
+            this.checkAuthorityHandle();//检查当前用户的权限方法
+        }
         this.getMonthLinkDataFun();//获取本月更多链接的方法
-        this.checkAuthorityHandle();//检查当前用户的权限方法
         return this;
     },
 	getMonthLinkDataFun:function(){//获取本月更多链接的方法

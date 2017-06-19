@@ -15,6 +15,7 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
     	var _this = this;
     	this.$el.find("a.yesKnow").on("click",function(){
             _this.closeDialog();//关闭弹出框
+            localStorage.setItem("yesKnow",true);
         })
         
         this.$el.find("a.nowToComplete").on("click",function(){//#/logout
