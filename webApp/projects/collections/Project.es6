@@ -1594,9 +1594,9 @@ App.Project = {
 		}
 
 		//api 页面 默认加载模型 && App.Project.Settings.loadType == "model"
-		if (App.Project.Settings.type == "token" ) {
-			$("#projectContainer").find(".fileContainer").hide().end().find(".modelContainer").show();
-		}
+		// if (App.Project.Settings.type == "token" ) {
+		// 	$("#projectContainer").find(".fileContainer").hide().end().find(".modelContainer").show();
+		// }
 		// 导航文件
 		App.Project.fetchFileNav();
 		//导航模型
