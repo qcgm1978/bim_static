@@ -18,14 +18,14 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
             localStorage.setItem("yesKnow",true);
         })
         
-        this.$el.find("a.nowToComplete").on("click",function(){//#/logout
+       /* this.$el.find("a.nowToComplete").on("click",function(){//#/logout
             if(!_this.$el.find("a.yesKnow").hasClass('canLookBtn')){
                 setTimeout(function(){
                     _this.closeDialog();//立即参与培训 之后页面退到登录页面
                     window.location.href = "#/logout";
                 },10000)
             }
-        }) 
+        }) */
     },
     closeDialog:function(){//关闭弹出框
     	$("#tipDialogBgBox").hide();
@@ -39,7 +39,6 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
         	URLtype: "current",
         }
         App.Comm.ajax(data,function(data){
-            console.log("测试测试=====",12345678910);
         	if(data.code == 0){
                 var currentTime = data.data.currentTime;
         		var learnStatus = data.data.learnStatus;
