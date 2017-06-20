@@ -20,8 +20,10 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
         
         this.$el.find("a.nowToComplete").on("click",function(){//#/logout
             if(!_this.$el.find("a.yesKnow").hasClass('canLookBtn')){
-                _this.closeDialog();//立即参与培训 之后页面退到登录页面
-                window.location.href = "#/logout";
+                setTimeout(function(){
+                    _this.closeDialog();//立即参与培训 之后页面退到登录页面
+                    window.location.href = "#/logout";
+                },10000)
             }
         }) 
     },
