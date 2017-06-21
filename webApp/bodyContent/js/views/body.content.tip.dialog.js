@@ -44,7 +44,7 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
         		var learnStatus = data.data.learnStatus;
                 if(learnStatus){
                     if(learnStatus.beforestationstatus == 0){//未通过上岗
-                        if(learnStatus.bslessonless == 0 && learnStatus.bsexamless==0){//上岗培训课程跟考试均未完成提示：
+                        if(learnStatus.bslessonless != 0 && learnStatus.bsexamless!=0){//上岗培训课程跟考试均未完成提示：
                             html = '您的上岗培训还差<i>'+learnStatus.bslessonless+'</i>门课程和上岗考试就可以完成啦！请您尽快完成剩余的学习任务哦!'
                         }else if(learnStatus.bslessonless != 0 && learnStatus.bsexamless==0){//上岗培训只有课程未完成时提示
                             html = '您的上岗培训还差<i>'+learnStatus.bslessonless+'</i>门课程就可以完成啦！请您尽快完成剩余的学习任务哦!'
@@ -67,7 +67,7 @@ App.BodyContent.App.TipDialogV = Backbone.View.extend({
                             if(currentTime>endDate){//是否在规定日期完成培训
                                 _this.$el.find("a.yesKnow").hide().removeClass("canLookBtn");
                             }
-                            if(learnStatus.oslessonless == 0 && learnStatus.osexamless==0){//在岗培训课程跟考试均未完成提示
+                            if(learnStatus.oslessonless != 0 && learnStatus.osexamless!=0){//在岗培训课程跟考试均未完成提示
                                 html = '您的在岗培训还差<i>'+learnStatus.oslessonless+'</i>门课程和在岗考试就可以完成啦！请最晚于<i id="endStr">'+endDateStr+'</i>之前完成剩余的学习任务，加油哦!';
                             }else if(learnStatus.oslessonless != 0 && learnStatus.osexamless==0){//在岗培训只有课程未完成时提示
                                 html = '您的在岗培训还差<i>'+learnStatus.oslessonless+'</i>门课程就可以完成啦！请最晚于<i id="endStr">'+endDateStr+'</i>之前完成剩余的学习任务，加油哦!';
