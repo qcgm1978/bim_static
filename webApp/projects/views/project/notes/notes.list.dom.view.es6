@@ -11,8 +11,36 @@ App.Project.NotesListDomView = Backbone.View.extend({
 	},
 	render: function() {
 		this.$el.html(this.template);
-		this.loadNotesListHandle();//进入进来 获取批注列表的方法
+		if(App.Project.Settings.shareBool){
+			if(App.Project.Settings.pageBool){
+				this.getPageNumHandler();//当时分享过来的时候 如果不存在分页就通过批注id去获取页数
+			}else{
+				this.loadNotesListHandle();//进入进来 获取批注列表的方法
+			}
+		}else{
+			this.loadNotesListHandle();//进入进来 获取批注列表的方法
+		}
 		return this;
+	},
+	getPageNumHandler(){//当时分享过来的时候 如果不存在分页就通过批注id去获取页数
+		var parsm = {
+			projectId:App.Project.Settings.shareProjectId,
+			viewPointId:App.Project.Settings.viewpointShareUrlId,
+			pageItemCount:15,
+		}
+		var data = {
+			URLtype: "getNotesPage",
+			data: parsm,
+			type: "get",
+		}
+		App.Comm.ajax(data, (data) => {
+			if (data.code == 0) {
+				App.Project.Settings.viewpointSharePageNum = data.data;
+				this.loadNotesListHandle();//进入进来 获取批注列表的方法
+			} else {
+				alert(data.message);
+			}
+		})
 	},
 	loadNotesListHandle(){//进入进来 获取批注列表的方法
 		var data = {}
@@ -182,7 +210,7 @@ App.Project.NotesListDomView = Backbone.View.extend({
 		}
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
-				obj.url = "http://" + location.host + "/#projects/"+data.data.projectId+"/"+data.data.projectVersionId+"?viewpointId="+data.data.viewpointId+"&currentPageNum="+App.Project.NotesCollection.defaults.pageIndexNotes;
+				obj.url = "http://" + location.host + "/#projects/"+data.data.projectId+"/"+data.data.projectVersionId+"?share=true&viewpointId="+data.data.viewpointId+"&currentPageNum="+App.Project.NotesCollection.defaults.pageIndexNotes;
 				var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.share.dialog.html')(obj),
 					opts = {
 						title: "分享快照",

@@ -923,7 +923,7 @@ App.Project = {
 			App.ajax(data, function(data) {
 
 				if (data.code == 0) {
-					obj.url = "http://" + location.host + "/#projects/"+data.data.projectId+"/"+data.data.projectVersionId+"?viewpointId="+obj.id;
+					obj.url = "http://" + location.host + "/#projects/"+data.data.projectId+"/"+data.data.projectVersionId+"?share=true&viewpointId="+obj.id+"&projectId="+App.Project.Settings.projectId+"&currentPageNum=";
 					//obj.url = data.data.url;
 					// obj.url = "http://" + location.host + "/" + data.data.url;
 					var dialogHtml = App.Project.templateUrl('/libsH5/tpls/comment/bimview.share.dialog.html')(obj),

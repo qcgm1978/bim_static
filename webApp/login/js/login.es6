@@ -224,7 +224,8 @@ var Login = {
 			Login.dispatchIE('/?commType=loginIn');
 
 
-			localStorage.setItem("user", JSON.stringify(data.data))
+			localStorage.setItem("user", JSON.stringify(data.data));
+			localStorage.setItem("yesKnow",false);
 			Login.setCookie('OUTSSO_LoginId', data.data.userId);
 			Login.setCookie('userId', data.data.userId);
 			Login.setCookie('isOuter', data.data.outer);

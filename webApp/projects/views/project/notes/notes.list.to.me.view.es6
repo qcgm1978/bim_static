@@ -12,6 +12,10 @@ App.Project.NotesToMeView = Backbone.View.extend({
 			App.Project.NotesCollection.resetUrlHandle();// 重置地址栏地址 单不刷新页面
 			App.Project.NotesCollection.getNotesListHandle();//共用了获取批注列表的方法
 		})
+		if(App.Project.Settings.shareBool){
+			this.$("#toMe").prop('checked', false);
+			App.Project.NotesCollection.defaults.toMeBool = false;
+		}
 		this.$("#toMe").on("change",function(evt){
 			var target = $(evt.target);
 			var searchData = {

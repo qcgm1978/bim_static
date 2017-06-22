@@ -1594,8 +1594,10 @@ App.Project = {
 		}
 
 		//api 页面 默认加载模型 && App.Project.Settings.loadType == "model"
-		if (App.Project.Settings.type == "token" ) {
+		if (App.Project.Settings.type == "token" && window.location.href.indexOf("plan/")!=-1) {
 			$("#projectContainer").find(".fileContainer").hide().end().find(".modelContainer").show();
+		}else if (App.Project.Settings.type == "token" && window.location.href.indexOf("version/")!=-1){
+			$("#projectContainer").find(".modelContainer").hide().end().find(".fileContainer").show();
 		}
 		// 导航文件
 		App.Project.fetchFileNav();
@@ -1632,14 +1634,16 @@ App.Project = {
 		this.setPropertyByAuth();
 
 		// //api 页面 默认加载模型 && App.Project.Settings.loadType == "model"
-		// if (App.Project.Settings.type == "token" ) {
-		// 	$(".fileNav .notes").click();
-		// 	//分享
-		// 	// if (window.location.href.indexOf("share") > 10) {
-		// 	// 	//初始化分享
-		// 	// 	App.Project.Share.init();
-		// 	// }
-		// }
+		if (App.Project.Settings.type == "token" && window.location.href.indexOf("plan/")!=-1) {
+			$(".fileNav .model").click();
+			//分享
+			// if (window.location.href.indexOf("share") > 10) {
+			// 	//初始化分享
+			// 	App.Project.Share.init();
+			// }
+		}else if (App.Project.Settings.type == "token" && window.location.href.indexOf("version/")!=-1){
+			$(".fileNav .file").click();
+		}
 
 		// //存在viewpintid
 		// if (App.Project.Settings.viewPintId) {

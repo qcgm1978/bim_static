@@ -33,19 +33,22 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		//加载文件
 		this.$el.find(".projectCotent").append(new App.Project.FileContainer().render().el);
 		this.$el.find(".projectCotent").append('<div class="modelContainer"> <div class="modelContainerScroll"><div class="modelContainerContent"></div></div> </div>');
-		if(window.location.href.indexOf("?") != -1){
+		if(window.location.href.indexOf("share=") != -1){
 			var fileNav = this.$el.find(".fileNav span.notes");
-			if(window.location.href.indexOf("&") != -1){
-				App.Project.Settings.viewpointShareUrlId = window.location.href.substring(window.location.href.indexOf("=")+1,window.location.href.indexOf("&"));
-			}else{
-				App.Project.Settings.viewpointShareUrlId = window.location.href.substr(window.location.href.indexOf("=")+1);
+			var shareUrl = window.location.href.substr(window.location.href.indexOf("share=")+11);
+			var shareArr = shareUrl.split("&");
+			var obj={};
+			for(var i=0,len=shareArr.length;i<len;i++){
+				obj[shareArr[i].split("=")[0]]=shareArr[i].split("=")[1];
 			}
+			App.Project.Settings.shareBool = true;
+			App.Project.Settings.pageBool = obj.currentPageNum?false:true;
+			App.Project.Settings.viewpointShareUrlId = obj.viewpointId;
+			App.Project.Settings.shareProjectId = obj.projectId;
+			App.Project.Settings.viewpointSharePageNum = obj.currentPageNum?obj.currentPageNum:"";
 			setTimeout(function(){
 				fileNav.click();
 			},500);
-		}
-		if(window.location.href.indexOf("&") != -1){
-			App.Project.Settings.viewpointSharePageNum = window.location.href.substr(window.location.href.indexOf("&")+16);
 		}
 		return this;
 	},
