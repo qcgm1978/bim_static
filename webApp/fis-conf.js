@@ -137,9 +137,9 @@ fis.match('login/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
 });
-fis.match('login/down/BIM演示系统账号申请表.docx', {
-  //useHash:true,
-  release: "/static/dist/tpls/$0"
+fis.match('login/down/BIM演示系统账号申请表.docx',{
+  //useHash:true,static/dist/login/down/BIM演示系统账号申请表.docx
+  release: "/static/dist/$0"
 });
 fis.match('projects/**.html', {
   //useHash:true,
