@@ -1,4 +1,4 @@
-App.Services.System.FeedBackAttrManagerContentDialog=Backbone.View.extend({
+App.Services.FeedBackAttrManagerContentDialog=Backbone.View.extend({
 	tagName:'div',
 	className:"feedBackDialog suggestView",
 	events:{
@@ -32,7 +32,7 @@ App.Services.System.FeedBackAttrManagerContentDialog=Backbone.View.extend({
 			contentType:"application/json",
 		}).done(function(res){
 			if(res.code == 0){
-				var dialogHtml = _.templateUrl("/services/tpls/system/feedBack/feedBackAttrManagerDialog.html");
+				var dialogHtml = _.templateUrl("/services/tpls/system/feedback/feedBackAttrManagerDialog.html");
 				_this.$el.html(dialogHtml(res.data.items[0]));
 			}else{
 				$.tip({message:res.message,type:'alarm'});
@@ -63,7 +63,7 @@ App.Services.System.FeedBackAttrManagerContentDialog=Backbone.View.extend({
 			}).done(function(res){
 				if(res.code == 0){
 					App.Services.SystemCollection.getFeedBackListHandle();
-					App.Services.System.FeedBackDialog.close();
+					App.Services.FeedBackDialog.close();
 				}else{
 					alert(res.message)
 					$.tip({message:res.message,type:'alarm'});
@@ -84,7 +84,7 @@ App.Services.System.FeedBackAttrManagerContentDialog=Backbone.View.extend({
 			},
 		}).done(function(res){
 			if(res.code == 0){
-				App.Services.System.FeedBackDialog.close();
+				App.Services.FeedBackDialog.close();
 				App.Services.SystemCollection.getFeedBackListHandle();
 			}else{
 				$.tip({message:res.message,type:'alarm'});

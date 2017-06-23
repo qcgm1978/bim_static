@@ -1,10 +1,10 @@
 /**
  * @require /services/views/system/feedback/feedback.es6
  */
-App.Services.System.FeedBackAttrManagerContent=Backbone.View.extend({
+App.Services.FeedBackAttrManagerContent=Backbone.View.extend({
 	tagName:'div',
 	className:"feedBackContent",
-	template:_.templateUrl("/services/tpls/system/feedBack/feedBackAttrManagerContent.html",true),
+	template:_.templateUrl("/services/tpls/system/feedback/feedBackAttrManagerContent.html",true),
 	initialize() {//初始化
 		this.listenTo(App.Services.SystemCollection.FeedBackCollection, "add", this.addOne);
 		this.listenTo(App.Services.SystemCollection.FeedBackCollection, "reset", this.resetList);
@@ -19,7 +19,7 @@ App.Services.System.FeedBackAttrManagerContent=Backbone.View.extend({
 	},
 	addOne(model){//每一条数据 进行处理
 		var data = model.toJSON();
-		var FeedBackAttrManagerContentList = new App.Services.System.FeedBackAttrManagerContentList({model:data});
+		var FeedBackAttrManagerContentList = new App.Services.FeedBackAttrManagerContentList({model:data});
 		this.$(".feedBackList").append(FeedBackAttrManagerContentList.render().el);
 		this.bindScroll();
 	},

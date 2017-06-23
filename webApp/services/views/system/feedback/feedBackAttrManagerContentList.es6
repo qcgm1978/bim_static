@@ -1,9 +1,9 @@
 /**
  * @require /services/views/system/feedback/feedBackAttrManagerContent.es6
  */
-App.Services.System.FeedBackAttrManagerContentList=Backbone.View.extend({
+App.Services.FeedBackAttrManagerContentList=Backbone.View.extend({
 	tagName:'tr',
-	template:_.templateUrl("/services/tpls/system/feedBack/feedBackAttrManagerContentList.html"),
+	template:_.templateUrl("/services/tpls/system/feedback/feedBackAttrManagerContentList.html"),
 	events:{
 		"click .downLoadId":"downLoadIdHandle",
 		"click td.feedBackTd":"answerBtnHandle",
@@ -23,8 +23,8 @@ App.Services.System.FeedBackAttrManagerContentList=Backbone.View.extend({
 	answerBtnHandle(event){
 		var target = $(event.target);
 		var feedbackid = target.parents("td").data("feedbackid")||target.data("feedbackid");
-		var FeedBackAttrManagerContentDialog = new App.Services.System.FeedBackAttrManagerContentDialog({model:feedbackid});
-		App.Services.System.FeedBackDialog = new App.Comm.modules.Dialog({
+		var FeedBackAttrManagerContentDialog = new App.Services.FeedBackAttrManagerContentDialog({model:feedbackid});
+		App.Services.FeedBackDialog = new App.Comm.modules.Dialog({
 			title: "建议反馈",
 			width: 600,
 			height: 600,

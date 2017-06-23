@@ -47,8 +47,33 @@ App.Services.System=Backbone.View.extend({
 	itemClick(event){
 		var $target=$(event.target),type=$target.data("type"),viewer;
 		$target.addClass("selected").siblings().removeClass("selected");
-
-		if (type=="category") { 
+		switch(type){
+			case "category":
+			//业务类别
+			viewer=new App.Services.System.CategoryManager();
+			break;
+			case "flow":
+			//流程
+			viewer=new App.Services.System.FolwManager();
+			break;
+			case "extend":
+			//扩展
+			viewer=new App.Services.System.ExtendAttrManager();
+			break;
+			case "announcement":
+			//公告
+			viewer=new App.Services.NoticeAttrManager();
+			break;
+			case "feedback":
+			//反馈
+			viewer=new App.Services.FeedBackAttrManager();
+			break;
+			case "announcement":
+			//资源
+			viewer=new App.Services.System.ResourceAttrManager();
+			break;
+		}
+		/*if (type=="category") { 
 			//业务类别
 			viewer=new App.Services.System.CategoryManager();
 		}else if (type=="flow") {
@@ -62,11 +87,11 @@ App.Services.System=Backbone.View.extend({
 			viewer=new App.Services.NoticeAttrManager();
 		}else if (type=="feedback") {
 			//反馈
-			viewer=new App.Services.System.FeedBackAttrManager();
+			viewer=new App.Services.FeedBackAttrManager();
 		}else if (type=="resource") {
 			//资源
 			viewer=new App.Services.System.ResourceAttrManager();
-		} 
+		} */
 		this.$("#systemContainer").html(viewer.render().el);
 	}
 });
