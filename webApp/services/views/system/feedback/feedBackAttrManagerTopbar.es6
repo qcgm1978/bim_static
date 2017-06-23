@@ -1,3 +1,6 @@
+/**
+ * @require /services/views/system/feedback/feedback.es6
+ */
 App.Services.System.FeedBackAttrManagerTopbar=Backbone.View.extend({
 	tagName:'div',
 	className:"feedBackTopbarSearchBox",
@@ -17,6 +20,7 @@ App.Services.System.FeedBackAttrManagerTopbar=Backbone.View.extend({
 		var endTimeStr = eTimeStr.getFullYear() + "-" + (eTimeStr.getMonth() + 1) + "-" + eTimeStr.getDate();
 		this.default.startTime = startTimeStr;
 		this.default.endTime = endTimeStr;
+		debugger;
 		this.$el.html(this.template(this.default));
 		this.bindTimeFun();
 		return this;

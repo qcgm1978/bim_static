@@ -1,3 +1,6 @@
+/**
+ * @require /services/views/system/feedback/feedBackAttrManagerContent.es6
+ */
 App.Services.System.FeedBackAttrManagerContentList=Backbone.View.extend({
 	tagName:'tr',
 	template:_.templateUrl("/services/tpls/system/feedBack/feedBackAttrManagerContentList.html"),

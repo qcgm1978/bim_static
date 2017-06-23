@@ -1,3 +1,6 @@
+/**
+ * @require /services/views/system/feedback/feedback.es6
+ */
 App.Services.System.FeedBackAttrManagerContent=Backbone.View.extend({
 	tagName:'div',
 	className:"feedBackContent",
