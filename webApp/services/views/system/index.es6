@@ -45,9 +45,10 @@ App.Services.System=Backbone.View.extend({
 
 	//tab 切换
 	itemClick(event){
-		var $target=$(event.target),type=$target.data("type"),viewer;
+		var $target=$(event.target),type=$target.data("type"),
+			viewer="";
 		$target.addClass("selected").siblings().removeClass("selected");
-		switch(type){
+		/*switch(type){
 			case "category":
 			//业务类别
 			viewer=new App.Services.System.CategoryManager();
@@ -72,8 +73,8 @@ App.Services.System=Backbone.View.extend({
 			//资源
 			viewer=new App.Services.System.ResourceAttrManager();
 			break;
-		}
-		/*if (type=="category") { 
+		}*/
+		if (type=="category") { 
 			//业务类别
 			viewer=new App.Services.System.CategoryManager();
 		}else if (type=="flow") {
@@ -91,7 +92,7 @@ App.Services.System=Backbone.View.extend({
 		}else if (type=="resource") {
 			//资源
 			viewer=new App.Services.System.ResourceAttrManager();
-		} */
+		} 
 		this.$("#systemContainer").html(viewer.render().el);
 	}
 });
