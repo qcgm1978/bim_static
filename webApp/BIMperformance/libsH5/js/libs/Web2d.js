@@ -5061,7 +5061,6 @@ CLOUD.MiniMap = function (viewer) {
 
         _isChangeView = changeView;
 
-
         var jsonObj = CLOUD.MiniMap.floorPlaneData;
 
         if (!jsonObj) return;
@@ -5347,7 +5346,7 @@ CLOUD.MiniMap = function (viewer) {
     // 根据指定位置点获得轴网信息
     this.getAxisGridInfoByPoint = function(point) {
 
-        if (_isLoadedFloorPlane) {
+        //if (_isLoadedFloorPlane) {
 
             var sceneMatrix = this.getMainSceneMatrix();
             var inverseMatrix = new THREE.Matrix4();
@@ -5382,7 +5381,7 @@ CLOUD.MiniMap = function (viewer) {
                     offsetY: offsetY
                 }
             }
-        }
+        //}
 
         return {
             position: new THREE.Vector3(),
@@ -5396,7 +5395,7 @@ CLOUD.MiniMap = function (viewer) {
     // 根据规范化坐标点获得轴网信息
     this.getAxisGridInfoByNormalizedPoint = function(normalizedPoint) {
 
-        if (_isLoadedFloorPlane) {
+        //if (_isLoadedFloorPlane) {
 
             // 世界坐标
             var pointWorldPosition = normalizedPoint.clone();
@@ -5426,7 +5425,7 @@ CLOUD.MiniMap = function (viewer) {
                     offsetY: offsetY
                 }
             }
-        }
+        //}
 
         return {
             position: new THREE.Vector3(),
@@ -5503,10 +5502,24 @@ CLOUD.MiniMap = function (viewer) {
         return _axisGridIntersectionPoints[idx];
     };
 
+    // 检查平面图包围盒，如果没有平面图，则使用场景包围盒
+    this.checkFloorPlaneBox = function () {
+
+        if (!_floorPlaneBox) {
+            // 没有平面图的话，将平面图包围设置为场景包围盒
+            _floorPlaneBox = this.viewer.getBoundingBoxWorld();
+            // 设置相机投影点位置高度在平面图包围盒中心
+            _cameraProjectedPosZ = 0.5 * (_floorPlaneBox.min.z + _floorPlaneBox.max.z);
+            _floorPlaneMinZ = _floorPlaneBox.min.z;
+        }
+    };
+
     // 计算相机在小地图上的位置
     this.calculateCameraPosition = function () {
 
-        if (!_isLoadedFloorPlane) return;
+        // if (!_isLoadedFloorPlane) return;
+
+        this.checkFloorPlaneBox();
 
         var camera = this.viewer.camera;
         var cameraEditor = this.viewer.cameraEditor;
@@ -5746,6 +5759,8 @@ CLOUD.MiniMap = function (viewer) {
 
         if (intersection) {
 
+            this.checkFloorPlaneBox();
+
             var interPoint = new THREE.Vector3(intersection.intersectionPoint.x, intersection.intersectionPoint.y, _cameraProjectedPosZ);
 
             screenToNormalizedPoint(interPoint);
@@ -5870,6 +5885,24 @@ CLOUD.MiniMap = function (viewer) {
         this.callbackClickOnAxisGrid = callback;
     };
 
+    this.resize = function (width, height) {
+
+        if (_mapContainer && _isLoadedAxisGrid) {
+            // 设置绘图面板大小
+            this.setSize(width, height);
+            this.resizeClientAxisGrid();
+
+            if (_isShowAxisGrid ) {
+                _svgGroupForAxisGrid.style.display = "";
+            } else{
+                _svgGroupForAxisGrid.style.display = "none";
+            }
+
+            this.hideTip();
+            this.render();
+        }
+
+    }
 };
 
 CLOUD.MiniMap.axisGridData = null;
@@ -7977,18 +8010,18 @@ CLOUD.Extensions.AnnotationText = function (editor, id) {
     this.currText = "";
     this.currTextLines = [""];
     this.textDirty = true;
-    this.lineHeight = 100;
+    this.lineHeight = 100; // 单位 %
 
-    this.textArea = document.createElement('textarea');
-    this.textArea.setAttribute('maxlength', '260');
+    // this.textArea = document.createElement('textarea');
+    // this.textArea.setAttribute('maxlength', '260');
+    //
+    // this.textAreaStyle = {};
+    // this.textAreaStyle['position'] = 'absolute';
+    // this.textAreaStyle['overflow-y'] = 'hidden';
+    //
+    // this.measurePanel = document.createElement('div');
 
-    this.textAreaStyle = {};
-    this.textAreaStyle['position'] = 'absolute';
-    this.textAreaStyle['overflow-y'] = 'hidden';
-
-    this.measurePanel = document.createElement('div');
-
-    this.isActive = false;
+    // this.isActive = false;
 
     this.createShape();
     this.addDomEventListeners();
@@ -8225,9 +8258,17 @@ CLOUD.Extensions.AnnotationText.prototype.getLineHeight = function () {
     return this.style['font-size'] * (this.lineHeight * 0.01);
 };
 
+// CLOUD.Extensions.AnnotationText.prototype.calcTextLines = function () {
+//
+//     var textValues = this.editor.annotationTextArea.getTextValuesByAnnotation(this);
+//     return textValues.lines;
+// };
+
 CLOUD.Extensions.AnnotationText.prototype.calcTextLines = function () {
 
-    var textValues = this.editor.annotationTextArea.getTextValuesByAnnotation(this);
+    var textArea = this.editor.getTextArea();
+    var textValues = textArea.getTextValuesByAnnotation(this);
+
     return textValues.lines;
 };
 
@@ -8655,6 +8696,289 @@ CLOUD.Extensions.AnnotationTextArea.prototype.splitLine = function (text, maxLen
         }
     }
 };
+
+
+
+CLOUD.Extensions.AnnotationPopupTextArea = function (editor, container, popupCallback) {
+
+    this.editor = editor;
+    this.container = container;
+    this.measurePanel = document.createElement('div');
+    this.textAnnotation = null;
+    this.popupCallback = popupCallback;
+    this.initialText = "";
+    this._resetTextAreaStyle();
+
+};
+
+CLOUD.Extensions.AnnotationPopupTextArea.prototype._setStyle = function (style) {
+
+    var position = this.textAnnotation.getClientPosition();
+    var size = this.textAnnotation.getClientSize();
+    var left = Math.floor(position.x - size.width * 0.5 + 0.5);
+    var top = Math.floor(position.y - size.height * 0.5 + 0.5);
+    var width = size.width;
+    var height = size.height;
+    var fontSize = style['font-size'];
+
+    if (left + width >= this.container.clientWidth) {
+        //left = this.container.clientWidth - (width + 10);
+        width = fontSize + 10;
+        left = this.container.clientWidth - width;
+    }
+
+    if (top + height >= this.container.clientHeight) {
+        //top = this.container.clientHeight - (height + 10);
+        height = fontSize + 10;
+        top = this.container.clientHeight - height;
+    }
+
+    this.textAreaStyle['left'] = left + 'px';
+    this.textAreaStyle['top'] = top + 'px';
+    this.textAreaStyle['width'] = width + 'px';
+    this.textAreaStyle['height'] = height + 'px';
+    this.textAreaStyle['font-family'] = style['font-family'];
+    this.textAreaStyle['font-size'] = style['font-size'] + 'px';
+    this.textAreaStyle['font-weight'] = style['font-weight'];
+    this.textAreaStyle['font-style'] = style['font-style'];
+    this.textAreaStyle['color'] = style['stroke-color'];
+
+};
+
+CLOUD.Extensions.AnnotationPopupTextArea.prototype._getTextValues = function () {
+
+    var text = this.textAnnotation.getText();
+
+    return {
+        text: text,
+        lines: this._calcTextLines(text)
+    };
+};
+
+CLOUD.Extensions.AnnotationPopupTextArea.prototype._calcTextLines = function (text) {
+
+    var linesBreaks = text.split(/\r*\n/);
+    var container = this.container;
+    var measureStyle = CLOUD.DomUtil.cloneStyle(this.textAreaStyle);
+
+    CLOUD.DomUtil.removeStyleAttribute(measureStyle, ['top', 'left', 'width', 'height', 'overflow-y']);
+    measureStyle['position'] = 'absolute';
+    measureStyle['white-space'] = 'nowrap';
+    measureStyle['float'] = 'left';
+    measureStyle['visibility'] = 'hidden';
+
+    this.measurePanel.setAttribute('style', CLOUD.DomUtil.getStyleString(measureStyle));
+    container.appendChild(this.measurePanel);
+
+    var maxLineLength = parseFloat(this.textAreaStyle.width);
+    var lines = [];
+
+    for (var i = 0, len = linesBreaks.length; i < len; ++i) {
+
+        var line = CLOUD.DomUtil.trimRight(linesBreaks[i]);
+        this._splitTextLine(line, maxLineLength, lines);
+    }
+
+    container.removeChild(this.measurePanel);
+
+    return lines;
+};
+
+CLOUD.Extensions.AnnotationPopupTextArea.prototype._getShorterTextLine = function (line) {
+
+    var iLastSpace = line.lastIndexOf(' ');
+
+    if (iLastSpace === -1) {
+        return [line];
+    }
+
+    while (line.charAt(iLastSpace - 1) === ' ') {
+        iLastSpace--;
+    }
+
+    var trailingWord = line.substr(iLastSpace);
+    var shorterLine = line.substr(0, iLastSpace);
+
+    return [shorterLine, trailingWord];
+};
+
+CLOUD.Extensions.AnnotationPopupTextArea.prototype._splitWord = function (word, remaining, maxLength, output) {
+
+    var lenSoFar = 1;
+    var fits = true;
+
+    while (fits) {
+
+        var part = word.substr(0, lenSoFar);
+        this.measurePanel.innerHTML = part;
+        var lineLen = this.measurePanel.clientWidth;
+
+        if (lineLen > maxLength) {
+
+            if (lenSoFar === 1) {
+
+                output.push(part);
+                this._splitWord(word.substr(1), remaining, maxLength, output);
+
+                return;
+            }
+
+            var okayWord = word.substr(0, lenSoFar - 1);
+            output.push(okayWord);
+
+            var extraWord = word.substr(lenSoFar - 1);
+
+            this._splitTextLine(extraWord + remaining, maxLength, output);
+
+            return;
+        }
+
+        lenSoFar++;
+
+        if (lenSoFar > word.length) {
+
+            output.push(word);
+
+            return;
+        }
+    }
+};
+
+CLOUD.Extensions.AnnotationPopupTextArea.prototype._splitTextLine = function (text, maxLength, output) {
+
+    if (text === '') {
+        return;
+    }
+
+    var remaining = '';
+    var done = false;
+
+    var measurePanel = this.measurePanel;
+
+    while (!done) {
+
+        measurePanel.innerHTML = text;
+        var lineLen = measurePanel.clientWidth;
+
+        if (lineLen <= maxLength) {
+
+            output.push(text);
+            this._splitTextLine(CLOUD.DomUtil.trimLeft(remaining), maxLength, output);
+            done = true;
+
+        } else {
+
+            var parts = this._getShorterTextLine(text);
+
+            if (parts.length === 1) {
+
+                this._splitWord(text, remaining, maxLength, output);
+                done = true;
+
+            } else {
+
+                text = parts[0];
+                remaining = parts[1] + remaining;
+
+            }
+        }
+    }
+};
+
+CLOUD.Extensions.AnnotationPopupTextArea.prototype._resetTextAreaStyle = function () {
+
+    this.textAreaStyle = {};
+    this.textAreaStyle['position'] = 'absolute';
+    this.textAreaStyle['overflow-y'] = 'hidden';
+
+};
+
+CLOUD.Extensions.AnnotationPopupTextArea.prototype.destroy = function () {
+
+    this.inactive();
+
+    this.editor = null;
+    this.container = null;
+    this.measurePanel = null;
+    this.popupCallback = null;
+};
+
+CLOUD.Extensions.AnnotationPopupTextArea.prototype.isActive = function () {
+
+    return !!this.textAnnotation;
+};
+
+CLOUD.Extensions.AnnotationPopupTextArea.prototype.active = function (annotation, popup) {
+
+    this.inactive();
+    this.textAnnotation = annotation;
+    this._setStyle(this.textAnnotation.getStyle());
+
+    this.initialText = this.textAnnotation.getText();
+    var text = this.initialText;
+
+    if (popup && this.popupCallback) {
+        this.popupCallback(text);
+    }
+
+};
+
+CLOUD.Extensions.AnnotationPopupTextArea.prototype.inactive = function () {
+
+    if (this.textAnnotation) {
+
+        this.textAnnotation = null;
+
+    }
+
+    this._resetTextAreaStyle();
+
+};
+
+CLOUD.Extensions.AnnotationPopupTextArea.prototype.accept = function (text) {
+
+    var textAreaStyle = this.textAreaStyle;
+    var left = parseFloat(textAreaStyle.left);
+    var top = parseFloat(textAreaStyle.top);
+    var width = parseFloat(textAreaStyle.width);
+    var height = parseFloat(textAreaStyle.height);
+
+    var textLines = this._calcTextLines(text);
+    var position = {
+        x: left + (width * 0.5),
+        y: top + (height * 0.5)
+    };
+    var data = {
+        annotation: this.textAnnotation,
+        position: position,
+        width : width,
+        height:height,
+        text: text,
+        lines: textLines
+    };
+
+    this.editor.handleTextChange(data);
+    this.inactive();
+};
+
+CLOUD.Extensions.AnnotationPopupTextArea.prototype.unaccept = function () {
+
+    var text = this.initialText;
+    this.accept(text);
+};
+
+CLOUD.Extensions.AnnotationPopupTextArea.prototype.getTextValuesByAnnotation = function (annotation) {
+
+    this.active(annotation, false);
+
+    var textValues = this._getTextValues();
+
+    this.inactive();
+
+    return textValues;
+};
+
+
 
 
 CLOUD.Extensions.AnnotationFrame = function (editor, container) {
@@ -9247,7 +9571,7 @@ CLOUD.Extensions.AnnotationFrame.prototype.isRotatePoint = function (element) {
 var CLOUD = CLOUD || {};
 CLOUD.Extensions = CLOUD.Extensions || {};
 
-CLOUD.Extensions.AnnotationEditor = function (domElement) {
+CLOUD.Extensions.AnnotationEditor = function (domElement, options) {
     "use strict";
 
     this.domElement = domElement;
@@ -9300,6 +9624,11 @@ CLOUD.Extensions.AnnotationEditor = function (domElement) {
     this.onTouchStartBinded = this.onTouchStart.bind(this);
     this.onTouchMoveBinded = this.onTouchMove.bind(this);
     this.onTouchEndBinded = this.onTouchEnd.bind(this);
+
+    options = options || {};
+    this.popupCallback = options.popupCallback;
+    this.annotationTextArea = null;
+    this.annotationPopupTextArea = null;
 };
 
 CLOUD.Extensions.AnnotationEditor.prototype.addDomEventListeners = function () {
@@ -10089,7 +10418,9 @@ CLOUD.Extensions.AnnotationEditor.prototype.startText = function (x , y) {
     text.forceRedraw();
 
     this.selectedAnnotation = text;
-    this.annotationTextArea.active(this.selectedAnnotation, true);
+
+    var textArea = this.getTextArea();
+    textArea.active(this.selectedAnnotation, true);
 
     return true;
 };
@@ -10103,7 +10434,9 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseDoubleClickForText = function (
             this.currentAnnotationText = annotation;
             this.selectedAnnotation.hide();
             this.deselectAnnotation();
-            this.annotationTextArea.active(annotation, false);
+
+            var textArea = this.getTextArea();
+            textArea.active(annotation, true);
 
         }
     }
@@ -10137,7 +10470,13 @@ CLOUD.Extensions.AnnotationEditor.prototype.init = function (callbacks) {
         this.enableSVGPaint(false);
 
         this.annotationFrame = new CLOUD.Extensions.AnnotationFrame(this, this.domElement);
-        this.annotationTextArea = new CLOUD.Extensions.AnnotationTextArea(this, this.domElement);
+
+        if (this.popupCallback) {
+            this.annotationPopupTextArea = new CLOUD.Extensions.AnnotationPopupTextArea(this, this.domElement, this.popupCallback);
+        } else {
+            this.annotationTextArea = new CLOUD.Extensions.AnnotationTextArea(this, this.domElement);
+        }
+
     }
 
     this.initialized = true;
@@ -10189,6 +10528,10 @@ CLOUD.Extensions.AnnotationEditor.prototype.destroy = function () {
 
     if (this.currentAnnotationText) {
         this.currentAnnotationText = null;
+    }
+
+    if (this.popupCallback) {
+        this.popupCallback = null;
     }
 };
 
@@ -10358,21 +10701,28 @@ CLOUD.Extensions.AnnotationEditor.prototype.selectAnnotation = function (annotat
 
     if (annotation) {
 
-        if (this.annotationType === annotation.shapeType) {
+        var shapeType = annotation.shapeType;
+
+        if (this.annotationType === shapeType) {
 
             this.setAnnotationSelection(annotation)
 
         } else {
-
-            var shapeType = annotation.shapeType;
 
             this.setAnnotationSelection(null);
             //this.setAnnotationType(shapeType);
             this.setAnnotationSelection(annotation);
         }
 
+        if (shapeType === CLOUD.Extensions.Annotation.shapeTypes.TEXT){
+            this.currentAnnotationText = annotation;
+        } else {
+            this.currentAnnotationText = null;
+        }
+
     } else {
         this.setAnnotationSelection(null);
+        this.currentAnnotationText = null;
     }
 
 };
@@ -10390,7 +10740,6 @@ CLOUD.Extensions.AnnotationEditor.prototype.deselectAnnotation = function () {
 CLOUD.Extensions.AnnotationEditor.prototype.worldToClient = function (wPoint) {
 
     // var rect = this.getDomContainerBounds();
-    // var camera = this.cameraEditor.object;
     var result = new THREE.Vector3(wPoint.x, wPoint.y, wPoint.z);
 
     // // 变换到相机空间
@@ -10409,7 +10758,6 @@ CLOUD.Extensions.AnnotationEditor.prototype.worldToClient = function (wPoint) {
 CLOUD.Extensions.AnnotationEditor.prototype.clientToWorld = function (cPoint) {
 
     // var rect = this.getDomContainerBounds();
-    // var camera = this.cameraEditor.object;
     var result = new THREE.Vector3(cPoint.x, cPoint.y, 0);
     //
     // result.x = cPoint.x / rect.width * 2 - 1;
@@ -10475,7 +10823,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.getViewBox = function (clientWidth, 
 
 CLOUD.Extensions.AnnotationEditor.prototype.handleTextChange = function (data) {
 
-    var text = data.annotation;
+    var textAnnotation = data.annotation;
 
     if (data.text === '') {
         this.selectAnnotation(null);
@@ -10488,8 +10836,8 @@ CLOUD.Extensions.AnnotationEditor.prototype.handleTextChange = function (data) {
     var position = this.getAnnotationWorldPosition(clientPosition);
     var size = this.getAnnotationWorldSize(clientSize, clientPosition);
 
-    text.resetSize(size, position);
-    text.setText(data.text);
+    textAnnotation.resetSize(size, position);
+    textAnnotation.setText(data.text);
 
     this.createAnnotationEnd();
     this.deselectAnnotation();
@@ -10842,16 +11190,47 @@ CLOUD.Extensions.AnnotationEditor.prototype.enableDblClickCloseCloud = function 
     this.isDblClickCloseCloud = enable;
 };
 
+
+CLOUD.Extensions.AnnotationEditor.prototype.getTextArea = function () {
+
+    var textArea;
+
+    if (this.popupCallback) {
+        textArea = this.annotationPopupTextArea;
+    } else {
+        textArea = this.annotationTextArea;
+    }
+
+    return textArea;
+
+};
+
+CLOUD.Extensions.AnnotationEditor.prototype.setTextFromPopupBox = function (text) {
+
+    if (this.popupCallback) {
+        this.annotationPopupTextArea.accept(text);
+    }
+
+};
+
+CLOUD.Extensions.AnnotationEditor.prototype.unsetTextFromPopupBox = function () {
+
+    if (this.popupCallback) {
+        this.annotationPopupTextArea.unaccept();
+    }
+
+};
+
 // ---------------------------- 外部 API END ---------------------------- //
 
 
 var CLOUD = CLOUD || {};
 CLOUD.Extensions = CLOUD.Extensions || {};
 
-CLOUD.Extensions.AnnotationEditor2D = function (domElement) {
+CLOUD.Extensions.AnnotationEditor2D = function (domElement, options) {
     "use strict";
 
-    CLOUD.Extensions.AnnotationEditor.call(this, domElement);
+    CLOUD.Extensions.AnnotationEditor.call(this, domElement, options);
 
     this.absoluteBasePoint = null;
     this.screenBasePoint = null;
@@ -10985,10 +11364,10 @@ CLOUD.Extensions.AnnotationEditor2D.prototype.setSvgZIndex = function (zIndex) {
 var CLOUD = CLOUD || {};
 CLOUD.Extensions = CLOUD.Extensions || {};
 
-CLOUD.Extensions.AnnotationEditor3D = function (domElement, camera) {
+CLOUD.Extensions.AnnotationEditor3D = function (domElement, camera, options) {
     "use strict";
 
-    CLOUD.Extensions.AnnotationEditor.call(this, domElement);
+    CLOUD.Extensions.AnnotationEditor.call(this, domElement, options);
 
     this.camera = camera;
 };
@@ -11856,9 +12235,12 @@ CLOUD.Extensions.MarkerEditor.prototype.setMarkerClickCallback = function (callb
  */
 CLOUD.Extensions.MiniMapHelper = function (viewer) {
 
+    "use strict";
+
     this.viewer = viewer;
     this.miniMaps = {};
     this.defaultMiniMap = null;
+
 };
 
 /**
@@ -12177,6 +12559,22 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
         if (defaultMiniMap) {
             intersect.axisGridInfo = defaultMiniMap.getAxisGridInfoByPoint(intersect.point);
         }
+    },
+
+    /**
+     * 重置小地图大小
+     *
+     * @param {string} name - 小地图标识名
+     * @param {number} width - 宽度
+     * @param {number} height - 高度
+     */
+    resize:function(name, width, height){
+
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+            miniMap.resize(name, width, height);
+        }
     }
 
     // ------------------ 小地图API -- E ------------------ //
@@ -12392,12 +12790,14 @@ CLOUD.Extensions.MarkerHelper.prototype = {
 /**
  * DWG批注辅助类
  * @class  CLOUD.Extensions.DwgHelper
+ * @param {Object} options - 特定的操作对象, 例如指定回调函数 options.popupCallback
  */
-CLOUD.Extensions.DwgHelper = function () {
+CLOUD.Extensions.DwgHelper = function (options) {
+
+    "use strict";
 
     this.dwgContainer = null;
     this.annotationContainer = null;
-
     this.defaultStyle = {
         'stroke-width': 3,
         'stroke-color': '#ff0000',
@@ -12410,6 +12810,7 @@ CLOUD.Extensions.DwgHelper = function () {
         'font-weight': ''
     };
     this.isDblClickCloseCloud = true;
+    this.options = options;
 };
 
 /**
@@ -12430,6 +12831,7 @@ CLOUD.Extensions.DwgHelper.prototype = {
         this.editor = null;
         this.dwgContainer = null;
         this.annotationContainer = null;
+        this.options = null;
     },
 
     /**
@@ -12460,10 +12862,11 @@ CLOUD.Extensions.DwgHelper.prototype = {
 
         var scope = this;
         var domElement = this.annotationContainer;
+        var options = this.options;
 
         if (!this.editor) {
 
-            this.editor = new CLOUD.Extensions.AnnotationEditor2D(domElement);
+            this.editor = new CLOUD.Extensions.AnnotationEditor2D(domElement, options);
 
         } else {
 
@@ -12784,6 +13187,31 @@ CLOUD.Extensions.DwgHelper.prototype = {
         this.initAnnotation();
 
         this.editor.setZoomFactor(factorX, factorY);
+    },
+
+    /**
+     * 设置文字批注文本内容
+     *
+     * @param {string} text - 弹窗文本
+     */
+    setTextFromPopupBox : function (text) {
+
+        if (this.editor) {
+            this.editor.setTextFromPopupBox(text);
+        }
+
+    },
+
+    /**
+     * 取消文字批注文本内容设置
+     *
+     */
+    unsetTextFromPopupBox : function () {
+
+        if (this.editor) {
+            this.editor.unsetTextFromPopupBox();
+        }
+
     }
 
 };
@@ -12791,8 +13219,11 @@ CLOUD.Extensions.DwgHelper.prototype = {
 /**
  * 2D批注辅助类
  * @class  CLOUD.Extensions.AnnotationHelper2D
+ * @param {Object} options - 特定的操作对象, 例如指定回调函数 options.popupCallback
  */
-CLOUD.Extensions.AnnotationHelper2D = function () {
+CLOUD.Extensions.AnnotationHelper2D = function (options) {
+
+    "use strict";
 
     this.domContainer = null;
     this.defaultStyle = {
@@ -12807,6 +13238,7 @@ CLOUD.Extensions.AnnotationHelper2D = function () {
         'font-weight': ''
     };
     this.isDblClickCloseCloud = false;
+    this.options = options;
 };
 
 /**
@@ -12829,6 +13261,7 @@ CLOUD.Extensions.AnnotationHelper2D.prototype = {
         this.endEditCallback = null;
         this.stateChangeCallback = null;
         this.defaultStyle = null;
+        this.options = null;
     },
 
     /**
@@ -12861,9 +13294,10 @@ CLOUD.Extensions.AnnotationHelper2D.prototype = {
 
         var scope = this;
         var domElement = this.domContainer;
+        var options = this.options;
 
         if (!this.editor) {
-            this.editor = new CLOUD.Extensions.AnnotationEditor2D(domElement);
+            this.editor = new CLOUD.Extensions.AnnotationEditor2D(domElement, options);
         } else {
             // 设置父容器
             this.editor.setDomContainer(domElement);
@@ -13171,6 +13605,31 @@ CLOUD.Extensions.AnnotationHelper2D.prototype = {
         // 如果初始化，则自动初始化
         this.initAnnotation();
         this.editor.setZoomFactor(factorX, factorY);
+    },
+
+    /**
+     * 设置文字批注文本内容
+     *
+     * @param {string} text - 弹窗文本
+     */
+    setTextFromPopupBox : function (text) {
+
+        if (this.editor) {
+            this.editor.setTextFromPopupBox(text);
+        }
+        
+    },
+
+    /**
+     * 取消文字批注文本内容设置
+     *
+     */
+    unsetTextFromPopupBox : function () {
+
+        if (this.editor) {
+            this.editor.unsetTextFromPopupBox();
+        }
+
     }
 
 };
@@ -13179,8 +13638,12 @@ CLOUD.Extensions.AnnotationHelper2D.prototype = {
  * 3D批注辅助类
  * @class  CLOUD.Extensions.AnnotationHelper3D
  * @param {Object} viewer - 模型浏览类对象
+ * @param {Object} options - 特定的操作对象, 例如指定回调函数 options.popupCallback
  */
-CLOUD.Extensions.AnnotationHelper3D = function (viewer) {
+CLOUD.Extensions.AnnotationHelper3D = function (viewer, options) {
+
+    "use strict";
+
     this.viewer = viewer;
     this.defaultStyle = {
         'stroke-width': 3,
@@ -13196,6 +13659,7 @@ CLOUD.Extensions.AnnotationHelper3D = function (viewer) {
     this.isDblClickCloseCloud = true;
     this.resizeBind = this.resizeAnnotations.bind(this);
     this.renderBind = this.renderAnnotations.bind(this);
+    this.options = options;
 };
 
 /**
@@ -13216,6 +13680,7 @@ CLOUD.Extensions.AnnotationHelper3D.prototype = {
         this.viewer = null;
         this.resizeBind = null;
         this.renderBind = null;
+        this.options = null;
     },
 
     /**
@@ -13233,9 +13698,10 @@ CLOUD.Extensions.AnnotationHelper3D.prototype = {
     initAnnotation: function () {
         var viewer = this.viewer;
         var scope = this;
+        var options = this.options;
 
         if (!this.editor) {
-            this.editor = new CLOUD.Extensions.AnnotationEditor3D(viewer.domElement, viewer.camera);
+            this.editor = new CLOUD.Extensions.AnnotationEditor3D(viewer.domElement, viewer.camera, options);
         }
 
         this.editor.enableDblClickCloseCloud(this.isDblClickCloseCloud);
@@ -13311,9 +13777,8 @@ CLOUD.Extensions.AnnotationHelper3D.prototype = {
      * @param {Int} type - 批注类型（{ARROW: 0, RECTANGLE: 1, CIRCLE: 2, CROSS: 3, CLOUD: 4, TEXT: 5}）
      */
     setAnnotationType: function (type) {
-        if (this.editor) {
-            this.editor.setAnnotationType(type);
-        }
+        this.initAnnotation();
+        this.editor.setAnnotationType(type);
     },
 
     /**
@@ -13427,6 +13892,31 @@ CLOUD.Extensions.AnnotationHelper3D.prototype = {
         var dataUrl = this.viewer.getRenderBufferScreenShot(backgroundClr);
         dataUrl = this.editor.getScreenSnapshot(dataUrl);
         return dataUrl;
+    },
+
+    /**
+     * 设置文字批注文本内容
+     *
+     * @param {string} text - 弹窗文本
+     */
+    setTextFromPopupBox : function (text) {
+
+        if (this.editor) {
+            this.editor.setTextFromPopupBox(text);
+        }
+
+    },
+
+    /**
+     * 取消文字批注文本内容设置
+     *
+     */
+    unsetTextFromPopupBox : function () {
+
+        if (this.editor) {
+            this.editor.unsetTextFromPopupBox();
+        }
+
     }
 
 };
