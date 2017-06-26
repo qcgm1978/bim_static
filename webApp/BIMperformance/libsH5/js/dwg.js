@@ -128,7 +128,7 @@ var dwgViewer = function(options) {
 
       var lod = self.__options.lod
       self.__firstImgUrl = lod.url + '/L1/Model_0_0.' + lod.ext,
-        self.fit()
+        self.fit(App.Project.viewPointPos);
       self.__bindEvent()
       self.__initComment();
     },
@@ -242,7 +242,32 @@ var dwgViewer = function(options) {
 
       var that = this,
         dwgHelper = this.dwgHelper;
-
+        this.dwgHelper.captureAnnotationsScreenSnapshot(function(data){
+            var commentData = {
+              /*
+              camera: th.getCamera(),
+              list: newList,
+              */
+              image: data.substr(22)
+              /*
+              filter: {
+                category: category
+              }
+              */
+            };
+            var innerOptions = {};
+            innerOptions.commentData = commentData;
+            // th.dwgState = {
+            //   left : th.viewer.dwgView.__viewLeft,
+            //   top : th.viewer.dwgView.__viewTop,
+            //   scale : th.viewer.dwgView.__zoomScale,
+            //   level : th.viewer.dwgView.__curLevel,
+            //   device : "mobile"
+            // };
+            // innerOptions.th = th;
+            callback(innerOptions);
+        }); 
+      /*
       //获取图片data
       dwgHelper.canvas2image(function(imgData) {
 
@@ -262,7 +287,7 @@ var dwgViewer = function(options) {
         }
 
       });
-
+      */
     },
 
     getPanel: function() {
@@ -360,7 +385,7 @@ var dwgViewer = function(options) {
 
       self.__viewLeft = self.__startPos.left - x
       self.__viewTop = self.__startPos.top - y
-
+      console.log("move:",self.__viewLeft + "," + self.__viewTop);
       //self.__removeLast()
 
       self.__resetSceneInViewPoint()
@@ -393,15 +418,20 @@ var dwgViewer = function(options) {
     },
 
     //回到第一层并自适应
-    fit: function() {
+    fit: function(posObject) {
       var self = this
       self.__curLevel = 1
       self.__zoomScale = 1
-
       self.__viewLeft = 0
       self.__viewTop = 0
-
-      self.__viewPoint()
+      if(posObject!=undefined)
+      {
+          self.__zoomScale = posObject.scale;
+          self.__viewLeft = posObject.left;
+          self.__viewTop = posObject.top;
+          self.__curLevel = posObject.level;
+      }
+      self.__viewPoint(false,posObject)
 
       self.__genTiles()
     },
@@ -645,7 +675,7 @@ var dwgViewer = function(options) {
      * @param isInited,是否初始化完成了。
      * @private
      */
-    __viewPoint: function(isInited) {
+    __viewPoint: function(isInited,posObject) {
       var self = this
       var unit = self.__unit
       var zoomScale = self.__zoomScale
@@ -664,11 +694,17 @@ var dwgViewer = function(options) {
         self.__mouseInViewPoint = {
             left: viewWidth / 2,
             top: viewHeight / 2
-          }
+        }
+        if(posObject!=undefined)
+        {
+            self.__viewLeft = posObject.left;
+            self.__viewTop = posObject.top;
+        }
+        console.log("init:", self.__viewLeft + "," + self.__viewTop);
           //初始化场景在视口中间点的坐标百分比
         self.__resetSceneInViewPoint()
 
-        self.__changeViewPos()
+        self.__changeViewPos(posObject)
         return false
       }
 
@@ -687,14 +723,14 @@ var dwgViewer = function(options) {
 
       self.__viewLeft = viewLeft
       self.__viewTop = viewTop
-      self.__changeViewPos()
+      self.__changeViewPos(posObject)
     },
 
     /**
      * 改变view的位置
      * @private
      */
-    __changeViewPos: function() {
+    __changeViewPos: function(posObject) {
       var self = this
       var panel = self.__panel
       var zoomScale = self.__zoomScale

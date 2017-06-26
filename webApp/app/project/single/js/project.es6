@@ -113,7 +113,10 @@ App.Project = {
 
 					//dwg 格式
 					if (data.data.suffix == "dwg") {
-						App.Project.renderDwg(data.data.modelId);
+						App.Project.getViewPointData(function(){
+							App.Project.renderDwg(data.data.modelId);
+						});
+						
 					} else {
 						App.Project.renderOther(data.data.modelId, data.data.suffix);
 					}
@@ -124,6 +127,45 @@ App.Project = {
 				}
 			} else {
 				alert(data.message);
+			}
+		});
+	},
+
+	getParam : function(key){
+		var search = location.search;
+		search = search.replace("?","");
+		var items = search.split("&");
+		var item,i;
+		for(i=0;i<items.length;i++)
+		{
+			item = items[i].split("=");
+			if(item[0]==key)
+			{
+				return item[1];
+			}
+		}
+		return "";
+	},
+
+
+	/*获取图纸定位信息*/
+	getViewPointData : function(fn){
+		var url = "/sixD/{projectId}/viewPoint/{viewPointId}";
+		var th = this;
+		url = url.replace("{projectId}",App.Project.getParam("projectId"));
+		url = url.replace("{viewPointId}",App.Project.getParam("viewpointId"));
+		$.ajax({
+			url : url,
+			type:"get",
+			dataType : "json",
+			success : function(data){
+				fn();
+				try
+				{
+					th.viewPointPos = JSON.parse(data.data.viewPoint);
+				}
+				catch(e)
+				{}
 			}
 		});
 	},
@@ -676,11 +718,19 @@ App.Project = {
 
 	//保存批注
 	dwgViewer.prototype.saveCommentDwg = function() {
+
 		var that = this;
-		this.dwgView.getCommentData(function(data) { 
+		this.dwgView.getCommentData(function(object) {
+			var data ={};
+			data.image = object.commentData.image.replace('data:image/png;base64,', '');
+			that.data = data;
+			SingleComment.saveCommentDialog(); 
+
+			/*
 			data.image = data.image.replace('data:image/png;base64,', '');
 			that.data = data;
 			SingleComment.saveCommentDialog(); 
+			*/
 		});
 	}
 
@@ -777,6 +827,14 @@ App.Project = {
 
 		//保存批注
 		saveComment(type, dialog, commentData, callback) {
+			var dwgView = App.Project.Settings.Viewer.dwgView;
+        	var dwgState = {
+        		left : dwgView.__viewLeft,
+        		top : dwgView.__viewTop,
+        		scale : dwgView.__zoomScale,
+        		level : dwgView.__curLevel,
+        		device : "PC"
+        	};
 
 			if (dialog.isSubmit) {
 				return;
@@ -787,7 +845,7 @@ App.Project = {
 					projectVersionId: parseInt(App.Project.Settings.projectVersionId),
 					name: dialog.element.find(".name").val().trim(),
 					type: dialog.type,
-					viewPoint: commentData.camera
+					viewPoint: commentData.camera || JSON.stringify(dwgState)
 				};
 
 			if (!pars.name) {
@@ -874,6 +932,7 @@ App.Project = {
 		//保存图片
 		saveImage(data) {
 			//数据
+			console.log("保存图纸批注");
 			var formdata = new FormData();
 			formdata.append("fileName", (+(new Date())) + ".png");
 			formdata.append("size", data.img.length);

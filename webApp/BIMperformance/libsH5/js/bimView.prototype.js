@@ -12,12 +12,14 @@
         self.annotationHelper3D = new CLOUD.Extensions.AnnotationHelper3D(self.viewer);
         // render 回调
         var renderCB = function(){
-                helper.renderAnnotations();
+                //helper.renderAnnotations();
+                self.annotationHelper3D.renderAnnotations();
         }
         self.viewer.addCallbacks("render", renderCB );
         // resize 回调
         var resizeCB = function(){
-                helper.resizeAnnotations();
+                //helper.resizeAnnotations();
+                self.annotationHelper3D.resizeAnnotations();
         }
         self.viewer.addCallbacks("render", resizeCB );
 
