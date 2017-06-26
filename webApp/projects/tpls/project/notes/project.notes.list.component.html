@@ -24,7 +24,7 @@
 		<%}else if(obj.hostType == 1){%>
 			<a href="/static/dist/app/project/single/filePreview.html?id=<%= obj.fileVersionId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>&viewpointid=<%=obj.viewPoint%>" data-hosttype="<%=obj.type%>" target="_blank">查看模型</a>
 		<%}else if(obj.hostType == 2){%>
-			<a href="/static/dist/app/project/single/filePreview.html?id=<%= obj.fileVersionId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank">查看图纸</a>
+			<a href="/static/dist/app/project/single/filePreview.html?id=<%= obj.fileVersionId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>&viewpointId=<%= obj.id %>" target="_blank">查看图纸</a>
 		<%}%>
 		<i></i>
 		<%if(obj.editDeleteBool){%>
