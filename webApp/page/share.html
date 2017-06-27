@@ -38,7 +38,7 @@ var Url = {
 };
 
 var pcHref = "/#/projects/{projectId}/{projectVersionId}?share=true&viewpointId={viewpointId}&currentPageNum=&projectId={projectId}";
-var mobileHref = "/notesDetails/{projectId}/{projectVersionId}/{projectName}//{viewpointId}/{fileVersionId}";
+var mobileHref = "/mobile/#/notesDetails/{projectId}/{projectVersionId}/{projectName}//{viewpointId}/{fileVersionId}";
 if(ua.indexOf("Android")>0||ua.indexOf("iPhone")>0)
 {
 	App.Storage.setData("viewPointId",Url.getParam("viewpointId"));
@@ -55,7 +55,6 @@ else
 	pcHref = pcHref.replace("{projectId}",Url.getParam("projectId")).replace("{projectVersionId}",Url.getParam("projectVersionId"));
 	pcHref = pcHref.replace("{viewpointId}",Url.getParam("viewpointId"));
 	pcHref = pcHref.replace("{projectId}",Url.getParam("projectId"));
-	alert(pcHref);
 	location.href = pcHref;
 }
 </script>
