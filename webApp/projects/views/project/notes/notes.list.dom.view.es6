@@ -1,4 +1,7 @@
 App.Project.NotesListDomView = Backbone.View.extend({
+	defaults:{
+		hasScrollBool:false
+	},
 	tagName: "div",
 	className: "notesScrollBox",
 	template:_.templateUrl("/projects/tpls/project/notes/project.notes.list.dom.html",true),
@@ -210,7 +213,7 @@ App.Project.NotesListDomView = Backbone.View.extend({
 		}
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
-				obj.url = "http://" + location.host + "/#projects/"+data.data.projectId+"/"+data.data.projectVersionId+"?share=true&viewpointId="+data.data.viewpointId+"&currentPageNum="+App.Project.NotesCollection.defaults.pageIndexNotes;
+				obj.url = "http://" + location.host + "/#projects/"+data.data.projectId+"/"+data.data.projectVersionId+"?share=true&projectId="+data.data.projectId+"&viewpointId="+data.data.viewpointId+"&currentPageNum=";
 				var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.share.dialog.html')(obj),
 					opts = {
 						title: "分享快照",
@@ -262,7 +265,18 @@ App.Project.NotesListDomView = Backbone.View.extend({
 		}
 		var NotesListComponentView = new App.Project.NotesListComponentView({model:data});//批注列表单个组件的视图
 		leftUlNotesListBox.append(NotesListComponentView.render().el);
-		App.Comm.initScroll($(".notesScrollBox"), "y");
+		if(!this.defaults.hasScrollBool){
+			this.defaults.hasScrollBool = $(".notesScrollBox").mCustomScrollbar({
+			    theme: 'minimal-dark',
+				axis: "y",
+				keyboard: {
+					enable: true
+				},
+				scrollInertia: 0
+			});
+		}else{
+			$(".notesScrollBox").mCustomScrollbar("update");
+		}
 	},
 	resetList(){//重置加载
 		this.$("#leftUlNotesListBox").html('<li class="loading">正在加载，请稍候……</li>');

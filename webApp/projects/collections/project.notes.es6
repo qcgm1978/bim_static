@@ -68,6 +68,7 @@ App.Project.NotesCollection = {
 			type:"POST",
 			contentType:"application/json",
 			success:function(collection, response, options){
+				$("#pageLoading").hide();
 				if(response.code == 0){
 					var $content = $(".leftNotesListBox");
 					var rightNotesCommentListBox = $("#rightNotesCommentListBox");
@@ -98,6 +99,7 @@ App.Project.NotesCollection = {
 						        App.Project.NotesCollection.defaults.pageIndexNotes = pageIndex + 1;
 						        App.Project.NotesCollection.defaults.pageIndexComment=1;
 						        App.Project.NotesCollection.getNotesListHandle();
+						        App.Project.NotesCollection.resetUrlHandle();// 重置地址栏地址 单不刷新页面
 						    },
 						    prev_text: "上一页",
 						    next_text: "下一页"
@@ -105,6 +107,7 @@ App.Project.NotesCollection = {
 					}
 					App.Project.Settings.NotesDatas = response.data.items;
 					localStorage.setItem("NotesDatas",response.data.items);
+					
 					self.initListDomHandle();//点击事件初始化
 				}
 				return response.data;
@@ -125,6 +128,7 @@ App.Project.NotesCollection = {
 			type:"POST",
 			contentType:"application/json",
 			success:function(collection, response, options){
+				$("#pageLoading").hide();
 				var commetnListBox = $(".commentBox");
 				var commentComponentBox = this.$("#commentComponentBox");
 				var pageCount = response.data.totalItemCount;
@@ -176,8 +180,8 @@ App.Project.NotesCollection = {
 				})
 				clickLiBox.eq(0).click();//如果有批注默认去第一个批注的评论
 			}else{
-				closestLiBox.click();
 				$(".notesScrollBox").mCustomScrollbar("scrollTo",".notes_"+App.Project.Settings.viewpointShareUrlId);
+				closestLiBox.click();
 			}
 		}else{
 			clickLiBox.eq(0).click();//如果有批注默认去第一个批注的评论
@@ -253,7 +257,7 @@ App.Project.NotesCollection = {
 	},
 	resetUrlHandle(){// 重置地址栏地址 单不刷新页面
 		if(window.location.href.indexOf("?")!=-1){
-			var newUrl = window.location.href.substr(0,window.location.href.lastIndexOf("/"));
+			var newUrl = window.location.href.substr(0,window.location.href.lastIndexOf("?"));
 				history.pushState("","",newUrl);
 				App.Project.Settings.viewpointShareUrlId = undefined;
 				App.Project.Settings.viewpointSharePageNum = 1;
