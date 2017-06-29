@@ -8,7 +8,7 @@
  * @require /libsH5/js/libs/three.min.js
  */
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20170612";
+CLOUD.Version = "20170512";
 
 /**
  * @namespace CLOUD.GlobalData
@@ -42,7 +42,7 @@ CLOUD.GlobalData = {
     DisableAntialias: false,
     EnableDemolishByDClick: true,
 
-    UseMpkWorker: false,
+    UseMpkWorker: true,
     MpkWorkerUrl: "../libs/mpkWorker.min.js", //"../libs/mpkWorker.min.js",
 
     UseLayerData: true,
@@ -53,7 +53,7 @@ CLOUD.GlobalData = {
     maxObjectNumInPool: 60000,
     maxDrawCacheNum : 40000,
 
-    OctantDepth: 15,
+    OctantDepth: 8,
     MaximumDepth: 0,
     TargetDistance: 10000,
     ConcurrencyRequestCount: 8, // Limitation of concurrency request (HTTP, web worker, etc. ) count
@@ -10764,23 +10764,11 @@ CLOUD.Camera.prototype.zoomToBBox = function (bound, margin, ratio, direction) {
 
     ratio = ratio || 1.0;
     margin = margin || 0.05;
-    margin = margin > 1.0 ? 1.0 : margin; // 钳制
-
-    // var bbox = new THREE.Box3();
-    // bbox.copy(bound);
-    //
-    // bbox.expandByScalar(bound.size().length() * margin);
 
     var bbox = new THREE.Box3();
     bbox.copy(bound);
-
-    if (margin !== 0.0) {
-        var boxLen = bound.size().length() * 0.5;
-        var diagonalLine = new THREE.Vector3();
-        diagonalLine.subVectors(bbox.min, bbox.max).normalize();
-        diagonalLine.multiplyScalar(boxLen * margin);
-        bbox.expandByVector(diagonalLine);
-    }
+    
+    bbox.expandByScalar(bound.size().length() * margin);
 
     var dir = direction ? direction : this.getWorldDirection();
     var up = this.up;
@@ -12687,7 +12675,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                 rotAxis = _zAxisUp;
                 rotAngle = thetaDelta;
             }
-            else if (!this.isConstrainedAxisZ) {
+            else {
                 rotAxis = rightDir;
 
                 var cross = new THREE.Vector3(0, 1, 0).clone().cross(up);
@@ -16086,7 +16074,8 @@ CLOUD.SelectPad = function (editor) {
     this.startPt = new THREE.Vector2();
     this.position = new THREE.Vector2();
 
-    this.callback = null;
+    this.click = false;
+    this.clickCallback = null;
 
     this.intersect = null;
 
@@ -16152,7 +16141,7 @@ CLOUD.SelectPad = function (editor) {
                 if (pickHelper.filter.setSelectedIds()) {
                     cameraEditor.updateView(true);
                 }
-                //pickHelper.onObjectSelected(null, false);
+                pickHelper.onObjectSelected(null, false);
                 scope.intersect = null;
                 return;
             }
@@ -16162,11 +16151,11 @@ CLOUD.SelectPad = function (editor) {
 
             pickHelper.filter.setSelectedIds();
             if (pickHelper.filter.addSelectedId(userId, intersect.object.userData, true)) {
-                //pickHelper.onObjectSelected(intersect, false);
+                pickHelper.onObjectSelected(intersect, false);
                 scope.intersect = intersect;
             }
             else {
-                //pickHelper.onObjectSelected(null, false);
+                pickHelper.onObjectSelected(null, false);
                 scope.intersect = null;
             }
             cameraEditor.updateView(true);
@@ -16178,6 +16167,8 @@ CLOUD.SelectPad = function (editor) {
             event.stopPropagation();
             event.preventDefault();
             this.startPt.set(event.touches[0].clientX, event.touches[0].clientY);
+
+            this.click = true;
         }
     };
 
@@ -16198,17 +16189,21 @@ CLOUD.SelectPad = function (editor) {
             this.startPt.set(event.touches[0].clientX, event.touches[0].clientY);
 
             this.pick();
+
+            this.click = false;
         }
     };
 
-    this.onTouchEnd = function (event) {
+    this.onTouchEnd = function () {
         event.stopPropagation();
 
-        if (this.callback != null) {
-            this.callback(this.intersect);
-        }
-        else {
-            console.log("selectPad click", this.intersect);
+        if (this.click) {
+            if (this.clickCallback != null) {
+                this.clickCallback(this.intersect);
+            }
+            else {
+                console.log("selectPad click", this.intersect);
+            }
         }
     };
 
@@ -21125,24 +21120,6 @@ CLOUD.Viewer.prototype = {
     },
 
     /**
-     * 获得场景包围盒(变换前)
-     *
-     * @return {THREE.Box3} 场景包围盒
-     */
-    getBoundingBoxWorld: function () {
-        return this.getScene().getBoundingBoxWorld();
-    },
-
-    /**
-     * 获得场景包围盒(变换后)
-     *
-     * @return {THREE.Box3} 场景包围盒
-     */
-    getBoundingBox: function () {
-        return this.getScene().getBoundingBox();
-    },
-
-    /**
      * 放大
      *
      * @param {Float} factor - 放大因子
@@ -21181,7 +21158,7 @@ CLOUD.Viewer.prototype = {
         var box = this.getScene().boundingBoxInner;
 
         if (box.empty()) {
-            this.zoomAll(margin, ratio);
+            this.zoomAll();
         } else {
             this.editorManager.zoomToBBox(this, box, margin, ratio);
         }
@@ -21913,17 +21890,6 @@ CLOUD.Viewer.prototype = {
         this.debugInfoDiv.innerHTML = html + "<br /><br />";
 
         adjustLocation(this.debugInfoDiv, cx, cy);
-    },
-
-    //callback函数中只包含一个intersect参数，intersect是一个对象包含以下变量
-    //databagId, distance, face, faceIndex, object:MeshEx, point userId, worldBoundingBox, worldPosition
-    setSelectPadCallback: function(callback) {
-
-        var selectPad = this.editorManager.editors.rectPickEditor.selectPad;
-
-        if (selectPad) {
-            selectPad.callback = callback;
-        }
     }
 
 };
