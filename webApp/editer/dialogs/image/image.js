@@ -35,8 +35,11 @@
 //                }
 
                 return arr.push({
-                    _src: node.src,
-                    src: node.src
+                    // _src: node.src,
+                    // src: node.src,
+                    _src: $(node).attr("src"),
+                    src: $(node).attr("src"),
+                    
                 });
             });
 

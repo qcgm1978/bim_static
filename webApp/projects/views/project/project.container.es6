@@ -49,6 +49,12 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			setTimeout(function(){
 				fileNav.click();
 			},500);
+		}else if(window.location.href.indexOf("openModel=") != -1){
+			var fileNav = this.$el.find(".fileNav span.model");
+			setTimeout(function(){
+				fileNav.click();
+				App.Project.NotesCollection.resetUrlHandle();// 重置地址栏地址 单不刷新页面
+			},500);
 		}
 		return this;
 	},
