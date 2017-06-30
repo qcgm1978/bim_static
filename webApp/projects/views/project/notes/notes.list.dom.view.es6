@@ -9,10 +9,11 @@ App.Project.NotesListDomView = Backbone.View.extend({
 		"click .clickItem":"notesClickHandle",//点击每个批注执行的方法
 	},
 	initialize() {//初始化
-		this.listenTo(App.Project.NotesCollection.GetNotesListCollection, "add", this.addOne);
 		this.listenTo(App.Project.NotesCollection.GetNotesListCollection, "reset", this.resetList);
+		this.listenTo(App.Project.NotesCollection.GetNotesListCollection, "add", this.addOne);
 	},
 	render: function() {
+		this.defaults.hasScrollBool=false;
 		this.$el.html(this.template);
 		if(App.Project.Settings.shareBool){
 			if(App.Project.Settings.pageBool){
@@ -76,9 +77,14 @@ App.Project.NotesListDomView = Backbone.View.extend({
 				}
 				
 			}else if(evt.target.innerText == "查看模型"&&!$(evt.target).data("hosttype")){
+				App.Project.NotesCollection.resetUrlHandle();// 重置地址栏地址 单不刷新页面
 				viewpointInput.attr("data-viewpoint",target.children("input").data("viewpointid"));
 				viewpointInput.attr("data-viewpointfilter",notesId);
-				App.Project.NotesCollection.clickModelHandle();//执行查看模型方法
+				if(target.children("input").data("projectversionid") == App.Project.Settings.versionId){
+					App.Project.NotesCollection.clickModelHandle();//执行查看模型方法
+				}else{
+					window.location.href = "/#projects/"+App.Project.Settings.projectId+"/"+target.children("input").data("projectversionid")+"?openModel=true";
+				}
 				return false;
 			}else if(evt.target.innerText == "编辑"){
 				if(!$(evt.target).hasClass('noCan')){
