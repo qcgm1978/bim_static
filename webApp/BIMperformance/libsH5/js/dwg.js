@@ -128,7 +128,17 @@ var dwgViewer = function(options) {
 
       var lod = self.__options.lod
       self.__firstImgUrl = lod.url + '/L1/Model_0_0.' + lod.ext,
-        self.fit(App.Project.viewPointPos);
+        self.fit();
+      if(App.Project.viewPointPos!=undefined)
+      {
+          self.__zoomScale = App.Project.viewPointPos.scale;
+          self.__sceneInViewPoint.left = App.Project.viewPointPos.left;
+          self.__sceneInViewPoint.top = App.Project.viewPointPos.top;
+          self.__curLevel = App.Project.viewPointPos.level;
+
+          self.__viewPoint(true);
+          self.__genTiles();            
+      }
       self.__bindEvent()
       self.__initComment();
     },
