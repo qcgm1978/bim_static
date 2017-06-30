@@ -718,11 +718,10 @@ App.Project = {
 
 	//保存批注
 	dwgViewer.prototype.saveCommentDwg = function() {
-
 		var that = this;
 		this.dwgView.getCommentData(function(object) {
 			var data ={};
-			data.image = object.commentData.image.replace('data:image/png;base64,', '');
+			data.image = object./*commentData.*/image.replace('data:image/png;base64,', '');
 			that.data = data;
 			SingleComment.saveCommentDialog(); 
 
