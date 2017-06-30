@@ -48,7 +48,7 @@ topNav 头部导航
 
 四： fis3 release -w 监听代码改变构建改变部分，且自动刷新浏览器
 
-注意：执行 fis3 release -wL 在IE8 下 livereload.js 会报错，这是fis3 自动监听的问题，如果要在IE8 下查看，不要执行此命令
+注意：执行 fis3 release -w 在IE8 下 livereload.js 会报错，这是fis3 自动监听的问题，如果要在IE8 下查看，不要执行此命令
 
       切记模块间相互依赖！！！，遇到公共的部分抽取出来。
 

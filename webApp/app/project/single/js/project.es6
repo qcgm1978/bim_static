@@ -721,9 +721,9 @@ App.Project = {
 		var that = this;
 		this.dwgView.getCommentData(function(object) {
 			var data ={};
-			data.image = object.commentData.image.replace('data:image/png;base64,', '');
+			data.image = object./*commentData.*/image.replace('data:image/png;base64,', '');
 			that.data = data;
-			SingleComment.saveCommentDialog(); 
+			SingleComment.saveCommentDialog();
 
 			/*
 			data.image = data.image.replace('data:image/png;base64,', '');
