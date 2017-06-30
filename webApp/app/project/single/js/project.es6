@@ -828,8 +828,8 @@ App.Project = {
 		saveComment(type, dialog, commentData, callback) {
 			var dwgView = App.Project.Settings.Viewer.dwgView;
         	var dwgState = {
-        		left : dwgView.__viewLeft,
-        		top : dwgView.__viewTop,
+        		left : dwgView.__sceneInViewPoint.left,
+        		top : dwgView.__sceneInViewPoint.top,
         		scale : dwgView.__zoomScale,
         		level : dwgView.__curLevel,
         		device : "PC"
